@@ -109,7 +109,7 @@ static void setItems(const SLAndroidBufferItem *pItems, SLuint32 itemsLength,
                     //SL_LOGD("Found DISCONTINUITYevent=%d", pBuff->mItems.mTsCmdData.mTsCmdCode);
                 } else if (pItems->itemSize == sizeof(SLAuint64)) {
                     pBuff->mItems.mTsCmdData.mTsCmdCode |= ANDROID_MP2TSEVENT_DISCON_NEWPTS;
-                    pBuff->mItems.mTsCmdData.mPts = *((SLAuint64*)pItems->itemData);
+		    memcpy(&pBuff->mItems.mTsCmdData.mPts, pItems->itemData, sizeof(SLAuint64));
                     //SL_LOGD("Found PTS=%lld", pBuff->mItems.mTsCmdData.mPts);
                 } else {
                     SL_LOGE("Invalid item parameter size %u for MPEG-2 PTS, ignoring value",
