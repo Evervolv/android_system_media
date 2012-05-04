@@ -124,7 +124,8 @@ static void setItems(const SLAndroidBufferItem *pItems, SLuint32 itemsLength,
                     SL_LOGV("Received format change with no data == full format change");
                     pBuff->mItems.mTsCmdData.mTsCmdCode |= ANDROID_MP2TSEVENT_FORMAT_CHANGE_FULL;
                 } else if (pItems->itemSize == sizeof(SLuint32)) {
-                    XAuint32 formatData = *((XAuint32*)pItems->itemData);
+                    XAuint32 formatData;// = *((XAuint32*)pItems->itemData);
+		    memcpy(&formatData, pItems->itemData, sizeof(XAuint32));
                     // intentionally only supporting video change when reading which specific
                     //    stream has changed, interpret other changes as full change
                     if (formatData == XA_ANDROID_FORMATCHANGE_ITEMDATA_VIDEO) {
