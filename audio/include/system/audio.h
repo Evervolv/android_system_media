@@ -814,6 +814,10 @@ typedef enum {
                                          // start voip over voice path.
     AUDIO_OUTPUT_FLAG_COMPRESS_PASSTHROUGH = 0x1000, // flag for HDMI compressed passthrough
     AUDIO_OUTPUT_FLAG_DIRECT_PCM = 0x2000, // flag for Direct PCM
+#ifdef QCOM_HARDWARE
+    AUDIO_OUTPUT_FLAG_LPA = 0x4000, // flag for LPA
+    AUDIO_OUTPUT_FLAG_TUNNEL = 0x8000, // flag for Tunnel
+#endif
 } audio_output_flags_t;
 
 /* The audio input flags are analogous to audio output flags.
