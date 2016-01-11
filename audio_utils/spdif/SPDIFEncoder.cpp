@@ -47,7 +47,7 @@ SPDIFEncoder::SPDIFEncoder(audio_format_t format)
     switch(format) {
         case AUDIO_FORMAT_AC3:
         case AUDIO_FORMAT_E_AC3:
-            mFramer = new AC3FrameScanner();
+            mFramer = new AC3FrameScanner(format);
             break;
         case AUDIO_FORMAT_DTS:
         case AUDIO_FORMAT_DTS_HD:
