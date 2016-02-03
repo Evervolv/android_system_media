@@ -238,7 +238,7 @@ bool AC3FrameScanner::parseHeader()
         mAudioBlocksPerSyncFrame = 6;
     }
     ALOGI_IF((mFormatDumpCount == 0),
-            "AC3 frame rate = %d * %d, size = %d, audioBlocksPerSyncFrame = %d\n",
+            "AC3 frame rate = %d * %d, size = %zu, audioBlocksPerSyncFrame = %d\n",
             mSampleRate, mRateMultiplier, mFrameSizeBytes, mAudioBlocksPerSyncFrame);
     mFormatDumpCount++;
     return true;

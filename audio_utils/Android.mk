@@ -16,6 +16,7 @@ LOCAL_SRC_FILES:= \
 	roundup.c \
 	echo_reference.c
 
+LOCAL_CFLAGS := -Wno-unused-parameter
 LOCAL_C_INCLUDES += $(call include-path-for, speex)
 LOCAL_C_INCLUDES += \
 	$(call include-path-for, speex) \
@@ -40,7 +41,7 @@ LOCAL_SRC_FILES := \
 	roundup.c
 LOCAL_C_INCLUDES += \
 	$(call include-path-for, audio-utils)
-LOCAL_CFLAGS := -D__unused=
+LOCAL_CFLAGS := -D__unused= -Wno-unused-parameter
 include $(BUILD_HOST_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -83,6 +84,7 @@ LOCAL_SRC_FILES := \
 	primitives.c \
 	roundup.c
 
+LOCAL_CFLAGS := -Wno-unused-parameter
 LOCAL_C_INCLUDES += \
 	$(call include-path-for, audio-utils)
 
