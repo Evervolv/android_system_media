@@ -129,7 +129,7 @@ bool DTSFrameScanner::parseHeader()
 
     mRateMultiplier = 1; // TODO what about "frequency extension"?
     ALOGI_IF((mFormatDumpCount == 0),
-            "DTS frame rate = %d * %d, size = %d\n",
+            "DTS frame rate = %d * %d, size = %zu\n",
             mSampleRate, mRateMultiplier, mFrameSizeBytes);
     mFormatDumpCount++;
     return true;
