@@ -199,9 +199,15 @@ camera_metadata_t *allocate_camera_metadata(size_t entry_capacity,
     size_t memory_needed = calculate_camera_metadata_size(entry_capacity,
                                                           data_capacity);
     void *buffer = malloc(memory_needed);
-    return place_camera_metadata(buffer, memory_needed,
-                                 entry_capacity,
-                                 data_capacity);
+    camera_metadata_t *metadata = place_camera_metadata(
+        buffer, memory_needed, entry_capacity, data_capacity);
+    if (!metadata) {
+        /* This should not happen when memory_needed is the same
+         * calculated in this function and in place_camera_metadata.
+         */
+        free(buffer);
+    }
+    return metadata;
 }
 
 camera_metadata_t *place_camera_metadata(void *dst,
