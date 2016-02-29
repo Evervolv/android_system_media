@@ -23,6 +23,7 @@
 #include <set>
 #include <vector>
 
+#include <base/bind.h>
 #include <base/files/file_path.h>
 #include <gtest/gtest_prod.h>
 #include <linux/input.h>
@@ -58,6 +59,33 @@ class AudioDeviceHandler {
   //
   // |aps| is a pointer to the binder object.
   void APSConnect(android::sp<android::IAudioPolicyService> aps);
+
+  // Get the list of connected devices.
+  //
+  // |devices_list| is the vector to copy list of connected input devices to.
+  void GetInputDevices(std::vector<int>* devices_list);
+
+  // Get the list of connected output devices.
+  //
+  // |devices_list| is the vector to copy the list of connected output devices
+  // to.
+  void GetOutputDevices(std::vector<int>* devices_list);
+
+  // Enum used to represent whether devices are being connected or not. This is
+  // used when triggering callbacks.
+  enum DeviceConnectionState {
+    kDevicesConnected,
+    kDevicesDisconnected
+  };
+
+  // Register a callback function to call when device state changes.
+  //
+  // |callback| is an object of type base::Callback that accepts a
+  // DeviceConnectionState and a vector of ints. See DeviceCallback() in
+  // audio_daemon.h.
+  void RegisterDeviceCallback(
+      base::Callback<void(DeviceConnectionState,
+                          const std::vector<int>& )>& callback);
 
  private:
   friend class AudioDeviceHandlerTest;
@@ -125,6 +153,11 @@ class AudioDeviceHandler {
   // Disconnect all supported audio devices.
   void DisconnectAllSupportedDevices();
 
+  // Trigger a callback when a device is either connected or disconnected.
+  //
+  // |state| is kDevicesConnected when |devices| are being connected.
+  virtual void TriggerCallback(DeviceConnectionState state);
+
   // All input devices currently supported by AudioDeviceHandler.
   std::vector<audio_devices_t> kSupportedInputDevices_{
       AUDIO_DEVICE_IN_WIRED_HEADSET};
@@ -139,12 +172,17 @@ class AudioDeviceHandler {
   std::set<audio_devices_t> connected_input_devices_;
   // Set of connected output devices.
   std::set<audio_devices_t> connected_output_devices_;
+  // Vector of devices changed (used for callbacks to clients).
+  std::vector<int> changed_devices_;
   // Keeps track of whether a headphone has been connected. Used by ProcessEvent
   // and UpdateAudioSystem.
   bool headphone_;
   // Keeps track of whether a microphone has been connected. Used by
   // ProcessEvent and UpdateAudioSystem.
   bool microphone_;
+  // Callback object to call when device state changes.
+  base::Callback<void(DeviceConnectionState,
+                      const std::vector<int>& )> callback_;
 };
 
 }  // namespace brillo
