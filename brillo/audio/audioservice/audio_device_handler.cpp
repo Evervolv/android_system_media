@@ -19,6 +19,7 @@
 
 #include <base/files/file.h>
 #include <base/logging.h>
+#include <brillo/message_loops/message_loop.h>
 #include <media/AudioSystem.h>
 
 namespace brillo {
@@ -31,6 +32,35 @@ AudioDeviceHandler::AudioDeviceHandler() {
 }
 
 AudioDeviceHandler::~AudioDeviceHandler() {}
+
+void AudioDeviceHandler::GetInputDevices(std::vector<int>* devices_list) {
+  std::copy(connected_input_devices_.begin(),
+            connected_input_devices_.end(),
+            std::back_inserter(*devices_list));
+}
+
+void AudioDeviceHandler::GetOutputDevices(std::vector<int>* devices_list) {
+  std::copy(connected_output_devices_.begin(),
+            connected_output_devices_.end(),
+            std::back_inserter(*devices_list));
+}
+
+void AudioDeviceHandler::RegisterDeviceCallback(
+      base::Callback<void(DeviceConnectionState,
+                          const std::vector<int>& )>& callback) {
+  callback_ = callback;
+}
+
+void AudioDeviceHandler::TriggerCallback(DeviceConnectionState state) {
+  // If no devices have changed, don't bother triggering a callback.
+  if (changed_devices_.size() == 0)
+    return;
+  base::Closure closure = base::Bind(callback_, state, changed_devices_);
+  MessageLoop::current()->PostTask(closure);
+  // We can clear changed_devices_ here since base::Bind makes a copy of
+  // changed_devices_.
+  changed_devices_.clear();
+}
 
 void AudioDeviceHandler::APSDisconnect() {
   aps_.clear();
@@ -54,6 +84,7 @@ void AudioDeviceHandler::Init(android::sp<android::IAudioPolicyService> aps) {
   // was previously told.
   VLOG(1) << "Calling DisconnectAllSupportedDevices.";
   DisconnectAllSupportedDevices();
+  TriggerCallback(kDevicesDisconnected);
 
   // Get headphone jack state and update audio policy service with new state.
   VLOG(1) << "Calling ReadInitialAudioDeviceState.";
@@ -104,6 +135,7 @@ void AudioDeviceHandler::ConnectAudioDevice(audio_devices_t device) {
     connected_input_devices_.insert(device);
   else
     connected_output_devices_.insert(device);
+  changed_devices_.push_back(device);
 }
 
 void AudioDeviceHandler::DisconnectAudioDevice(audio_devices_t device) {
@@ -113,6 +145,7 @@ void AudioDeviceHandler::DisconnectAudioDevice(audio_devices_t device) {
     connected_input_devices_.erase(device);
   else
     connected_output_devices_.erase(device);
+  changed_devices_.push_back(device);
 }
 
 void AudioDeviceHandler::DisconnectAllSupportedDevices() {
@@ -147,7 +180,11 @@ void AudioDeviceHandler::UpdateAudioSystem(bool headphone, bool microphone) {
     // No devices are connected. Inform the audio policy service that all
     // connected devices have been disconnected.
     DisconnectAllConnectedDevices();
+    TriggerCallback(kDevicesDisconnected);
+    return;
   }
+  TriggerCallback(kDevicesConnected);
+  return;
 }
 
 void AudioDeviceHandler::ProcessEvent(const struct input_event& event) {
