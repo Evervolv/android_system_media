@@ -32,7 +32,7 @@
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
-#define PERIOD_SIZE_US (5 * 1000)
+#define PERIOD_DURATION_US (5 * 1000)
 
 #define DEFAULT_PERIOD_SIZE 1024
 
@@ -113,7 +113,7 @@ unsigned profile_calc_min_period_size(alsa_device_profile* profile, unsigned sam
     if (profile == NULL) {
         return DEFAULT_PERIOD_SIZE;
     } else {
-        unsigned period_us = property_get_int32("ro.audio.usb.period_us", PERIOD_SIZE_US);
+        unsigned period_us = property_get_int32("ro.audio.usb.period_us", PERIOD_DURATION_US);
         unsigned num_sample_frames = ((uint64_t)sample_rate * period_us) / 1000000;
 
         if (num_sample_frames < profile->min_period_size) {
