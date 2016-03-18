@@ -96,8 +96,8 @@ void AudioDeviceHandler::GetInitialAudioDeviceState(
   base::File file(path, base::File::FLAG_OPEN | base::File::FLAG_READ);
   if (!file.IsValid()) {
     LOG(WARNING) << "Kernel does not have wired headset support. Could not "
-                 << "open " << path.value() << "( "
-                 << base::File::ErrorToString(file.error_details()) << " ).";
+                 << "open " << path.value() << " ("
+                 << base::File::ErrorToString(file.error_details()) << ").";
     return;
   }
   int state = 0;
