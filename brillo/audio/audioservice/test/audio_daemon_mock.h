@@ -33,10 +33,10 @@ class AudioDaemonMock : public AudioDaemon {
  private:
   friend class AudioDaemonTest;
   FRIEND_TEST(AudioDaemonTest, RegisterService);
-  FRIEND_TEST(AudioDaemonTest, TestAPSConnectInitializesHandlerOnlyOnce);
+  FRIEND_TEST(AudioDaemonTest, TestAPSConnectInitializesHandlersOnlyOnce);
   FRIEND_TEST(AudioDaemonTest, TestDeviceCallbackInitializesBASIfNULL);
 
-  MOCK_METHOD0(InitializeHandler, void());
+  MOCK_METHOD0(InitializeHandlers, void());
 };
 
 }  // namespace brillo
