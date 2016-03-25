@@ -103,7 +103,7 @@ void SPDIFEncoder::writeBurstBufferShorts(const uint16_t *buffer, size_t numShor
     mByteCursor = (mByteCursor + 1) & ~1; // round up to even byte
     size_t bytesToWrite = numShorts * sizeof(uint16_t);
     if ((mByteCursor + bytesToWrite) > mBurstBufferSizeBytes) {
-        ALOGE("SPDIFEncoder: Burst buffer overflow!\n");
+        ALOGE("SPDIFEncoder: Burst buffer overflow!");
         reset();
         return;
     }
@@ -123,7 +123,7 @@ void SPDIFEncoder::writeBurstBufferBytes(const uint8_t *buffer, size_t numBytes)
 {
     size_t bytesToWrite = numBytes;
     if ((mByteCursor + bytesToWrite) > mBurstBufferSizeBytes) {
-        ALOGE("SPDIFEncoder: Burst buffer overflow!\n");
+        ALOGE("SPDIFEncoder: Burst buffer overflow!");
         clearBurstBuffer();
         return;
     }
