@@ -29,6 +29,7 @@ LOCAL_SHARED_LIBRARIES := \
 	liblog \
 	libspeexresampler
 
+LOCAL_CFLAGS := -Werror -Wall
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -44,7 +45,9 @@ LOCAL_SRC_FILES := \
 	roundup.c
 LOCAL_C_INCLUDES += \
 	$(call include-path-for, audio-utils)
-LOCAL_CFLAGS := -D__unused= -Wno-unused-parameter
+LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CFLAGS += -D__unused='__attribute__((unused))'
+#LOCAL_CFLAGS += -Wno-unused-parameter
 include $(BUILD_HOST_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -58,7 +61,8 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES += \
 	$(call include-path-for, audio-utils)
 
-LOCAL_CFLAGS := -UHAVE_STDERR
+LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CFLAGS += -UHAVE_STDERR
 
 include $(BUILD_STATIC_LIBRARY)
 
@@ -75,6 +79,8 @@ LOCAL_C_INCLUDES += \
 
 #LOCAL_SHARED_LIBRARIES := libaudioutils
 
+LOCAL_CFLAGS := -Werror -Wall
+
 include $(BUILD_HOST_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -90,6 +96,8 @@ LOCAL_SRC_FILES := \
 LOCAL_CFLAGS := -Wno-unused-parameter
 LOCAL_C_INCLUDES += \
 	$(call include-path-for, audio-utils)
+
+LOCAL_CFLAGS := -Werror -Wall
 
 include $(BUILD_STATIC_LIBRARY)
 
