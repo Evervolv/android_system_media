@@ -40,7 +40,7 @@ LOCAL_SRC_FILES := \
   main_audio_service.cpp
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
 LOCAL_SHARED_LIBRARIES := $(audio_service_shared_libraries)
-LOCAL_CFLAGS := -Wall
+LOCAL_CFLAGS := -Werror -Wall
 LOCAL_INIT_RC := brilloaudioserv.rc
 include $(BUILD_EXECUTABLE)
 
@@ -61,5 +61,6 @@ LOCAL_STATIC_LIBRARIES := \
   libBionicGtestMain \
   libchrome_test_helpers \
   libgmock
-LOCAL_CFLAGS := -Wno-sign-compare -Wall
+LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CFLAGS += -Wno-sign-compare
 include $(BUILD_NATIVE_TEST)
