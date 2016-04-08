@@ -24,6 +24,16 @@ audio_service_shared_libraries := \
   libmedia \
   libutils
 
+audio_client_sources := \
+  aidl/android/brillo/brilloaudioservice/IAudioServiceCallback.aidl \
+  aidl/android/brillo/brilloaudioservice/IBrilloAudioService.aidl \
+  audio_service_callback.cpp \
+  brillo_audio_client.cpp \
+  brillo_audio_client_helpers.cpp \
+  brillo_audio_device_info.cpp \
+  brillo_audio_device_info_internal.cpp \
+  brillo_audio_manager.cpp
+
 audio_service_sources := \
   aidl/android/brillo/brilloaudioservice/IAudioServiceCallback.aidl \
   aidl/android/brillo/brilloaudioservice/IBrilloAudioService.aidl \
@@ -44,7 +54,18 @@ LOCAL_CFLAGS := -Wall
 LOCAL_INIT_RC := brilloaudioserv.rc
 include $(BUILD_EXECUTABLE)
 
-# Unit tests for audio device handler.
+# Audio client library.
+# =============================================================================
+include $(CLEAR_VARS)
+LOCAL_MODULE := libbrilloaudio
+LOCAL_SRC_FILES := \
+  $(audio_client_sources)
+LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
+LOCAL_SHARED_LIBRARIES := $(audio_service_shared_libraries)
+LOCAL_CFLAGS := -Wall -std=c++14
+include $(BUILD_SHARED_LIBRARY)
+
+# Unit tests for the Brillo audio service.
 # =============================================================================
 include $(CLEAR_VARS)
 LOCAL_MODULE := brilloaudioservice_test
@@ -52,6 +73,26 @@ LOCAL_SRC_FILES := \
   $(audio_service_sources) \
   test/audio_daemon_test.cpp \
   test/audio_device_handler_test.cpp
+LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
+LOCAL_C_INCLUDES := external/gtest/include
+LOCAL_SHARED_LIBRARIES := \
+  $(audio_service_shared_libraries) \
+  libbinderwrapper_test_support
+LOCAL_STATIC_LIBRARIES := \
+  libBionicGtestMain \
+  libchrome_test_helpers \
+  libgmock
+LOCAL_CFLAGS := -Wno-sign-compare -Wall
+include $(BUILD_NATIVE_TEST)
+
+# Unit tests for the Brillo audio client.
+# =============================================================================
+include $(CLEAR_VARS)
+LOCAL_MODULE := brilloaudioclient_test
+LOCAL_SRC_FILES := \
+  $(audio_client_sources) \
+  test/audio_service_callback_test.cpp \
+  test/brillo_audio_device_info_internal_test.cpp
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
 LOCAL_C_INCLUDES := external/gtest/include
 LOCAL_SHARED_LIBRARIES := \
