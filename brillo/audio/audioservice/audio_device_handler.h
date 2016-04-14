@@ -71,6 +71,15 @@ class AudioDeviceHandler {
   // to.
   void GetOutputDevices(std::vector<int>* devices_list);
 
+  // Set device.
+  //
+  // |usage| is an int of type audio_policy_force_use_t
+  // |config| is an int of type audio_policy_forced_cfg_t.
+  //
+  // Returns 0 on sucess and errno on failure.
+  int SetDevice(audio_policy_force_use_t usage,
+                audio_policy_forced_cfg_t config);
+
   // Enum used to represent whether devices are being connected or not. This is
   // used when triggering callbacks.
   enum DeviceConnectionState {

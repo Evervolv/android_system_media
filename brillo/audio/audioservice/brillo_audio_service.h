@@ -37,7 +37,7 @@ class BrilloAudioService : public BnBrilloAudioService {
  public:
   // From AIDL.
   Status GetDevices(int flag, std::vector<int>* _aidl_return);
-
+  Status SetDevice(int usage, int config);
   Status RegisterServiceCallback(
       const android::sp<IAudioServiceCallback>& callback);
   Status UnregisterServiceCallback(
