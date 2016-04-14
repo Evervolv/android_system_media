@@ -32,6 +32,11 @@ interface IBrilloAudioService {
   // return input devices. Otherwise, return output devices.
   int[] GetDevices(int flag);
 
+  // Set device for a given usage.
+  // usage is an int of type audio_policy_force_use_t.
+  // config is an int of type audio_policy_forced_cfg_t.
+  void SetDevice(int usage, int config);
+
   // Register a callback object with the service.
   void RegisterServiceCallback(IAudioServiceCallback callback);
 

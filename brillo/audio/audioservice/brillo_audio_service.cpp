@@ -24,9 +24,9 @@ namespace brillo {
 Status BrilloAudioService::GetDevices(int flag,
                                       std::vector<int>* _aidl_return) {
   auto device_handler = audio_device_handler_.lock();
-  if (device_handler) {
-    return Status::fromExceptionCode(
-        Status::EX_SERVICE_SPECIFIC,
+  if (!device_handler) {
+    return Status::fromServiceSpecificError(
+        EREMOTEIO,
         android::String8("The audio device handler died."));
   }
   if (flag == BrilloAudioService::GET_DEVICES_INPUTS) {
@@ -34,9 +34,24 @@ Status BrilloAudioService::GetDevices(int flag,
   } else if (flag == BrilloAudioService::GET_DEVICES_OUTPUTS) {
     device_handler->GetOutputDevices(_aidl_return);
   } else {
-    return Status::fromExceptionCode(Status::EX_SERVICE_SPECIFIC,
-                                     android::String8("Invalid flag."));
+    return Status::fromServiceSpecificError(EINVAL,
+                                            android::String8("Invalid flag."));
   }
+  return Status::ok();
+}
+
+Status BrilloAudioService::SetDevice(int usage, int config) {
+  auto device_handler = audio_device_handler_.lock();
+  if (!device_handler) {
+    return Status::fromServiceSpecificError(
+        EREMOTEIO,
+        android::String8("The audio device handler died."));
+  }
+  int rc = device_handler->SetDevice(
+      static_cast<audio_policy_force_use_t>(usage),
+      static_cast<audio_policy_forced_cfg_t>(config));
+  if (rc)
+    return Status::fromServiceSpecificError(rc);
   return Status::ok();
 }
 

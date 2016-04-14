@@ -128,6 +128,17 @@ void AudioDeviceHandler::NotifyAudioPolicyService(
   aps_->setDeviceConnectionState(device, state, "", "");
 }
 
+int AudioDeviceHandler::SetDevice(audio_policy_force_use_t usage,
+                                  audio_policy_forced_cfg_t config) {
+  if (aps_ == nullptr) {
+    LOG(WARNING) << "Audio policy service cannot be reached. Please try again.";
+    return EAGAIN;
+  }
+  VLOG(1) << "Calling audio policy service to set " << usage << " to "
+          << config;
+  return aps_->setForceUse(usage, config);
+}
+
 void AudioDeviceHandler::ConnectAudioDevice(audio_devices_t device) {
   audio_policy_dev_state_t state = AUDIO_POLICY_DEVICE_STATE_AVAILABLE;
   NotifyAudioPolicyService(device, state);
