@@ -55,7 +55,7 @@ Status AudioServiceCallback::OnAudioDevicesDisconnected(
   return Status::ok();
 }
 
-bool AudioServiceCallback::Equals(AudioServiceCallback* callback) {
+bool AudioServiceCallback::Equals(android::sp<AudioServiceCallback> callback) {
   if (callback->connected_callback_.Equals(connected_callback_) &&
       callback->disconnected_callback_.Equals(disconnected_callback_) &&
       callback->user_data_ == user_data_)

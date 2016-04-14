@@ -47,7 +47,8 @@ int BAudioManager_getDevices(
     const BAudioManager* brillo_audio_manager, int flag,
     BAudioDeviceInfo* device_array[], unsigned int size,
     unsigned int* num_devices) {
-  if (!brillo_audio_manager || !num_devices)
+  if (!brillo_audio_manager || !num_devices ||
+      (flag != GET_DEVICES_INPUTS && flag != GET_DEVICES_OUTPUTS))
     return EINVAL;
   auto client = brillo_audio_manager->client_.lock();
   if (!client) {
@@ -94,23 +95,23 @@ int BAudioManager_setOutputDevice(
                            device->internal_->GetConfig());
 }
 
-int BAudioManager_registerAudioDeviceCallback(
+int BAudioManager_registerAudioCallback(
     const BAudioManager* brillo_audio_manager, const BAudioCallback* callback,
     void* user_data, int* callback_id) {
   if (!brillo_audio_manager || !callback || !callback_id)
     return EINVAL;
-  // This copies the BAudioCallback into AudioServiceCallback so the
-  // BAudioCallback can be safely deleted.
   auto client = brillo_audio_manager->client_.lock();
   if (!client) {
     *callback_id = 0;
     return ECONNABORTED;
   }
+  // This copies the BAudioCallback into AudioServiceCallback so the
+  // BAudioCallback can be safely deleted.
   return client->RegisterAudioCallback(
       new AudioServiceCallback(callback, user_data), callback_id);
 }
 
-int BAudioManager_unregisterAudioDeviceCallback(
+int BAudioManager_unregisterAudioCallback(
     const BAudioManager* brillo_audio_manager, int callback_id) {
   if (!brillo_audio_manager)
     return EINVAL;
