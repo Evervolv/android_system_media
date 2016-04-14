@@ -88,10 +88,6 @@ class BrilloAudioClient {
   // reconnect to the service.
   void OnBASDisconnect();
 
-  // Callback to be triggered when the audio policy service dies. It attempts to
-  // reconnect to the service.
-  void OnAPSDisconnect();
-
   // Helper method to connect to a service and register a callback to receive
   // death notifications.
   //
@@ -105,8 +101,6 @@ class BrilloAudioClient {
 
   // Used to generate weak_ptr to BrilloAudioClient for use in base::Bind.
   base::WeakPtrFactory<BrilloAudioClient> weak_ptr_factory_{this};
-  // Pointer to the audio policy service.
-  android::sp<android::IAudioPolicyService> aps_;
   // Pointer to the brillo audio service.
   android::sp<IBrilloAudioService> brillo_audio_service_;
   // Counter for callback IDs.
