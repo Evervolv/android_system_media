@@ -30,7 +30,6 @@ namespace brillo {
 
 static const char kBrilloAudioServiceName[] =
     "android.brillo.brilloaudioservice.BrilloAudioService";
-static const char kAudioPolicyServiceName[] = "media.audio_policy";
 
 std::shared_ptr<BrilloAudioClient> BrilloAudioClient::instance_ = nullptr;
 
@@ -66,12 +65,6 @@ void BrilloAudioClient::OnBASDisconnect() {
   instance_.reset();
 }
 
-void BrilloAudioClient::OnAPSDisconnect() {
-  LOG(ERROR) << "The audio policy service died! Please reset the "
-             << "BAudioManager.";
-  instance_.reset();
-}
-
 bool BrilloAudioClient::Initialize() {
   auto service = ConnectToService(
       kBrilloAudioServiceName, base::Bind(&BrilloAudioClient::OnBASDisconnect,
@@ -81,14 +74,6 @@ bool BrilloAudioClient::Initialize() {
     return false;
   }
   brillo_audio_service_ = android::interface_cast<IBrilloAudioService>(service);
-  service = ConnectToService(kAudioPolicyServiceName,
-                             base::Bind(&BrilloAudioClient::OnAPSDisconnect,
-                                        weak_ptr_factory_.GetWeakPtr()));
-  if (!service.get()) {
-    LOG(ERROR) << "Could not connect to audio policy service.";
-    return false;
-  }
-  aps_ = android::interface_cast<android::IAudioPolicyService>(service);
   return true;
 }
 
@@ -106,11 +91,12 @@ int BrilloAudioClient::GetDevices(int flag, std::vector<int>& devices) {
 
 int BrilloAudioClient::SetDevice(audio_policy_force_use_t usage,
                                  audio_policy_forced_cfg_t config) {
-  if (!aps_.get()) {
-    OnAPSDisconnect();
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
     return ECONNABORTED;
   }
-  return aps_->setForceUse(usage, config);
+  auto status = brillo_audio_service_->SetDevice(usage, config);
+  return status.exceptionCode();
 }
 
 int BrilloAudioClient::RegisterAudioCallback(AudioServiceCallback* callback,
