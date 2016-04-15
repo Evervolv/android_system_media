@@ -27,4 +27,9 @@ interface IAudioServiceCallback {
 
   // Oneway call triggered when audio devices are disconnected from the system.
   oneway void OnAudioDevicesDisconnected(in int[] removed_devices);
+
+  // Oneway call triggered when the volume is changed. If there are
+  // multiple active streams, this call will be called multiple times.
+  oneway void OnVolumeChanged(
+      int stream_type, int old_volume_index, int new_volume_index);
 }
