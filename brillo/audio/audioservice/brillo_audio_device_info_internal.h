@@ -54,6 +54,11 @@ class BAudioDeviceInfoInternal {
   // Returns an int which is the device_id.
   int GetDeviceId();
 
+  // Get audio_devices_t that corresponds to device_id;
+  //
+  // Returns an audio_devices_t.
+  audio_devices_t GetAudioDevicesT();
+
  private:
   FRIEND_TEST(BrilloAudioDeviceInfoInternalTest, InWiredHeadset);
   FRIEND_TEST(BrilloAudioDeviceInfoInternalTest, OutWiredHeadset);

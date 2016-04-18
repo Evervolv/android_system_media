@@ -21,6 +21,7 @@
 #include <binder/Status.h>
 #include <binderwrapper/binder_wrapper.h>
 
+#include "brillo_audio_client_helpers.h"
 #include "brillo_audio_device_info_def.h"
 #include "brillo_audio_device_info_internal.h"
 
@@ -95,6 +96,90 @@ int BrilloAudioClient::SetDevice(audio_policy_force_use_t usage,
     return ECONNABORTED;
   }
   auto status = brillo_audio_service_->SetDevice(usage, config);
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::GetMaxVolumeSteps(BAudioUsage usage, int* max_steps) {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->GetMaxVolumeSteps(
+      BrilloAudioClientHelpers::GetStreamType(usage), max_steps);
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::SetMaxVolumeSteps(BAudioUsage usage, int max_steps) {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->SetMaxVolumeSteps(
+      BrilloAudioClientHelpers::GetStreamType(usage), max_steps);
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::SetVolumeIndex(BAudioUsage usage,
+                                      audio_devices_t device,
+                                      int index) {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->SetVolumeIndex(
+      BrilloAudioClientHelpers::GetStreamType(usage), device, index);
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::GetVolumeIndex(BAudioUsage usage,
+                                      audio_devices_t device,
+                                      int* index) {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->GetVolumeIndex(
+      BrilloAudioClientHelpers::GetStreamType(usage), device, index);
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::GetVolumeControlStream(BAudioUsage* usage) {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  int stream;
+  auto status = brillo_audio_service_->GetVolumeControlStream(&stream);
+  *usage = BrilloAudioClientHelpers::GetBAudioUsage(
+      static_cast<audio_stream_type_t>(stream));
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::SetVolumeControlStream(BAudioUsage usage) {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->SetVolumeControlStream(
+      BrilloAudioClientHelpers::GetStreamType(usage));
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::IncrementVolume() {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->IncrementVolume();
+  return status.serviceSpecificErrorCode();
+}
+
+int BrilloAudioClient::DecrementVolume() {
+  if (!brillo_audio_service_.get()) {
+    OnBASDisconnect();
+    return ECONNABORTED;
+  }
+  auto status = brillo_audio_service_->DecrementVolume();
   return status.serviceSpecificErrorCode();
 }
 

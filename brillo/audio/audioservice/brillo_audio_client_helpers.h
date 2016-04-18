@@ -29,6 +29,8 @@ namespace brillo {
 class BrilloAudioClientHelpers {
  public:
   static audio_policy_force_use_t GetForceUse(BAudioUsage usage);
+  static audio_stream_type_t GetStreamType(BAudioUsage usage);
+  static BAudioUsage GetBAudioUsage(audio_stream_type_t stream);
 };
 
 }  // namespace brillo
