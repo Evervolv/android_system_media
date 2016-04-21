@@ -13,21 +13,20 @@
 // limitations under the License.
 //
 
-// Implementation of brillo_audio_service.h
+// Implementation of brillo_audio_service_impl.h
 
-#include "brillo_audio_service.h"
+#include "brillo_audio_service_impl.h"
 
 using android::binder::Status;
 
 namespace brillo {
 
-Status BrilloAudioService::GetDevices(int flag,
-                                      std::vector<int>* _aidl_return) {
+Status BrilloAudioServiceImpl::GetDevices(int flag,
+                                          std::vector<int>* _aidl_return) {
   auto device_handler = audio_device_handler_.lock();
   if (!device_handler) {
     return Status::fromServiceSpecificError(
-        EREMOTEIO,
-        android::String8("The audio device handler died."));
+        EREMOTEIO, android::String8("The audio device handler died."));
   }
   if (flag == BrilloAudioService::GET_DEVICES_INPUTS) {
     device_handler->GetInputDevices(_aidl_return);
@@ -40,45 +39,45 @@ Status BrilloAudioService::GetDevices(int flag,
   return Status::ok();
 }
 
-Status BrilloAudioService::SetDevice(int usage, int config) {
+Status BrilloAudioServiceImpl::SetDevice(int usage, int config) {
   auto device_handler = audio_device_handler_.lock();
   if (!device_handler) {
     return Status::fromServiceSpecificError(
-        EREMOTEIO,
-        android::String8("The audio device handler died."));
+        EREMOTEIO, android::String8("The audio device handler died."));
   }
-  int rc = device_handler->SetDevice(
-      static_cast<audio_policy_force_use_t>(usage),
-      static_cast<audio_policy_forced_cfg_t>(config));
-  if (rc)
-    return Status::fromServiceSpecificError(rc);
+  int rc =
+      device_handler->SetDevice(static_cast<audio_policy_force_use_t>(usage),
+                                static_cast<audio_policy_forced_cfg_t>(config));
+  if (rc) return Status::fromServiceSpecificError(rc);
   return Status::ok();
 }
 
-Status BrilloAudioService::RegisterServiceCallback(
+Status BrilloAudioServiceImpl::RegisterServiceCallback(
     const android::sp<IAudioServiceCallback>& callback) {
   callbacks_set_.insert(callback);
   return Status::ok();
 }
 
-Status BrilloAudioService::UnregisterServiceCallback(
+Status BrilloAudioServiceImpl::UnregisterServiceCallback(
     const android::sp<IAudioServiceCallback>& callback) {
   callbacks_set_.erase(callback);
   return Status::ok();
 }
 
-void BrilloAudioService::RegisterDeviceHandler(
+void BrilloAudioServiceImpl::RegisterDeviceHandler(
     std::weak_ptr<AudioDeviceHandler> audio_device_handler) {
   audio_device_handler_ = audio_device_handler;
 }
 
-void BrilloAudioService::OnDevicesConnected(const std::vector<int>& devices) {
+void BrilloAudioServiceImpl::OnDevicesConnected(
+    const std::vector<int>& devices) {
   for (auto callback : callbacks_set_) {
     callback->OnAudioDevicesConnected(devices);
   }
 }
 
-void BrilloAudioService::OnDevicesDisconnected(const std::vector<int>& devices) {
+void BrilloAudioServiceImpl::OnDevicesDisconnected(
+    const std::vector<int>& devices) {
   for (auto callback : callbacks_set_) {
     callback->OnAudioDevicesDisconnected(devices);
   }
