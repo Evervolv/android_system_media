@@ -35,6 +35,7 @@ namespace brillo {
 
 class BrilloAudioClient {
  public:
+  virtual ~BrilloAudioClient();
 
   // Get or create a pointer to the client instance.
   //
@@ -51,13 +52,14 @@ class BrilloAudioClient {
 
   // Register a callback object with the service.
   //
-  // |callback| is a pointer to a callback object to be register with the
+  // |callback| is a ref pointer to a callback object to be register with the
   // brillo audio service.
   // |callback_id| is a pointer to an int that represents a callback id token on
   // success and 0 on failure.
   //
   // Returns 0 on success and errno on failure.
-  int RegisterAudioCallback(AudioServiceCallback* callback, int* callback_id);
+  int RegisterAudioCallback(android::sp<AudioServiceCallback> callback,
+                            int* callback_id);
 
   // Unregister a callback object with the service.
   //
@@ -76,8 +78,14 @@ class BrilloAudioClient {
   int SetDevice(audio_policy_force_use_t usage,
                 audio_policy_forced_cfg_t config);
 
- private:
+ protected:
   BrilloAudioClient() = default;
+
+ private:
+  friend class BrilloAudioClientTest;
+  FRIEND_TEST(BrilloAudioClientTest, InitializeNoService);
+  FRIEND_TEST(BrilloAudioClientTest,
+              CheckInitializeRegistersForDeathNotifications);
 
   // Initialize the BrilloAudioClient object and connects to the brillo audio
   // service and the audio policy service. It also registers for death
@@ -86,7 +94,7 @@ class BrilloAudioClient {
 
   // Callback to be triggered when the brillo audio service dies. It attempts to
   // reconnect to the service.
-  void OnBASDisconnect();
+  virtual void OnBASDisconnect();
 
   // Helper method to connect to a service and register a callback to receive
   // death notifications.
@@ -106,7 +114,7 @@ class BrilloAudioClient {
   // Counter for callback IDs.
   static int callback_id_counter_;
   // Map of callback ids to callback objects.
-  std::map<int, std::unique_ptr<AudioServiceCallback> > callback_map_;
+  std::map<int, android::sp<AudioServiceCallback> > callback_map_;
 
   DISALLOW_COPY_AND_ASSIGN(BrilloAudioClient);
 };
