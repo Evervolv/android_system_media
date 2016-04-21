@@ -26,7 +26,7 @@
 #include <binderwrapper/binder_wrapper.h>
 #include <linux/input.h>
 
-#include "brillo_audio_service.h"
+#include "brillo_audio_service_impl.h"
 
 namespace brillo {
 
@@ -80,7 +80,7 @@ void AudioDaemon::InitializeHandler() {
 }
 
 void AudioDaemon::InitializeBrilloAudioService() {
-  brillo_audio_service_ = new BrilloAudioService();
+  brillo_audio_service_ = new BrilloAudioServiceImpl();
   brillo_audio_service_->RegisterDeviceHandler(
       std::weak_ptr<AudioDeviceHandler>(audio_device_handler_));
   android::BinderWrapper::Get()->RegisterService(kServiceName,

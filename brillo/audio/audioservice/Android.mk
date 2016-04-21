@@ -39,7 +39,7 @@ audio_service_sources := \
   aidl/android/brillo/brilloaudioservice/IBrilloAudioService.aidl \
   audio_daemon.cpp \
   audio_device_handler.cpp \
-  brillo_audio_service.cpp
+  brillo_audio_service_impl.cpp
 
 # Audio service.
 # =============================================================================
@@ -93,7 +93,9 @@ LOCAL_MODULE := brilloaudioclient_test
 LOCAL_SRC_FILES := \
   $(audio_client_sources) \
   test/audio_service_callback_test.cpp \
-  test/brillo_audio_device_info_internal_test.cpp
+  test/brillo_audio_client_test.cpp \
+  test/brillo_audio_device_info_internal_test.cpp \
+  test/brillo_audio_manager_test.cpp
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
 LOCAL_C_INCLUDES := external/gtest/include
 LOCAL_SHARED_LIBRARIES := \

@@ -35,35 +35,31 @@ namespace brillo {
 
 class BrilloAudioService : public BnBrilloAudioService {
  public:
+  virtual ~BrilloAudioService() {}
+
   // From AIDL.
-  Status GetDevices(int flag, std::vector<int>* _aidl_return);
-  Status SetDevice(int usage, int config);
-  Status RegisterServiceCallback(
-      const android::sp<IAudioServiceCallback>& callback);
-  Status UnregisterServiceCallback(
-      const android::sp<IAudioServiceCallback>& callback);
+  virtual Status GetDevices(int flag, std::vector<int>* _aidl_return) = 0;
+  virtual Status SetDevice(int usage, int config) = 0;
+  virtual Status RegisterServiceCallback(
+      const android::sp<IAudioServiceCallback>& callback) = 0;
+  virtual Status UnregisterServiceCallback(
+      const android::sp<IAudioServiceCallback>& callback) = 0;
 
   // Register a device handler.
   //
   // |audio_device_handler| is a weak pointer to an audio device handler object.
-  void RegisterDeviceHandler(
-      std::weak_ptr<AudioDeviceHandler> audio_device_handler);
+  virtual void RegisterDeviceHandler(
+      std::weak_ptr<AudioDeviceHandler> audio_device_handler) = 0;
 
   // Callback to be called when a device is connected.
   //
   // |devices| is a vector of ints representing the audio_devices_t.
-  void OnDevicesConnected(const std::vector<int>& device);
+  virtual void OnDevicesConnected(const std::vector<int>& device) = 0;
 
   // Callback to be called when a device is disconnected.
   //
   // |devices| is a vector of ints representing the audio_devices_t.
-  void OnDevicesDisconnected(const std::vector<int>& device);
-
- private:
-  // A weak pointer to the audio device handler.
-  std::weak_ptr<AudioDeviceHandler> audio_device_handler_;
-  // List of all callbacks objects registered with the service.
-  std::set<android::sp<IAudioServiceCallback> > callbacks_set_;
+  virtual void OnDevicesDisconnected(const std::vector<int>& device) = 0;
 };
 
 }  // namespace brillo
