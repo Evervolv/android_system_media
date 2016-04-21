@@ -34,6 +34,11 @@ typedef struct BAudioManager BAudioManager;
 // Returns a pointer to a BAudioManager. Returns NULL on failure.
 BAudioManager* BAudioManager_new();
 
+// Flag to get input devices.
+static const int GET_DEVICES_INPUTS = 1;
+// Flag to get output devices.
+static const int GET_DEVICES_OUTPUTS = 2;
+
 // Returns the list of input/output devices connected to the system.
 //
 // Arg:
@@ -113,7 +118,7 @@ typedef struct BAudioCallback BAudioCallback;
 //                used to de-register this callback. Contains 0 on failure.
 //
 // Returns 0 on success and errno on failure.
-int BAudioManager_registerAudioDeviceCallback(
+int BAudioManager_registerAudioCallback(
     const BAudioManager* brillo_audio_manager, const BAudioCallback* callback,
     void* user_data, int* callback_id);
 
@@ -124,7 +129,7 @@ int BAudioManager_registerAudioDeviceCallback(
 //   callback_id: A token correspoding to the callback object.
 //
 // Returns 0 on success and errno on failure.
-int BAudioManager_unregisterAudioDeviceCallback(
+int BAudioManager_unregisterAudioCallback(
     const BAudioManager* brillo_audio_manager, int callback_id);
 
 // Free a Brillo audio manager object.

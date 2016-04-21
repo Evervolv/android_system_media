@@ -35,6 +35,8 @@ std::shared_ptr<BrilloAudioClient> BrilloAudioClient::instance_ = nullptr;
 
 int BrilloAudioClient::callback_id_counter_ = 1;
 
+BrilloAudioClient::~BrilloAudioClient() {}
+
 std::weak_ptr<BrilloAudioClient> BrilloAudioClient::GetClientInstance() {
   if (!instance_) {
     instance_ = std::shared_ptr<BrilloAudioClient>(new BrilloAudioClient());
@@ -83,10 +85,7 @@ int BrilloAudioClient::GetDevices(int flag, std::vector<int>& devices) {
     return ECONNABORTED;
   }
   auto status = brillo_audio_service_->GetDevices(flag, &devices);
-  if (!status.isOk()) {
-    return status.exceptionCode();
-  }
-  return 0;
+  return status.serviceSpecificErrorCode();
 }
 
 int BrilloAudioClient::SetDevice(audio_policy_force_use_t usage,
@@ -96,11 +95,11 @@ int BrilloAudioClient::SetDevice(audio_policy_force_use_t usage,
     return ECONNABORTED;
   }
   auto status = brillo_audio_service_->SetDevice(usage, config);
-  return status.exceptionCode();
+  return status.serviceSpecificErrorCode();
 }
 
-int BrilloAudioClient::RegisterAudioCallback(AudioServiceCallback* callback,
-                                             int* callback_id) {
+int BrilloAudioClient::RegisterAudioCallback(
+    android::sp<AudioServiceCallback> callback, int* callback_id) {
   if (!brillo_audio_service_.get()) {
     OnBASDisconnect();
     return ECONNABORTED;
@@ -112,12 +111,12 @@ int BrilloAudioClient::RegisterAudioCallback(AudioServiceCallback* callback,
   for (auto& entry : callback_map_) {
     if (entry.second->Equals(callback)) {
       LOG(ERROR) << "Callback has already been registered.";
+      *callback_id = 0;
       return EINVAL;
     }
   }
   *callback_id = callback_id_counter_++;
-  callback_map_.emplace(
-      *callback_id, std::unique_ptr<AudioServiceCallback>(callback));
+  callback_map_.emplace(*callback_id, callback);
   return 0;
 }
 

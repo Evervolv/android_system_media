@@ -51,11 +51,11 @@ class AudioServiceCallback : public BnAudioServiceCallback {
 
   // Method to compare two AudioServiceCallback objects.
   //
-  // |callback| is a pointer to a AudioServiceCallback object to be compared
-  // with this.
+  // |callback| is a ref counted pointer to a AudioServiceCallback object to be
+  // compared with this.
   //
   // Returns true if |callback| equals this.
-  bool Equals(AudioServiceCallback* callback);
+  bool Equals(android::sp<AudioServiceCallback> callback);
 
  private:
   // Callback when devices are connected.
