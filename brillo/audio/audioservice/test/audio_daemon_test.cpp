@@ -48,11 +48,11 @@ TEST_F(AudioDaemonTest, RegisterService) {
                 "android.brillo.brilloaudioservice.BrilloAudioService"));
 }
 
-TEST_F(AudioDaemonTest, TestAPSConnectInitializesHandlerOnlyOnce) {
+TEST_F(AudioDaemonTest, TestAPSConnectInitializesHandlersOnlyOnce) {
   binder_wrapper()->SetBinderForService("media.audio_policy",
                                         binder_wrapper()->CreateLocalBinder());
-  daemon_.handler_initialized_ = false;
-  EXPECT_CALL(daemon_, InitializeHandler()).Times(1);
+  daemon_.handlers_initialized_ = false;
+  EXPECT_CALL(daemon_, InitializeHandlers()).Times(1);
   daemon_.ConnectToAPS();
 }
 

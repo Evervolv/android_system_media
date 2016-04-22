@@ -24,6 +24,14 @@
 
 namespace brillo {
 
+// All input devices currently supported by AudioDeviceHandler.
+const std::vector<audio_devices_t> AudioDeviceHandler::kSupportedInputDevices_ =
+    {AUDIO_DEVICE_IN_WIRED_HEADSET};
+
+const std::vector<audio_devices_t>
+    AudioDeviceHandler::kSupportedOutputDevices_ = {
+        AUDIO_DEVICE_OUT_WIRED_HEADSET, AUDIO_DEVICE_OUT_WIRED_HEADPHONE};
+
 static const char kH2WStateFile[] = "/sys/class/switch/h2w/state";
 
 AudioDeviceHandler::AudioDeviceHandler() {
