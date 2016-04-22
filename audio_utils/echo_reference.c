@@ -332,6 +332,10 @@ static int echo_reference_read(struct echo_reference_itfe *echo_reference,
         uint32_t timeoutMs = (uint32_t)((1000 * buffer->frame_count) / er->rd_sampling_rate / 2);
         struct timespec ts = {0, 0};
 
+#ifndef HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE
+        clock_gettime(CLOCK_REALTIME, &ts);
+#endif
+
         ts.tv_sec  += timeoutMs/1000;
         ts.tv_nsec += (timeoutMs%1000) * 1000000;
         if (ts.tv_nsec >= 1000000000) {
@@ -339,7 +343,11 @@ static int echo_reference_read(struct echo_reference_itfe *echo_reference,
             ts.tv_sec  += 1;
         }
 
+#ifdef HAVE_PTHREAD_COND_TIMEDWAIT_RELATIVE
+        pthread_cond_timedwait_relative_np(&er->cond, &er->lock, &ts);
+#else
         pthread_cond_timedwait(&er->cond, &er->lock, &ts);
+#endif
 
         ALOGV_IF((er->frames_in < buffer->frame_count),
                  "echo_reference_read() waited %d ms but still not enough frames"\
