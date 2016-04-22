@@ -37,12 +37,15 @@ static const char kServiceName[] =
 
 AudioDaemon::~AudioDaemon() {}
 
-void AudioDaemon::InitializeHandler() {
-  // Start and initialize the audio device handler.
+void AudioDaemon::InitializeHandlers() {
+  // Start and initialize the audio daemon handlers.
   audio_device_handler_ =
       std::shared_ptr<AudioDeviceHandler>(new AudioDeviceHandler());
+  audio_volume_handler_ =
+      std::unique_ptr<AudioVolumeHandler>(new AudioVolumeHandler());
 
-  // Register a callback with the handler to call when device state changes.
+  // Register a callback with the audio device handler to call when device state
+  // changes.
   base::Callback<void(AudioDeviceHandler::DeviceConnectionState,
                       const std::vector<int>&)> device_callback = base::Bind(
                           &AudioDaemon::DeviceCallback,
@@ -50,6 +53,7 @@ void AudioDaemon::InitializeHandler() {
   audio_device_handler_->RegisterDeviceCallback(device_callback);
 
   audio_device_handler_->Init(aps_);
+  audio_volume_handler_->Init(aps_);
 
   // Poll on all files in kInputDeviceDir.
   base::FileEnumerator fenum(base::FilePath(kInputDeviceDir),
@@ -73,8 +77,8 @@ void AudioDaemon::InitializeHandler() {
     }
   }
 
-  handler_initialized_ = true;
-  // Once the handler has been initialized, we can register with service
+  handlers_initialized_ = true;
+  // Once the handlers have been initialized, we can register with service
   // manager.
   InitializeBrilloAudioService();
 }
@@ -106,22 +110,25 @@ void AudioDaemon::ConnectToAPS() {
                  weak_ptr_factory_.GetWeakPtr()));
   VLOG(1) << "Registered death notification.";
   aps_ = android::interface_cast<android::IAudioPolicyService>(binder);
-  if (!handler_initialized_)
-    InitializeHandler();
-  else
+  if (!handlers_initialized_) {
+    InitializeHandlers();
+  } else {
     audio_device_handler_->APSConnect(aps_);
+    audio_volume_handler_->APSConnect(aps_);
+  }
 }
 
 void AudioDaemon::OnAPSDisconnected() {
   LOG(INFO) << "Audio policy service died. Will try to reconnect.";
   audio_device_handler_->APSDisconnect();
+  audio_volume_handler_->APSDisconnect();
   aps_ = nullptr;
   ConnectToAPS();
 }
 
 // OnInit, we want to do the following:
 //   - Get a binder to the audio policy service.
-//   - Initialize the audio device handler.
+//   - Initialize the audio device and volume handlers.
 //   - Set up polling on files in /dev/input.
 int AudioDaemon::OnInit() {
   int exit_code = Daemon::OnInit();
@@ -143,6 +150,7 @@ void AudioDaemon::EventCallback(base::File* file) {
     return;
   }
   audio_device_handler_->ProcessEvent(event);
+  audio_volume_handler_->ProcessEvent(event);
 }
 
 void AudioDaemon::DeviceCallback(
