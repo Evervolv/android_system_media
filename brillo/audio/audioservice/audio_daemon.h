@@ -29,6 +29,7 @@
 #include <media/IAudioPolicyService.h>
 
 #include "audio_device_handler.h"
+#include "audio_volume_handler.h"
 #include "brillo_audio_service.h"
 
 namespace brillo {
@@ -46,7 +47,7 @@ class AudioDaemon : public Daemon {
  private:
   friend class AudioDaemonTest;
   FRIEND_TEST(AudioDaemonTest, RegisterService);
-  FRIEND_TEST(AudioDaemonTest, TestAPSConnectInitializesHandlerOnlyOnce);
+  FRIEND_TEST(AudioDaemonTest, TestAPSConnectInitializesHandlersOnlyOnce);
   FRIEND_TEST(AudioDaemonTest, TestDeviceCallbackInitializesBASIfNULL);
 
   // Callback function for input events. Events are handled by the audio device
@@ -71,11 +72,11 @@ class AudioDaemon : public Daemon {
   // Register the brillo audio service with the service manager.
   void InitializeBrilloAudioService();
 
-  // Initialize the audio_device_handler_.
+  // Initialize all audio daemon handlers.
   //
   // Note: This can only occur after we have connected to the audio policy
   // service.
-  virtual void InitializeHandler();
+  virtual void InitializeHandlers();
 
   // Store the file objects that are created during initialization for the files
   // being polled. This is done so these objects can be freed when the
@@ -83,12 +84,14 @@ class AudioDaemon : public Daemon {
   std::stack<base::File> files_;
   // Handler for audio device input events.
   std::shared_ptr<AudioDeviceHandler> audio_device_handler_;
+  // Handler for volume key press input events.
+  std::unique_ptr<AudioVolumeHandler> audio_volume_handler_;
   // Used to generate weak_ptr to AudioDaemon for use in base::Bind.
   base::WeakPtrFactory<AudioDaemon> weak_ptr_factory_{this};
   // Pointer to the audio policy service.
   android::sp<android::IAudioPolicyService> aps_;
-  // Flag to indicate whether the handler has been initialized.
-  bool handler_initialized_ = false;
+  // Flag to indicate whether the handlers have been initialized.
+  bool handlers_initialized_ = false;
   // Binder watcher to watch for binder messages.
   BinderWatcher binder_watcher_;
   // Brillo audio service. Used for scheduling callbacks to clients.
