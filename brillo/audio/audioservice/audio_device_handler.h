@@ -31,9 +31,11 @@
 #include <system/audio.h>
 #include <system/audio_policy.h>
 
+#include "audio_daemon_handler.h"
+
 namespace brillo {
 
-class AudioDeviceHandler {
+class AudioDeviceHandler : public AudioDaemonHandler {
  public:
   AudioDeviceHandler();
   virtual ~AudioDeviceHandler();
@@ -42,7 +44,7 @@ class AudioDeviceHandler {
   // the initial state.
   //
   // |aps| is a pointer to the binder object.
-  void Init(android::sp<android::IAudioPolicyService> aps);
+  virtual void Init(android::sp<android::IAudioPolicyService> aps) override;
 
   // Process input events from the kernel. Connecting/disconnecting an audio
   // device will result in multiple calls to this method.
@@ -50,7 +52,7 @@ class AudioDeviceHandler {
   // |event| is a pointer to an input_event. This function should be able to
   // gracefully handle input events that are not relevant to the functionality
   // provided by this class.
-  void ProcessEvent(const struct input_event& event);
+  virtual void ProcessEvent(const struct input_event& event) override;
 
   // Inform the handler that the audio policy service has been disconnected.
   void APSDisconnect();
@@ -58,7 +60,8 @@ class AudioDeviceHandler {
   // Inform the handler that the audio policy service is reconnected.
   //
   // |aps| is a pointer to the binder object.
-  void APSConnect(android::sp<android::IAudioPolicyService> aps);
+  virtual void APSConnect(
+      android::sp<android::IAudioPolicyService> aps) override;
 
   // Get the list of connected devices.
   //
@@ -98,6 +101,8 @@ class AudioDeviceHandler {
 
  private:
   friend class AudioDeviceHandlerTest;
+  friend class AudioVolumeHandler;
+  friend class AudioVolumeHandlerTest;
   FRIEND_TEST(AudioDeviceHandlerTest,
               DisconnectAllSupportedDevicesCallsDisconnect);
   FRIEND_TEST(AudioDeviceHandlerTest, InitCallsDisconnectAllSupportedDevices);
@@ -123,6 +128,7 @@ class AudioDeviceHandler {
   FRIEND_TEST(AudioDeviceHandlerTest, ConnectAudioDeviceOutput);
   FRIEND_TEST(AudioDeviceHandlerTest, DisconnectAudioDeviceInput);
   FRIEND_TEST(AudioDeviceHandlerTest, DisconnectAudioDeviceOutput);
+  FRIEND_TEST(AudioVolumeHandlerTest, FileGeneration);
 
   // Read the initial state of audio devices in /sys/class/* and update
   // the audio policy service.
@@ -168,13 +174,9 @@ class AudioDeviceHandler {
   virtual void TriggerCallback(DeviceConnectionState state);
 
   // All input devices currently supported by AudioDeviceHandler.
-  std::vector<audio_devices_t> kSupportedInputDevices_{
-      AUDIO_DEVICE_IN_WIRED_HEADSET};
+  static const std::vector<audio_devices_t> kSupportedInputDevices_;
   // All output devices currently supported by AudioDeviceHandler.
-  std::vector<audio_devices_t> kSupportedOutputDevices_{
-      AUDIO_DEVICE_OUT_WIRED_HEADSET, AUDIO_DEVICE_OUT_WIRED_HEADPHONE};
-  // Pointer to the audio policy service.
-  android::sp<android::IAudioPolicyService> aps_;
+  static const std::vector<audio_devices_t> kSupportedOutputDevices_;
 
  protected:
   // Set of connected input devices.
