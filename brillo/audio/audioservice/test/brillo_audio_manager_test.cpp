@@ -70,7 +70,7 @@ TEST_F(BrilloAudioManagerTest, NewWithBAS) {
 
 TEST_F(BrilloAudioManagerTest, GetDevicesInvalidParams) {
   auto bam = GetValidManager();
-  size_t num_devices;
+  unsigned int num_devices;
   EXPECT_EQ(BAudioManager_getDevices(nullptr, 1, nullptr, 0, &num_devices),
             EINVAL);
   EXPECT_EQ(BAudioManager_getDevices(bam, 1, nullptr, 0, nullptr), EINVAL);
@@ -80,7 +80,7 @@ TEST_F(BrilloAudioManagerTest, GetDevicesInvalidParams) {
 
 TEST_F(BrilloAudioManagerTest, GetDevicesNullArrNoDevices) {
   auto bam = GetValidManager();
-  size_t num_devices = -1;
+  unsigned int num_devices = -1;
   EXPECT_CALL(*bas_.get(), GetDevices(1, _)).WillOnce(Return(Status::ok()));
   EXPECT_EQ(BAudioManager_getDevices(bam, 1, nullptr, 0, &num_devices), 0);
   EXPECT_EQ(num_devices, 0);
@@ -239,7 +239,7 @@ TEST_F(BrilloAudioManagerTest, UnregisterCallback) {
 
 TEST_F(BrilloAudioManagerTest, GetDevicesBASDies) {
   auto bam = GetValidManager();
-  size_t num_devices = -1;
+  unsigned int num_devices = -1;
   binder_wrapper()->NotifyAboutBinderDeath(bas_);
   EXPECT_EQ(BAudioManager_getDevices(bam, 1, nullptr, 0, &num_devices),
             ECONNABORTED);
