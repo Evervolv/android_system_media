@@ -47,6 +47,11 @@ class AudioVolumeHandlerTest : public testing::Test {
     handler_.SetVolumeFilePathForTesting(volume_file_path_);
   }
 
+  void SetupHandlerVolumeFile() {
+    handler_.kv_store_ = std::unique_ptr<KeyValueStore>(new KeyValueStore);
+    handler_.GenerateVolumeFile();
+  }
+
   AudioVolumeHandlerMock handler_;
   FilePath volume_file_path_;
 
@@ -56,8 +61,7 @@ class AudioVolumeHandlerTest : public testing::Test {
 
 // Test that the volume file is formatted correctly.
 TEST_F(AudioVolumeHandlerTest, FileGeneration) {
-  handler_.kv_store_ = std::unique_ptr<KeyValueStore>(new KeyValueStore);
-  handler_.GenerateVolumeFile();
+  SetupHandlerVolumeFile();
   KeyValueStore kv_store;
   kv_store.Load(volume_file_path_);
   for (auto stream : handler_.kSupportedStreams_) {
@@ -74,13 +78,6 @@ TEST_F(AudioVolumeHandlerTest, FileGeneration) {
   }
 }
 
-// Test accessing the key-value store works.
-TEST_F(AudioVolumeHandlerTest, GetVolumeForKey) {
-  handler_.kv_store_ = std::unique_ptr<KeyValueStore>(new KeyValueStore);
-  handler_.kv_store_->SetString("foo", "100");
-  ASSERT_EQ(handler_.GetVolumeForKey("foo"), 100);
-}
-
 // Test GetVolumeCurrentIndex.
 TEST_F(AudioVolumeHandlerTest, GetVolumeForStreamDeviceTuple) {
   handler_.kv_store_ = std::unique_ptr<KeyValueStore>(new KeyValueStore);
@@ -93,7 +90,8 @@ TEST_F(AudioVolumeHandlerTest, GetVolumeForStreamDeviceTuple) {
 // Test SetVolumeCurrentIndex.
 TEST_F(AudioVolumeHandlerTest, SetVolumeForStreamDeviceTuple) {
   handler_.kv_store_ = std::unique_ptr<KeyValueStore>(new KeyValueStore);
-  handler_.SetVolumeCurrentIndex(static_cast<audio_stream_type_t>(1), 2, 100);
+  handler_.PersistVolumeConfiguration(
+      static_cast<audio_stream_type_t>(1), 2, 100);
   std::string value;
   auto key = handler_.kCurrentIndexKey_ + ".1.2";
   handler_.kv_store_->GetString(key, &value);
@@ -148,9 +146,9 @@ TEST_F(AudioVolumeHandlerTest, ProcessEventKeyDown) {
 }
 
 TEST_F(AudioVolumeHandlerTest, SelectStream) {
-  EXPECT_EQ(handler_.selected_stream_, AUDIO_STREAM_DEFAULT);
+  EXPECT_EQ(handler_.GetVolumeControlStream(), AUDIO_STREAM_DEFAULT);
   handler_.SetVolumeControlStream(AUDIO_STREAM_MUSIC);
-  EXPECT_EQ(handler_.selected_stream_, AUDIO_STREAM_MUSIC);
+  EXPECT_EQ(handler_.GetVolumeControlStream(), AUDIO_STREAM_MUSIC);
 }
 
 TEST_F(AudioVolumeHandlerTest, ComputeNewVolume) {
@@ -159,10 +157,56 @@ TEST_F(AudioVolumeHandlerTest, ComputeNewVolume) {
   handler_.step_sizes_[AUDIO_STREAM_MUSIC] = 10;
   EXPECT_EQ(handler_.GetNewVolumeIndex(50, 1, AUDIO_STREAM_MUSIC), 60);
   EXPECT_EQ(handler_.GetNewVolumeIndex(50, -1, AUDIO_STREAM_MUSIC), 40);
-  handler_.kv_store_ = std::unique_ptr<KeyValueStore>(new KeyValueStore);
-  handler_.GenerateVolumeFile();
+  SetupHandlerVolumeFile();
   EXPECT_EQ(handler_.GetNewVolumeIndex(100, 1, AUDIO_STREAM_MUSIC), 100);
   EXPECT_EQ(handler_.GetNewVolumeIndex(0, -1, AUDIO_STREAM_MUSIC), 0);
+}
+
+TEST_F(AudioVolumeHandlerTest, GetSetMaxSteps) {
+  EXPECT_EQ(handler_.GetVolumeMaxSteps(AUDIO_STREAM_MUSIC), 100);
+  EXPECT_EQ(handler_.SetVolumeMaxSteps(AUDIO_STREAM_MUSIC, 0), EINVAL);
+  EXPECT_EQ(handler_.GetVolumeMaxSteps(AUDIO_STREAM_MUSIC), 100);
+  EXPECT_EQ(handler_.SetVolumeMaxSteps(AUDIO_STREAM_MUSIC, 100), 0);
+  EXPECT_EQ(handler_.GetVolumeMaxSteps(AUDIO_STREAM_MUSIC), 100);
+  EXPECT_EQ(handler_.SetVolumeMaxSteps(AUDIO_STREAM_MUSIC, -1), EINVAL);
+  EXPECT_EQ(handler_.SetVolumeMaxSteps(AUDIO_STREAM_MUSIC, 101), EINVAL);
+}
+
+TEST_F(AudioVolumeHandlerTest, GetSetVolumeIndex) {
+  SetupHandlerVolumeFile();
+  EXPECT_CALL(handler_, TriggerCallback(AUDIO_STREAM_MUSIC, _, 0));
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, 0),
+            0);
+  EXPECT_CALL(handler_, TriggerCallback(AUDIO_STREAM_MUSIC, 0, 50));
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, 50),
+            0);
+  EXPECT_CALL(handler_, TriggerCallback(AUDIO_STREAM_MUSIC, 50, 100));
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, 100),
+            0);
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, -1),
+            EINVAL);
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, 101),
+            EINVAL);
+  EXPECT_EQ(handler_.SetVolumeMaxSteps(AUDIO_STREAM_MUSIC, 10), 0);
+  EXPECT_EQ(handler_.GetVolumeIndex(AUDIO_STREAM_MUSIC,
+                                    AUDIO_DEVICE_OUT_WIRED_HEADSET),
+            10);
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, 11),
+            EINVAL);
+  EXPECT_CALL(handler_, TriggerCallback(AUDIO_STREAM_MUSIC, 100, 50));
+  EXPECT_EQ(handler_.SetVolumeIndex(
+                AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADSET, 5),
+            0);
+  EXPECT_EQ(handler_.SetVolumeMaxSteps(AUDIO_STREAM_MUSIC, 20), 0);
+  EXPECT_EQ(handler_.GetVolumeIndex(AUDIO_STREAM_MUSIC,
+                                    AUDIO_DEVICE_OUT_WIRED_HEADSET),
+            10);
 }
 
 }  // namespace brillo
