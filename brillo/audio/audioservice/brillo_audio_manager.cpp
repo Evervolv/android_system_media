@@ -95,6 +95,104 @@ int BAudioManager_setOutputDevice(
                            device->internal_->GetConfig());
 }
 
+int BAudioManager_getMaxVolumeSteps(const BAudioManager* brillo_audio_manager,
+                                    BAudioUsage usage,
+                                    int* max_steps) {
+  if (!brillo_audio_manager || !max_steps)
+    return EINVAL;
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client)
+    return ECONNABORTED;
+  return client->GetMaxVolumeSteps(usage, max_steps);
+}
+
+int BAudioManager_setMaxVolumeSteps(const BAudioManager* brillo_audio_manager,
+                                    BAudioUsage usage,
+                                    int max_steps) {
+  if (!brillo_audio_manager || max_steps < 0 || max_steps > 100)
+    return EINVAL;
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client)
+    return ECONNABORTED;
+  return client->SetMaxVolumeSteps(usage, max_steps);
+}
+
+int BAudioManager_setVolumeIndex(const BAudioManager* brillo_audio_manager,
+                                 BAudioUsage usage,
+                                 const BAudioDeviceInfo* device,
+                                 int index) {
+  if (!brillo_audio_manager || !device) {
+    return EINVAL;
+  }
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client) {
+    return ECONNABORTED;
+  }
+  return client->SetVolumeIndex(
+      usage, device->internal_->GetAudioDevicesT(), index);
+}
+
+int BAudioManager_getVolumeIndex(const BAudioManager* brillo_audio_manager,
+                                 BAudioUsage usage,
+                                 const BAudioDeviceInfo* device,
+                                 int* index) {
+  if (!brillo_audio_manager || !device || !index) {
+    return EINVAL;
+  }
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client) {
+    return ECONNABORTED;
+  }
+  return client->GetVolumeIndex(
+      usage, device->internal_->GetAudioDevicesT(), index);
+}
+
+int BAudioManager_getVolumeControlUsage(
+    const BAudioManager* brillo_audio_manager, BAudioUsage* usage) {
+  if (!brillo_audio_manager || !usage) {
+    return EINVAL;
+  }
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client) {
+    return ECONNABORTED;
+  }
+  return client->GetVolumeControlStream(usage);
+}
+
+int BAudioManager_setVolumeControlUsage(
+    const BAudioManager* brillo_audio_manager, BAudioUsage usage) {
+  if (!brillo_audio_manager) {
+    return EINVAL;
+  }
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client) {
+    return ECONNABORTED;
+  }
+  return client->SetVolumeControlStream(usage);
+}
+
+int BAudioManager_incrementVolume(const BAudioManager* brillo_audio_manager) {
+  if (!brillo_audio_manager) {
+    return EINVAL;
+  }
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client) {
+    return ECONNABORTED;
+  }
+  return client->IncrementVolume();
+}
+
+int BAudioManager_decrementVolume(const BAudioManager* brillo_audio_manager) {
+  if (!brillo_audio_manager) {
+    return EINVAL;
+  }
+  auto client = brillo_audio_manager->client_.lock();
+  if (!client) {
+    return ECONNABORTED;
+  }
+  return client->DecrementVolume();
+}
+
 int BAudioManager_registerAudioCallback(
     const BAudioManager* brillo_audio_manager, const BAudioCallback* callback,
     void* user_data, int* callback_id) {

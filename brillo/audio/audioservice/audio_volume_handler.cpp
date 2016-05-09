@@ -21,6 +21,7 @@
 #include <base/files/file_util.h>
 #include <base/logging.h>
 #include <brillo/map_utils.h>
+#include <brillo/message_loops/message_loop.h>
 #include <brillo/strings/string_utils.h>
 
 #include "audio_device_handler.h"
@@ -48,15 +49,55 @@ void AudioVolumeHandler::APSConnect(
   InitAPSAllStreams();
 }
 
+void AudioVolumeHandler::RegisterCallback(
+    base::Callback<void(audio_stream_type_t, int, int)>& callback) {
+  callback_ = callback;
+}
+
+int AudioVolumeHandler::ConvertToUserDefinedIndex(audio_stream_type_t stream,
+                                                  int index) {
+  return index / step_sizes_[stream];
+}
+
+int AudioVolumeHandler::ConvertToInternalIndex(audio_stream_type_t stream,
+                                               int index) {
+  return index * step_sizes_[stream];
+}
+
+void AudioVolumeHandler::TriggerCallback(audio_stream_type_t stream,
+                                         int previous_index,
+                                         int current_index) {
+  int user_defined_previous_index =
+      ConvertToUserDefinedIndex(stream, previous_index);
+  int user_defined_current_index =
+      ConvertToUserDefinedIndex(stream, current_index);
+  MessageLoop::current()->PostTask(base::Bind(callback_,
+                                              stream,
+                                              user_defined_previous_index,
+                                              user_defined_current_index));
+}
+
 void AudioVolumeHandler::GenerateVolumeFile() {
   for (auto stream : kSupportedStreams_) {
     for (auto device : AudioDeviceHandler::kSupportedOutputDevices_) {
-      SetVolumeCurrentIndex(stream, device, kDefaultCurrentIndex_);
+      PersistVolumeConfiguration(stream, device, kDefaultCurrentIndex_);
     }
   }
   if (!kv_store_->Save(volume_state_file_)) {
     LOG(ERROR) << "Could not save volume data file!";
   }
+}
+
+int AudioVolumeHandler::GetVolumeMaxSteps(audio_stream_type_t stream) {
+  return ConvertToUserDefinedIndex(stream, kMaxIndex_);
+}
+
+int AudioVolumeHandler::SetVolumeMaxSteps(audio_stream_type_t stream,
+                                          int max_steps) {
+  if (max_steps <= kMinIndex_ || max_steps > kMaxIndex_)
+    return EINVAL;
+  step_sizes_[stream] = kMaxIndex_ / max_steps;
+  return 0;
 }
 
 int AudioVolumeHandler::GetVolumeCurrentIndex(audio_stream_type_t stream,
@@ -68,18 +109,32 @@ int AudioVolumeHandler::GetVolumeCurrentIndex(audio_stream_type_t stream,
   return std::stoi(value);
 }
 
-int AudioVolumeHandler::GetVolumeForKey(const std::string& key) {
-  std::string value;
-  kv_store_->GetString(key, &value);
-  return std::stoi(value);
+int AudioVolumeHandler::GetVolumeIndex(audio_stream_type_t stream,
+                                       audio_devices_t device) {
+  return ConvertToUserDefinedIndex(stream,
+                                   GetVolumeCurrentIndex(stream, device));
 }
 
-void AudioVolumeHandler::SetVolumeCurrentIndex(audio_stream_type_t stream,
-                                               audio_devices_t device,
-                                               int index) {
+int AudioVolumeHandler::SetVolumeIndex(audio_stream_type_t stream,
+                                       audio_devices_t device,
+                                       int index) {
+  if (index < kMinIndex_ ||
+      index > ConvertToUserDefinedIndex(stream, kMaxIndex_))
+    return EINVAL;
+  int previous_index = GetVolumeCurrentIndex(stream, device);
+  int current_absolute_index = ConvertToInternalIndex(stream, index);
+  PersistVolumeConfiguration(stream, device, current_absolute_index);
+  TriggerCallback(stream, previous_index, current_absolute_index);
+  return 0;
+}
+
+void AudioVolumeHandler::PersistVolumeConfiguration(audio_stream_type_t stream,
+                                                    audio_devices_t device,
+                                                    int index) {
   auto key = kCurrentIndexKey_ + "." + string_utils::ToString(stream) + "." +
              string_utils::ToString(device);
   kv_store_->SetString(key, string_utils::ToString(index));
+  kv_store_->Save(volume_state_file_);
 }
 
 void AudioVolumeHandler::InitAPSAllStreams() {
@@ -114,13 +169,18 @@ void AudioVolumeHandler::Init(android::sp<android::IAudioPolicyService> aps) {
   InitAPSAllStreams();
 }
 
+audio_stream_type_t AudioVolumeHandler::GetVolumeControlStream() {
+  return selected_stream_;
+}
+
 void AudioVolumeHandler::SetVolumeControlStream(audio_stream_type_t stream) {
   selected_stream_ = stream;
 }
 
 int AudioVolumeHandler::GetNewVolumeIndex(int previous_index, int direction,
                                           audio_stream_type_t stream) {
-  int current_index = previous_index + direction * step_sizes_.at(stream);
+  int current_index =
+      previous_index + ConvertToInternalIndex(stream, direction);
   if (current_index < kMinIndex_) {
     return kMinIndex_;
   } else if (current_index > kMaxIndex_) {
@@ -139,7 +199,8 @@ void AudioVolumeHandler::AdjustStreamVolume(audio_stream_type_t stream,
   VLOG(1) << "Current index is " << current_index << " for stream " << stream
           << " and device " << device;
   aps_->setStreamVolumeIndex(stream, current_index, device);
-  SetVolumeCurrentIndex(selected_stream_, device, current_index);
+  PersistVolumeConfiguration(selected_stream_, device, current_index);
+  TriggerCallback(stream, previous_index, current_index);
 }
 
 void AudioVolumeHandler::AdjustVolumeActiveStreams(int direction) {

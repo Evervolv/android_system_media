@@ -78,6 +78,64 @@ class BrilloAudioClient {
   int SetDevice(audio_policy_force_use_t usage,
                 audio_policy_forced_cfg_t config);
 
+  // Get the maximum number of steps for a given BAudioUsage.
+  //
+  // |usage| is an enum of type BAudioUsage.
+  // |max_steps| is a pointer to the maximum number of steps.
+  //
+  // Returns 0 on success and errno on failure.
+  int GetMaxVolumeSteps(BAudioUsage usage, int* max_steps);
+
+  // Set the maximum number of steps to use for a given BAudioUsage.
+  //
+  // |usage| is an enum of type BAudioUsage.
+  // |max_steps| is an int between 0 and 100.
+  //
+  // Returns 0 on success and errno on failure.
+  int SetMaxVolumeSteps(BAudioUsage usage, int max_steps);
+
+  // Set the volume index for a given BAudioUsage and device.
+  //
+  // |usage| is an enum of type BAudioUsage.
+  // |device| is of type audio_devices_t.
+  // |index| is an int representing the current index.
+  //
+  // Returns 0 on success and errno on failure.
+  int SetVolumeIndex(BAudioUsage usage, audio_devices_t device, int index);
+
+  // Get the volume index for a given BAudioUsage and device.
+  //
+  // |usage| is an enum of type BAudioUsage.
+  // |device| is of type audio_devices_t.
+  // |index| is a pointer to an int representing the current index.
+  //
+  // Returns 0 on success and errno on failure.
+  int GetVolumeIndex(BAudioUsage usage, audio_devices_t device, int* index);
+
+  // Get default stream to use for volume buttons.
+  //
+  // |usage| is a pointer to a BAudioUsage.
+  //
+  // Returns 0 on success and errno on failure.
+  int GetVolumeControlStream(BAudioUsage* usage);
+
+  // Set default stream to use for volume buttons.
+  //
+  // |usage| is an enum of type BAudioUsage.
+  //
+  // Returns 0 on success and errno on failure.
+  int SetVolumeControlStream(BAudioUsage usage);
+
+  // Increment the volume.
+  //
+  // Returns 0 on success and errno on failure.
+  int IncrementVolume();
+
+  // Decrement the volume.
+  //
+  // Returns 0 on success and errno on failure.
+  int DecrementVolume();
+
  protected:
   BrilloAudioClient() = default;
 

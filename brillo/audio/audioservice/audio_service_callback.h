@@ -44,10 +44,17 @@ class AudioServiceCallback : public BnAudioServiceCallback {
   // |devices| is a vector of audio_devices_t.
   Status OnAudioDevicesConnected(const std::vector<int>& devices);
 
-  // Callback function triggered with a device is disconnected.
+  // Callback function triggered when a device is disconnected.
   //
   // |devices| is a vector of audio_devices_t.
   Status OnAudioDevicesDisconnected(const std::vector<int>& devices);
+
+  // Callback function triggered when volume is changed.
+  //
+  // |stream| is an int representing the stream.
+  // |previous_index| is the volume index before the key press.
+  // |current_index| is the volume index after the key press.
+  Status OnVolumeChanged(int stream, int previous_index, int current_index);
 
   // Method to compare two AudioServiceCallback objects.
   //
@@ -62,6 +69,8 @@ class AudioServiceCallback : public BnAudioServiceCallback {
   base::Callback<void(const BAudioDeviceInfo*, void*)> connected_callback_;
   // Callback when devices are disconnected.
   base::Callback<void(const BAudioDeviceInfo*, void*)> disconnected_callback_;
+  // Callback when the volume button is pressed.
+  base::Callback<void(BAudioUsage, int, int, void*)> volume_callback_;
   // User data passed to the callbacks.
   void* user_data_;
 };
