@@ -72,7 +72,8 @@ enum BAudioUsage {
   kUsageAlarm,
   kUsageMedia,
   kUsageNotifications,
-  kUsageSystem
+  kUsageSystem,
+  kUsageInvalid
 };
 
 // Select the output device to be used for playback.
@@ -88,6 +89,112 @@ int BAudioManager_setOutputDevice(
     const BAudioManager* brillo_audio_manager, const BAudioDeviceInfo* device,
     BAudioUsage usage);
 
+// Get the number of steps for a given stream type.
+//
+// Args:
+//   brillo_audio_manager: A pointer to a BAudioManager object.
+//   usage: A BAudioUsage representing the audio stream.
+//   max_steps: A pointer to an int representing the number of steps for a given
+//              usage.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_getMaxVolumeSteps(const BAudioManager* brillo_audio_manager,
+                                    BAudioUsage usage,
+                                    int* max_steps);
+
+// Set the number of steps for a given stream type.
+//
+// Args:
+//   brillo_audio_manager: A pointer to a BAudioManager object.
+//   usage: A BAudioUsage representing the audio stream.
+//   max_steps: An int representing the number of steps to use for a given
+//              usage.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_setMaxVolumeSteps(const BAudioManager* brillo_audio_manager,
+                                    BAudioUsage usage,
+                                    int max_steps);
+
+// Set the volume for a given stream type.
+//
+// Args:
+//   brillo_audio_manager: A pointer to a BAudioManager object.
+//   usage: A BAudioUsage representing the audio stream.
+//   device: A pointer to a BAudioDeviceInfo object.
+//   value: An int representing the index to set the volume to. The index must
+//           be less than max_steps if BAudioManager_setMaxVolumeSteps was
+//           called or 100 otherwise.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_setVolumeIndex(const BAudioManager* brillo_audio_manager,
+                                 BAudioUsage usage,
+                                 const BAudioDeviceInfo* device,
+                                 int index);
+
+// Get the volume for a given stream type.
+//
+// Args:
+//   brillo_audio_manager: A pointer to a BAudioManager object.
+//   usage: A BAudioUsage representing the audio stream.
+//   device: A pointer to a BAudioDeviceInfo object.
+//   value: A pointer to int. This will be set to an int representing the volume
+//          index for |usage|.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_getVolumeIndex(const BAudioManager* brillo_audio_manager,
+                                 BAudioUsage usage,
+                                 const BAudioDeviceInfo* device,
+                                 int* index);
+
+// Get the default stream for volume buttons. If
+// BAudioManager_setVolumeControlUsage has not been called, this will return
+// kInvalidUsage.
+//
+// Args:
+//  brillo_audio_manager: A pointer to a BAudioManager object.
+//  usage: A pointer to a BAudioUsage representing the audio stream.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_getVolumeControlUsage(
+    const BAudioManager* brillo_audio_manager, BAudioUsage* usage);
+
+// Set the default stream to use for volume buttons. By default, streams will be
+// ordered by priority:
+//   1. kUsageAlarm
+//   2. kUsageNotifications
+//   3. kUsageSystem
+//   4. kUsageMedia
+//
+// Calling BAudioMananager_setVolumeControlUsage with kInvalidUsage will reset
+// the volume control stream to its default priorities and undo the effects of
+// previous calls to BAudioManager_setVolumeControlUsage.
+//
+// Args:
+//  brillo_audio_manager: A pointer to a BAudioManager object.
+//  usage: A BAudioUsage representing the audio stream.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_setVolumeControlUsage(
+    const BAudioManager* brillo_audio_manager, BAudioUsage usage);
+
+// Increment the volume of active streams or stream selected using
+// BAudioManager_setVolumeControlUsage.
+//
+// Args:
+//   brillo_audio_manager: A pointer to a BAudioManager object.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_incrementVolume(const BAudioManager* brillo_audio_manager);
+
+// Decrement the volume of active streams or stream selected using
+// BAudioManager_setVolumeControlUsage.
+//
+// Args:
+//   brillo_audio_manager: A pointer to a BAudioManager object.
+//
+// Returns 0 on success and errno on failure.
+int BAudioManager_decrementVolume(const BAudioManager* brillo_audio_manager);
+
 // Object used for callbacks.
 struct BAudioCallback {
   // Function to be called when an audio device is added. If multiple audio
@@ -101,6 +208,12 @@ struct BAudioCallback {
   // user is not responsible for freeing removed_device.
   void (*OnAudioDeviceRemoved)(const BAudioDeviceInfo* removed_device,
                                void* user_data);
+
+  // Function to be called when the volume button is pressed.
+  void (*OnVolumeChanged)(BAudioUsage usage,
+                          int old_volume_index,
+                          int new_volume_index,
+                          void* user_data);
 };
 
 typedef struct BAudioCallback BAudioCallback;

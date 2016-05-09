@@ -25,4 +25,35 @@ audio_policy_force_use_t BrilloAudioClientHelpers::GetForceUse(
     return AUDIO_POLICY_FORCE_FOR_SYSTEM;
 }
 
+audio_stream_type_t BrilloAudioClientHelpers::GetStreamType(BAudioUsage usage) {
+  switch (usage) {
+    case kUsageAlarm:
+      return AUDIO_STREAM_ALARM;
+    case kUsageMedia:
+      return AUDIO_STREAM_MUSIC;
+    case kUsageNotifications:
+      return AUDIO_STREAM_NOTIFICATION;
+    case kUsageSystem:
+      return AUDIO_STREAM_SYSTEM;
+    default:
+      return AUDIO_STREAM_DEFAULT;
+  }
+}
+
+BAudioUsage BrilloAudioClientHelpers::GetBAudioUsage(
+    audio_stream_type_t stream) {
+  switch (stream) {
+    case AUDIO_STREAM_ALARM:
+      return kUsageAlarm;
+    case AUDIO_STREAM_MUSIC:
+      return kUsageMedia;
+    case AUDIO_STREAM_NOTIFICATION:
+      return kUsageNotifications;
+    case AUDIO_STREAM_SYSTEM:
+      return kUsageSystem;
+    default:
+      return kUsageInvalid;
+  }
+}
+
 }  // namespace brillo
