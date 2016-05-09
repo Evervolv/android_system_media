@@ -46,11 +46,14 @@ void AudioDaemon::InitializeHandlers() {
 
   // Register a callback with the audio device handler to call when device state
   // changes.
-  base::Callback<void(AudioDeviceHandler::DeviceConnectionState,
-                      const std::vector<int>&)> device_callback = base::Bind(
-                          &AudioDaemon::DeviceCallback,
-                          weak_ptr_factory_.GetWeakPtr());
+  auto device_callback =
+      base::Bind(&AudioDaemon::DeviceCallback, weak_ptr_factory_.GetWeakPtr());
   audio_device_handler_->RegisterDeviceCallback(device_callback);
+
+  // Register a callback with the audio volume handler.
+  auto volume_callback =
+      base::Bind(&AudioDaemon::VolumeCallback, weak_ptr_factory_.GetWeakPtr());
+  audio_volume_handler_->RegisterCallback(volume_callback);
 
   audio_device_handler_->Init(aps_);
   audio_volume_handler_->Init(aps_);
@@ -85,8 +88,9 @@ void AudioDaemon::InitializeHandlers() {
 
 void AudioDaemon::InitializeBrilloAudioService() {
   brillo_audio_service_ = new BrilloAudioServiceImpl();
-  brillo_audio_service_->RegisterDeviceHandler(
-      std::weak_ptr<AudioDeviceHandler>(audio_device_handler_));
+  brillo_audio_service_->RegisterHandlers(
+      std::weak_ptr<AudioDeviceHandler>(audio_device_handler_),
+      std::weak_ptr<AudioVolumeHandler>(audio_volume_handler_));
   android::BinderWrapper::Get()->RegisterService(kServiceName,
                                                  brillo_audio_service_);
   VLOG(1) << "Registered brilloaudioservice with the service manager.";
@@ -168,6 +172,20 @@ void AudioDaemon::DeviceCallback(
     brillo_audio_service_->OnDevicesConnected(devices);
   else
     brillo_audio_service_->OnDevicesDisconnected(devices);
+}
+
+void AudioDaemon::VolumeCallback(audio_stream_type_t stream,
+                                 int previous_index,
+                                 int current_index) {
+  VLOG(1) << "Triggering volume button press callback.";
+  if (!brillo_audio_service_.get()) {
+    LOG(ERROR) << "The Brillo audio service object is unavailble. Will try to "
+               << "call the clients again once the service is up.";
+    InitializeBrilloAudioService();
+    VolumeCallback(stream, previous_index, current_index);
+    return;
+  }
+  brillo_audio_service_->OnVolumeChanged(stream, previous_index, current_index);
 }
 
 }  // namespace brillo

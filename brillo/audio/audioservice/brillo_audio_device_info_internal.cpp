@@ -48,6 +48,23 @@ audio_policy_forced_cfg_t BAudioDeviceInfoInternal::GetConfig() {
   }
 }
 
+audio_devices_t BAudioDeviceInfoInternal::GetAudioDevicesT() {
+  switch (device_id_) {
+    case TYPE_BUILTIN_SPEAKER:
+      return AUDIO_DEVICE_OUT_SPEAKER;
+    case TYPE_WIRED_HEADSET:
+      return AUDIO_DEVICE_OUT_WIRED_HEADSET;
+    case TYPE_WIRED_HEADSET_MIC:
+      return AUDIO_DEVICE_IN_WIRED_HEADSET;
+    case TYPE_WIRED_HEADPHONES:
+      return AUDIO_DEVICE_OUT_WIRED_HEADPHONE;
+    case TYPE_BUILTIN_MIC:
+      return AUDIO_DEVICE_IN_BUILTIN_MIC;
+    default:
+      return AUDIO_DEVICE_NONE;
+  }
+}
+
 BAudioDeviceInfoInternal* BAudioDeviceInfoInternal::CreateFromAudioDevicesT(
     unsigned int device) {
   int device_id = TYPE_UNKNOWN;
