@@ -292,4 +292,206 @@ TEST_F(BrilloAudioManagerTest, UnregisterCallbackBASDies) {
             ECONNABORTED);
 }
 
+TEST_F(BrilloAudioManagerTest, GetMaxVolumeStepsInvalidParams) {
+  auto bam = GetValidManager();
+  int foo;
+  EXPECT_EQ(BAudioManager_getMaxVolumeSteps(
+                nullptr, BAudioUsage::kUsageMedia, nullptr),
+            EINVAL);
+  EXPECT_EQ(
+      BAudioManager_getMaxVolumeSteps(nullptr, BAudioUsage::kUsageMedia, &foo),
+      EINVAL);
+  EXPECT_EQ(
+      BAudioManager_getMaxVolumeSteps(bam, BAudioUsage::kUsageMedia, nullptr),
+      EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, GetMaxVolStepsWithBAS) {
+  auto bam = GetValidManager();
+  int foo;
+  EXPECT_CALL(*bas_.get(), GetMaxVolumeSteps(AUDIO_STREAM_MUSIC, &foo))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(
+      BAudioManager_getMaxVolumeSteps(bam, BAudioUsage::kUsageMedia, &foo), 0);
+}
+
+TEST_F(BrilloAudioManagerTest, GetMaxVolStepsBASDies) {
+  auto bam = GetValidManager();
+  int foo;
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(
+      BAudioManager_getMaxVolumeSteps(bam, BAudioUsage::kUsageMedia, &foo),
+      ECONNABORTED);
+}
+
+TEST_F(BrilloAudioManagerTest, SetMaxVolumeStepsInvalidParams) {
+  EXPECT_EQ(
+      BAudioManager_setMaxVolumeSteps(nullptr, BAudioUsage::kUsageMedia, 100),
+      EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, SetMaxVolStepsWithBAS) {
+  auto bam = GetValidManager();
+  EXPECT_CALL(*bas_.get(), SetMaxVolumeSteps(AUDIO_STREAM_MUSIC, 100))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(BAudioManager_setMaxVolumeSteps(bam, BAudioUsage::kUsageMedia, 100),
+            0);
+}
+
+TEST_F(BrilloAudioManagerTest, SetMaxVolStepsBASDies) {
+  auto bam = GetValidManager();
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(BAudioManager_setMaxVolumeSteps(bam, BAudioUsage::kUsageMedia, 100),
+            ECONNABORTED);
+}
+
+TEST_F(BrilloAudioManagerTest, SetVolIndexInvalidParams) {
+  auto bam = GetValidManager();
+  EXPECT_EQ(BAudioManager_setVolumeIndex(
+                nullptr, BAudioUsage::kUsageMedia, nullptr, 100),
+            EINVAL);
+  EXPECT_EQ(
+      BAudioManager_setVolumeIndex(bam, BAudioUsage::kUsageMedia, nullptr, 100),
+      EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, SetVolIndexWithBAS) {
+  auto bam = GetValidManager();
+  auto device = BAudioDeviceInfo_new(TYPE_WIRED_HEADPHONES);
+  EXPECT_CALL(
+      *bas_.get(),
+      SetVolumeIndex(AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADPHONE, 100))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(
+      BAudioManager_setVolumeIndex(bam, BAudioUsage::kUsageMedia, device, 100),
+      0);
+  BAudioDeviceInfo_delete(device);
+}
+
+TEST_F(BrilloAudioManagerTest, SetVolIndexBASDies) {
+  auto bam = GetValidManager();
+  auto device = BAudioDeviceInfo_new(TYPE_WIRED_HEADPHONES);
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(
+      BAudioManager_setVolumeIndex(bam, BAudioUsage::kUsageMedia, device, 100),
+      ECONNABORTED);
+  BAudioDeviceInfo_delete(device);
+}
+
+TEST_F(BrilloAudioManagerTest, GetVolIndexInvalidParams) {
+  auto bam = GetValidManager();
+  int foo;
+  EXPECT_EQ(BAudioManager_getVolumeIndex(
+                nullptr, BAudioUsage::kUsageMedia, nullptr, nullptr),
+            EINVAL);
+  auto device = BAudioDeviceInfo_new(TYPE_WIRED_HEADPHONES);
+  EXPECT_EQ(BAudioManager_getVolumeIndex(
+                bam, BAudioUsage::kUsageMedia, device, nullptr),
+            EINVAL);
+  EXPECT_EQ(BAudioManager_getVolumeIndex(
+                nullptr, BAudioUsage::kUsageMedia, device, &foo),
+            EINVAL);
+  EXPECT_EQ(BAudioManager_getVolumeIndex(
+                bam, BAudioUsage::kUsageMedia, nullptr, &foo),
+            EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, GetVolIndexWithBAS) {
+  auto bam = GetValidManager();
+  auto device = BAudioDeviceInfo_new(TYPE_WIRED_HEADPHONES);
+  int foo;
+  EXPECT_CALL(*bas_.get(),
+              GetVolumeIndex(
+                  AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_WIRED_HEADPHONE, &foo))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(
+      BAudioManager_getVolumeIndex(bam, BAudioUsage::kUsageMedia, device, &foo),
+      0);
+  BAudioDeviceInfo_delete(device);
+}
+
+TEST_F(BrilloAudioManagerTest, GetVolIndexBASDies) {
+  auto bam = GetValidManager();
+  auto device = BAudioDeviceInfo_new(TYPE_WIRED_HEADPHONES);
+  int foo;
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(
+      BAudioManager_getVolumeIndex(bam, BAudioUsage::kUsageMedia, device, &foo),
+      ECONNABORTED);
+  BAudioDeviceInfo_delete(device);
+}
+
+TEST_F(BrilloAudioManagerTest, GetVolumeControlUsageInvalidParams) {
+  auto bam = GetValidManager();
+  BAudioUsage foo;
+  EXPECT_EQ(BAudioManager_getVolumeControlUsage(nullptr, nullptr), EINVAL);
+  EXPECT_EQ(BAudioManager_getVolumeControlUsage(nullptr, &foo), EINVAL);
+  EXPECT_EQ(BAudioManager_getVolumeControlUsage(bam, nullptr), EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, GetVolumeControlStreamWithBAS) {
+  auto bam = GetValidManager();
+  BAudioUsage foo;
+  EXPECT_CALL(*bas_.get(), GetVolumeControlStream(_))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(BAudioManager_getVolumeControlUsage(bam, &foo), 0);
+}
+
+TEST_F(BrilloAudioManagerTest, GetVolumeControlStreamBASDies) {
+  auto bam = GetValidManager();
+  BAudioUsage foo;
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(BAudioManager_getVolumeControlUsage(bam, &foo), ECONNABORTED);
+}
+
+TEST_F(BrilloAudioManagerTest, SetVolumeControlUsageInvalidParams) {
+  EXPECT_EQ(
+      BAudioManager_setVolumeControlUsage(nullptr, BAudioUsage::kUsageMedia),
+      EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, SetVolumeControlStreamWithBAS) {
+  auto bam = GetValidManager();
+  EXPECT_CALL(*bas_.get(), SetVolumeControlStream(AUDIO_STREAM_MUSIC))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(BAudioManager_setVolumeControlUsage(bam, BAudioUsage::kUsageMedia),
+            0);
+}
+
+TEST_F(BrilloAudioManagerTest, SetVolumeControlStreamBASDies) {
+  auto bam = GetValidManager();
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(BAudioManager_setVolumeControlUsage(bam, BAudioUsage::kUsageMedia),
+            ECONNABORTED);
+}
+
+TEST_F(BrilloAudioManagerTest, DecIncInvalidParams) {
+  EXPECT_EQ(BAudioManager_decrementVolume(nullptr), EINVAL);
+  EXPECT_EQ(BAudioManager_incrementVolume(nullptr), EINVAL);
+}
+
+TEST_F(BrilloAudioManagerTest, IncVolWithBAS) {
+  auto bam = GetValidManager();
+  EXPECT_CALL(*bas_.get(), IncrementVolume()).WillOnce(Return(Status::ok()));
+  EXPECT_EQ(BAudioManager_incrementVolume(bam), 0);
+}
+
+TEST_F(BrilloAudioManagerTest, IncVolBASDies) {
+  auto bam = GetValidManager();
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(BAudioManager_incrementVolume(bam), ECONNABORTED);
+}
+
+TEST_F(BrilloAudioManagerTest, DecVolWithBAS) {
+  auto bam = GetValidManager();
+  EXPECT_CALL(*bas_.get(), DecrementVolume()).WillOnce(Return(Status::ok()));
+  EXPECT_EQ(BAudioManager_decrementVolume(bam), 0);
+}
+
+TEST_F(BrilloAudioManagerTest, DecVolBASDies) {
+  auto bam = GetValidManager();
+  binder_wrapper()->NotifyAboutBinderDeath(bas_);
+  EXPECT_EQ(BAudioManager_decrementVolume(bam), ECONNABORTED);
+}
+
 }  // namespace brillo

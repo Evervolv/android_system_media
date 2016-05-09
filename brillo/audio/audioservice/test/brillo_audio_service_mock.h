@@ -32,14 +32,25 @@ class BrilloAudioServiceMock : public BrilloAudioService {
 
   MOCK_METHOD2(GetDevices, Status(int flag, std::vector<int>* _aidl_return));
   MOCK_METHOD2(SetDevice, Status(int usage, int config));
+  MOCK_METHOD2(GetMaxVolumeSteps, Status(int stream, int* _aidl_return));
+  MOCK_METHOD2(SetMaxVolumeSteps, Status(int stream, int max_steps));
+  MOCK_METHOD3(SetVolumeIndex, Status(int stream, int device, int index));
+  MOCK_METHOD3(GetVolumeIndex,
+               Status(int stream, int device, int* _aidl_return));
+  MOCK_METHOD1(GetVolumeControlStream, Status(int* _aidl_return));
+  MOCK_METHOD1(SetVolumeControlStream, Status(int stream));
+  MOCK_METHOD0(IncrementVolume, Status());
+  MOCK_METHOD0(DecrementVolume, Status());
   MOCK_METHOD1(RegisterServiceCallback,
                Status(const android::sp<IAudioServiceCallback>& callback));
   MOCK_METHOD1(UnregisterServiceCallback,
                Status(const android::sp<IAudioServiceCallback>& callback));
 
-  void RegisterDeviceHandler(std::weak_ptr<AudioDeviceHandler>){};
+  void RegisterHandlers(std::weak_ptr<AudioDeviceHandler>,
+                        std::weak_ptr<AudioVolumeHandler>){};
   void OnDevicesConnected(const std::vector<int>&) {}
   void OnDevicesDisconnected(const std::vector<int>&) {}
+  void OnVolumeChanged(audio_stream_type_t, int, int){};
 };
 
 }  // namespace brillo

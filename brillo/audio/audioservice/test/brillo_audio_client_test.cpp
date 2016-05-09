@@ -102,8 +102,6 @@ TEST_F(BrilloAudioClientTest, SetDeviceWithBAS) {
 TEST_F(BrilloAudioClientTest, RegisterCallbackWithBAS) {
   EXPECT_TRUE(ConnectClientToBAS());
   BAudioCallback bcallback;
-  bcallback.OnAudioDeviceAdded = nullptr;
-  bcallback.OnAudioDeviceRemoved = nullptr;
   AudioServiceCallback* callback =
       new AudioServiceCallback(&bcallback, nullptr);
   int id = 0;
@@ -117,8 +115,6 @@ TEST_F(BrilloAudioClientTest, RegisterCallbackWithBAS) {
 TEST_F(BrilloAudioClientTest, RegisterSameCallbackTwiceWithBAS) {
   EXPECT_TRUE(ConnectClientToBAS());
   BAudioCallback bcallback;
-  bcallback.OnAudioDeviceAdded = nullptr;
-  bcallback.OnAudioDeviceRemoved = nullptr;
   AudioServiceCallback* callback =
       new AudioServiceCallback(&bcallback, nullptr);
   int id = -1;
@@ -136,8 +132,6 @@ TEST_F(BrilloAudioClientTest, RegisterSameCallbackTwiceWithBAS) {
 TEST_F(BrilloAudioClientTest, UnregisterAudioCallbackValidWithBAS) {
   EXPECT_TRUE(ConnectClientToBAS());
   BAudioCallback bcallback;
-  bcallback.OnAudioDeviceAdded = nullptr;
-  bcallback.OnAudioDeviceRemoved = nullptr;
   AudioServiceCallback* callback =
       new AudioServiceCallback(&bcallback, nullptr);
   int id = 0;
@@ -160,10 +154,6 @@ TEST_F(BrilloAudioClientTest, UnregisterInvalidCallbackWithBAS) {
 TEST_F(BrilloAudioClientTest, RegisterAndUnregisterAudioTwoCallbacks) {
   EXPECT_TRUE(ConnectClientToBAS());
   BAudioCallback bcallback1, bcallback2;
-  bcallback1.OnAudioDeviceAdded = nullptr;
-  bcallback1.OnAudioDeviceRemoved = nullptr;
-  bcallback2.OnAudioDeviceAdded = nullptr;
-  bcallback2.OnAudioDeviceRemoved = nullptr;
   AudioServiceCallback* callback1 =
       new AudioServiceCallback(&bcallback1, nullptr);
   AudioServiceCallback* callback2 =
@@ -179,6 +169,119 @@ TEST_F(BrilloAudioClientTest, RegisterAndUnregisterAudioTwoCallbacks) {
       .WillRepeatedly(Return(Status::ok()));
   EXPECT_EQ(client_.UnregisterAudioCallback(id1), 0);
   EXPECT_EQ(client_.UnregisterAudioCallback(id2), 0);
+}
+
+TEST_F(BrilloAudioClientTest, GetMaxVolStepsNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  int foo;
+  EXPECT_EQ(client_.GetMaxVolumeSteps(BAudioUsage::kUsageInvalid, &foo),
+            ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, GetMaxVolStepsWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  int foo;
+  EXPECT_CALL(*bas_.get(), GetMaxVolumeSteps(AUDIO_STREAM_MUSIC, &foo))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.GetMaxVolumeSteps(BAudioUsage::kUsageMedia, &foo), 0);
+}
+
+TEST_F(BrilloAudioClientTest, SetMaxVolStepsNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  EXPECT_EQ(client_.SetMaxVolumeSteps(BAudioUsage::kUsageInvalid, 100),
+            ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, SetMaxVolStepsWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  EXPECT_CALL(*bas_.get(), SetMaxVolumeSteps(AUDIO_STREAM_MUSIC, 100))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.SetMaxVolumeSteps(BAudioUsage::kUsageMedia, 100), 0);
+}
+
+TEST_F(BrilloAudioClientTest, SetVolIndexNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  EXPECT_EQ(client_.SetVolumeIndex(
+                BAudioUsage::kUsageInvalid, AUDIO_DEVICE_NONE, 100),
+            ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, SetVolIndexWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  EXPECT_CALL(*bas_.get(),
+              SetVolumeIndex(AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_SPEAKER, 100))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.SetVolumeIndex(
+                BAudioUsage::kUsageMedia, AUDIO_DEVICE_OUT_SPEAKER, 100),
+            0);
+}
+
+TEST_F(BrilloAudioClientTest, GetVolIndexNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  int foo;
+  EXPECT_EQ(client_.GetVolumeIndex(
+                BAudioUsage::kUsageInvalid, AUDIO_DEVICE_NONE, &foo),
+            ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, GetVolIndexWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  int foo;
+  EXPECT_CALL(
+      *bas_.get(),
+      GetVolumeIndex(AUDIO_STREAM_MUSIC, AUDIO_DEVICE_OUT_SPEAKER, &foo))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.GetVolumeIndex(
+                BAudioUsage::kUsageMedia, AUDIO_DEVICE_OUT_SPEAKER, &foo),
+            0);
+}
+
+TEST_F(BrilloAudioClientTest, GetVolumeControlStreamNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  BAudioUsage foo;
+  EXPECT_EQ(client_.GetVolumeControlStream(&foo), ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, GetVolumeControlStreamWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  EXPECT_CALL(*bas_.get(), GetVolumeControlStream(_))
+      .WillOnce(Return(Status::ok()));
+  BAudioUsage foo;
+  EXPECT_EQ(client_.GetVolumeControlStream(&foo), 0);
+}
+
+TEST_F(BrilloAudioClientTest, SetVolumeControlStreamNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  EXPECT_EQ(client_.SetVolumeControlStream(kUsageMedia), ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, SetVolumeControlStreamWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  EXPECT_CALL(*bas_.get(), SetVolumeControlStream(AUDIO_STREAM_MUSIC))
+      .WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.SetVolumeControlStream(kUsageMedia), 0);
+}
+
+TEST_F(BrilloAudioClientTest, IncrementVolNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  EXPECT_EQ(client_.IncrementVolume(), ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, IncrementVolWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  EXPECT_CALL(*bas_.get(), IncrementVolume()).WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.IncrementVolume(), 0);
+}
+
+TEST_F(BrilloAudioClientTest, DecrementVolNoService) {
+  EXPECT_CALL(client_, OnBASDisconnect());
+  EXPECT_EQ(client_.DecrementVolume(), ECONNABORTED);
+}
+
+TEST_F(BrilloAudioClientTest, DecrementVolWithBAS) {
+  EXPECT_TRUE(ConnectClientToBAS());
+  EXPECT_CALL(*bas_.get(), DecrementVolume()).WillOnce(Return(Status::ok()));
+  EXPECT_EQ(client_.DecrementVolume(), 0);
 }
 
 }  // namespace brillo

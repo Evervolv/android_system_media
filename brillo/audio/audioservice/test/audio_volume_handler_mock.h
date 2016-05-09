@@ -43,7 +43,9 @@ class AudioVolumeHandlerMock : public AudioVolumeHandler {
   FRIEND_TEST(AudioVolumeHandlerTest, ProcessEventKeyDown);
   FRIEND_TEST(AudioVolumeHandlerTest, SelectStream);
   FRIEND_TEST(AudioVolumeHandlerTest, ComputeNewVolume);
+  FRIEND_TEST(AudioVolumeHandlerTest, GetSetVolumeIndex);
 
+  MOCK_METHOD3(TriggerCallback, void(audio_stream_type_t, int, int));
   MOCK_METHOD0(InitAPSAllStreams, void());
   MOCK_METHOD1(AdjustVolumeActiveStreams, void(int));
 };

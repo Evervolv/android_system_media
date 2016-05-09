@@ -40,7 +40,7 @@ class AudioDaemon : public Daemon {
   virtual ~AudioDaemon();
 
  protected:
-  // Initialize the audio device handler and start pollig the files in
+  // Initialize the audio daemon handlers and start pollig the files in
   // /dev/input.
   int OnInit() override;
 
@@ -61,6 +61,15 @@ class AudioDaemon : public Daemon {
   // |devices| is a vector of integers representing audio_devices_t.
   void DeviceCallback(AudioDeviceHandler::DeviceConnectionState,
                       const std::vector<int>& devices);
+
+  // Callback function when volume changes.
+  //
+  // |stream| is an audio_stream_type_t representing the stream.
+  // |previous_index| is the volume index before the key press.
+  // |current_index| is the volume index after the key press.
+  void VolumeCallback(audio_stream_type_t stream,
+                      int previous_index,
+                      int current_index);
 
   // Callback function for audio policy service death notification.
   void OnAPSDisconnected();
@@ -85,7 +94,7 @@ class AudioDaemon : public Daemon {
   // Handler for audio device input events.
   std::shared_ptr<AudioDeviceHandler> audio_device_handler_;
   // Handler for volume key press input events.
-  std::unique_ptr<AudioVolumeHandler> audio_volume_handler_;
+  std::shared_ptr<AudioVolumeHandler> audio_volume_handler_;
   // Used to generate weak_ptr to AudioDaemon for use in base::Bind.
   base::WeakPtrFactory<AudioDaemon> weak_ptr_factory_{this};
   // Pointer to the audio policy service.

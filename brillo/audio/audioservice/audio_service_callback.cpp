@@ -20,6 +20,7 @@
 #include <base/bind.h>
 #include <base/logging.h>
 
+#include "brillo_audio_client_helpers.h"
 #include "brillo_audio_device_info_def.h"
 
 using android::binder::Status;
@@ -30,6 +31,7 @@ AudioServiceCallback::AudioServiceCallback(const BAudioCallback* callback,
                                            void* user_data) {
   connected_callback_ = base::Bind(callback->OnAudioDeviceAdded);
   disconnected_callback_ = base::Bind(callback->OnAudioDeviceRemoved);
+  volume_callback_ = base::Bind(callback->OnVolumeChanged);
   user_data_ = user_data;
 }
 
@@ -55,9 +57,19 @@ Status AudioServiceCallback::OnAudioDevicesDisconnected(
   return Status::ok();
 }
 
+Status AudioServiceCallback::OnVolumeChanged(int stream,
+                                             int previous_index,
+                                             int current_index) {
+  auto usage = BrilloAudioClientHelpers::GetBAudioUsage(
+      static_cast<audio_stream_type_t>(stream));
+  volume_callback_.Run(usage, previous_index, current_index, user_data_);
+  return Status::ok();
+}
+
 bool AudioServiceCallback::Equals(android::sp<AudioServiceCallback> callback) {
   if (callback->connected_callback_.Equals(connected_callback_) &&
       callback->disconnected_callback_.Equals(disconnected_callback_) &&
+      callback->volume_callback_.Equals(volume_callback_) &&
       callback->user_data_ == user_data_)
     return true;
   return false;
