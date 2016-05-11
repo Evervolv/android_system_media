@@ -345,15 +345,15 @@ size_t nonZeroStereo16(const int16_t *frames, size_t count)
 #define copy_frame_by_mask(dst, dmask, src, smask, count, zero) \
 { \
     uint32_t bit, ormask; \
-    while (count--) { \
-        ormask = dmask | smask; \
+    while ((count)--) { \
+        ormask = (dmask) | (smask); \
         while (ormask) { \
             bit = ormask & -ormask; /* get lowest bit */ \
             ormask ^= bit; /* remove lowest bit */ \
-            if (dmask & bit) { \
-                *dst++ = smask & bit ? *src++ : zero; \
+            if ((dmask) & bit) { \
+                *(dst)++ = (smask) & bit ? *(src)++ : (zero); \
             } else { /* source channel only */ \
-                ++src; \
+                ++(src); \
             } \
         } \
     } \
@@ -417,12 +417,12 @@ void memcpy_by_channel_mask(void *dst, uint32_t dst_mask,
 { \
     unsigned i; \
     int index; \
-    while (count--) { \
-        for (i = 0; i < dst_channels; ++i) { \
-            index = idxary[i]; \
-            *dst++ = index < 0 ? zero : src[index]; \
+    while ((count)--) { \
+        for (i = 0; i < (dst_channels); ++i) { \
+            index = (idxary)[i]; \
+            *(dst)++ = index < 0 ? (zero) : (src)[index]; \
         } \
-        src += src_channels; \
+        (src) += (src_channels); \
     } \
 }
 
