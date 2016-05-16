@@ -27,7 +27,7 @@
 
 #define OK         0
 #define ERROR      1
-#define NOT_FOUND -ENOENT
+#define NOT_FOUND (-ENOENT)
 
 #define ALIGN_TO(val, alignment) \
     (((uintptr_t)(val) + ((alignment) - 1)) & ~((alignment) - 1))
