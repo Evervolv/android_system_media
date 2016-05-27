@@ -18,6 +18,7 @@
 #ifndef BRILLO_AUDIO_AUDIOSERVICE_BRILLO_AUDIO_CLIENT_H_
 #define BRILLO_AUDIO_AUDIOSERVICE_BRILLO_AUDIO_CLIENT_H_
 
+#include <map>
 #include <memory>
 #include <vector>
 
