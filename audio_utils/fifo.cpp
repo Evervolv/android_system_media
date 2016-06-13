@@ -21,114 +21,126 @@
 #include <string.h>
 #include <audio_utils/fifo.h>
 #include <audio_utils/roundup.h>
-#include <cutils/atomic.h>
 #include <cutils/log.h>
+#include <utils/Errors.h>
 
-void audio_utils_fifo_init(struct audio_utils_fifo *fifo, size_t frameCount, size_t frameSize,
-        void *buffer)
+audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer) :
+    mFrameCount(frameCount), mFrameCountP2(roundup(frameCount)),
+    mFudgeFactor(mFrameCountP2 - mFrameCount), mFrameSize(frameSize), mBuffer(buffer),
+    mLocalFront(0), mLocalRear(0), mSharedFront(0), mSharedRear(0)
 {
-    // We would need a 64-bit roundup to support larger frameCount.
-    ALOG_ASSERT(fifo != NULL && frameCount > 0 && frameSize > 0 && buffer != NULL);
-    fifo->mFrameCount = frameCount;
-    fifo->mFrameCountP2 = roundup(frameCount);
-    fifo->mFudgeFactor = fifo->mFrameCountP2 - fifo->mFrameCount;
-    fifo->mFrameSize = frameSize;
-    fifo->mBuffer = buffer;
-    fifo->mFront = 0;
-    fifo->mRear = 0;
+    // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
+    // be able to distinguish successful and error return values from read and write.
+    ALOG_ASSERT(frameCount > 0 && frameSize > 0 && buffer != NULL &&
+            frameCount <= ((uint32_t) INT_MAX) / frameSize);
 }
 
-void audio_utils_fifo_deinit(struct audio_utils_fifo *fifo __unused)
+audio_utils_fifo::~audio_utils_fifo()
 {
 }
 
-// Return a new index as the sum of an old index (either mFront or mRear) and a specified increment.
-static inline int32_t audio_utils_fifo_sum(struct audio_utils_fifo *fifo, int32_t index,
-        uint32_t increment)
+uint32_t audio_utils_fifo::sum(uint32_t index, uint32_t increment)
+        __attribute__((no_sanitize("integer")))
 {
-    if (fifo->mFudgeFactor) {
-        uint32_t mask = fifo->mFrameCountP2 - 1;
-        ALOG_ASSERT((index & mask) < fifo->mFrameCount);
-        ALOG_ASSERT(/*0 <= increment &&*/ increment <= fifo->mFrameCountP2);
-        if ((index & mask) + increment >= fifo->mFrameCount) {
-            increment += fifo->mFudgeFactor;
+    if (mFudgeFactor) {
+        uint32_t mask = mFrameCountP2 - 1;
+        ALOG_ASSERT((index & mask) < mFrameCount);
+        ALOG_ASSERT(increment <= mFrameCountP2);
+        if ((index & mask) + increment >= mFrameCount) {
+            increment += mFudgeFactor;
         }
         index += increment;
-        ALOG_ASSERT((index & mask) < fifo->mFrameCount);
+        ALOG_ASSERT((index & mask) < mFrameCount);
         return index;
     } else {
         return index + increment;
     }
 }
 
-// Return the difference between two indices: rear - front, where 0 <= difference <= mFrameCount.
-static inline size_t audio_utils_fifo_diff(struct audio_utils_fifo *fifo, int32_t rear,
-        int32_t front)
+int32_t audio_utils_fifo::diff(uint32_t rear, uint32_t front)
+        __attribute__((no_sanitize("integer")))
 {
-    int32_t diff = rear - front;
-    if (fifo->mFudgeFactor) {
-        uint32_t mask = ~(fifo->mFrameCountP2 - 1);
-        int32_t genDiff = (rear & mask) - (front & mask);
+    uint32_t diff = rear - front;
+    if (mFudgeFactor) {
+        uint32_t mask = mFrameCountP2 - 1;
+        uint32_t rearMasked = rear & mask;
+        uint32_t frontMasked = front & mask;
+        if (rearMasked >= mFrameCount || frontMasked >= mFrameCount) {
+            return (int32_t) android::UNKNOWN_ERROR;
+        }
+        uint32_t genDiff = (rear & ~mask) - (front & ~mask);
         if (genDiff != 0) {
-            ALOG_ASSERT(genDiff == (int32_t) fifo->mFrameCountP2);
-            diff -= fifo->mFudgeFactor;
+            if (genDiff > mFrameCountP2) {
+                return (int32_t) android::UNKNOWN_ERROR;
+            }
+            diff -= mFudgeFactor;
         }
     }
     // FIFO should not be overfull
-    ALOG_ASSERT(0 <= diff && diff <= (int32_t) fifo->mFrameCount);
-    return (size_t) diff;
+    if (diff > mFrameCount) {
+        return (int32_t) android::UNKNOWN_ERROR;
+    }
+    return (int32_t) diff;
 }
 
-ssize_t audio_utils_fifo_write(struct audio_utils_fifo *fifo, const void *buffer, size_t count)
+ssize_t audio_utils_fifo::write(const void *buffer, size_t count)
+        __attribute__((no_sanitize("integer")))
 {
-    int32_t front = android_atomic_acquire_load(&fifo->mFront);
-    int32_t rear = fifo->mRear;
-    size_t availToWrite = fifo->mFrameCount - audio_utils_fifo_diff(fifo, rear, front);
+    uint32_t front = (uint32_t) atomic_load_explicit(&mSharedFront, std::memory_order_acquire);
+    uint32_t rear = mLocalRear;
+    int32_t filled = diff(rear, front);
+    if (filled < 0) {
+        return (ssize_t) filled;
+    }
+    size_t availToWrite = (size_t) mFrameCount - (size_t) filled;
     if (availToWrite > count) {
         availToWrite = count;
     }
-    rear &= fifo->mFrameCountP2 - 1;
-    size_t part1 = fifo->mFrameCount - rear;
+    uint32_t rearMasked = rear & (mFrameCountP2 - 1);
+    size_t part1 = mFrameCount - rearMasked;
     if (part1 > availToWrite) {
         part1 = availToWrite;
     }
     if (part1 > 0) {
-        memcpy((char *) fifo->mBuffer + (rear * fifo->mFrameSize), buffer,
-                part1 * fifo->mFrameSize);
+        memcpy((char *) mBuffer + (rearMasked * mFrameSize), buffer, part1 * mFrameSize);
         size_t part2 = availToWrite - part1;
         if (part2 > 0) {
-            memcpy(fifo->mBuffer, (char *) buffer + (part1 * fifo->mFrameSize),
-                    part2 * fifo->mFrameSize);
+            memcpy(mBuffer, (char *) buffer + (part1 * mFrameSize), part2 * mFrameSize);
         }
-        android_atomic_release_store(audio_utils_fifo_sum(fifo, fifo->mRear, availToWrite),
-                &fifo->mRear);
+        mLocalRear = sum(rear, availToWrite);
+        atomic_store_explicit(&mSharedRear, (uint_fast32_t) mLocalRear,
+                std::memory_order_release);
     }
     return availToWrite;
 }
 
-ssize_t audio_utils_fifo_read(struct audio_utils_fifo *fifo, void *buffer, size_t count)
+ssize_t audio_utils_fifo::read(void *buffer, size_t count)
+        __attribute__((no_sanitize("integer")))
 {
-    int32_t rear = android_atomic_acquire_load(&fifo->mRear);
-    int32_t front = fifo->mFront;
-    size_t availToRead = audio_utils_fifo_diff(fifo, rear, front);
+    uint32_t rear = (uint32_t) atomic_load_explicit(&mSharedRear, std::memory_order_acquire);
+    uint32_t front = mLocalFront;
+    int32_t filled = diff(rear, front);
+    if (filled < 0) {
+        return (ssize_t) filled;
+    }
+    size_t availToRead = (size_t) filled;
     if (availToRead > count) {
         availToRead = count;
     }
-    front &= fifo->mFrameCountP2 - 1;
-    size_t part1 = fifo->mFrameCount - front;
+    uint32_t frontMasked = front & (mFrameCountP2 - 1);
+    size_t part1 = mFrameCount - frontMasked;
     if (part1 > availToRead) {
         part1 = availToRead;
     }
     if (part1 > 0) {
-        memcpy(buffer, (char *) fifo->mBuffer + (front * fifo->mFrameSize),
-                part1 * fifo->mFrameSize);
+        memcpy(buffer, (char *) mBuffer + (frontMasked * mFrameSize), part1 * mFrameSize);
         size_t part2 = availToRead - part1;
         if (part2 > 0) {
-            memcpy((char *) buffer + (part1 * fifo->mFrameSize), fifo->mBuffer,
-                    part2 * fifo->mFrameSize);
+            memcpy((char *) buffer + (part1 * mFrameSize), mBuffer, part2 * mFrameSize);
         }
-        android_atomic_release_store(audio_utils_fifo_sum(fifo, fifo->mFront, availToRead),
-                &fifo->mFront);
+        mLocalFront = sum(front, availToRead);
+        atomic_store_explicit(&mSharedFront, (uint_fast32_t) mLocalFront,
+                std::memory_order_release);
     }
     return availToRead;
 }

@@ -44,5 +44,5 @@ LOCAL_SRC_FILES := limiter_tests.c
 LOCAL_MODULE := limiter_tests
 LOCAL_C_INCLUDES := $(call include-path-for, audio-utils)
 LOCAL_STATIC_LIBRARIES := libaudioutils
-LOCAL_CFLAGS := -Werror -Wall
+LOCAL_CFLAGS := -Werror -Wall -UNDEBUG
 include $(BUILD_HOST_EXECUTABLE)

@@ -23,6 +23,10 @@
 #include <audio_utils/fifo.h>
 #include <audio_utils/sndfile.h>
 
+#ifndef min
+#define min(x, y) (((x) < (y)) ? (x) : (y))
+#endif
+
 int main(int argc, char **argv)
 {
     size_t frameCount = 256;
@@ -51,7 +55,7 @@ int main(int argc, char **argv)
 
     if (argc - i != 2) {
 usage:
-        fprintf(stderr, "usage: %s [-c#] in.wav out.wav\n", argv[0]);
+        fprintf(stderr, "usage: %s [-c#] [-r#] [-w#] in.wav out.wav\n", argv[0]);
         return EXIT_FAILURE;
     }
     char *inputFile = argv[i];
@@ -64,12 +68,11 @@ usage:
         perror(inputFile);
         return EXIT_FAILURE;
     }
-    // sf_readf_short() does conversion, so not strictly necessary to check the file format.
-    // But I want to do "cmp" on input and output files afterwards,
-    // and it is easier if they are all the same format.
-    // Enforcing that everything is 16-bit is convenient for this.
-    if ((sfinfoin.format & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)) !=
-            (SF_FORMAT_WAV | SF_FORMAT_PCM_16)) {
+    switch (sfinfoin.format & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)) {
+    case SF_FORMAT_WAV | SF_FORMAT_PCM_16:
+    case SF_FORMAT_WAV | SF_FORMAT_PCM_U8:
+        break;
+    default:
         fprintf(stderr, "%s: unsupported format\n", inputFile);
         sf_close(sfin);
         return EXIT_FAILURE;
@@ -87,9 +90,8 @@ usage:
     short *outputBuffer = new short[sfinfoin.frames * sfinfoin.channels];
     size_t framesWritten = 0;
     size_t framesRead = 0;
-    struct audio_utils_fifo fifo;
     short *fifoBuffer = new short[frameCount * sfinfoin.channels];
-    audio_utils_fifo_init(&fifo, frameCount, frameSize, fifoBuffer);
+    audio_utils_fifo fifo(frameCount, frameSize, fifoBuffer);
     int fifoWriteCount = 0, fifoReadCount = 0;
     int fifoFillLevel = 0, minFillLevel = INT_MAX, maxFillLevel = INT_MIN;
     for (;;) {
@@ -103,11 +105,15 @@ usage:
             framesToWrite = maxFramesPerWrite;
         }
         framesToWrite = rand() % (framesToWrite + 1);
-        ssize_t actualWritten = audio_utils_fifo_write(&fifo,
+        ssize_t actualWritten = fifo.write(
                 &inputBuffer[framesWritten * sfinfoin.channels], framesToWrite);
         if (actualWritten < 0 || (size_t) actualWritten > framesToWrite) {
             fprintf(stderr, "write to FIFO failed\n");
             break;
+        }
+        if (actualWritten < min((int) frameCount - fifoFillLevel, (int) framesToWrite)) {
+            fprintf(stderr, "only wrote %d when should have written min(%d, %d)\n",
+                    (int) actualWritten, (int) frameCount - fifoFillLevel, (int) framesToWrite);
         }
         framesWritten += actualWritten;
         if (actualWritten > 0) {
@@ -116,19 +122,25 @@ usage:
         fifoFillLevel += actualWritten;
         if (fifoFillLevel > maxFillLevel) {
             maxFillLevel = fifoFillLevel;
-            if (maxFillLevel > (int) frameCount)
+            if (maxFillLevel > (int) frameCount) {
+                printf("maxFillLevel=%d >  frameCount=%d\n", maxFillLevel, (int) frameCount);
                 abort();
+            }
         }
 
         if (framesToRead > maxFramesPerRead) {
             framesToRead = maxFramesPerRead;
         }
         framesToRead = rand() % (framesToRead + 1);
-        ssize_t actualRead = audio_utils_fifo_read(&fifo,
+        ssize_t actualRead = fifo.read(
                 &outputBuffer[framesRead * sfinfoin.channels], framesToRead);
         if (actualRead < 0 || (size_t) actualRead > framesToRead) {
             fprintf(stderr, "read from FIFO failed\n");
             break;
+        }
+        if (actualRead < min(fifoFillLevel, (int) framesToRead)) {
+            fprintf(stderr, "only read %d when should have read min(%d, %d)\n",
+                    (int) actualRead, fifoFillLevel, (int) framesToRead);
         }
         framesRead += actualRead;
         if (actualRead > 0) {
@@ -137,14 +149,19 @@ usage:
         fifoFillLevel -= actualRead;
         if (fifoFillLevel < minFillLevel) {
             minFillLevel = fifoFillLevel;
-            if (minFillLevel < 0)
+            if (minFillLevel < 0) {
+                printf("minFillLevel=%d < 0\n", minFillLevel);
                 abort();
+            }
         }
     }
+    delete[] inputBuffer;
+    inputBuffer = NULL;
+    delete[] fifoBuffer;
+    fifoBuffer = NULL;
+
     printf("FIFO non-empty writes: %d, non-empty reads: %d\n", fifoWriteCount, fifoReadCount);
     printf("fill=%d, min=%d, max=%d\n", fifoFillLevel, minFillLevel, maxFillLevel);
-    audio_utils_fifo_deinit(&fifo);
-    delete[] fifoBuffer;
 
     SF_INFO sfinfoout;
     memset(&sfinfoout, 0, sizeof(sfinfoout));
@@ -157,9 +174,9 @@ usage:
         return EXIT_FAILURE;
     }
     sf_count_t actualWritten = sf_writef_short(sfout, outputBuffer, framesRead);
-    delete[] inputBuffer;
     delete[] outputBuffer;
-    delete[] fifoBuffer;
+    outputBuffer = NULL;
+
     if (actualWritten != (sf_count_t) framesRead) {
         fprintf(stderr, "%s: unexpected error\n", outputFile);
         sf_close(sfout);
