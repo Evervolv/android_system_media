@@ -8,7 +8,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES:= \
 	channels.c \
 	conversion.cpp \
-	fifo.c \
+	fifo.cpp \
 	fixedfft.cpp.arm \
 	format.c \
 	limiter.c \
@@ -37,7 +37,7 @@ LOCAL_MODULE := libaudioutils
 LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := \
 	channels.c \
-	fifo.c \
+	fifo.cpp \
 	format.c \
 	limiter.c \
 	minifloat.c \
@@ -88,7 +88,7 @@ LOCAL_MODULE := libfifo
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := \
-	fifo.c \
+	fifo.cpp \
 	primitives.c \
 	roundup.c
 
