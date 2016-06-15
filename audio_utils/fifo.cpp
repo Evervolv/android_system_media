@@ -27,7 +27,8 @@
 audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer) :
     mFrameCount(frameCount), mFrameCountP2(roundup(frameCount)),
     mFudgeFactor(mFrameCountP2 - mFrameCount), mFrameSize(frameSize), mBuffer(buffer),
-    mLocalFront(0), mLocalRear(0), mSharedFront(0), mSharedRear(0)
+    mLocalFront(0), mLocalRear(0), mSharedFront(0), mSharedRear(0),
+    mReadObtained(0), mWriteObtained(0)
 {
     // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
     // be able to distinguish successful and error return values from read and write.
@@ -86,10 +87,27 @@ int32_t audio_utils_fifo::diff(uint32_t rear, uint32_t front)
 ssize_t audio_utils_fifo::write(const void *buffer, size_t count)
         __attribute__((no_sanitize("integer")))
 {
+    audio_utils_iovec iovec[2];
+    ssize_t availToWrite = writeObtain(iovec, count);
+    if (availToWrite > 0) {
+        memcpy(iovec[0].mBase, buffer, iovec[0].mLen * mFrameSize);
+        if (iovec[1].mLen > 0) {
+            memcpy(iovec[1].mBase, (char *) buffer + (iovec[0].mLen * mFrameSize),
+                    iovec[1].mLen * mFrameSize);
+        }
+        writeRelease(availToWrite);
+    }
+    return availToWrite;
+}
+
+ssize_t audio_utils_fifo::writeObtain(audio_utils_iovec iovec[2], size_t count)
+        __attribute__((no_sanitize("integer")))
+{
     uint32_t front = (uint32_t) atomic_load_explicit(&mSharedFront, std::memory_order_acquire);
     uint32_t rear = mLocalRear;
     int32_t filled = diff(rear, front);
     if (filled < 0) {
+        mWriteObtained = 0;
         return (ssize_t) filled;
     }
     size_t availToWrite = (size_t) mFrameCount - (size_t) filled;
@@ -101,26 +119,50 @@ ssize_t audio_utils_fifo::write(const void *buffer, size_t count)
     if (part1 > availToWrite) {
         part1 = availToWrite;
     }
-    if (part1 > 0) {
-        memcpy((char *) mBuffer + (rearMasked * mFrameSize), buffer, part1 * mFrameSize);
-        size_t part2 = availToWrite - part1;
-        if (part2 > 0) {
-            memcpy(mBuffer, (char *) buffer + (part1 * mFrameSize), part2 * mFrameSize);
-        }
-        mLocalRear = sum(rear, availToWrite);
-        atomic_store_explicit(&mSharedRear, (uint_fast32_t) mLocalRear,
-                std::memory_order_release);
-    }
+    size_t part2 = part1 > 0 ? availToWrite - part1 : 0;
+    iovec[0].mLen = part1;
+    iovec[0].mBase = part1 > 0 ? (char *) mBuffer + (rearMasked * mFrameSize) : NULL;
+    iovec[1].mLen = part2;
+    iovec[1].mBase = part2 > 0 ? mBuffer : NULL;
+    mWriteObtained = availToWrite;
     return availToWrite;
 }
 
+void audio_utils_fifo::writeRelease(size_t count)
+{
+    if (count > 0) {
+        ALOG_ASSERT(count <= mWriteObtained);
+        mLocalRear = sum(mLocalRear, count);
+        atomic_store_explicit(&mSharedRear, (uint_fast32_t) mLocalRear,
+                std::memory_order_release);
+        mWriteObtained -= count;
+    }
+}
+
 ssize_t audio_utils_fifo::read(void *buffer, size_t count)
+        __attribute__((no_sanitize("integer")))
+{
+    audio_utils_iovec iovec[2];
+    ssize_t availToRead = readObtain(iovec, count);
+    if (availToRead > 0) {
+        memcpy(buffer, iovec[0].mBase, iovec[0].mLen * mFrameSize);
+        if (iovec[1].mLen > 0) {
+            memcpy((char *) buffer + (iovec[0].mLen * mFrameSize), iovec[1].mBase,
+                    iovec[1].mLen * mFrameSize);
+        }
+        readRelease(availToRead);
+    }
+    return availToRead;
+}
+
+ssize_t audio_utils_fifo::readObtain(audio_utils_iovec iovec[2], size_t count)
         __attribute__((no_sanitize("integer")))
 {
     uint32_t rear = (uint32_t) atomic_load_explicit(&mSharedRear, std::memory_order_acquire);
     uint32_t front = mLocalFront;
     int32_t filled = diff(rear, front);
     if (filled < 0) {
+        mReadObtained = 0;
         return (ssize_t) filled;
     }
     size_t availToRead = (size_t) filled;
@@ -132,15 +174,22 @@ ssize_t audio_utils_fifo::read(void *buffer, size_t count)
     if (part1 > availToRead) {
         part1 = availToRead;
     }
-    if (part1 > 0) {
-        memcpy(buffer, (char *) mBuffer + (frontMasked * mFrameSize), part1 * mFrameSize);
-        size_t part2 = availToRead - part1;
-        if (part2 > 0) {
-            memcpy((char *) buffer + (part1 * mFrameSize), mBuffer, part2 * mFrameSize);
-        }
-        mLocalFront = sum(front, availToRead);
+    size_t part2 = part1 > 0 ? availToRead - part1 : 0;
+    iovec[0].mLen = part1;
+    iovec[0].mBase = part1 > 0 ? (char *) mBuffer + (frontMasked * mFrameSize) : NULL;
+    iovec[1].mLen = part2;
+    iovec[1].mBase = part2 > 0 ? mBuffer : NULL;
+    mReadObtained = availToRead;
+    return availToRead;
+}
+
+void audio_utils_fifo::readRelease(size_t count)
+{
+    if (count > 0) {
+        ALOG_ASSERT(count <= mReadObtained);
+        mLocalFront = sum(mLocalFront, count);
         atomic_store_explicit(&mSharedFront, (uint_fast32_t) mLocalFront,
                 std::memory_order_release);
+        mReadObtained -= count;
     }
-    return availToRead;
 }

@@ -24,6 +24,13 @@
 #error C API is no longer supported
 #endif
 
+// Describes one virtually contiguous fragment of a logically contiguous slice.
+// Compare to struct iovec for readv(2) and writev(2).
+struct audio_utils_iovec {
+    void   *mBase;  // const void * for readObtain()
+    size_t  mLen;   // in frames
+};
+
 // Single writer, single reader non-blocking FIFO.
 // Writer and reader must be in same process.
 
@@ -66,6 +73,10 @@ private:
     // These are accessed by both sides using atomic operations
     std::atomic_uint_fast32_t mSharedFront;
     std::atomic_uint_fast32_t mSharedRear;
+
+    // Number of frames obtained at most recent obtainRead/Write(), less number of frames released
+    uint32_t    mReadObtained;
+    uint32_t    mWriteObtained;
 
 public:
 
@@ -116,6 +127,11 @@ private:
  */
     int32_t diff(uint32_t rear, uint32_t front);
 
+    // obtain and release are based on frameworks/av/include/media/AudioBufferProvider.h
+    ssize_t readObtain(audio_utils_iovec iovec[2], size_t count);
+    void readRelease(size_t count);
+    ssize_t writeObtain(audio_utils_iovec iovec[2], size_t count);
+    void writeRelease(size_t count);
 };
 
 #endif  // !ANDROID_AUDIO_FIFO_H
