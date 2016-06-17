@@ -24,23 +24,21 @@
 #include <cutils/log.h>
 #include <utils/Errors.h>
 
-audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer)
+audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount)
         __attribute__((no_sanitize("integer"))) :
     mFrameCount(frameCount), mFrameCountP2(roundup(frameCount)),
-    mFudgeFactor(mFrameCountP2 - mFrameCount), mFrameSize(frameSize), mBuffer(buffer),
+    mFudgeFactor(mFrameCountP2 - mFrameCount),
     mSharedRear(0), mThrottleFront(NULL)
 {
-    // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
-    // be able to distinguish successful and error return values from read and write.
-    ALOG_ASSERT(frameCount > 0 && frameSize > 0 && buffer != NULL &&
-            frameCount <= ((uint32_t) INT_MAX) / frameSize);
+    // actual upper bound on frameCount will depend on the frame size
+    ALOG_ASSERT(frameCount > 0 && frameCount <= ((uint32_t) INT_MAX));
 }
 
-audio_utils_fifo::~audio_utils_fifo()
+audio_utils_fifo_base::~audio_utils_fifo_base()
 {
 }
 
-uint32_t audio_utils_fifo::sum(uint32_t index, uint32_t increment)
+uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment)
         __attribute__((no_sanitize("integer")))
 {
     if (mFudgeFactor) {
@@ -58,7 +56,7 @@ uint32_t audio_utils_fifo::sum(uint32_t index, uint32_t increment)
     }
 }
 
-int32_t audio_utils_fifo::diff(uint32_t rear, uint32_t front, size_t *lost)
+int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
         __attribute__((no_sanitize("integer")))
 {
     uint32_t diff = rear - front;
@@ -89,6 +87,22 @@ int32_t audio_utils_fifo::diff(uint32_t rear, uint32_t front, size_t *lost)
         return -EOVERFLOW;
     }
     return (int32_t) diff;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer)
+        __attribute__((no_sanitize("integer"))) :
+    audio_utils_fifo_base(frameCount), mFrameSize(frameSize), mBuffer(buffer)
+{
+    // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
+    // be able to distinguish successful and error return values from read and write.
+    ALOG_ASSERT(frameCount > 0 && frameSize > 0 && buffer != NULL &&
+            frameCount <= ((uint32_t) INT_MAX) / frameSize);
+}
+
+audio_utils_fifo::~audio_utils_fifo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////

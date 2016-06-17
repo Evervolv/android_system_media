@@ -24,31 +24,14 @@
 #error C API is no longer supported
 #endif
 
-// Single writer, single reader non-blocking FIFO.
-// Writer and reader must be in same process.
+// Base class for single writer, single-reader or multi-reader non-blocking FIFO.
+// The base class manipulates frame indices only, and has no knowledge of frame sizes or the buffer.
 
-// No user-serviceable parts within.
-class audio_utils_fifo {
+class audio_utils_fifo_base {
 
-    friend class audio_utils_fifo_reader;
-    friend class audio_utils_fifo_writer;
-
-public:
-
-/**
- * Construct a FIFO object.
- *
- *  \param frameCount  Max number of significant frames to be stored in the FIFO > 0.
- *                     If writes and reads always use the same count, and that count is a divisor of
- *                     frameCount, then the writes and reads will never do a partial transfer.
- *  \param frameSize   Size of each frame in bytes > 0, and frameSize * frameCount <= INT_MAX.
- *  \param buffer      Pointer to a caller-allocated buffer of frameCount frames.
- */
-    audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer);
-
-    ~audio_utils_fifo();
-
-private:
+protected:
+    audio_utils_fifo_base(uint32_t frameCount);
+    virtual ~audio_utils_fifo_base();
 
 /** Return a new index as the sum of a validated index and a specified increment.
  *
@@ -75,14 +58,44 @@ private:
     const uint32_t mFudgeFactor;  // mFrameCountP2 - mFrameCount, the number of "wasted" frames
                                   // after the end of mBuffer.  Only the indices are wasted, not any
                                   // memory.
-    const uint32_t mFrameSize;    // size of each frame in bytes
-    void * const   mBuffer;       // pointer to caller-allocated buffer of size mFrameCount frames
 
     std::atomic_uint_fast32_t mSharedRear;  // accessed by both sides using atomic operations
 
     // Pointer to the mSharedFront of at most one reader that throttles the writer,
     // or NULL for no throttling
     std::atomic_uint_fast32_t *mThrottleFront;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Same as above, but understands frame sizes and knows about the buffer but does not own it.
+// Writer and reader must be in same process.
+
+class audio_utils_fifo : audio_utils_fifo_base {
+
+    friend class audio_utils_fifo_reader;
+    friend class audio_utils_fifo_writer;
+
+public:
+
+/**
+ * Construct a FIFO object.
+ *
+ *  \param frameCount  Max number of significant frames to be stored in the FIFO > 0.
+ *                     If writes and reads always use the same count, and that count is a divisor of
+ *                     frameCount, then the writes and reads will never do a partial transfer.
+ *  \param frameSize   Size of each frame in bytes > 0, and frameSize * frameCount <= INT_MAX.
+ *  \param buffer      Pointer to a caller-allocated buffer of frameCount frames.
+ */
+    audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer);
+
+    virtual ~audio_utils_fifo();
+
+private:
+
+    // These fields are const after initialization
+    const uint32_t mFrameSize;    // size of each frame in bytes
+    void * const   mBuffer;       // pointer to caller-allocated buffer of size mFrameCount frames
 };
 
 // Describes one virtually contiguous fragment of a logically contiguous slice.
@@ -118,7 +131,7 @@ class audio_utils_fifo_writer : public audio_utils_fifo_provider {
 
 public:
     audio_utils_fifo_writer(audio_utils_fifo& fifo);
-    ~audio_utils_fifo_writer();
+    virtual ~audio_utils_fifo_writer();
 
 /**
  * Write to FIFO.
@@ -151,7 +164,7 @@ class audio_utils_fifo_reader : public audio_utils_fifo_provider {
 
 public:
     audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter);
-    ~audio_utils_fifo_reader();
+    virtual ~audio_utils_fifo_reader();
 
 /** Read from FIFO.
  *
