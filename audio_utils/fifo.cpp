@@ -133,10 +133,12 @@ ssize_t audio_utils_fifo_writer::write(const void *buffer, size_t count)
     audio_utils_iovec iovec[2];
     ssize_t availToWrite = obtain(iovec, count);
     if (availToWrite > 0) {
-        memcpy(iovec[0].mBase, buffer, iovec[0].mLen * mFifo.mFrameSize);
-        if (iovec[1].mLen > 0) {
-            memcpy(iovec[1].mBase, (char *) buffer + (iovec[0].mLen * mFifo.mFrameSize),
-                    iovec[1].mLen * mFifo.mFrameSize);
+        memcpy((char *) mFifo.mBuffer + iovec[0].mOffset * mFifo.mFrameSize, buffer,
+                iovec[0].mLength * mFifo.mFrameSize);
+        if (iovec[1].mLength > 0) {
+            memcpy((char *) mFifo.mBuffer + iovec[1].mOffset * mFifo.mFrameSize,
+                    (char *) buffer + (iovec[0].mLength * mFifo.mFrameSize),
+                    iovec[1].mLength * mFifo.mFrameSize);
         }
         release(availToWrite);
     }
@@ -168,10 +170,10 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
         part1 = availToWrite;
     }
     size_t part2 = part1 > 0 ? availToWrite - part1 : 0;
-    iovec[0].mLen = part1;
-    iovec[0].mBase = part1 > 0 ? (char *) mFifo.mBuffer + (rearMasked * mFifo.mFrameSize) : NULL;
-    iovec[1].mLen = part2;
-    iovec[1].mBase = part2 > 0 ? mFifo.mBuffer : NULL;
+    iovec[0].mOffset = rearMasked;
+    iovec[0].mLength = part1;
+    iovec[1].mOffset = 0;
+    iovec[1].mLength = part2;
     mObtained = availToWrite;
     return availToWrite;
 }
@@ -208,10 +210,12 @@ ssize_t audio_utils_fifo_reader::read(void *buffer, size_t count, size_t *lost)
     audio_utils_iovec iovec[2];
     ssize_t availToRead = obtain(iovec, count, lost);
     if (availToRead > 0) {
-        memcpy(buffer, iovec[0].mBase, iovec[0].mLen * mFifo.mFrameSize);
-        if (iovec[1].mLen > 0) {
-            memcpy((char *) buffer + (iovec[0].mLen * mFifo.mFrameSize), iovec[1].mBase,
-                    iovec[1].mLen * mFifo.mFrameSize);
+        memcpy(buffer, (char *) mFifo.mBuffer + iovec[0].mOffset * mFifo.mFrameSize,
+                iovec[0].mLength * mFifo.mFrameSize);
+        if (iovec[1].mLength > 0) {
+            memcpy((char *) buffer + (iovec[0].mLength * mFifo.mFrameSize),
+                    (char *) mFifo.mBuffer + iovec[1].mOffset * mFifo.mFrameSize,
+                    iovec[1].mLength * mFifo.mFrameSize);
         }
         release(availToRead);
     }
@@ -261,10 +265,10 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         part1 = availToRead;
     }
     size_t part2 = part1 > 0 ? availToRead - part1 : 0;
-    iovec[0].mLen = part1;
-    iovec[0].mBase = part1 > 0 ? (char *) mFifo.mBuffer + (frontMasked * mFifo.mFrameSize) : NULL;
-    iovec[1].mLen = part2;
-    iovec[1].mBase = part2 > 0 ? mFifo.mBuffer : NULL;
+    iovec[0].mOffset = frontMasked;
+    iovec[0].mLength = part1;
+    iovec[1].mOffset = 0;
+    iovec[1].mLength = part2;
     mObtained = availToRead;
     return availToRead;
 }

@@ -101,8 +101,8 @@ private:
 // Describes one virtually contiguous fragment of a logically contiguous slice.
 // Compare to struct iovec for readv(2) and writev(2).
 struct audio_utils_iovec {
-    void   *mBase;  // const void * for audio_utils_fifo_reader::obtain()
-    size_t  mLen;   // in frames
+    uint32_t    mOffset;    // in frames, relative to mBuffer, undefined if mLength == 0
+    uint32_t    mLength;    // in frames
 };
 
 ////////////////////////////////////////////////////////////////////////////////
