@@ -196,12 +196,16 @@ audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool th
     audio_utils_fifo_provider(), mFifo(fifo), mLocalFront(0), mSharedFront(0)
 {
     if (throttlesWriter) {
+        ALOG_ASSERT(fifo.mThrottleFront == NULL);
         fifo.mThrottleFront = &mSharedFront;
     }
 }
 
 audio_utils_fifo_reader::~audio_utils_fifo_reader()
 {
+    if (mFifo.mThrottleFront == &mSharedFront) {
+        mFifo.mThrottleFront = NULL;
+    }
 }
 
 ssize_t audio_utils_fifo_reader::read(void *buffer, size_t count, size_t *lost)

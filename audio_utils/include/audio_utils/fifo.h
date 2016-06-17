@@ -143,7 +143,7 @@ public:
  *
  * The actual transfer count may be zero if the FIFO is full,
  * or partial if the FIFO was almost full.
- * A negative return value indicates an error.  Currently there are no errors defined.
+ * A negative return value indicates an error.
  */
     ssize_t write(const void *buffer, size_t count);
 
@@ -176,7 +176,7 @@ public:
  *
  * The actual transfer count may be zero if the FIFO is empty,
  * or partial if the FIFO was almost empty.
- * A negative return value indicates an error.  Currently there are no errors defined.
+ * A negative return value indicates an error.
  */
     ssize_t read(void *buffer, size_t count, size_t *lost = NULL);
 
