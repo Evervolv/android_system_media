@@ -31,7 +31,7 @@ class audio_utils_fifo_base {
 
 protected:
     audio_utils_fifo_base(uint32_t frameCount);
-    virtual ~audio_utils_fifo_base();
+    /*virtual*/ ~audio_utils_fifo_base();
 
 /** Return a new index as the sum of a validated index and a specified increment.
  *
@@ -89,7 +89,7 @@ public:
  */
     audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer);
 
-    virtual ~audio_utils_fifo();
+    /*virtual*/ ~audio_utils_fifo();
 
 private:
 

@@ -17,6 +17,7 @@
 //#define LOG_NDEBUG 0
 #define LOG_TAG "audio_utils_fifo"
 
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <audio_utils/fifo.h>
@@ -31,7 +32,7 @@ audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount)
     mSharedRear(0), mThrottleFront(NULL)
 {
     // actual upper bound on frameCount will depend on the frame size
-    ALOG_ASSERT(frameCount > 0 && frameCount <= ((uint32_t) INT_MAX));
+    LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameCount > ((uint32_t) INT_MAX));
 }
 
 audio_utils_fifo_base::~audio_utils_fifo_base()
@@ -97,8 +98,8 @@ audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void
 {
     // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
     // be able to distinguish successful and error return values from read and write.
-    ALOG_ASSERT(frameCount > 0 && frameSize > 0 && buffer != NULL &&
-            frameCount <= ((uint32_t) INT_MAX) / frameSize);
+    LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameSize == 0 || buffer == NULL ||
+            frameCount > ((uint32_t) INT_MAX) / frameSize);
 }
 
 audio_utils_fifo::~audio_utils_fifo()
@@ -182,7 +183,7 @@ void audio_utils_fifo_writer::release(size_t count)
         __attribute__((no_sanitize("integer")))
 {
     if (count > 0) {
-        ALOG_ASSERT(count <= mObtained);
+        LOG_ALWAYS_FATAL_IF(count > mObtained);
         mLocalRear = mFifo.sum(mLocalRear, count);
         atomic_store_explicit(&mFifo.mSharedRear, (uint_fast32_t) mLocalRear,
                 std::memory_order_release);
@@ -196,13 +197,14 @@ audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool th
     audio_utils_fifo_provider(), mFifo(fifo), mLocalFront(0), mSharedFront(0)
 {
     if (throttlesWriter) {
-        ALOG_ASSERT(fifo.mThrottleFront == NULL);
+        LOG_ALWAYS_FATAL_IF(fifo.mThrottleFront != NULL);
         fifo.mThrottleFront = &mSharedFront;
     }
 }
 
 audio_utils_fifo_reader::~audio_utils_fifo_reader()
 {
+    // TODO Need a way to pass throttle capability to the another reader, should one reader exit.
     if (mFifo.mThrottleFront == &mSharedFront) {
         mFifo.mThrottleFront = NULL;
     }
@@ -236,7 +238,7 @@ void audio_utils_fifo_reader::release(size_t count)
         __attribute__((no_sanitize("integer")))
 {
     if (count > 0) {
-        ALOG_ASSERT(count <= mObtained);
+        LOG_ALWAYS_FATAL_IF(count > mObtained);
         mLocalFront = mFifo.sum(mLocalFront, count);
         if (mFifo.mThrottleFront == &mSharedFront) {
             atomic_store_explicit(&mSharedFront, (uint_fast32_t) mLocalFront,
