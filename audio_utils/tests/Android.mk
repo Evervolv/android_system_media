@@ -40,6 +40,15 @@ LOCAL_CFLAGS := -Werror -Wall
 include $(BUILD_HOST_EXECUTABLE)
 
 include $(CLEAR_VARS)
+# TODO move getch.c and .h to a utility library
+LOCAL_SRC_FILES := fifo_threads.cpp getch.c
+LOCAL_MODULE := fifo_threads
+LOCAL_C_INCLUDES := $(call include-path-for, audio-utils)
+LOCAL_STATIC_LIBRARIES := libaudioutils liblog
+LOCAL_CFLAGS := -Werror -Wall
+include $(BUILD_HOST_EXECUTABLE)
+
+include $(CLEAR_VARS)
 LOCAL_SRC_FILES := limiter_tests.c
 LOCAL_MODULE := limiter_tests
 LOCAL_C_INCLUDES := $(call include-path-for, audio-utils)

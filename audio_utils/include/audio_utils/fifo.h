@@ -59,6 +59,9 @@ protected:
                                   // after the end of mBuffer.  Only the indices are wasted, not any
                                   // memory.
 
+    // TODO always true for now, will be extended later to support false
+    const bool mIsPrivate;        // whether reader and writer virtual address spaces are the same
+
     std::atomic_uint_fast32_t mSharedRear;  // accessed by both sides using atomic operations
 
     // Pointer to the mSharedFront of at most one reader that throttles the writer,
@@ -113,10 +116,16 @@ public:
     audio_utils_fifo_provider();
     virtual ~audio_utils_fifo_provider();
 
+// The count is the maximum number of desired frames, not the minimum number of desired frames.
+// See the high/low setpoints for something which is close to, but not the same as, a true minimum.
+
+// The timeout indicates the maximum time to wait for at least one frame, not for all frames.
+// NULL is equivalent to non-blocking.
+
 // Error codes for ssize_t return value:
 //  -EIO        corrupted indices (reader or writer)
 //  -EOVERFLOW  reader is not keeping up with writer (reader only)
-    virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count) = 0;
+    virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count, struct timespec *timeout) = 0;
 
     virtual void release(size_t count) = 0;
 
@@ -138,6 +147,7 @@ public:
  *
  * \param buffer    Pointer to source buffer containing 'count' frames of data.
  * \param count     Desired number of frames to write.
+ * \param timeout   NULL and zero fields are both non-blocking.
  *
  * \return actual number of frames written <= count.
  *
@@ -145,17 +155,27 @@ public:
  * or partial if the FIFO was almost full.
  * A negative return value indicates an error.
  */
-    ssize_t write(const void *buffer, size_t count);
+    ssize_t write(const void *buffer, size_t count, struct timespec *timeout = NULL);
 
     // Implement audio_utils_fifo_provider
-    virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count);
+    virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count, struct timespec *timeout);
     virtual void release(size_t count);
+
+    // TODO add error checks and getters
+    void setHighLevelTrigger(uint32_t level) { mHighLevelTrigger = level; }
+    void setEffectiveFrames(uint32_t effectiveFrames) { mEffectiveFrames = effectiveFrames; }
 
 private:
     audio_utils_fifo&   mFifo;
 
     // Accessed by writer only using ordinary operations
     uint32_t    mLocalRear; // frame index of next frame slot available to write, or write index
+
+    uint32_t    mLowLevelArm;       // arm if filled <= threshold
+    uint32_t    mHighLevelTrigger;  // trigger reader if armed and filled >= threshold
+    bool        mArmed;
+
+    uint32_t    mEffectiveFrames;   // current effective buffer size, <= mFifo.mFrameCount
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,6 +190,7 @@ public:
  *
  * \param buffer    Pointer to destination buffer to be filled with up to 'count' frames of data.
  * \param count     Desired number of frames to read.
+ * \param timeout   NULL and zero fields are both non-blocking.
  * \param lost      If non-NULL, set to the approximate number of lost frames before re-sync.
  *
  * \return actual number of frames read <= count.
@@ -178,14 +199,15 @@ public:
  * or partial if the FIFO was almost empty.
  * A negative return value indicates an error.
  */
-    ssize_t read(void *buffer, size_t count, size_t *lost = NULL);
+    ssize_t read(void *buffer, size_t count, struct timespec *timeout = NULL, size_t *lost = NULL);
 
     // Implement audio_utils_fifo_provider
-    virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count);
+    virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count, struct timespec *timeout);
     virtual void release(size_t count);
 
     // Extended parameter list for reader only
-    ssize_t obtain(audio_utils_iovec iovec[2], size_t count, size_t *lost);
+    ssize_t obtain(audio_utils_iovec iovec[2], size_t count, struct timespec *timeout,
+            size_t *lost);
 
 private:
     audio_utils_fifo&   mFifo;
@@ -195,6 +217,10 @@ private:
 
     // Accessed by a throttling reader and writer using atomic operations
     std::atomic_uint_fast32_t mSharedFront;
+
+    uint32_t    mHighLevelArm;      // arm if filled >= threshold
+    uint32_t    mLowLevelTrigger;   // trigger writer if armed and filled <= threshold
+    bool        mArmed;
 };
 
 #endif  // !ANDROID_AUDIO_FIFO_H
