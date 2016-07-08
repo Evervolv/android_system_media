@@ -17,11 +17,21 @@
 //#define LOG_NDEBUG 0
 #define LOG_TAG "audio_utils_fifo"
 
+#include <errno.h>
 #include <limits.h>
-#include <linux/futex.h>
 #include <stdlib.h>
 #include <string.h>
+
+// FIXME futex portion is not supported on Mac, should use the Mac alternative
+#ifdef __linux__
+#include <linux/futex.h>
 #include <sys/syscall.h>
+#else
+#define FUTEX_WAIT 0
+#define FUTEX_WAIT_PRIVATE 0
+#define FUTEX_WAKE 0
+#define FUTEX_WAKE_PRIVATE 0
+#endif
 
 #include <audio_utils/fifo.h>
 #include <audio_utils/roundup.h>
@@ -30,7 +40,12 @@
 
 static int sys_futex(void *addr1, int op, int val1, struct timespec *timeout, void *addr2, int val3)
 {
+#ifdef __linux__
     return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
+#else
+    errno = ENOSYS;
+    return -1;
+#endif
 }
 
 audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount)
