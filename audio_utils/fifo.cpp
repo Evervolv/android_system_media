@@ -43,6 +43,12 @@ static int sys_futex(void *addr1, int op, int val1, struct timespec *timeout, vo
 #ifdef __linux__
     return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
 #else
+    (void) addr1;
+    (void) op;
+    (void) val1;
+    (void) timeout;
+    (void) addr2;
+    (void) val3;
     errno = ENOSYS;
     return -1;
 #endif
