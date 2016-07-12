@@ -35,7 +35,7 @@ namespace android {
 class AC3FrameScanner : public FrameScanner
 {
 public:
-    AC3FrameScanner(audio_format_t format);
+    explicit AC3FrameScanner(audio_format_t format);
     virtual ~AC3FrameScanner();
 
     virtual int getMaxChannels()   const { return 5 + 1; } // 5.1 surround

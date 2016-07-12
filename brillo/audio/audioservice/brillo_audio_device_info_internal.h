@@ -33,7 +33,7 @@ class BAudioDeviceInfoInternal {
   //
   // |device_id| is an integer representing an audio device type as defined in
   // brillo_audio_device_info.h.
-  BAudioDeviceInfoInternal(int device_id);
+  explicit BAudioDeviceInfoInternal(int device_id);
 
   // Get audio policy config.
   //
