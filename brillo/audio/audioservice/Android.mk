@@ -63,7 +63,7 @@ LOCAL_SRC_FILES := \
   $(audio_client_sources)
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
 LOCAL_SHARED_LIBRARIES := $(audio_service_shared_libraries)
-LOCAL_CFLAGS := -Wall -std=c++14
+LOCAL_CFLAGS := -Wall -Werror -std=c++14
 include $(BUILD_SHARED_LIBRARY)
 
 # Unit tests for the Brillo audio service.
@@ -106,5 +106,5 @@ LOCAL_STATIC_LIBRARIES := \
   libBionicGtestMain \
   libchrome_test_helpers \
   libgmock
-LOCAL_CFLAGS := -Wno-sign-compare -Wall
+LOCAL_CFLAGS := -Wno-sign-compare -Wall -Werror
 include $(BUILD_NATIVE_TEST)
