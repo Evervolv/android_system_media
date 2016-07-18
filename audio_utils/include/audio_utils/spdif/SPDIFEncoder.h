@@ -34,7 +34,7 @@ namespace android {
 class SPDIFEncoder {
 public:
 
-    SPDIFEncoder(audio_format_t format);
+    explicit SPDIFEncoder(audio_format_t format);
     // Defaults to AC3 format. Was in original API.
     SPDIFEncoder();
 
