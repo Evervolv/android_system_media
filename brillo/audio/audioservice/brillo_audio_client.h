@@ -160,7 +160,7 @@ class BrilloAudioClient {
   //
   // |service_name| is a string representing the name of the service.
   // |callback| is a base::Closure which will be called if the service dies.
-  android::sp<android::IBinder> ConnectToService(std::string service_name,
+  android::sp<android::IBinder> ConnectToService(const std::string& service_name,
                                                  const base::Closure& callback);
 
   // Pointer to the BrilloAudioClient object.
