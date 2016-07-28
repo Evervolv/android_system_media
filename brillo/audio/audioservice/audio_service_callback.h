@@ -62,7 +62,7 @@ class AudioServiceCallback : public BnAudioServiceCallback {
   // compared with this.
   //
   // Returns true if |callback| equals this.
-  bool Equals(android::sp<AudioServiceCallback> callback);
+  bool Equals(const android::sp<AudioServiceCallback>& callback);
 
  private:
   // Callback when devices are connected.

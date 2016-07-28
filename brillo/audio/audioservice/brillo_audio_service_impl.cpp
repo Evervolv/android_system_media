@@ -170,14 +170,14 @@ Status BrilloAudioServiceImpl::DecrementVolume() {
 
 void BrilloAudioServiceImpl::OnDevicesConnected(
     const std::vector<int>& devices) {
-  for (auto callback : callbacks_set_) {
+  for (const auto& callback : callbacks_set_) {
     callback->OnAudioDevicesConnected(devices);
   }
 }
 
 void BrilloAudioServiceImpl::OnDevicesDisconnected(
     const std::vector<int>& devices) {
-  for (auto callback : callbacks_set_) {
+  for (const auto& callback : callbacks_set_) {
     callback->OnAudioDevicesDisconnected(devices);
   }
 }
@@ -185,7 +185,7 @@ void BrilloAudioServiceImpl::OnDevicesDisconnected(
 void BrilloAudioServiceImpl::OnVolumeChanged(audio_stream_type_t stream,
                                              int previous_index,
                                              int current_index) {
-  for (auto callback : callbacks_set_) {
+  for (const auto& callback : callbacks_set_) {
     callback->OnVolumeChanged(stream, previous_index, current_index);
   }
 }
