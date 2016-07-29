@@ -66,7 +66,7 @@ Status AudioServiceCallback::OnVolumeChanged(int stream,
   return Status::ok();
 }
 
-bool AudioServiceCallback::Equals(android::sp<AudioServiceCallback> callback) {
+bool AudioServiceCallback::Equals(const android::sp<AudioServiceCallback>& callback) {
   if (callback->connected_callback_.Equals(connected_callback_) &&
       callback->disconnected_callback_.Equals(disconnected_callback_) &&
       callback->volume_callback_.Equals(volume_callback_) &&
