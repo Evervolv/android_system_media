@@ -51,7 +51,7 @@ std::weak_ptr<BrilloAudioClient> BrilloAudioClient::GetClientInstance() {
 }
 
 android::sp<android::IBinder> BrilloAudioClient::ConnectToService(
-    std::string service_name, const base::Closure& callback) {
+    const std::string& service_name, const base::Closure& callback) {
   android::BinderWrapper* binder_wrapper =
       android::BinderWrapper::GetOrCreateInstance();
   auto service = binder_wrapper->GetService(service_name);
