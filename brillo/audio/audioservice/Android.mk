@@ -76,7 +76,6 @@ LOCAL_SRC_FILES := \
   test/audio_device_handler_test.cpp \
   test/audio_volume_handler_test.cpp
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
-LOCAL_C_INCLUDES := external/gtest/include
 LOCAL_SHARED_LIBRARIES := \
   $(audio_service_shared_libraries) \
   libbinderwrapper_test_support
