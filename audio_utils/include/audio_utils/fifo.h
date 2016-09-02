@@ -24,13 +24,43 @@
 #error C API is no longer supported
 #endif
 
+/** An index that may optionally be placed in shared memory.
+ *  Must be Plain Old Data (POD), so no virtual methods are allowed.
+ *  If in shared memory, exactly one process must explicitly call the constructor via placement new.
+ */
+struct audio_utils_fifo_index {
+    friend class audio_utils_fifo_reader;
+    friend class audio_utils_fifo_writer;
+
+public:
+    audio_utils_fifo_index() : mIndex(0) { }
+
+private:
+    // Linux futex is 32 bits regardless of platform.
+    // It would make more sense to declare this as atomic_uint32_t, but there is no such type name.
+    std::atomic_uint_least32_t  mIndex; // accessed by both sides using atomic operations
+    static_assert(sizeof(mIndex) == sizeof(uint32_t), "mIndex must be 32 bits");
+
+    // TODO Abstract out atomic operations to here
+    // TODO Replace friend by setter and getter, and abstract the futex
+};
+
 // Base class for single writer, single-reader or multi-reader non-blocking FIFO.
 // The base class manipulates frame indices only, and has no knowledge of frame sizes or the buffer.
 
 class audio_utils_fifo_base {
 
 protected:
-    audio_utils_fifo_base(uint32_t frameCount);
+
+/* Construct FIFO base class
+ *
+ *  \param sharedRear  Writer's rear index in shared memory.
+ *  \param throttleFront Pointer to the front index of at most one reader that throttles the
+ *                       writer, or NULL for no throttling.
+ */
+    audio_utils_fifo_base(uint32_t frameCount, audio_utils_fifo_index& sharedRear,
+            // TODO inconsistent & vs *
+            audio_utils_fifo_index *throttleFront = NULL);
     /*virtual*/ ~audio_utils_fifo_base();
 
 /** Return a new index as the sum of a validated index and a specified increment.
@@ -62,11 +92,11 @@ protected:
     // TODO always true for now, will be extended later to support false
     const bool mIsPrivate;        // whether reader and writer virtual address spaces are the same
 
-    std::atomic_uint_fast32_t mSharedRear;  // accessed by both sides using atomic operations
+    audio_utils_fifo_index&     mSharedRear;
 
-    // Pointer to the mSharedFront of at most one reader that throttles the writer,
+    // Pointer to the front index of at most one reader that throttles the writer,
     // or NULL for no throttling
-    std::atomic_uint_fast32_t *mThrottleFront;
+    audio_utils_fifo_index*     mThrottleFront;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,23 +112,41 @@ class audio_utils_fifo : audio_utils_fifo_base {
 public:
 
 /**
- * Construct a FIFO object.
+ * Construct a FIFO object: multi-process.
  *
  *  \param frameCount  Max number of significant frames to be stored in the FIFO > 0.
  *                     If writes and reads always use the same count, and that count is a divisor of
  *                     frameCount, then the writes and reads will never do a partial transfer.
  *  \param frameSize   Size of each frame in bytes > 0, and frameSize * frameCount <= INT_MAX.
  *  \param buffer      Pointer to a caller-allocated buffer of frameCount frames.
+ *  \param sharedRear  Writer's rear index in shared memory.
+ *  \param throttleFront Pointer to the front index of at most one reader that throttles the
+ *                       writer, or NULL for no throttling.
  */
-    audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer);
+    audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
+            // TODO inconsistent & vs *
+            audio_utils_fifo_index& sharedRear, audio_utils_fifo_index *throttleFront = NULL);
+
+/**
+ * Construct a FIFO object: single-process.
+ *  \param throttlesWriter Whether there is a reader that throttles the writer.
+ */
+    audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
+            bool throttlesWriter = false);
 
     /*virtual*/ ~audio_utils_fifo();
 
 private:
 
     // These fields are const after initialization
-    const uint32_t mFrameSize;    // size of each frame in bytes
-    void * const   mBuffer;       // pointer to caller-allocated buffer of size mFrameCount frames
+    const uint32_t mFrameSize;  // size of each frame in bytes
+    void * const   mBuffer;     // pointer to caller-allocated buffer of size mFrameCount frames
+
+    // only used for single-process constructor
+    audio_utils_fifo_index      mSingleProcessSharedRear;
+
+    // only used for single-process constructor when throttlesWriter == true
+    audio_utils_fifo_index      mSingleProcessSharedFront;
 };
 
 // Describes one virtually contiguous fragment of a logically contiguous slice.
@@ -121,6 +169,7 @@ public:
 
 // The timeout indicates the maximum time to wait for at least one frame, not for all frames.
 // NULL is equivalent to non-blocking.
+// FIXME specify timebase, relative/absolute etc
 
 // Error codes for ssize_t return value:
 //  -EIO        corrupted indices (reader or writer)
@@ -139,6 +188,7 @@ protected:
 class audio_utils_fifo_writer : public audio_utils_fifo_provider {
 
 public:
+    // Single-process and multi-process use same constructor here, but different 'fifo' constructors
     audio_utils_fifo_writer(audio_utils_fifo& fifo);
     virtual ~audio_utils_fifo_writer();
 
@@ -171,6 +221,7 @@ private:
     // Accessed by writer only using ordinary operations
     uint32_t    mLocalRear; // frame index of next frame slot available to write, or write index
 
+    // TODO needs a state transition diagram for threshold and arming process
     uint32_t    mLowLevelArm;       // arm if filled <= threshold
     uint32_t    mHighLevelTrigger;  // trigger reader if armed and filled >= threshold
     bool        mArmed;
@@ -183,7 +234,8 @@ private:
 class audio_utils_fifo_reader : public audio_utils_fifo_provider {
 
 public:
-    audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter);
+    // At most one reader can specify throttlesWriter == true
+    audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter = true);
     virtual ~audio_utils_fifo_reader();
 
 /** Read from FIFO.
@@ -215,12 +267,14 @@ private:
     // Accessed by reader only using ordinary operations
     uint32_t     mLocalFront;   // frame index of first frame slot available to read, or read index
 
-    // Accessed by a throttling reader and writer using atomic operations
-    std::atomic_uint_fast32_t mSharedFront;
+    // Points to shared front index if this reader throttles writer, or NULL if we don't throttle
+    audio_utils_fifo_index*     mThrottleFront;
 
+    // TODO not used yet
     uint32_t    mHighLevelArm;      // arm if filled >= threshold
     uint32_t    mLowLevelTrigger;   // trigger writer if armed and filled <= threshold
     bool        mArmed;
+
 };
 
 #endif  // !ANDROID_AUDIO_FIFO_H
