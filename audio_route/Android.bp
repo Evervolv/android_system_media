@@ -1,0 +1,15 @@
+cc_library_shared {
+    name: "libaudioroute",
+    srcs: ["audio_route.c"],
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libutils",
+        "libexpat",
+        "libtinyalsa",
+    ],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+}
