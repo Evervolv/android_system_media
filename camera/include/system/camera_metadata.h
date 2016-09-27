@@ -20,7 +20,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <cutils/compiler.h>
-#include <system/camera_vendor_tags.h>
 
 #ifdef __cplusplus
 extern "C" {
