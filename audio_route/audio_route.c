@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <cutils/log.h>
+#include <android/log.h>
 
 #include <tinyalsa/asoundlib.h>
 

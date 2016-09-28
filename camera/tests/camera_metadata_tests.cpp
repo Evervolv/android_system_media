@@ -16,13 +16,15 @@
 
 #define LOG_NDEBUG 1
 #define LOG_TAG "camera_metadata_tests"
-#include "cutils/log.h"
 
 #include <errno.h>
 
 #include <vector>
 #include <algorithm>
-#include "gtest/gtest.h"
+
+#include <android/log.h>
+#include <gtest/gtest.h>
+
 #include "system/camera_metadata.h"
 #include "camera_metadata_hidden.h"
 
