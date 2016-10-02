@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// FIXME futex portion is not supported on Mac, should use the Mac alternative
+// FIXME futex portion is not supported on macOS, should use the macOS alternative
 #ifdef __linux__
 #include <linux/futex.h>
 #include <sys/syscall.h>
@@ -38,11 +38,33 @@
 #include <cutils/log.h>
 #include <utils/Errors.h>
 
+#ifdef __linux__
+#ifdef __ANDROID__
+// bionic for Android provides clock_nanosleep
+#else
+// bionic for desktop Linux omits clock_nanosleep
+int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *request,
+        struct timespec *remain)
+{
+    return syscall(SYS_clock_nanosleep, clock_id, flags, request, remain);
+}
+#endif  // __ANDROID__
+#else   // __linux__
+// macOS doesn't have clock_nanosleep
+int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *request,
+        struct timespec *remain)
+{
+    errno = ENOSYS;
+    return -1;
+}
+#endif  // __linux__
+
 static int sys_futex(void *addr1, int op, int val1, struct timespec *timeout, void *addr2, int val3)
 {
 #ifdef __linux__
     return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
-#else
+#else   // __linux__
+    // macOS doesn't have futex
     (void) addr1;
     (void) op;
     (void) val1;
@@ -51,16 +73,17 @@ static int sys_futex(void *addr1, int op, int val1, struct timespec *timeout, vo
     (void) val3;
     errno = ENOSYS;
     return -1;
-#endif
+#endif  // __linux__
 }
 
 audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount,
-        audio_utils_fifo_index& sharedRear, audio_utils_fifo_index *throttleFront)
+        audio_utils_fifo_index& writerRear, audio_utils_fifo_index *throttleFront)
         __attribute__((no_sanitize("integer"))) :
     mFrameCount(frameCount), mFrameCountP2(roundup(frameCount)),
     mFudgeFactor(mFrameCountP2 - mFrameCount),
-    mIsPrivate(true),
-    mSharedRear(sharedRear), mThrottleFront(throttleFront)
+    // FIXME need an API to configure the sync types
+    mWriterRear(writerRear), mWriterRearSync(AUDIO_UTILS_FIFO_SYNC_SHARED),
+    mThrottleFront(throttleFront), mThrottleFrontSync(AUDIO_UTILS_FIFO_SYNC_SHARED)
 {
     // actual upper bound on frameCount will depend on the frame size
     LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameCount > ((uint32_t) INT_MAX));
@@ -124,9 +147,9 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
 ////////////////////////////////////////////////////////////////////////////////
 
 audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
-        audio_utils_fifo_index& sharedRear, audio_utils_fifo_index *throttleFront)
+        audio_utils_fifo_index& writerRear, audio_utils_fifo_index *throttleFront)
         __attribute__((no_sanitize("integer"))) :
-    audio_utils_fifo_base(frameCount, sharedRear, throttleFront),
+    audio_utils_fifo_base(frameCount, writerRear, throttleFront),
     mFrameSize(frameSize), mBuffer(buffer)
 {
     // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
@@ -161,7 +184,8 @@ audio_utils_fifo_provider::~audio_utils_fifo_provider()
 
 audio_utils_fifo_writer::audio_utils_fifo_writer(audio_utils_fifo& fifo) :
     audio_utils_fifo_provider(), mFifo(fifo), mLocalRear(0),
-    mLowLevelArm(fifo.mFrameCount), mHighLevelTrigger(0), mArmed(false),
+    mLowLevelArm(fifo.mFrameCount), mHighLevelTrigger(0),
+    mArmed(true),   // because initial fill level of zero is < mLowLevelArm
     mEffectiveFrames(fifo.mFrameCount)
 {
 }
@@ -188,19 +212,27 @@ ssize_t audio_utils_fifo_writer::write(const void *buffer, size_t count, struct 
     return availToWrite;
 }
 
+// iovec == NULL is not part of the public API, but is used internally to mean don't set mObtained
 ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count,
         struct timespec *timeout)
         __attribute__((no_sanitize("integer")))
 {
+    int err = 0;
     size_t availToWrite;
     if (mFifo.mThrottleFront != NULL) {
         uint32_t front;
         for (;;) {
-            front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex,
-                    std::memory_order_acquire);
-            int32_t filled = mFifo.diff(mLocalRear, front, NULL /*lost*/);
+            front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex, std::memory_order_acquire);
+            int32_t filled = mFifo.diff(mLocalRear, front);
             if (filled < 0) {
-                mObtained = 0;
+                // on error, return an empty slice
+                if (iovec != NULL) {
+                    iovec[0].mOffset = 0;
+                    iovec[0].mLength = 0;
+                    iovec[1].mOffset = 0;
+                    iovec[1].mLength = 0;
+                    mObtained = 0;
+                }
                 return (ssize_t) filled;
             }
             availToWrite = mEffectiveFrames > (uint32_t) filled ?
@@ -210,18 +242,42 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
                     (timeout->tv_sec == 0 && timeout->tv_nsec == 0)) {
                 break;
             }
-            int err = sys_futex(&mFifo.mThrottleFront->mIndex,
-                    mFifo.mIsPrivate ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT, front, timeout, NULL, 0);
-            if (err < 0) {
-                switch (errno) {
-                case EWOULDBLOCK:
-                case EINTR:
-                case ETIMEDOUT:
-                    break;
-                default:
-                    LOG_ALWAYS_FATAL("unexpected err=%d errno=%d", err, errno);
-                    break;
+            // TODO add comments
+            // TODO abstract out switch and replace by general sync object
+            int op = FUTEX_WAIT;
+            switch (mFifo.mThrottleFrontSync) {
+            case AUDIO_UTILS_FIFO_SYNC_SLEEP:
+                err = clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout, NULL /*remain*/);
+                if (err < 0) {
+                    LOG_ALWAYS_FATAL_IF(errno != EINTR, "unexpected err=%d errno=%d", err, errno);
+                    err = -errno;
+                } else {
+                    err = -ETIMEDOUT;
                 }
+                break;
+            case AUDIO_UTILS_FIFO_SYNC_PRIVATE:
+                op = FUTEX_WAIT_PRIVATE;
+                // fall through
+            case AUDIO_UTILS_FIFO_SYNC_SHARED:
+                if (timeout->tv_sec == LONG_MAX) {
+                    timeout = NULL;
+                }
+                err = sys_futex(&mFifo.mThrottleFront->mIndex, op, front, timeout, NULL, 0);
+                if (err < 0) {
+                    switch (errno) {
+                    case EINTR:
+                    case ETIMEDOUT:
+                        err = -errno;
+                        break;
+                    default:
+                        LOG_ALWAYS_FATAL("unexpected err=%d errno=%d", err, errno);
+                        break;
+                    }
+                }
+                break;
+            default:
+                LOG_ALWAYS_FATAL("mFifo.mThrottleFrontSync=%d", mFifo.mThrottleFrontSync);
+                break;
             }
             timeout = NULL;
         }
@@ -237,12 +293,15 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
         part1 = availToWrite;
     }
     size_t part2 = part1 > 0 ? availToWrite - part1 : 0;
-    iovec[0].mOffset = rearMasked;
-    iovec[0].mLength = part1;
-    iovec[1].mOffset = 0;
-    iovec[1].mLength = part2;
-    mObtained = availToWrite;
-    return availToWrite;
+    // return slice
+    if (iovec != NULL) {
+        iovec[0].mOffset = rearMasked;
+        iovec[0].mLength = part1;
+        iovec[1].mOffset = 0;
+        iovec[1].mLength = part2;
+        mObtained = availToWrite;
+    }
+    return availToWrite > 0 ? availToWrite : err;
 }
 
 void audio_utils_fifo_writer::release(size_t count)
@@ -253,32 +312,97 @@ void audio_utils_fifo_writer::release(size_t count)
         if (mFifo.mThrottleFront != NULL) {
             uint32_t front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex,
                     std::memory_order_acquire);
-            int32_t filled = mFifo.diff(mLocalRear, front, NULL /*lost*/);
+            int32_t filled = mFifo.diff(mLocalRear, front);
             mLocalRear = mFifo.sum(mLocalRear, count);
-            atomic_store_explicit(&mFifo.mSharedRear.mIndex, mLocalRear,
+            atomic_store_explicit(&mFifo.mWriterRear.mIndex, mLocalRear,
                     std::memory_order_release);
-            if (filled >= 0) {
-                if (filled + count <= mLowLevelArm) {
-                    mArmed = true;
-                }
-                if (mArmed && filled + count >= mHighLevelTrigger) {
-                    int err = sys_futex(&mFifo.mSharedRear.mIndex,
-                            mFifo.mIsPrivate ? FUTEX_WAKE_PRIVATE : FUTEX_WAKE,
-                            INT_MAX /*waiters*/, NULL, NULL, 0);
-                    // err is number of processes woken up
-                    if (err < 0) {
-                        LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d", __func__, err, errno);
+            // TODO add comments
+            int op = FUTEX_WAKE;
+            switch (mFifo.mWriterRearSync) {
+            case AUDIO_UTILS_FIFO_SYNC_SLEEP:
+                break;
+            case AUDIO_UTILS_FIFO_SYNC_PRIVATE:
+                op = FUTEX_WAKE_PRIVATE;
+                // fall through
+            case AUDIO_UTILS_FIFO_SYNC_SHARED:
+                if (filled >= 0) {
+                    if ((uint32_t) filled < mLowLevelArm) {
+                        mArmed = true;
                     }
-                    mArmed = false;
+                    if (mArmed && filled + count > mHighLevelTrigger) {
+                        int err = sys_futex(&mFifo.mWriterRear.mIndex,
+                                op, INT_MAX /*waiters*/, NULL, NULL, 0);
+                        // err is number of processes woken up
+                        if (err < 0) {
+                            LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
+                                    __func__, err, errno);
+                        }
+                        mArmed = false;
+                    }
                 }
+                break;
+            default:
+                LOG_ALWAYS_FATAL("mFifo.mWriterRearSync=%d", mFifo.mWriterRearSync);
+                break;
             }
         } else {
             mLocalRear = mFifo.sum(mLocalRear, count);
-            atomic_store_explicit(&mFifo.mSharedRear.mIndex, mLocalRear,
+            atomic_store_explicit(&mFifo.mWriterRear.mIndex, mLocalRear,
                     std::memory_order_release);
         }
         mObtained -= count;
     }
+}
+
+ssize_t audio_utils_fifo_writer::available()
+{
+    return obtain(NULL /*iovec*/, SIZE_MAX /*count*/, NULL /*timeout*/);
+}
+
+void audio_utils_fifo_writer::resize(uint32_t frameCount)
+{
+    // cap to range [0, mFifo.mFrameCount]
+    if (frameCount > mFifo.mFrameCount) {
+        frameCount = mFifo.mFrameCount;
+    }
+    // if we reduce the effective frame count, update hysteresis points to be within the new range
+    if (frameCount < mEffectiveFrames) {
+        if (mLowLevelArm > frameCount) {
+            mLowLevelArm = frameCount;
+        }
+        if (mHighLevelTrigger > frameCount) {
+            mHighLevelTrigger = frameCount;
+        }
+    }
+    mEffectiveFrames = frameCount;
+}
+
+uint32_t audio_utils_fifo_writer::getSize() const
+{
+    return mEffectiveFrames;
+}
+
+void audio_utils_fifo_writer::setHysteresis(uint32_t lowLevelArm, uint32_t highLevelTrigger)
+{
+    // cap to range [0, mEffectiveFrames]
+    if (lowLevelArm > mEffectiveFrames) {
+        lowLevelArm = mEffectiveFrames;
+    }
+    if (highLevelTrigger > mEffectiveFrames) {
+        highLevelTrigger = mEffectiveFrames;
+    }
+    // TODO this is overly conservative; it would be better to arm based on actual fill level
+    if (lowLevelArm > mLowLevelArm) {
+        mArmed = true;
+    }
+    mLowLevelArm = lowLevelArm;
+    mHighLevelTrigger = highLevelTrigger;
+}
+
+void audio_utils_fifo_writer::getHysteresis(uint32_t *lowLevelArm, uint32_t *highLevelTrigger) const
+{
+    *lowLevelArm = mLowLevelArm;
+    *highLevelTrigger = mHighLevelTrigger;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +410,8 @@ void audio_utils_fifo_writer::release(size_t count)
 audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter) :
     audio_utils_fifo_provider(), mFifo(fifo), mLocalFront(0),
     mThrottleFront(throttlesWriter ? mFifo.mThrottleFront : NULL),
-    mHighLevelArm(0), mLowLevelTrigger(mFifo.mFrameCount), mArmed(false)
+    mHighLevelArm(-1), mLowLevelTrigger(mFifo.mFrameCount),
+    mArmed(true)    // because initial fill level of zero is > mHighLevelArm
 {
 }
 
@@ -318,7 +443,7 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         struct timespec *timeout)
         __attribute__((no_sanitize("integer")))
 {
-    return obtain(iovec, count, timeout, NULL);
+    return obtain(iovec, count, timeout, NULL /*lost*/);
 }
 
 void audio_utils_fifo_reader::release(size_t count)
@@ -327,26 +452,40 @@ void audio_utils_fifo_reader::release(size_t count)
     if (count > 0) {
         LOG_ALWAYS_FATAL_IF(count > mObtained);
         if (mThrottleFront != NULL) {
-            uint32_t rear = atomic_load_explicit(&mFifo.mSharedRear.mIndex,
+            uint32_t rear = atomic_load_explicit(&mFifo.mWriterRear.mIndex,
                     std::memory_order_acquire);
-            int32_t filled = mFifo.diff(rear, mLocalFront, NULL /*lost*/);
+            int32_t filled = mFifo.diff(rear, mLocalFront);
             mLocalFront = mFifo.sum(mLocalFront, count);
             atomic_store_explicit(&mThrottleFront->mIndex, mLocalFront,
                     std::memory_order_release);
-            if (filled >= 0) {
-                if (filled - count >= mHighLevelArm) {
-                    mArmed = true;
-                }
-                if (mArmed && filled - count <= mLowLevelTrigger) {
-                    int err = sys_futex(&mFifo.mSharedRear.mIndex,
-                            mFifo.mIsPrivate ? FUTEX_WAKE_PRIVATE : FUTEX_WAKE,
-                            1 /*waiters*/, NULL, NULL, 0);
-                    // err is number of processes woken up
-                    if (err < 0 || err > 1) {
-                        LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d", __func__, err, errno);
+            // TODO add comments
+            int op = FUTEX_WAKE;
+            switch (mFifo.mThrottleFrontSync) {
+            case AUDIO_UTILS_FIFO_SYNC_SLEEP:
+                break;
+            case AUDIO_UTILS_FIFO_SYNC_PRIVATE:
+                op = FUTEX_WAKE_PRIVATE;
+                // fall through
+            case AUDIO_UTILS_FIFO_SYNC_SHARED:
+                if (filled >= 0) {
+                    if (filled > mHighLevelArm) {
+                        mArmed = true;
                     }
-                    mArmed = false;
+                    if (mArmed && filled - count < mLowLevelTrigger) {
+                        int err = sys_futex(&mThrottleFront->mIndex,
+                                op, 1 /*waiters*/, NULL, NULL, 0);
+                        // err is number of processes woken up
+                        if (err < 0 || err > 1) {
+                            LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
+                                    __func__, err, errno);
+                        }
+                        mArmed = false;
+                    }
                 }
+                break;
+            default:
+                LOG_ALWAYS_FATAL("mFifo.mThrottleFrontSync=%d", mFifo.mThrottleFrontSync);
+                break;
             }
         } else {
             mLocalFront = mFifo.sum(mLocalFront, count);
@@ -355,32 +494,56 @@ void audio_utils_fifo_reader::release(size_t count)
     }
 }
 
+// iovec == NULL is not part of the public API, but is used internally to mean don't set mObtained
 ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count,
         struct timespec *timeout, size_t *lost)
         __attribute__((no_sanitize("integer")))
 {
+    int err = 0;
     uint32_t rear;
     for (;;) {
-        rear = atomic_load_explicit(&mFifo.mSharedRear.mIndex,
+        rear = atomic_load_explicit(&mFifo.mWriterRear.mIndex,
                 std::memory_order_acquire);
         // TODO pull out "count == 0"
         if (count == 0 || rear != mLocalFront || timeout == NULL ||
                 (timeout->tv_sec == 0 && timeout->tv_nsec == 0)) {
             break;
         }
-        int err = sys_futex(&mFifo.mSharedRear.mIndex,
-                mFifo.mIsPrivate ? FUTEX_WAIT_PRIVATE : FUTEX_WAIT,
-                rear, timeout, NULL, 0);
-        if (err < 0) {
-            switch (errno) {
-            case EWOULDBLOCK:
-            case EINTR:
-            case ETIMEDOUT:
-                break;
-            default:
-                LOG_ALWAYS_FATAL("unexpected err=%d errno=%d", err, errno);
-                break;
+        // TODO add comments
+        int op = FUTEX_WAIT;
+        switch (mFifo.mWriterRearSync) {
+        case AUDIO_UTILS_FIFO_SYNC_SLEEP:
+            err = clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout, NULL /*remain*/);
+            if (err < 0) {
+                LOG_ALWAYS_FATAL_IF(errno != EINTR, "unexpected err=%d errno=%d", err, errno);
+                err = -errno;
+            } else {
+                err = -ETIMEDOUT;
             }
+            break;
+        case AUDIO_UTILS_FIFO_SYNC_PRIVATE:
+            op = FUTEX_WAIT_PRIVATE;
+            // fall through
+        case AUDIO_UTILS_FIFO_SYNC_SHARED:
+            if (timeout->tv_sec == LONG_MAX) {
+                timeout = NULL;
+            }
+            err = sys_futex(&mFifo.mWriterRear.mIndex, op, rear, timeout, NULL, 0);
+            if (err < 0) {
+                switch (errno) {
+                case EINTR:
+                case ETIMEDOUT:
+                    err = -errno;
+                    break;
+                default:
+                    LOG_ALWAYS_FATAL("unexpected err=%d errno=%d", err, errno);
+                    break;
+                }
+            }
+            break;
+        default:
+            LOG_ALWAYS_FATAL("mFifo.mWriterRearSync=%d", mFifo.mWriterRearSync);
+            break;
         }
         timeout = NULL;
     }
@@ -389,7 +552,14 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         if (filled == -EOVERFLOW) {
             mLocalFront = rear;
         }
-        mObtained = 0;
+        // on error, return an empty slice
+        if (iovec != NULL) {
+            iovec[0].mOffset = 0;
+            iovec[0].mLength = 0;
+            iovec[1].mOffset = 0;
+            iovec[1].mLength = 0;
+            mObtained = 0;
+        }
         return (ssize_t) filled;
     }
     size_t availToRead = (size_t) filled;
@@ -402,10 +572,48 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         part1 = availToRead;
     }
     size_t part2 = part1 > 0 ? availToRead - part1 : 0;
-    iovec[0].mOffset = frontMasked;
-    iovec[0].mLength = part1;
-    iovec[1].mOffset = 0;
-    iovec[1].mLength = part2;
-    mObtained = availToRead;
-    return availToRead;
+    // return slice
+    if (iovec != NULL) {
+        iovec[0].mOffset = frontMasked;
+        iovec[0].mLength = part1;
+        iovec[1].mOffset = 0;
+        iovec[1].mLength = part2;
+        mObtained = availToRead;
+    }
+    return availToRead > 0 ? availToRead : err;
+}
+
+ssize_t audio_utils_fifo_reader::available()
+{
+    return available(NULL /*lost*/);
+}
+
+ssize_t audio_utils_fifo_reader::available(size_t *lost)
+{
+    return obtain(NULL /*iovec*/, SIZE_MAX /*count*/, NULL /*timeout*/, lost);
+}
+
+void audio_utils_fifo_reader::setHysteresis(int32_t highLevelArm, uint32_t lowLevelTrigger)
+{
+    // cap to range [0, mFifo.mFrameCount]
+    if (highLevelArm < 0) {
+        highLevelArm = -1;
+    } else if ((uint32_t) highLevelArm > mFifo.mFrameCount) {
+        highLevelArm = mFifo.mFrameCount;
+    }
+    if (lowLevelTrigger > mFifo.mFrameCount) {
+        lowLevelTrigger = mFifo.mFrameCount;
+    }
+    // TODO this is overly conservative; it would be better to arm based on actual fill level
+    if (highLevelArm < mHighLevelArm) {
+        mArmed = true;
+    }
+    mHighLevelArm = highLevelArm;
+    mLowLevelTrigger = lowLevelTrigger;
+}
+
+void audio_utils_fifo_reader::getHysteresis(int32_t *highLevelArm, uint32_t *lowLevelTrigger) const
+{
+    *highLevelArm = mHighLevelArm;
+    *lowLevelTrigger = mLowLevelTrigger;
 }

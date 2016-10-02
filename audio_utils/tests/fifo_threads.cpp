@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <errno.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -36,15 +37,23 @@ void *input_routine(void *arg)
     Context *context = (Context *) arg;
     for (;;) {
         struct timespec timeout;
-        timeout.tv_sec = 3;
+        timeout.tv_sec = 30;
         timeout.tv_nsec = 0;
         char buffer[4];
         ssize_t actual = context->mInputReader->read(buffer, sizeof(buffer), &timeout);
-        if (actual == 0) {
+        // TODO this test is unreadable
+        if (actual > 0) {
+            if ((size_t) actual > sizeof(buffer)) {
+                printf("input.read actual = %d\n", (int) actual);
+                abort();
+            }
+            ssize_t actual2 = context->mTransferWriter->write(buffer, actual, &timeout);
+            if (actual2 != actual) {
+                printf("transfer.write(%d) = %d\n", (int) actual, (int) actual2);
+            }
+            //sleep(10);
+        } else if (actual == -ETIMEDOUT) {
             (void) write(1, "t", 1);
-        } else if (actual > 0) {
-            actual = context->mTransferWriter->write(buffer, actual, &timeout);
-            //printf("transfer.write actual = %d\n", (int) actual);
         } else {
             printf("input.read actual = %d\n", (int) actual);
         }
@@ -52,20 +61,32 @@ void *input_routine(void *arg)
     return NULL;
 }
 
+volatile bool outputPaused = false;
+
 void *output_routine(void *arg)
 {
     Context *context = (Context *) arg;
     for (;;) {
+        if (outputPaused) {
+            sleep(1);
+            continue;
+        }
         struct timespec timeout;
-        timeout.tv_sec = 5;
+        timeout.tv_sec = 60;
         timeout.tv_nsec = 0;
         char buffer[4];
         ssize_t actual = context->mTransferReader->read(buffer, sizeof(buffer), &timeout);
-        if (actual == 0) {
+        if (actual > 0) {
+            if ((size_t) actual > sizeof(buffer)) {
+                printf("transfer.read actual = %d\n", (int) actual);
+                abort();
+            }
+            ssize_t actual2 = context->mOutputWriter->write(buffer, actual, NULL /*timeout*/);
+            if (actual2 != actual) {
+                printf("output.write(%d) = %d\n", (int) actual, (int) actual2);
+            }
+        } else if (actual == -ETIMEDOUT) {
             (void) write(1, "T", 1);
-        } else if (actual > 0) {
-            actual = context->mOutputWriter->write(buffer, actual, &timeout);
-            //printf("output.write actual = %d\n", (int) actual);
         } else {
             printf("transfer.read actual = %d\n", (int) actual);
         }
@@ -79,21 +100,24 @@ int main(int argc, char **argv)
     argc = argc + 0;
     argv = &argv[0];
 
-    char inputBuffer[64];
-    audio_utils_fifo inputFifo(sizeof(inputBuffer) /*frameCount*/, 1 /*frameSize*/, inputBuffer);
+    char inputBuffer[16];
+    audio_utils_fifo inputFifo(sizeof(inputBuffer) /*frameCount*/, 1 /*frameSize*/, inputBuffer,
+            true /*throttlesWriter*/);
     audio_utils_fifo_writer inputWriter(inputFifo);
-    audio_utils_fifo_reader inputReader(inputFifo, true /*readerThrottlesWriter*/);
-    inputWriter.setHighLevelTrigger(3);
+    audio_utils_fifo_reader inputReader(inputFifo, true /*throttlesWriter*/);
+    //inputWriter.setHysteresis(sizeof(inputBuffer) * 1/4, sizeof(inputBuffer) * 3/4);
 
     char transferBuffer[64];
     audio_utils_fifo transferFifo(sizeof(transferBuffer) /*frameCount*/, 1 /*frameSize*/,
-            transferBuffer);
+            transferBuffer, true /*throttlesWriter*/);
     audio_utils_fifo_writer transferWriter(transferFifo);
-    audio_utils_fifo_reader transferReader(transferFifo, true /*readerThrottlesWriter*/);
-    transferWriter.setEffectiveFrames(2);
+    audio_utils_fifo_reader transferReader(transferFifo, true /*throttlesWriter*/);
+    transferReader.setHysteresis(sizeof(transferBuffer) * 3/4, sizeof(transferBuffer) * 1/4);
+    //transferWriter.setEffective(8);
 
     char outputBuffer[64];
-    audio_utils_fifo outputFifo(sizeof(outputBuffer) /*frameCount*/, 1 /*frameSize*/, outputBuffer);
+    audio_utils_fifo outputFifo(sizeof(outputBuffer) /*frameCount*/, 1 /*frameSize*/, outputBuffer,
+            true /*throttlesWriter*/);
     audio_utils_fifo_writer outputWriter(outputFifo);
     audio_utils_fifo_reader outputReader(outputFifo, true /*readerThrottlesWriter*/);
 
@@ -114,24 +138,25 @@ int main(int argc, char **argv)
     ok = ok + 0;
 
     for (;;) {
-        char buffer[1];
-        struct timespec timeout;
-        timeout.tv_sec = 0;
-        timeout.tv_nsec = 0;
-        ssize_t actual = outputReader.read(buffer, sizeof(buffer), &timeout);
-        if (actual == 1) {
-            printf("%c", buffer[0]);
+        char buffer[4];
+        ssize_t actual = outputReader.read(buffer, sizeof(buffer), NULL /*timeout*/);
+        if (actual > 0) {
+            printf("%.*s", (int) actual, buffer);
             fflush(stdout);
         } else if (actual != 0) {
             printf("outputReader.read actual = %d\n", (int) actual);
         }
         if (kbhit()) {
             int ch = getch();
-            if (ch <= 0 || ch == 3) {
+            if (ch <= 0 || ch == '\003' /*control-C*/) {
                 break;
             }
+            if (ch == 'p')
+                outputPaused = true;
+            else if (ch == 'p')
+                outputPaused = false;
             buffer[0] = ch;
-            actual = inputWriter.write(buffer, sizeof(buffer), &timeout);
+            actual = inputWriter.write(buffer, 1, NULL /*timeout*/);
             if (actual != 1) {
                 printf("inputWriter.write actual = %d\n", (int) actual);
             }

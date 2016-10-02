@@ -94,7 +94,18 @@ int main(int argc __unused, char **argv __unused)
                 printf("wrote unexpected actual = %zd\n", actual);
                 break;
             }
-            sleep(1);
+            // TODO needs a lot of work
+            switch (value) {
+            case 10:
+                sleep(2);
+                break;
+            case 14:
+                sleep(4);
+                break;
+            default:
+                usleep(500000);
+                break;
+            }
         }
 
         (void) close(frontFd);
@@ -129,7 +140,8 @@ int main(int argc __unused, char **argv __unused)
         printf("reader prot read rear ok=%d\n", ok);
         // The pagesize * 4 offset confirms that we don't assume identical mapping in both processes
         rearIndex = (audio_utils_fifo_index *) mmap((char *) rearIndex + pageSize * 4,
-                sizeof(audio_utils_fifo_index), PROT_READ, MAP_SHARED | MAP_FIXED, rearFd, (off_t) 0);
+                sizeof(audio_utils_fifo_index), PROT_READ, MAP_SHARED | MAP_FIXED, rearFd,
+                (off_t) 0);
         printf("reader rearIndex=%p\n", rearIndex);
 
         // Similarly for the data
@@ -161,6 +173,9 @@ int main(int argc __unused, char **argv __unused)
                 if (value == 20) {
                     goto out;
                 }
+                break;
+            case -ETIMEDOUT:
+                printf("read timed out\n");
                 break;
             default:
                 printf("read unexpected actual = %zd\n", actual);
