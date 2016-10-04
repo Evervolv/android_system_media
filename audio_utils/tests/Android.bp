@@ -35,6 +35,18 @@ cc_binary {
     ],
 }
 
+cc_binary {
+    name: "fifo_multiprocess",
+    host_supported: false,
+    srcs: ["fifo_multiprocess.cpp"],
+    shared_libs: ["libaudioutils", "libcutils"],
+    static_libs: ["libsndfile"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+}
+
 cc_binary_host {
     name: "fifo_threads",
     // TODO move getch.c and .h to a utility library
