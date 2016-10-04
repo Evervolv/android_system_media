@@ -1,0 +1,19 @@
+cc_library_shared {
+    name: "libradio_metadata",
+
+    srcs: ["src/radio_metadata.c"],
+
+    cflags: [
+        "-Werror",
+        "-Wall",
+        "-fvisibility=hidden",
+    ],
+
+    local_include_dirs: ["include"],
+    export_include_dirs: ["include"],
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+}
