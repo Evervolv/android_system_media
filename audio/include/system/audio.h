@@ -39,7 +39,6 @@ __BEGIN_DECLS
 
 /* AudioFlinger and AudioPolicy services use I/O handles to identify audio sources and sinks */
 typedef int audio_io_handle_t;
-#define AUDIO_IO_HANDLE_NONE    0
 
 /* Do not change these values without updating their counterparts
  * in frameworks/base/media/java/android/media/AudioAttributes.java
@@ -316,9 +315,7 @@ static const audio_config_base_t AUDIO_CONFIG_BASE_INITIALIZER = {
 };
 
 /* audio hw module handle functions or structures referencing a module */
-typedef enum {
-    AUDIO_MODULE_HANDLE_NONE = 0,
-} audio_module_handle_t;
+typedef int audio_module_handle_t;
 
 /******************************
  *  Volume control
@@ -375,7 +372,6 @@ struct audio_gain_config  {
 
 /* Each port has a unique ID or handle allocated by policy manager */
 typedef int audio_port_handle_t;
-#define AUDIO_PORT_HANDLE_NONE 0
 
 /* the maximum length for the human-readable device name */
 #define AUDIO_PORT_MAX_NAME_LEN 128
@@ -487,9 +483,7 @@ struct audio_port {
  * But the same patch receives another system wide unique handle allocated by the framework.
  * This unique handle is used for all transactions inside the framework.
  */
-typedef enum {
-    AUDIO_PATCH_HANDLE_NONE = 0,
-} audio_patch_handle_t;
+typedef int audio_patch_handle_t;
 
 #define AUDIO_PATCH_PORTS_MAX   16
 

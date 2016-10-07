@@ -7,6 +7,13 @@
 extern "C" {
 #endif
 
+enum {
+    AUDIO_IO_HANDLE_NONE = 0,
+    AUDIO_MODULE_HANDLE_NONE = 0,
+    AUDIO_PORT_HANDLE_NONE = 0,
+    AUDIO_PATCH_HANDLE_NONE = 0,
+};
+
 typedef enum {
     AUDIO_STREAM_DEFAULT = -1, // (-1)
     AUDIO_STREAM_MIN = 0,
