@@ -18,7 +18,7 @@
 #define ANDROID_AUDIO_AC3_FRAME_SCANNER_H
 
 #include <stdint.h>
-#include <hardware/audio.h>
+#include <system/audio.h>
 #include <audio_utils/spdif/FrameScanner.h>
 
 namespace android {

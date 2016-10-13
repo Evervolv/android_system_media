@@ -916,6 +916,17 @@ static inline bool audio_device_is_digital(audio_devices_t device) {
     }
 }
 
+// Unique effect ID (can be generated from the following site:
+//  http://www.itu.int/ITU-T/asn1/uuid.html)
+// This struct is used for effects identification and in soundtrigger.
+typedef struct audio_uuid_s {
+    uint32_t timeLow;
+    uint16_t timeMid;
+    uint16_t timeHiAndVersion;
+    uint16_t clockSeq;
+    uint8_t node[6];
+} audio_uuid_t;
+
 __END_DECLS
 
 #endif  // ANDROID_AUDIO_CORE_H
