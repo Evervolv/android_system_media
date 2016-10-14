@@ -71,7 +71,7 @@ protected:
     /**
      * Construct FIFO base class
      *
-     *  \param frameCount    Maximum usable frames to be stored in the FIFO > 0 && <= INT_MAX,
+     *  \param frameCount    Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX,
      *                       aka "capacity".
      *                       If release()s always use the same count, and the count is a divisor of
      *                       (effective) \p frameCount, then the obtain()s won't ever be fragmented.
@@ -104,7 +104,7 @@ protected:
 
     // These fields are const after initialization
 
-    /** Maximum usable frames to be stored in the FIFO > 0 && <= INT_MAX, aka "capacity" */
+    /** Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX, aka "capacity" */
     const uint32_t mFrameCount;
     /** Equal to roundup(mFrameCount) */
     const uint32_t mFrameCountP2;
@@ -145,11 +145,12 @@ public:
     /**
      * Construct a FIFO object: multi-process.
      *
-     *  \param frameCount  Maximum usable frames to be stored in the FIFO > 0 && <= INT_MAX,
+     *  \param frameCount  Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX,
      *                     aka "capacity".
      *                     If writes and reads always use the same count, and the count is a divisor
      *                     of \p frameCount, then the writes and reads won't do a partial transfer.
-     *  \param frameSize   Size of each frame in bytes > 0, \p frameSize * \p frameCount <= INT_MAX.
+     *  \param frameSize   Size of each frame in bytes > 0,
+     *                     \p frameSize * \p frameCount <= INT32_MAX.
      *  \param buffer      Pointer to a caller-allocated buffer of \p frameCount frames.
      *  \param writerRear  Writer's rear index.  Passed by reference because it must be non-NULL.
      *  \param throttleFront Pointer to the front index of at most one reader that throttles the
@@ -160,11 +161,12 @@ public:
 
     /**
      * Construct a FIFO object: single-process.
-     *  \param frameCount  Maximum usable frames to be stored in the FIFO > 0 && <= INT_MAX,
+     *  \param frameCount  Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX,
      *                     aka "capacity".
      *                     If writes and reads always use the same count, and the count is a divisor
      *                     of \p frameCount, then the writes and reads won't do a partial transfer.
-     *  \param frameSize   Size of each frame in bytes > 0, \p frameSize * \p frameCount <= INT_MAX.
+     *  \param frameSize   Size of each frame in bytes > 0,
+     *                     \p frameSize * \p frameCount <= INT32_MAX.
      *  \param buffer      Pointer to a caller-allocated buffer of \p frameCount frames.
      *  \param throttlesWriter Whether there is one reader that throttles the writer.
      */
@@ -335,7 +337,7 @@ public:
      *
      * \return effective buffer size in frames
      */
-    uint32_t getSize() const;
+    uint32_t size() const;
 
     /**
      * Set the hysteresis levels for the writer to wake blocked readers.

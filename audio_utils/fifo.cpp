@@ -92,7 +92,7 @@ audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount,
     mThrottleFront(throttleFront), mThrottleFrontSync(AUDIO_UTILS_FIFO_SYNC_SHARED)
 {
     // actual upper bound on frameCount will depend on the frame size
-    LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameCount > ((uint32_t) INT_MAX));
+    LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameCount > ((uint32_t) INT32_MAX));
 }
 
 audio_utils_fifo_base::~audio_utils_fifo_base()
@@ -123,9 +123,9 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
     uint32_t diff = rear - front;
     if (mFudgeFactor) {
         uint32_t mask = mFrameCountP2 - 1;
-        uint32_t rearMasked = rear & mask;
-        uint32_t frontMasked = front & mask;
-        if (rearMasked >= mFrameCount || frontMasked >= mFrameCount) {
+        uint32_t rearOffset = rear & mask;
+        uint32_t frontOffset = front & mask;
+        if (rearOffset >= mFrameCount || frontOffset >= mFrameCount) {
             return -EIO;
         }
         uint32_t genDiff = (rear & ~mask) - (front & ~mask);
@@ -158,10 +158,10 @@ audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void
     audio_utils_fifo_base(frameCount, writerRear, throttleFront),
     mFrameSize(frameSize), mBuffer(buffer)
 {
-    // maximum value of frameCount * frameSize is INT_MAX (2^31 - 1), not 2^31, because we need to
+    // maximum value of frameCount * frameSize is INT32_MAX (2^31 - 1), not 2^31, because we need to
     // be able to distinguish successful and error return values from read and write.
     LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameSize == 0 || buffer == NULL ||
-            frameCount > ((uint32_t) INT_MAX) / frameSize);
+            frameCount > ((uint32_t) INT32_MAX) / frameSize);
 }
 
 audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
@@ -218,7 +218,7 @@ ssize_t audio_utils_fifo_writer::write(const void *buffer, size_t count, struct 
     return availToWrite;
 }
 
-// iovec == NULL is not part of the public API, but is used internally to mean don't set mObtained
+// iovec == NULL is not part of the public API, but internally it means don't set mObtained
 ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count,
         struct timespec *timeout)
         __attribute__((no_sanitize("integer")))
@@ -232,14 +232,9 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
             int32_t filled = mFifo.diff(mLocalRear, front);
             if (filled < 0) {
                 // on error, return an empty slice
-                if (iovec != NULL) {
-                    iovec[0].mOffset = 0;
-                    iovec[0].mLength = 0;
-                    iovec[1].mOffset = 0;
-                    iovec[1].mLength = 0;
-                    mObtained = 0;
-                }
-                return (ssize_t) filled;
+                err = filled;
+                availToWrite = 0;
+                break;
             }
             availToWrite = mEffectiveFrames > (uint32_t) filled ?
                     mEffectiveFrames - (uint32_t) filled : 0;
@@ -250,6 +245,8 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
             }
             // TODO add comments
             // TODO abstract out switch and replace by general sync object
+            //      the high level code (synchronization, sleep, futex, iovec) should be completely
+            //      separate from the low level code (indexes, available, masking).
             int op = FUTEX_WAIT;
             switch (mFifo.mThrottleFrontSync) {
             case AUDIO_UTILS_FIFO_SYNC_SLEEP:
@@ -293,15 +290,15 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
     if (availToWrite > count) {
         availToWrite = count;
     }
-    uint32_t rearMasked = mLocalRear & (mFifo.mFrameCountP2 - 1);
-    size_t part1 = mFifo.mFrameCount - rearMasked;
+    uint32_t rearOffset = mLocalRear & (mFifo.mFrameCountP2 - 1);
+    size_t part1 = mFifo.mFrameCount - rearOffset;
     if (part1 > availToWrite) {
         part1 = availToWrite;
     }
     size_t part2 = part1 > 0 ? availToWrite - part1 : 0;
     // return slice
     if (iovec != NULL) {
-        iovec[0].mOffset = rearMasked;
+        iovec[0].mOffset = rearOffset;
         iovec[0].mLength = part1;
         iovec[1].mOffset = 0;
         iovec[1].mLength = part2;
@@ -337,7 +334,7 @@ void audio_utils_fifo_writer::release(size_t count)
                     }
                     if (mArmed && filled + count > mHighLevelTrigger) {
                         int err = sys_futex(&mFifo.mWriterRear.mIndex,
-                                op, INT_MAX /*waiters*/, NULL, NULL, 0);
+                                op, INT32_MAX /*waiters*/, NULL, NULL, 0);
                         // err is number of processes woken up
                         if (err < 0) {
                             LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
@@ -362,6 +359,7 @@ void audio_utils_fifo_writer::release(size_t count)
 
 ssize_t audio_utils_fifo_writer::available()
 {
+    // iovec == NULL is not part of the public API, but internally it means don't set mObtained
     return obtain(NULL /*iovec*/, SIZE_MAX /*count*/, NULL /*timeout*/);
 }
 
@@ -383,7 +381,7 @@ void audio_utils_fifo_writer::resize(uint32_t frameCount)
     mEffectiveFrames = frameCount;
 }
 
-uint32_t audio_utils_fifo_writer::getSize() const
+uint32_t audio_utils_fifo_writer::size() const
 {
     return mEffectiveFrames;
 }
@@ -500,7 +498,7 @@ void audio_utils_fifo_reader::release(size_t count)
     }
 }
 
-// iovec == NULL is not part of the public API, but is used internally to mean don't set mObtained
+// iovec == NULL is not part of the public API, but internally it means don't set mObtained
 ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count,
         struct timespec *timeout, size_t *lost)
         __attribute__((no_sanitize("integer")))
@@ -559,28 +557,22 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
             mLocalFront = rear;
         }
         // on error, return an empty slice
-        if (iovec != NULL) {
-            iovec[0].mOffset = 0;
-            iovec[0].mLength = 0;
-            iovec[1].mOffset = 0;
-            iovec[1].mLength = 0;
-            mObtained = 0;
-        }
-        return (ssize_t) filled;
+        err = filled;
+        filled = 0;
     }
     size_t availToRead = (size_t) filled;
     if (availToRead > count) {
         availToRead = count;
     }
-    uint32_t frontMasked = mLocalFront & (mFifo.mFrameCountP2 - 1);
-    size_t part1 = mFifo.mFrameCount - frontMasked;
+    uint32_t frontOffset = mLocalFront & (mFifo.mFrameCountP2 - 1);
+    size_t part1 = mFifo.mFrameCount - frontOffset;
     if (part1 > availToRead) {
         part1 = availToRead;
     }
     size_t part2 = part1 > 0 ? availToRead - part1 : 0;
     // return slice
     if (iovec != NULL) {
-        iovec[0].mOffset = frontMasked;
+        iovec[0].mOffset = frontOffset;
         iovec[0].mLength = part1;
         iovec[1].mOffset = 0;
         iovec[1].mLength = part2;
@@ -596,6 +588,7 @@ ssize_t audio_utils_fifo_reader::available()
 
 ssize_t audio_utils_fifo_reader::available(size_t *lost)
 {
+    // iovec == NULL is not part of the public API, but internally it means don't set mObtained
     return obtain(NULL /*iovec*/, SIZE_MAX /*count*/, NULL /*timeout*/, lost);
 }
 
