@@ -51,9 +51,15 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *reques
 #endif  // __ANDROID__
 #else   // __linux__
 // macOS doesn't have clock_nanosleep
+typedef int clockid_t;
+#define CLOCK_MONOTONIC 0
 int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *request,
         struct timespec *remain)
 {
+    (void) clock_id;
+    (void) flags;
+    (void) request;
+    (void) remain;
     errno = ENOSYS;
     return -1;
 }
