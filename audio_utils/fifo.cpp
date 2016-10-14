@@ -228,6 +228,7 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
     int err = 0;
     size_t availToWrite;
     if (mFifo.mThrottleFront != NULL) {
+        int retries = kRetries;
         uint32_t front;
         for (;;) {
             front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex, std::memory_order_acquire);
@@ -270,6 +271,13 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
                 err = sys_futex(&mFifo.mThrottleFront->mIndex, op, front, timeout, NULL, 0);
                 if (err < 0) {
                     switch (errno) {
+                    case EWOULDBLOCK:
+                        // benign race condition with partner, try again
+                        if (retries-- > 0) {
+                            // bypass the "timeout = NULL;" below
+                            continue;
+                        }
+                        // fall through
                     case EINTR:
                     case ETIMEDOUT:
                         err = -errno;
@@ -506,6 +514,7 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         __attribute__((no_sanitize("integer")))
 {
     int err = 0;
+    int retries = kRetries;
     uint32_t rear;
     for (;;) {
         rear = atomic_load_explicit(&mFifo.mWriterRear.mIndex,
@@ -537,6 +546,13 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
             err = sys_futex(&mFifo.mWriterRear.mIndex, op, rear, timeout, NULL, 0);
             if (err < 0) {
                 switch (errno) {
+                case EWOULDBLOCK:
+                    // benign race condition with partner, try again
+                    if (retries-- > 0) {
+                        // bypass the "timeout = NULL;" below
+                        continue;
+                    }
+                    // fall through
                 case EINTR:
                 case ETIMEDOUT:
                     err = -errno;
