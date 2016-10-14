@@ -34,6 +34,7 @@ int main(int argc, char **argv)
     size_t maxFramesPerRead = 0;
     size_t maxFramesPerWrite = 0;
     bool readerThrottlesWriter = true;
+    bool verbose = false;
     int i;
     for (i = 1; i < argc; i++) {
         char *arg = argv[i];
@@ -48,6 +49,9 @@ int main(int argc, char **argv)
             break;
         case 't':   // disable throttling of writer by reader
             readerThrottlesWriter = false;
+            break;
+        case 'v':   // enable verbose logging
+            verbose = true;
             break;
         case 'w':   // maximum frame count per write to FIFO
             maxFramesPerWrite = atoi(&arg[2]);
@@ -69,7 +73,7 @@ int main(int argc, char **argv)
 
     if (argc - i != 2) {
 usage:
-        fprintf(stderr, "usage: %s [-f#] [-r#] [-t] [-w#] in.wav out.wav\n", argv[0]);
+        fprintf(stderr, "usage: %s [-f#] [-r#] [-t] [-v] [-w#] in.wav out.wav\n", argv[0]);
         return EXIT_FAILURE;
     }
     char *inputFile = argv[i];
@@ -105,7 +109,7 @@ usage:
     size_t framesWritten = 0;
     size_t framesRead = 0;
     short *fifoBuffer = new short[frameCount * sfinfoin.channels];
-    audio_utils_fifo fifo(frameCount, frameSize, fifoBuffer);
+    audio_utils_fifo fifo(frameCount, frameSize, fifoBuffer, readerThrottlesWriter);
     audio_utils_fifo_writer fifoWriter(fifo);
     audio_utils_fifo_reader fifoReader(fifo, readerThrottlesWriter);
     int fifoWriteCount = 0, fifoReadCount = 0;
@@ -123,7 +127,9 @@ usage:
         framesToWrite = rand() % (framesToWrite + 1);
         ssize_t actualWritten = fifoWriter.write(
                 &inputBuffer[framesWritten * sfinfoin.channels], framesToWrite);
-        //printf("wrote %d out of %d\n", (int) actualWritten, (int) framesToWrite);
+        if (verbose) {
+            printf("wrote %d out of %d\n", (int) actualWritten, (int) framesToWrite);
+        }
         if (actualWritten < 0 || (size_t) actualWritten > framesToWrite) {
             fprintf(stderr, "write to FIFO failed\n");
             break;
@@ -137,6 +143,9 @@ usage:
             fifoWriteCount++;
         }
         fifoFillLevel += actualWritten;
+        if (verbose) {
+            printf("fill level after write %d\n", fifoFillLevel);
+        }
         if (fifoFillLevel > maxFillLevel) {
             maxFillLevel = fifoFillLevel;
             if (maxFillLevel > (int) frameCount) {
@@ -153,7 +162,9 @@ usage:
         framesToRead = rand() % (framesToRead + 1);
         ssize_t actualRead = fifoReader.read(
                 &outputBuffer[framesRead * sfinfoin.channels], framesToRead);
-        //printf("read %d out of %d\n", (int) actualRead, (int) framesToRead);
+        if (verbose) {
+            printf("read %d out of %d\n", (int) actualRead, (int) framesToRead);
+        }
         if (actualRead < 0 || (size_t) actualRead > framesToRead) {
             switch (actualRead) {
             case -EIO:
@@ -188,6 +199,9 @@ usage:
             fifoReadCount++;
         }
         fifoFillLevel -= actualRead;
+        if (verbose) {
+            printf("fill level after read %d\n", fifoFillLevel);
+        }
         if (fifoFillLevel < minFillLevel) {
             minFillLevel = fifoFillLevel;
             if (minFillLevel < 0) {
@@ -204,6 +218,7 @@ usage:
     printf("FIFO non-empty writes: %d, non-empty reads: %d\n", fifoWriteCount, fifoReadCount);
     printf("fill=%d, min=%d, max=%d\n", fifoFillLevel, minFillLevel, maxFillLevel);
 
+    printf("writing output\n");
     SF_INFO sfinfoout;
     memset(&sfinfoout, 0, sizeof(sfinfoout));
     sfinfoout.samplerate = sfinfoin.samplerate;
@@ -224,5 +239,7 @@ usage:
         return EXIT_FAILURE;
     }
     sf_close(sfout);
+    printf("done\n");
+
     return EXIT_SUCCESS;
 }
