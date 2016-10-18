@@ -930,6 +930,21 @@ typedef struct audio_uuid_s {
 __END_DECLS
 
 /**
+ * List of known audio HAL modules. This is the base name of the audio HAL
+ * library composed of the "audio." prefix, one of the base names below and
+ * a suffix specific to the device.
+ * e.g: audio.primary.goldfish.so or audio.a2dp.default.so
+ *
+ * The same module names are used in audio policy configuration files.
+ */
+
+#define AUDIO_HARDWARE_MODULE_ID_PRIMARY "primary"
+#define AUDIO_HARDWARE_MODULE_ID_A2DP "a2dp"
+#define AUDIO_HARDWARE_MODULE_ID_USB "usb"
+#define AUDIO_HARDWARE_MODULE_ID_REMOTE_SUBMIX "r_submix"
+#define AUDIO_HARDWARE_MODULE_ID_CODEC_OFFLOAD "codec_offload"
+
+/**
  * Parameter definitions.
  * Note that in the framework code it's recommended to use AudioParameter.h
  * instead of these preprocessor defines, and for sure avoid just copying
