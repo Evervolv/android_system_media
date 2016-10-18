@@ -929,4 +929,79 @@ typedef struct audio_uuid_s {
 
 __END_DECLS
 
+/**
+ * Parameter definitions.
+ * Note that in the framework code it's recommended to use AudioParameter.h
+ * instead of these preprocessor defines, and for sure avoid just copying
+ * the constant values.
+ */
+
+#define AUDIO_PARAMETER_VALUE_ON "on"
+#define AUDIO_PARAMETER_VALUE_OFF "off"
+
+/**
+ *  audio device parameters
+ */
+
+/* BT SCO Noise Reduction + Echo Cancellation parameters */
+#define AUDIO_PARAMETER_KEY_BT_NREC "bt_headset_nrec"
+
+/* Get a new HW synchronization source identifier.
+ * Return a valid source (positive integer) or AUDIO_HW_SYNC_INVALID if an error occurs
+ * or no HW sync is available. */
+#define AUDIO_PARAMETER_HW_AV_SYNC "hw_av_sync"
+
+/* Screen state */
+#define AUDIO_PARAMETER_KEY_SCREEN_STATE "screen_state"
+
+/**
+ *  audio stream parameters
+ */
+
+#define AUDIO_PARAMETER_STREAM_ROUTING "routing"             /* audio_devices_t */
+#define AUDIO_PARAMETER_STREAM_FORMAT "format"               /* audio_format_t */
+#define AUDIO_PARAMETER_STREAM_CHANNELS "channels"           /* audio_channel_mask_t */
+#define AUDIO_PARAMETER_STREAM_FRAME_COUNT "frame_count"     /* size_t */
+#define AUDIO_PARAMETER_STREAM_INPUT_SOURCE "input_source"   /* audio_source_t */
+#define AUDIO_PARAMETER_STREAM_SAMPLING_RATE "sampling_rate" /* uint32_t */
+
+#define AUDIO_PARAMETER_DEVICE_CONNECT "connect"            /* audio_devices_t */
+#define AUDIO_PARAMETER_DEVICE_DISCONNECT "disconnect"      /* audio_devices_t */
+
+/* Enable mono audio playback if 1, else should be 0. */
+#define AUDIO_PARAMETER_MONO_OUTPUT "mono_output"
+
+/* Set the HW synchronization source for an output stream. */
+#define AUDIO_PARAMETER_STREAM_HW_AV_SYNC "hw_av_sync"
+
+/* Query supported formats. The response is a '|' separated list of strings from
+ * audio_format_t enum e.g: "sup_formats=AUDIO_FORMAT_PCM_16_BIT" */
+#define AUDIO_PARAMETER_STREAM_SUP_FORMATS "sup_formats"
+/* Query supported channel masks. The response is a '|' separated list of strings from
+ * audio_channel_mask_t enum e.g: "sup_channels=AUDIO_CHANNEL_OUT_STEREO|AUDIO_CHANNEL_OUT_MONO" */
+#define AUDIO_PARAMETER_STREAM_SUP_CHANNELS "sup_channels"
+/* Query supported sampling rates. The response is a '|' separated list of integer values e.g:
+ * "sup_sampling_rates=44100|48000" */
+#define AUDIO_PARAMETER_STREAM_SUP_SAMPLING_RATES "sup_sampling_rates"
+
+#define AUDIO_PARAMETER_VALUE_LIST_SEPARATOR "|"
+
+/**
+ * audio codec parameters
+ */
+
+#define AUDIO_OFFLOAD_CODEC_PARAMS "music_offload_codec_param"
+#define AUDIO_OFFLOAD_CODEC_BIT_PER_SAMPLE "music_offload_bit_per_sample"
+#define AUDIO_OFFLOAD_CODEC_BIT_RATE "music_offload_bit_rate"
+#define AUDIO_OFFLOAD_CODEC_AVG_BIT_RATE "music_offload_avg_bit_rate"
+#define AUDIO_OFFLOAD_CODEC_ID "music_offload_codec_id"
+#define AUDIO_OFFLOAD_CODEC_BLOCK_ALIGN "music_offload_block_align"
+#define AUDIO_OFFLOAD_CODEC_SAMPLE_RATE "music_offload_sample_rate"
+#define AUDIO_OFFLOAD_CODEC_ENCODE_OPTION "music_offload_encode_option"
+#define AUDIO_OFFLOAD_CODEC_NUM_CHANNEL  "music_offload_num_channels"
+#define AUDIO_OFFLOAD_CODEC_DOWN_SAMPLING  "music_offload_down_sampling"
+#define AUDIO_OFFLOAD_CODEC_DELAY_SAMPLES  "delay_samples"
+#define AUDIO_OFFLOAD_CODEC_PADDING_SAMPLES  "padding_samples"
+
+
 #endif  // ANDROID_AUDIO_CORE_H
