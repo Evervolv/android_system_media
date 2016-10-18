@@ -243,7 +243,7 @@ public:
      * except they convey extra information as to the cause.
      */
     virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count,
-            struct timespec *timeout = NULL) = 0;
+            const struct timespec *timeout = NULL) = 0;
 
     /**
      * Release access to a portion of the most recently obtained slice.
@@ -310,11 +310,11 @@ public:
      *  \retval -EINTR     count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
      *                     was interrupted by a signal, and no frames were available after signal.
      */
-    ssize_t write(const void *buffer, size_t count, struct timespec *timeout = NULL);
+    ssize_t write(const void *buffer, size_t count, const struct timespec *timeout = NULL);
 
     // Implement audio_utils_fifo_provider
     virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count,
-            struct timespec *timeout = NULL);
+            const struct timespec *timeout = NULL);
     virtual void release(size_t count);
     virtual ssize_t available();
 
@@ -424,11 +424,12 @@ public:
      *  \retval -EINTR      count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
      *                      was interrupted by a signal, and no frames were available after signal.
      */
-    ssize_t read(void *buffer, size_t count, struct timespec *timeout = NULL, size_t *lost = NULL);
+    ssize_t read(void *buffer, size_t count, const struct timespec *timeout = NULL,
+            size_t *lost = NULL);
 
     // Implement audio_utils_fifo_provider
     virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count,
-            struct timespec *timeout = NULL);
+            const struct timespec *timeout = NULL);
     virtual void release(size_t count);
     virtual ssize_t available();
 
@@ -441,7 +442,7 @@ public:
      * \param lost    If non-NULL, updated to the approximate number of lost frames before re-sync.
      * \return See audio_utils_fifo_provider::obtain for 'Returns' and 'Return values'.
      */
-    ssize_t obtain(audio_utils_iovec iovec[2], size_t count, struct timespec *timeout,
+    ssize_t obtain(audio_utils_iovec iovec[2], size_t count, const struct timespec *timeout,
             size_t *lost);
 
     /**

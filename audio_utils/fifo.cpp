@@ -65,7 +65,8 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *reques
 }
 #endif  // __linux__
 
-static int sys_futex(void *addr1, int op, int val1, struct timespec *timeout, void *addr2, int val3)
+static int sys_futex(void *addr1, int op, int val1, const struct timespec *timeout, void *addr2,
+        int val3)
 {
 #ifdef __linux__
     return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
@@ -200,7 +201,8 @@ audio_utils_fifo_writer::~audio_utils_fifo_writer()
 {
 }
 
-ssize_t audio_utils_fifo_writer::write(const void *buffer, size_t count, struct timespec *timeout)
+ssize_t audio_utils_fifo_writer::write(const void *buffer, size_t count,
+        const struct timespec *timeout)
         __attribute__((no_sanitize("integer")))
 {
     audio_utils_iovec iovec[2];
@@ -220,7 +222,7 @@ ssize_t audio_utils_fifo_writer::write(const void *buffer, size_t count, struct 
 
 // iovec == NULL is not part of the public API, but is used internally to mean don't set mObtained
 ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count,
-        struct timespec *timeout)
+        const struct timespec *timeout)
         __attribute__((no_sanitize("integer")))
 {
     int err = 0;
@@ -426,7 +428,7 @@ audio_utils_fifo_reader::~audio_utils_fifo_reader()
     // TODO Need a way to pass throttle capability to the another reader, should one reader exit.
 }
 
-ssize_t audio_utils_fifo_reader::read(void *buffer, size_t count, struct timespec *timeout,
+ssize_t audio_utils_fifo_reader::read(void *buffer, size_t count, const struct timespec *timeout,
         size_t *lost)
         __attribute__((no_sanitize("integer")))
 {
@@ -446,7 +448,7 @@ ssize_t audio_utils_fifo_reader::read(void *buffer, size_t count, struct timespe
 }
 
 ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count,
-        struct timespec *timeout)
+        const struct timespec *timeout)
         __attribute__((no_sanitize("integer")))
 {
     return obtain(iovec, count, timeout, NULL /*lost*/);
@@ -502,7 +504,7 @@ void audio_utils_fifo_reader::release(size_t count)
 
 // iovec == NULL is not part of the public API, but is used internally to mean don't set mObtained
 ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count,
-        struct timespec *timeout, size_t *lost)
+        const struct timespec *timeout, size_t *lost)
         __attribute__((no_sanitize("integer")))
 {
     int err = 0;
