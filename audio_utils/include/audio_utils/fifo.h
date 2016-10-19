@@ -94,9 +94,10 @@ protected:
 
     /** Return the difference between two indices: rear - front.
      *
-     * \param rear     Caller should supply an unvalidated mRear.
-     * \param front    Caller should supply an unvalidated mFront.
-     * \param lost     If non-NULL, set to the approximate number of lost frames.
+     * \param rear  Caller should supply an unvalidated mRear.
+     * \param front Caller should supply an unvalidated mFront.
+     * \param lost  If non-NULL, set to the approximate number of frames lost before
+     *              re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
      *
      * \return The zero or positive difference <= mFrameCount, or a negative error code.
      */
@@ -235,7 +236,8 @@ public:
      *         Guaranteed to be <= \p count.
      *
      *  \retval -EIO        corrupted indices, no recovery is possible
-     *  \retval -EOVERFLOW  reader is not keeping up with writer (reader only)
+     *  \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
+     *                      isn't keeping up with writer; see \p lost
      *  \retval -ETIMEDOUT  count is greater than zero, timeout is non-NULL and not {0, 0},
      *                      timeout expired, and no frames were available after the timeout.
      *  \retval -EINTR      count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
@@ -266,7 +268,8 @@ public:
      *
      * \return Number of available frames, if greater than or equal to zero.
      *  \retval -EIO        corrupted indices, no recovery is possible
-     *  \retval -EOVERFLOW  reader is not keeping up with writer (reader only)
+     *  \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
+     *                      isn't keeping up with writer
      */
     virtual ssize_t available() = 0;
 
@@ -422,14 +425,16 @@ public:
      *                Time is expressed as relative CLOCK_MONOTONIC.
      *                As an optimization, if \p timeout->tv_sec is the maximum positive value for
      *                time_t (LONG_MAX), then the implementation treats it as infinite timeout.
-     * \param lost    If non-NULL, updated to the approximate number of lost frames before re-sync.
+     * \param lost    If non-NULL, set to the approximate number of frames lost before
+     *                re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
      *
      * \return Actual number of frames read, if greater than or equal to zero.
      *         Guaranteed to be <= \p count.
      *         The actual transfer count may be zero if the FIFO is empty,
      *         or partial if the FIFO was almost empty.
      *  \retval -EIO        corrupted indices, no recovery is possible
-     *  \retval -EOVERFLOW  reader is not keeping up with writer
+     *  \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
+     *                      isn't keeping up with writer; see \p lost
      *  \retval -ETIMEDOUT  count is greater than zero, timeout is non-NULL and not {0, 0},
      *                      timeout expired, and no frames were available after the timeout.
      *  \retval -EINTR      count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
@@ -453,7 +458,8 @@ public:
      * \param iovec   See audio_utils_fifo_provider::obtain.
      * \param count   See audio_utils_fifo_provider::obtain.
      * \param timeout See audio_utils_fifo_provider::obtain.
-     * \param lost    If non-NULL, updated to the approximate number of lost frames before re-sync.
+     * \param lost    If non-NULL, set to the approximate number of frames lost before
+     *                re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
      * \return See audio_utils_fifo_provider::obtain for 'Returns' and 'Return values'.
      */
     ssize_t obtain(audio_utils_iovec iovec[2], size_t count, const struct timespec *timeout,
@@ -464,11 +470,13 @@ public:
      * There's an inherent race condition: the value may soon be obsolete so shouldn't be trusted.
      * available() may be called after obtain(), but doesn't affect the number of releasable frames.
      *
-     * \param lost    If non-NULL, updated to the approximate number of lost frames before re-sync.
+     * \param lost    If non-NULL, set to the approximate number of frames lost before
+     *                re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
      *
      * \return Number of available frames, if greater than or equal to zero.
      *  \retval -EIO        corrupted indices, no recovery is possible
-     *  \retval -EOVERFLOW  reader is not keeping up with writer
+     *  \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
+     *                      isn't keeping up with writer; see \p lost
      */
     ssize_t available(size_t *lost);
 

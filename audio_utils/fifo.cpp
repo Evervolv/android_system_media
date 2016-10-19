@@ -121,6 +121,10 @@ uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment)
 int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
         __attribute__((no_sanitize("integer")))
 {
+    // TODO replace multiple returns by a single return point so this isn't needed
+    if (lost != NULL) {
+        *lost = 0;
+    }
     uint32_t diff = rear - front;
     if (mFudgeFactor) {
         uint32_t mask = mFrameCountP2 - 1;
@@ -144,7 +148,7 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
     // FIFO should not be overfull
     if (diff > mFrameCount) {
         if (lost != NULL) {
-            *lost = diff - mFrameCount;
+            *lost = diff;
         }
         return -EOVERFLOW;
     }
