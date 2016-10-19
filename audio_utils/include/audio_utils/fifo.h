@@ -241,7 +241,8 @@ public:
      *  \retval -EINTR      count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
      *                      was interrupted by a signal, and no frames were available after signal.
      *  \retval -EWOULDBLOCK count is greater than zero, timeout is non-NULL and not {0, 0},
-     *                      and lost wake-up retries failed.  Should usually handle like -EINTR.
+     *                      futex wait failed due to benign race, and unable to converge after
+     *                      retrying.  Should usually handle like -EINTR.
      *
      * Applications should treat all of these as equivalent to zero available frames,
      * except they convey extra information as to the cause.
@@ -273,7 +274,7 @@ protected:
     /** Number of frames obtained at most recent obtain(), less total number of frames released. */
     uint32_t    mObtained;
 
-    /** Number of times to retry a futex wait fails with EWOULDBLOCK. */
+    /** Number of times to retry a futex wait that fails with EWOULDBLOCK. */
     static const int kRetries = 2;
 };
 
@@ -317,7 +318,8 @@ public:
      *  \retval -EINTR     count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
      *                     was interrupted by a signal, and no frames were available after signal.
      *  \retval -EWOULDBLOCK count is greater than zero, timeout is non-NULL and not {0, 0},
-     *                     and lost wake-up retries failed.  Should usually handle like -EINTR.
+     *                      futex wait failed due to benign race, and unable to converge after
+     *                      retrying.  Should usually handle like -EINTR.
      */
     ssize_t write(const void *buffer, size_t count, const struct timespec *timeout = NULL);
 
@@ -433,7 +435,8 @@ public:
      *  \retval -EINTR      count is greater than zero, timeout is non-NULL and not {0, 0}, timeout
      *                      was interrupted by a signal, and no frames were available after signal.
      *  \retval -EWOULDBLOCK count is greater than zero, timeout is non-NULL and not {0, 0},
-     *                      and lost wake-up retries failed.  Should usually handle like -EINTR.
+     *                      futex wait failed due to benign race, and unable to converge after
+     *                      retrying.  Should usually handle like -EINTR.
      */
     ssize_t read(void *buffer, size_t count, const struct timespec *timeout = NULL,
             size_t *lost = NULL);

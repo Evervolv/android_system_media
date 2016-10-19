@@ -272,7 +272,9 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
                 if (err < 0) {
                     switch (errno) {
                     case EWOULDBLOCK:
-                        // benign race condition with partner, try again
+                        // Benign race condition with partner: mFifo.mThrottleFront->mIndex
+                        // changed value between the earlier atomic_load_explicit() and sys_futex().
+                        // Try to load index again, but give up if we are unable to converge.
                         if (retries-- > 0) {
                             // bypass the "timeout = NULL;" below
                             continue;
@@ -547,7 +549,9 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
             if (err < 0) {
                 switch (errno) {
                 case EWOULDBLOCK:
-                    // benign race condition with partner, try again
+                    // Benign race condition with partner: mFifo.mWriterRear->mIndex
+                    // changed value between the earlier atomic_load_explicit() and sys_futex().
+                    // Try to load index again, but give up if we are unable to converge.
                     if (retries-- > 0) {
                         // bypass the "timeout = NULL;" below
                         continue;
