@@ -30,8 +30,8 @@
 typedef struct radio_metadata_entry {
     radio_metadata_key_t    key;
     radio_metadata_type_t   type;
-    unsigned int            size;
-    unsigned char           data[];
+    uint32_t                size;
+    uint8_t                 data[];
 } radio_metadata_entry_t;
 
 
@@ -75,10 +75,10 @@ typedef struct radio_metadata_entry {
 
 /* Radio meta data buffer header */
 typedef struct radio_metadata_buffer {
-    unsigned int channel;       /* channel (frequency) this meta data is associated with */
-    unsigned int sub_channel;   /* sub channel this meta data is associated with */
-    unsigned int size_int;      /* Total size in 32 bit word units */
-    unsigned int count;         /* number of meta data entries */
+    uint32_t channel;       /* channel (frequency) this meta data is associated with */
+    uint32_t sub_channel;   /* sub channel this meta data is associated with */
+    uint32_t size_int;      /* Total size in 32 bit word units */
+    uint32_t count;         /* number of meta data entries */
 } radio_metadata_buffer_t;
 
 
