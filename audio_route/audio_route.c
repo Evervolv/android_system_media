@@ -478,7 +478,11 @@ static void start_tag(void *data, const XML_Char *tag_name,
             } else {
                 /* nested path */
                 struct mixer_path *sub_path = path_get_by_name(ar, attr_name);
-                path_add_path(ar, state->path, sub_path);
+                if (!sub_path) {
+                    ALOGE("unable to find sub path '%s'", attr_name);
+                } else {
+                    path_add_path(ar, state->path, sub_path);
+                }
             }
         }
     }
