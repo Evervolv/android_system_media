@@ -21,7 +21,7 @@ audio_service_shared_libraries := \
   libbrillo-binder \
   libc \
   libchrome \
-  libmedia \
+  libaudioclient \
   libutils
 
 audio_client_sources := \
