@@ -34,6 +34,9 @@ __BEGIN_DECLS
  * frameworks/base/include/media/AudioSystem.h
  */
 
+/* represents an invalid uid for tracks; the calling or client uid is often substituted. */
+#define AUDIO_UID_INVALID ((uid_t)-1)
+
 /* device address used to refer to the standard remote submix */
 #define AUDIO_REMOTE_SUBMIX_DEVICE_ADDRESS "0"
 
