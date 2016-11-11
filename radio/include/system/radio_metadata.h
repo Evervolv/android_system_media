@@ -286,6 +286,23 @@ int radio_metadata_get_from_key(const radio_metadata_t *metadata,
                                 void **value,
                                 size_t *size);
 
+/*
+ * Get channel and sub channel associated with metadata.
+ *
+ * arguments:
+ * - metadata: the meta data buffer
+ * - channel: address where to return the channel.
+ * - sub_channel: address where to return the sub channel.
+ *
+ * returns:
+ *  0 if successfully added
+ *  -EINVAL if the buffer passed is invalid
+ */
+ANDROID_API
+int radio_metadata_get_channel(radio_metadata_t *metadata,
+                               uint32_t *channel,
+                               uint32_t *sub_channel);
+
 #ifdef __cplusplus
 }
 #endif

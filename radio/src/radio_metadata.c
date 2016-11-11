@@ -426,3 +426,18 @@ int radio_metadata_get_from_key(const radio_metadata_t *metadata,
     *size = (size_t)entry->size;
     return 0;
 }
+
+int radio_metadata_get_channel(radio_metadata_t *metadata,
+                               uint32_t *channel,
+                               uint32_t *sub_channel)
+{
+    radio_metadata_buffer_t *metadata_buf =
+            (radio_metadata_buffer_t *)metadata;
+
+    if (metadata_buf == NULL || channel == NULL || sub_channel == NULL) {
+        return -EINVAL;
+    }
+    *channel = metadata_buf->channel;
+    *sub_channel = metadata_buf->sub_channel;
+    return 0;
+}
