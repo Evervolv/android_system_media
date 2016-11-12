@@ -153,11 +153,9 @@ static void path_free(struct audio_route *ar)
     unsigned int i;
 
     for (i = 0; i < ar->num_mixer_paths; i++) {
-        if (ar->mixer_path[i].name)
-            free(ar->mixer_path[i].name);
+        free(ar->mixer_path[i].name);
         if (ar->mixer_path[i].setting) {
-            if (ar->mixer_path[i].setting->value.ptr)
-                free(ar->mixer_path[i].setting->value.ptr);
+            free(ar->mixer_path[i].setting->value.ptr);
             free(ar->mixer_path[i].setting);
         }
     }
