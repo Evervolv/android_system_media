@@ -66,6 +66,16 @@ enum audio_utils_fifo_sync {
  */
 class audio_utils_fifo_base {
 
+public:
+
+    /**
+     * Return the capacity, or statically configured maximum frame count.
+     *
+     * \return The capacity in frames.
+     */
+    uint32_t capacity() const
+            { return mFrameCount; }
+
 protected:
 
     /**
@@ -100,14 +110,17 @@ protected:
      *              re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
      *
      * \return The zero or positive difference <= mFrameCount, or a negative error code.
+     * \retval -EIO        corrupted indices, no recovery is possible
+     * \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
+     *                     isn't keeping up with writer; see \p lost
      */
     int32_t diff(uint32_t rear, uint32_t front, size_t *lost = NULL);
 
     // These fields are const after initialization
 
-    /** Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX, aka "capacity" */
+    /** Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX, aka "capacity". */
     const uint32_t mFrameCount;
-    /** Equal to roundup(mFrameCount) */
+    /** Equal to roundup(mFrameCount). */
     const uint32_t mFrameCountP2;
 
     /**
@@ -136,7 +149,7 @@ protected:
  * Same as audio_utils_fifo_base, but understands frame sizes and knows about the buffer but does
  * not own it.
  */
-class audio_utils_fifo : audio_utils_fifo_base {
+class audio_utils_fifo : public audio_utils_fifo_base {
 
     friend class audio_utils_fifo_reader;
     friend class audio_utils_fifo_writer;
@@ -176,8 +189,23 @@ public:
 
     /*virtual*/ ~audio_utils_fifo();
 
-private:
+    /**
+     * Return the frame size in bytes.
+     *
+     * \return frame size in bytes.
+     */
+    uint32_t frameSize() const
+            { return mFrameSize; }
 
+    /**
+     * Return a pointer to the caller-allocated buffer.
+     *
+     * \return pointer to buffer.
+     */
+    void *buffer() const
+            { return mBuffer; }
+
+private:
     // These fields are const after initialization
     const uint32_t mFrameSize;  // size of each frame in bytes
     void * const   mBuffer;     // pointer to caller-allocated buffer of size mFrameCount frames
@@ -207,7 +235,7 @@ struct audio_utils_iovec {
  */
 class audio_utils_fifo_provider {
 public:
-    audio_utils_fifo_provider();
+    audio_utils_fifo_provider(audio_utils_fifo& fifo);
     virtual ~audio_utils_fifo_provider();
 
     /**
@@ -256,7 +284,7 @@ public:
      * Release access to a portion of the most recently obtained slice.
      * It is permitted to call release() multiple times without an intervening obtain().
      *
-     * \param count Number of frames to release.  The total number of frames released must not
+     * \param count Number of frames to release.  The cumulative number of frames released must not
      *              exceed the number of frames most recently obtained.
      */
     virtual void release(size_t count) = 0;
@@ -273,12 +301,37 @@ public:
      */
     virtual ssize_t available() = 0;
 
+    /**
+     * Return the capacity, or statically configured maximum frame count.
+     *
+     * \return The capacity in frames.
+     */
+    uint32_t capacity() const
+            { return mFifo.capacity(); }
+
+    /**
+     * Return the total number of frames released since construction.
+     * For a reader, this includes lost and flushed frames.
+     *
+     * \return Total frames released.
+     */
+    uint64_t totalReleased() const
+            { return mTotalReleased; }
+
 protected:
+    audio_utils_fifo&   mFifo;
+
     /** Number of frames obtained at most recent obtain(), less total number of frames released. */
     uint32_t    mObtained;
 
     /** Number of times to retry a futex wait that fails with EWOULDBLOCK. */
     static const int kRetries = 2;
+
+    /**
+     * Total number of frames released since construction.
+     * For a reader, this includes lost and flushed frames.
+     */
+    uint64_t    mTotalReleased;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,6 +399,7 @@ public:
 
     /**
      * Get the current effective buffer size.
+     * This value is not exposed to reader(s), and so must be conveyed via an out-of-band channel.
      *
      * \return effective buffer size in frames
      */
@@ -378,12 +432,9 @@ public:
     void getHysteresis(uint32_t *lowLevelArm, uint32_t *highLevelTrigger) const;
 
 private:
-    audio_utils_fifo&   mFifo;
-
     // Accessed by writer only using ordinary operations
     uint32_t    mLocalRear; // frame index of next frame slot available to write, or write index
 
-    // TODO needs a state transition diagram for threshold and arming process
     // TODO make a separate class and associate with the synchronization object
     uint32_t    mLowLevelArm;       // arm if filled < arm level before release()
     uint32_t    mHighLevelTrigger;  // trigger if armed and filled > trigger level after release()
@@ -481,6 +532,22 @@ public:
     ssize_t available(size_t *lost);
 
     /**
+     * Flush (discard) all frames that could be obtained or read without blocking.
+     * Note that fluah is a method on a reader, so if the writer wants to flush
+     * then it must communicate the request to the reader(s) via an out-of-band channel.
+     *
+     * \param lost    If non-NULL, set to the approximate number of frames lost before
+     *                re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
+     *
+     * \return Number of flushed frames, if greater than or equal to zero.
+     *         This number does not include any lost frames.
+     *  \retval -EIO        corrupted indices, no recovery is possible
+     *  \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
+     *                      isn't keeping up with writer; see \p lost
+     */
+    ssize_t flush(size_t *lost = NULL);
+
+    /**
      * Set the hysteresis levels for a throttling reader to wake a blocked writer.
      * A non-empty read() or release() by a throttling reader will wake the writer
      * only if the fill level was > \p highLevelArm before the read() or release(),
@@ -508,9 +575,25 @@ public:
      */
     void getHysteresis(int32_t *highLevelArm, uint32_t *lowLevelTrigger) const;
 
-private:
-    audio_utils_fifo&   mFifo;
+    /**
+     * Return the total number of lost frames since construction, due to reader not keeping up with
+     * writer.  Does not include flushed frames.
+     *
+     * \return Total lost frames.
+     */
+    uint64_t totalLost() const
+            { return mTotalLost; }
 
+    /**
+     * Return the total number of flushed frames since construction.
+     * Does not include lost frames.
+     *
+     * \return Total flushed frames.
+     */
+    uint64_t totalFlushed() const
+            { return mTotalFlushed; }
+
+private:
     // Accessed by reader only using ordinary operations
     uint32_t     mLocalFront;   // frame index of first frame slot available to read, or read index
 
@@ -518,10 +601,12 @@ private:
     // FIXME consider making it a boolean
     audio_utils_fifo_index*     mThrottleFront;
 
-    // TODO not used yet, needs state transition diagram
     int32_t     mHighLevelArm;      // arm if filled > arm level before release()
     uint32_t    mLowLevelTrigger;   // trigger if armed and filled < trigger level after release()
     bool        mArmed;             // whether currently armed
+
+    uint64_t    mTotalLost;         // total lost frames, does not include flushed frames
+    uint64_t    mTotalFlushed;      // total flushed frames, does not include lost frames
 };
 
 #endif  // !ANDROID_AUDIO_FIFO_H

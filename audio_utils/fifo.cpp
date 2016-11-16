@@ -185,8 +185,8 @@ audio_utils_fifo::~audio_utils_fifo()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-audio_utils_fifo_provider::audio_utils_fifo_provider() :
-    mObtained(0)
+audio_utils_fifo_provider::audio_utils_fifo_provider(audio_utils_fifo& fifo) :
+    mFifo(fifo), mObtained(0), mTotalReleased(0)
 {
 }
 
@@ -197,7 +197,7 @@ audio_utils_fifo_provider::~audio_utils_fifo_provider()
 ////////////////////////////////////////////////////////////////////////////////
 
 audio_utils_fifo_writer::audio_utils_fifo_writer(audio_utils_fifo& fifo) :
-    audio_utils_fifo_provider(), mFifo(fifo), mLocalRear(0),
+    audio_utils_fifo_provider(fifo), mLocalRear(0),
     mLowLevelArm(fifo.mFrameCount), mHighLevelTrigger(0),
     mArmed(true),   // because initial fill level of zero is < mLowLevelArm
     mEffectiveFrames(fifo.mFrameCount)
@@ -373,6 +373,7 @@ void audio_utils_fifo_writer::release(size_t count)
                     std::memory_order_release);
         }
         mObtained -= count;
+        mTotalReleased += count;
     }
 }
 
@@ -431,10 +432,11 @@ void audio_utils_fifo_writer::getHysteresis(uint32_t *lowLevelArm, uint32_t *hig
 ////////////////////////////////////////////////////////////////////////////////
 
 audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter) :
-    audio_utils_fifo_provider(), mFifo(fifo), mLocalFront(0),
+    audio_utils_fifo_provider(fifo), mLocalFront(0),
     mThrottleFront(throttlesWriter ? mFifo.mThrottleFront : NULL),
     mHighLevelArm(-1), mLowLevelTrigger(mFifo.mFrameCount),
-    mArmed(true)    // because initial fill level of zero is > mHighLevelArm
+    mArmed(true),   // because initial fill level of zero is > mHighLevelArm
+    mTotalLost(0), mTotalFlushed(0)
 {
 }
 
@@ -514,6 +516,7 @@ void audio_utils_fifo_reader::release(size_t count)
             mLocalFront = mFifo.sum(mLocalFront, count);
         }
         mObtained -= count;
+        mTotalReleased += count;
     }
 }
 
@@ -580,7 +583,13 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         }
         timeout = NULL;
     }
+    size_t ourLost;
+    if (lost == NULL) {
+        lost = &ourLost;
+    }
     int32_t filled = mFifo.diff(rear, mLocalFront, lost);
+    mTotalLost += *lost;
+    mTotalReleased += *lost;
     if (filled < 0) {
         if (filled == -EOVERFLOW) {
             mLocalFront = rear;
@@ -619,6 +628,19 @@ ssize_t audio_utils_fifo_reader::available(size_t *lost)
 {
     // iovec == NULL is not part of the public API, but internally it means don't set mObtained
     return obtain(NULL /*iovec*/, SIZE_MAX /*count*/, NULL /*timeout*/, lost);
+}
+
+ssize_t audio_utils_fifo_reader::flush(size_t *lost)
+{
+    audio_utils_iovec iovec[2];
+    ssize_t ret = obtain(iovec, SIZE_MAX /*count*/, NULL /*timeout*/, lost);
+    if (ret > 0) {
+        size_t flushed = (size_t) ret;
+        release(flushed);
+        mTotalFlushed += flushed;
+        ret = flushed;
+    }
+    return ret;
 }
 
 void audio_utils_fifo_reader::setHysteresis(int32_t highLevelArm, uint32_t lowLevelTrigger)
