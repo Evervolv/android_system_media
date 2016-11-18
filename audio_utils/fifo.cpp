@@ -198,8 +198,8 @@ audio_utils_fifo_provider::~audio_utils_fifo_provider()
 
 audio_utils_fifo_writer::audio_utils_fifo_writer(audio_utils_fifo& fifo) :
     audio_utils_fifo_provider(fifo), mLocalRear(0),
-    mLowLevelArm(fifo.mFrameCount), mHighLevelTrigger(0),
-    mArmed(true),   // because initial fill level of zero is < mLowLevelArm
+    mArmLevel(fifo.mFrameCount), mTriggerLevel(0),
+    mIsArmed(true), // because initial fill level of zero is < mArmLevel
     mEffectiveFrames(fifo.mFrameCount)
 {
 }
@@ -348,10 +348,10 @@ void audio_utils_fifo_writer::release(size_t count)
                 // fall through
             case AUDIO_UTILS_FIFO_SYNC_SHARED:
                 if (filled >= 0) {
-                    if ((uint32_t) filled < mLowLevelArm) {
-                        mArmed = true;
+                    if ((uint32_t) filled < mArmLevel) {
+                        mIsArmed = true;
                     }
-                    if (mArmed && filled + count > mHighLevelTrigger) {
+                    if (mIsArmed && filled + count > mTriggerLevel) {
                         int err = sys_futex(&mFifo.mWriterRear.mIndex,
                                 op, INT32_MAX /*waiters*/, NULL, NULL, 0);
                         // err is number of processes woken up
@@ -359,7 +359,7 @@ void audio_utils_fifo_writer::release(size_t count)
                             LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
                                     __func__, err, errno);
                         }
-                        mArmed = false;
+                        mIsArmed = false;
                     }
                 }
                 break;
@@ -391,11 +391,11 @@ void audio_utils_fifo_writer::resize(uint32_t frameCount)
     }
     // if we reduce the effective frame count, update hysteresis points to be within the new range
     if (frameCount < mEffectiveFrames) {
-        if (mLowLevelArm > frameCount) {
-            mLowLevelArm = frameCount;
+        if (mArmLevel > frameCount) {
+            mArmLevel = frameCount;
         }
-        if (mHighLevelTrigger > frameCount) {
-            mHighLevelTrigger = frameCount;
+        if (mTriggerLevel > frameCount) {
+            mTriggerLevel = frameCount;
         }
     }
     mEffectiveFrames = frameCount;
@@ -416,17 +416,17 @@ void audio_utils_fifo_writer::setHysteresis(uint32_t lowLevelArm, uint32_t highL
         highLevelTrigger = mEffectiveFrames;
     }
     // TODO this is overly conservative; it would be better to arm based on actual fill level
-    if (lowLevelArm > mLowLevelArm) {
-        mArmed = true;
+    if (lowLevelArm > mArmLevel) {
+        mIsArmed = true;
     }
-    mLowLevelArm = lowLevelArm;
-    mHighLevelTrigger = highLevelTrigger;
+    mArmLevel = lowLevelArm;
+    mTriggerLevel = highLevelTrigger;
 }
 
-void audio_utils_fifo_writer::getHysteresis(uint32_t *lowLevelArm, uint32_t *highLevelTrigger) const
+void audio_utils_fifo_writer::getHysteresis(uint32_t *armLevel, uint32_t *triggerLevel) const
 {
-    *lowLevelArm = mLowLevelArm;
-    *highLevelTrigger = mHighLevelTrigger;
+    *armLevel = mArmLevel;
+    *triggerLevel = mTriggerLevel;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -434,8 +434,8 @@ void audio_utils_fifo_writer::getHysteresis(uint32_t *lowLevelArm, uint32_t *hig
 audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter) :
     audio_utils_fifo_provider(fifo), mLocalFront(0),
     mThrottleFront(throttlesWriter ? mFifo.mThrottleFront : NULL),
-    mHighLevelArm(-1), mLowLevelTrigger(mFifo.mFrameCount),
-    mArmed(true),   // because initial fill level of zero is > mHighLevelArm
+    mArmLevel(-1), mTriggerLevel(mFifo.mFrameCount),
+    mIsArmed(true), // because initial fill level of zero is > mArmLevel
     mTotalLost(0), mTotalFlushed(0)
 {
 }
@@ -493,10 +493,10 @@ void audio_utils_fifo_reader::release(size_t count)
                 // fall through
             case AUDIO_UTILS_FIFO_SYNC_SHARED:
                 if (filled >= 0) {
-                    if (filled > mHighLevelArm) {
-                        mArmed = true;
+                    if (filled > mArmLevel) {
+                        mIsArmed = true;
                     }
-                    if (mArmed && filled - count < mLowLevelTrigger) {
+                    if (mIsArmed && filled - count < mTriggerLevel) {
                         int err = sys_futex(&mThrottleFront->mIndex,
                                 op, 1 /*waiters*/, NULL, NULL, 0);
                         // err is number of processes woken up
@@ -504,7 +504,7 @@ void audio_utils_fifo_reader::release(size_t count)
                             LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
                                     __func__, err, errno);
                         }
-                        mArmed = false;
+                        mIsArmed = false;
                     }
                 }
                 break;
@@ -643,27 +643,27 @@ ssize_t audio_utils_fifo_reader::flush(size_t *lost)
     return ret;
 }
 
-void audio_utils_fifo_reader::setHysteresis(int32_t highLevelArm, uint32_t lowLevelTrigger)
+void audio_utils_fifo_reader::setHysteresis(int32_t armLevel, uint32_t triggerLevel)
 {
     // cap to range [0, mFifo.mFrameCount]
-    if (highLevelArm < 0) {
-        highLevelArm = -1;
-    } else if ((uint32_t) highLevelArm > mFifo.mFrameCount) {
-        highLevelArm = mFifo.mFrameCount;
+    if (armLevel < 0) {
+        armLevel = -1;
+    } else if ((uint32_t) armLevel > mFifo.mFrameCount) {
+        armLevel = mFifo.mFrameCount;
     }
-    if (lowLevelTrigger > mFifo.mFrameCount) {
-        lowLevelTrigger = mFifo.mFrameCount;
+    if (triggerLevel > mFifo.mFrameCount) {
+        triggerLevel = mFifo.mFrameCount;
     }
     // TODO this is overly conservative; it would be better to arm based on actual fill level
-    if (highLevelArm < mHighLevelArm) {
-        mArmed = true;
+    if (armLevel < mArmLevel) {
+        mIsArmed = true;
     }
-    mHighLevelArm = highLevelArm;
-    mLowLevelTrigger = lowLevelTrigger;
+    mArmLevel = armLevel;
+    mTriggerLevel = triggerLevel;
 }
 
-void audio_utils_fifo_reader::getHysteresis(int32_t *highLevelArm, uint32_t *lowLevelTrigger) const
+void audio_utils_fifo_reader::getHysteresis(int32_t *armLevel, uint32_t *triggerLevel) const
 {
-    *highLevelArm = mHighLevelArm;
-    *lowLevelTrigger = mLowLevelTrigger;
+    *armLevel = mArmLevel;
+    *triggerLevel = mTriggerLevel;
 }
