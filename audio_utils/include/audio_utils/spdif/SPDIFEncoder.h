@@ -105,8 +105,8 @@ protected:
     // state variable, true if scanning for start of frame
     bool      mScanning;
 
-    static const unsigned short kSPDIFSync1; // Pa
-    static const unsigned short kSPDIFSync2; // Pb
+    static const uint16_t kSPDIFSync1; // Pa
+    static const uint16_t kSPDIFSync2; // Pb
 };
 
 }  // namespace android
