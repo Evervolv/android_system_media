@@ -27,8 +27,8 @@
 namespace android {
 
 // Burst Preamble defined in IEC61937-1
-const unsigned short SPDIFEncoder::kSPDIFSync1 = 0xF872; // Pa
-const unsigned short SPDIFEncoder::kSPDIFSync2 = 0x4E1F; // Pb
+const uint16_t SPDIFEncoder::kSPDIFSync1 = 0xF872; // Pa
+const uint16_t SPDIFEncoder::kSPDIFSync2 = 0x4E1F; // Pb
 
 static int32_t sEndianDetector = 1;
 #define isLittleEndian()  (*((uint8_t *)&sEndianDetector))

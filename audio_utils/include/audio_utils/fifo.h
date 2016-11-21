@@ -350,7 +350,7 @@ public:
      *
      * \param fifo Associated FIFO.  Passed by reference because it must be non-NULL.
      */
-    audio_utils_fifo_writer(audio_utils_fifo& fifo);
+    explicit audio_utils_fifo_writer(audio_utils_fifo& fifo);
     virtual ~audio_utils_fifo_writer();
 
     /**
@@ -463,7 +463,7 @@ public:
      * \param throttlesWriter Whether this reader throttles the writer.
      *                        At most one reader can specify throttlesWriter == true.
      */
-    audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter = true);
+    explicit audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter = true);
     virtual ~audio_utils_fifo_reader();
 
     /**

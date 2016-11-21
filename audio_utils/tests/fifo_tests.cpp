@@ -95,8 +95,8 @@ usage:
         sf_close(sfin);
         return EXIT_FAILURE;
     }
-    size_t frameSize = sizeof(short) * sfinfoin.channels;
-    short *inputBuffer = new short[sfinfoin.frames * sfinfoin.channels];
+    size_t frameSize = sizeof(int16_t) * sfinfoin.channels;
+    int16_t *inputBuffer = new int16_t[sfinfoin.frames * sfinfoin.channels];
     sf_count_t actualRead = sf_readf_short(sfin, inputBuffer, sfinfoin.frames);
     if (actualRead != sfinfoin.frames) {
         fprintf(stderr, "%s: unexpected EOF or error\n", inputFile);
@@ -105,10 +105,10 @@ usage:
     }
     sf_close(sfin);
 
-    short *outputBuffer = new short[sfinfoin.frames * sfinfoin.channels];
+    int16_t *outputBuffer = new int16_t[sfinfoin.frames * sfinfoin.channels];
     size_t framesWritten = 0;
     size_t framesRead = 0;
-    short *fifoBuffer = new short[frameCount * sfinfoin.channels];
+    int16_t *fifoBuffer = new int16_t[frameCount * sfinfoin.channels];
     audio_utils_fifo fifo(frameCount, frameSize, fifoBuffer, readerThrottlesWriter);
     audio_utils_fifo_writer fifoWriter(fifo);
     audio_utils_fifo_reader fifoReader(fifo, readerThrottlesWriter);
