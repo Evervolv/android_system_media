@@ -407,38 +407,39 @@ public:
 
     /**
      * Set the hysteresis levels for the writer to wake blocked readers.
+     * Hysteresis can decrease the number of context switches between writer and a blocking reader.
      * A non-empty write() or release() will wake readers
-     * only if the fill level was < \p lowLevelArm before the write() or release(),
-     * and then the fill level became > \p highLevelTrigger afterwards.
-     * The default value for \p lowLevelArm is mFifo.mFrameCount, which means always armed.
-     * The default value for \p highLevelTrigger is zero,
+     * only if the fill level was < \p armLevel before the write() or release(),
+     * and then the fill level became > \p triggerLevel afterwards.
+     * The default value for \p armLevel is mFifo.mFrameCount, which means always armed.
+     * The default value for \p triggerLevel is zero,
      * which means every write() or release() will wake the readers.
-     * For hysteresis, \p lowLevelArm must be <= \p highLevelTrigger + 1.
-     * Increasing \p lowLevelArm will arm for wakeup, regardless of the current fill level.
+     * For hysteresis, \p armLevel must be <= \p triggerLevel + 1.
+     * Increasing \p armLevel will arm for wakeup, regardless of the current fill level.
      *
-     * \param lowLevelArm       Arm for wakeup when fill level < this value.
-     *                          Capped to range [0, effective buffer size].
-     * \param highLevelTrigger  Trigger wakeup when armed and fill level > this value.
-     *                          Capped to range [0, effective buffer size].
+     * \param armLevel      Arm for wakeup when fill level < this value.
+     *                      Capped to range [0, effective buffer size].
+     * \param triggerLevel  Trigger wakeup when armed and fill level > this value.
+     *                      Capped to range [0, effective buffer size].
      */
-    void setHysteresis(uint32_t lowLevelArm, uint32_t highLevelTrigger);
+    void setHysteresis(uint32_t armLevel, uint32_t triggerLevel);
 
     /**
      * Get the hysteresis levels for waking readers.
      *
-     * \param lowLevelArm       Set to the current low level arm value in frames.
-     * \param highLevelTrigger  Set to the current high level trigger value in frames.
+     * \param armLevel      Set to the current arm level in frames.
+     * \param triggerLevel  Set to the current trigger level in frames.
      */
-    void getHysteresis(uint32_t *lowLevelArm, uint32_t *highLevelTrigger) const;
+    void getHysteresis(uint32_t *armLevel, uint32_t *triggerLevel) const;
 
 private:
     // Accessed by writer only using ordinary operations
     uint32_t    mLocalRear; // frame index of next frame slot available to write, or write index
 
     // TODO make a separate class and associate with the synchronization object
-    uint32_t    mLowLevelArm;       // arm if filled < arm level before release()
-    uint32_t    mHighLevelTrigger;  // trigger if armed and filled > trigger level after release()
-    bool        mArmed;             // whether currently armed
+    uint32_t    mArmLevel;          // arm if filled < arm level before release()
+    uint32_t    mTriggerLevel;      // trigger if armed and filled > trigger level after release()
+    bool        mIsArmed;           // whether currently armed
 
     uint32_t    mEffectiveFrames;   // current effective buffer size, <= mFifo.mFrameCount
 };
@@ -549,31 +550,32 @@ public:
 
     /**
      * Set the hysteresis levels for a throttling reader to wake a blocked writer.
+     * Hysteresis can decrease the number of context switches between reader and a blocking writer.
      * A non-empty read() or release() by a throttling reader will wake the writer
-     * only if the fill level was > \p highLevelArm before the read() or release(),
-     * and then the fill level became < \p lowLevelTrigger afterwards.
-     * The default value for \p highLevelArm is -1, which means always armed.
-     * The default value for \p lowLevelTrigger is mFifo.mFrameCount,
+     * only if the fill level was > \p armLevel before the read() or release(),
+     * and then the fill level became < \p triggerLevel afterwards.
+     * The default value for \p armLevel is -1, which means always armed.
+     * The default value for \p triggerLevel is mFifo.mFrameCount,
      * which means every read() or release() will wake the writer.
-     * For hysteresis, \p highLevelArm must be >= \p lowLevelTrigger - 1.
-     * Decreasing \p highLevelArm will arm for wakeup, regardless of the current fill level.
+     * For hysteresis, \p armLevel must be >= \p triggerLevel - 1.
+     * Decreasing \p armLevel will arm for wakeup, regardless of the current fill level.
      * Note that the throttling reader is not directly aware of the writer's effective buffer size,
      * so any change in effective buffer size must be communicated indirectly.
      *
-     * \param highLevelArm      Arm for wakeup when fill level > this value.
-     *                          Capped to range [-1, mFifo.mFrameCount].
-     * \param lowLevelTrigger   Trigger wakeup when armed and fill level < this value.
-     *                          Capped to range [0, mFifo.mFrameCount].
+     * \param armLevel      Arm for wakeup when fill level > this value.
+     *                      Capped to range [-1, mFifo.mFrameCount].
+     * \param triggerLevel  Trigger wakeup when armed and fill level < this value.
+     *                      Capped to range [0, mFifo.mFrameCount].
      */
-    void setHysteresis(int32_t highLevelArm, uint32_t lowLevelTrigger);
+    void setHysteresis(int32_t armLevel, uint32_t triggerLevel);
 
     /**
      * Get the hysteresis levels for waking readers.
      *
-     * \param highLevelArm      Set to the current high level arm value in frames.
-     * \param lowLevelTrigger   Set to the current low level trigger value in frames.
+     * \param armLevel      Set to the current arm level in frames.
+     * \param triggerLevel  Set to the current trigger level in frames.
      */
-    void getHysteresis(int32_t *highLevelArm, uint32_t *lowLevelTrigger) const;
+    void getHysteresis(int32_t *armLevel, uint32_t *triggerLevel) const;
 
     /**
      * Return the total number of lost frames since construction, due to reader not keeping up with
@@ -601,9 +603,9 @@ private:
     // FIXME consider making it a boolean
     audio_utils_fifo_index*     mThrottleFront;
 
-    int32_t     mHighLevelArm;      // arm if filled > arm level before release()
-    uint32_t    mLowLevelTrigger;   // trigger if armed and filled < trigger level after release()
-    bool        mArmed;             // whether currently armed
+    int32_t     mArmLevel;          // arm if filled > arm level before release()
+    uint32_t    mTriggerLevel;      // trigger if armed and filled < trigger level after release()
+    bool        mIsArmed;           // whether currently armed
 
     uint64_t    mTotalLost;         // total lost frames, does not include flushed frames
     uint64_t    mTotalFlushed;      // total flushed frames, does not include lost frames
