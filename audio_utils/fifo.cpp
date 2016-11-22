@@ -103,7 +103,7 @@ audio_utils_fifo_base::~audio_utils_fifo_base()
 {
 }
 
-uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment)
+uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment) const
         __attribute__((no_sanitize("integer")))
 {
     if (mFudgeFactor) {
@@ -121,7 +121,7 @@ uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment)
     }
 }
 
-int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
+int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost) const
         __attribute__((no_sanitize("integer")))
 {
     // TODO replace multiple returns by a single return point so this isn't needed

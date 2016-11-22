@@ -100,7 +100,7 @@ protected:
      *
      * \return The sum of index plus increment.
      */
-    uint32_t sum(uint32_t index, uint32_t increment);
+    uint32_t sum(uint32_t index, uint32_t increment) const;
 
     /** Return the difference between two indices: rear - front.
      *
@@ -114,7 +114,7 @@ protected:
      * \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
      *                     isn't keeping up with writer; see \p lost
      */
-    int32_t diff(uint32_t rear, uint32_t front, size_t *lost = NULL);
+    int32_t diff(uint32_t rear, uint32_t front, size_t *lost = NULL) const;
 
     // These fields are const after initialization
 
@@ -130,17 +130,17 @@ protected:
     const uint32_t mFudgeFactor;
 
     /** Reference to writer's rear index. */
-    audio_utils_fifo_index&     mWriterRear;
+    audio_utils_fifo_index&         mWriterRear;
     /** Indicates how synchronization is done for mWriterRear. */
-    audio_utils_fifo_sync       mWriterRearSync;
+    const audio_utils_fifo_sync     mWriterRearSync;
 
     /**
      * Pointer to the front index of at most one reader that throttles the writer,
      * or NULL for no throttling.
      */
-    audio_utils_fifo_index*     mThrottleFront;
+    audio_utils_fifo_index* const   mThrottleFront;
     /** Indicates how synchronization is done for mThrottleFront. */
-    audio_utils_fifo_sync       mThrottleFrontSync;
+    const audio_utils_fifo_sync     mThrottleFrontSync;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
