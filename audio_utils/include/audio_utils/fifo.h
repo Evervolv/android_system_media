@@ -251,8 +251,10 @@ public:
      *              iovec[0] describes the initial fragment of the slice, and
      *              iovec[1] describes the remaining non-virtually-contiguous fragment.
      *              Empty iovec[0] implies that iovec[1] is also empty.
+     *              iovec[0].mOffset and iovec[1].mOffset are always < capacity.
+     *              Typically iovec[1].mOffset is zero, but don't assume that.
      * \param count The maximum number of frames to obtain.
-     *              See the high/low setpoints for something which is close to, but not the same as,
+     *              See setHysteresis() for something which is close to, but not the same as,
      *              a minimum.
      * \param timeout Indicates the maximum time to block for at least one frame.
      *                NULL and {0, 0} both mean non-blocking.
@@ -261,7 +263,7 @@ public:
      *                time_t (LONG_MAX), then the implementation treats it as infinite timeout.
      *
      * \return Actual number of frames available, if greater than or equal to zero.
-     *         Guaranteed to be <= \p count.
+     *         Guaranteed to be <= \p count and == iovec[0].mLength + iovec[1].mLength.
      *
      *  \retval -EIO        corrupted indices, no recovery is possible
      *  \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
@@ -276,6 +278,7 @@ public:
      *
      * Applications should treat all of these as equivalent to zero available frames,
      * except they convey extra information as to the cause.
+     * After any error, both iovec[0] and iovec[1] will be empty.
      */
     virtual ssize_t obtain(audio_utils_iovec iovec[2], size_t count,
             const struct timespec *timeout = NULL) = 0;
@@ -534,7 +537,7 @@ public:
 
     /**
      * Flush (discard) all frames that could be obtained or read without blocking.
-     * Note that fluah is a method on a reader, so if the writer wants to flush
+     * Note that flush is a method on a reader, so if the writer wants to flush
      * then it must communicate the request to the reader(s) via an out-of-band channel.
      *
      * \param lost    If non-NULL, set to the approximate number of frames lost before
@@ -580,6 +583,9 @@ public:
     /**
      * Return the total number of lost frames since construction, due to reader not keeping up with
      * writer.  Does not include flushed frames.
+     * It is necessary to call read(), obtain(), or flush() prior to calling this method,
+     * in order to observe an increase in the total,
+     * but it is not necessary for the 'lost' parameter of those prior calls to be non-NULL.
      *
      * \return Total lost frames.
      */
