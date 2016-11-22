@@ -93,7 +93,8 @@ audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount,
     mFudgeFactor(mFrameCountP2 - mFrameCount),
     // FIXME need an API to configure the sync types
     mWriterRear(writerRear), mWriterRearSync(AUDIO_UTILS_FIFO_SYNC_SHARED),
-    mThrottleFront(throttleFront), mThrottleFrontSync(AUDIO_UTILS_FIFO_SYNC_SHARED)
+    mThrottleFront(throttleFront), mThrottleFrontSync(AUDIO_UTILS_FIFO_SYNC_SHARED),
+    mIsShutdown(false)
 {
     // actual upper bound on frameCount will depend on the frame size
     LOG_ALWAYS_FATAL_IF(frameCount == 0 || frameCount > ((uint32_t) INT32_MAX));
@@ -128,12 +129,18 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
     if (lost != NULL) {
         *lost = 0;
     }
+    if (mIsShutdown) {
+        return -EIO;
+    }
     uint32_t diff = rear - front;
     if (mFudgeFactor) {
         uint32_t mask = mFrameCountP2 - 1;
         uint32_t rearOffset = rear & mask;
         uint32_t frontOffset = front & mask;
         if (rearOffset >= mFrameCount || frontOffset >= mFrameCount) {
+            ALOGE("%s frontOffset=%u rearOffset=%u mFrameCount=%u",
+                    __func__, frontOffset, rearOffset, mFrameCount);
+            shutdown();
             return -EIO;
         }
         uint32_t genDiff = (rear & ~mask) - (front & ~mask);
@@ -156,6 +163,12 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
         return -EOVERFLOW;
     }
     return (int32_t) diff;
+}
+
+void audio_utils_fifo_base::shutdown() const
+{
+    ALOGE("%s", __func__);
+    mIsShutdown = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +252,7 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
         uint32_t front;
         for (;;) {
             front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex, std::memory_order_acquire);
+            // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(mLocalRear, front);
             if (filled < 0) {
                 // on error, return an empty slice
@@ -304,7 +318,12 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
             timeout = NULL;
         }
     } else {
-        availToWrite = mEffectiveFrames;
+        if (mFifo.mIsShutdown) {
+            err = -EIO;
+            availToWrite = 0;
+        } else {
+            availToWrite = mEffectiveFrames;
+        }
     }
     if (availToWrite > count) {
         availToWrite = count;
@@ -329,11 +348,17 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
 void audio_utils_fifo_writer::release(size_t count)
         __attribute__((no_sanitize("integer")))
 {
+    // no need to do an early check for mIsShutdown, because the extra code executed is harmless
     if (count > 0) {
-        LOG_ALWAYS_FATAL_IF(count > mObtained);
+        if (count > mObtained) {
+            ALOGE("%s(count=%zu) > mObtained=%u", __func__, count, mObtained);
+            mFifo.shutdown();
+            return;
+        }
         if (mFifo.mThrottleFront != NULL) {
             uint32_t front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex,
                     std::memory_order_acquire);
+            // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(mLocalRear, front);
             mLocalRear = mFifo.sum(mLocalRear, count);
             atomic_store_explicit(&mFifo.mWriterRear.mIndex, mLocalRear,
@@ -474,11 +499,17 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
 void audio_utils_fifo_reader::release(size_t count)
         __attribute__((no_sanitize("integer")))
 {
+    // no need to do an early check for mIsShutdown, because the extra code executed is harmless
     if (count > 0) {
-        LOG_ALWAYS_FATAL_IF(count > mObtained);
+        if (count > mObtained) {
+            ALOGE("%s(count=%zu) > mObtained=%u", __func__, count, mObtained);
+            mFifo.shutdown();
+            return;
+        }
         if (mThrottleFront != NULL) {
             uint32_t rear = atomic_load_explicit(&mFifo.mWriterRear.mIndex,
                     std::memory_order_acquire);
+            // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(rear, mLocalFront);
             mLocalFront = mFifo.sum(mLocalFront, count);
             atomic_store_explicit(&mThrottleFront->mIndex, mLocalFront,
@@ -587,6 +618,7 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
     if (lost == NULL) {
         lost = &ourLost;
     }
+    // returns -EIO if mIsShutdown
     int32_t filled = mFifo.diff(rear, mLocalFront, lost);
     mTotalLost += *lost;
     mTotalReleased += *lost;
