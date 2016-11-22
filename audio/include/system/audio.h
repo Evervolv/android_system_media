@@ -57,31 +57,6 @@ typedef enum {
     AUDIO_CONTENT_TYPE_MAX          = AUDIO_CONTENT_TYPE_CNT - 1,
 } audio_content_type_t;
 
-/* Do not change these values without updating their counterparts
- * in frameworks/base/media/java/android/media/AudioAttributes.java
- */
-typedef enum {
-    AUDIO_USAGE_UNKNOWN                            = 0,
-    AUDIO_USAGE_MEDIA                              = 1,
-    AUDIO_USAGE_VOICE_COMMUNICATION                = 2,
-    AUDIO_USAGE_VOICE_COMMUNICATION_SIGNALLING     = 3,
-    AUDIO_USAGE_ALARM                              = 4,
-    AUDIO_USAGE_NOTIFICATION                       = 5,
-    AUDIO_USAGE_NOTIFICATION_TELEPHONY_RINGTONE    = 6,
-    AUDIO_USAGE_NOTIFICATION_COMMUNICATION_REQUEST = 7,
-    AUDIO_USAGE_NOTIFICATION_COMMUNICATION_INSTANT = 8,
-    AUDIO_USAGE_NOTIFICATION_COMMUNICATION_DELAYED = 9,
-    AUDIO_USAGE_NOTIFICATION_EVENT                 = 10,
-    AUDIO_USAGE_ASSISTANCE_ACCESSIBILITY           = 11,
-    AUDIO_USAGE_ASSISTANCE_NAVIGATION_GUIDANCE     = 12,
-    AUDIO_USAGE_ASSISTANCE_SONIFICATION            = 13,
-    AUDIO_USAGE_GAME                               = 14,
-    AUDIO_USAGE_VIRTUAL_SOURCE                     = 15,
-
-    AUDIO_USAGE_CNT,
-    AUDIO_USAGE_MAX                                = AUDIO_USAGE_CNT - 1,
-} audio_usage_t;
-
 typedef uint32_t audio_flags_mask_t;
 
 /* Do not change these values without updating their counterparts
@@ -260,6 +235,9 @@ typedef struct {
     int64_t duration_us;                // duration in microseconds, -1 if unknown
     bool has_video;                     // true if stream is tied to a video stream
     bool is_streaming;                  // true if streaming, false if local playback
+    uint32_t bit_width;
+    uint32_t offload_buffer_size;       // offload fragment size
+    audio_usage_t usage;
 } audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
@@ -278,7 +256,10 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .bit_rate = */ 0,
     /* .duration_us = */ 0,
     /* .has_video = */ false,
-    /* .is_streaming = */ false
+    /* .is_streaming = */ false,
+    /* .bit_width = */ 16,
+    /* .offload_buffer_size = */ 0,
+    /* .usage = */ AUDIO_USAGE_UNKNOWN
 };
 
 /* common audio stream configuration parameters
@@ -308,7 +289,10 @@ static const audio_config_t AUDIO_CONFIG_INITIALIZER = {
         /* .bit_rate = */ 0,
         /* .duration_us = */ 0,
         /* .has_video = */ false,
-        /* .is_streaming = */ false
+        /* .is_streaming = */ false,
+        /* .bit_width = */ 16,
+        /* .offload_buffer_size = */ 0,
+        /* .usage = */ AUDIO_USAGE_UNKNOWN
     },
     /* .frame_count = */ 0,
 };
@@ -817,6 +801,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_AMR_NB:
     case AUDIO_FORMAT_AMR_WB:
     case AUDIO_FORMAT_AAC:
+    case AUDIO_FORMAT_AAC_ADTS:
     case AUDIO_FORMAT_HE_AAC_V1:
     case AUDIO_FORMAT_HE_AAC_V2:
     case AUDIO_FORMAT_VORBIS:
@@ -827,6 +812,21 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_DTS_HD:
     case AUDIO_FORMAT_IEC61937:
     case AUDIO_FORMAT_DOLBY_TRUEHD:
+    case AUDIO_FORMAT_QCELP:
+    case AUDIO_FORMAT_EVRC:
+    case AUDIO_FORMAT_EVRCB:
+    case AUDIO_FORMAT_EVRCWB:
+    case AUDIO_FORMAT_AAC_ADIF:
+    case AUDIO_FORMAT_AMR_WB_PLUS:
+    case AUDIO_FORMAT_MP2:
+    case AUDIO_FORMAT_EVRCNW:
+    case AUDIO_FORMAT_FLAC:
+    case AUDIO_FORMAT_ALAC:
+    case AUDIO_FORMAT_APE:
+    case AUDIO_FORMAT_WMA:
+    case AUDIO_FORMAT_WMA_PRO:
+    case AUDIO_FORMAT_DSD:
+    case AUDIO_FORMAT_LDAC:
         return true;
     default:
         return false;
