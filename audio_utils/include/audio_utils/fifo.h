@@ -116,6 +116,12 @@ protected:
      */
     int32_t diff(uint32_t rear, uint32_t front, size_t *lost = NULL) const;
 
+    /**
+     * Mark the FIFO as shutdown (permanently unusable), usually due to an -EIO status from an API.
+     * Thereafter, all APIs that return a status will return -EIO, and other APIs will be no-ops.
+     */
+    void shutdown() const;
+
     // These fields are const after initialization
 
     /** Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX, aka "capacity". */
@@ -141,6 +147,9 @@ protected:
     audio_utils_fifo_index* const   mThrottleFront;
     /** Indicates how synchronization is done for mThrottleFront. */
     const audio_utils_fifo_sync     mThrottleFrontSync;
+
+    /** Whether FIFO is marked as shutdown due to detection of an "impossible" error condition. */
+    mutable bool                    mIsShutdown;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -289,6 +298,7 @@ public:
      *
      * \param count Number of frames to release.  The cumulative number of frames released must not
      *              exceed the number of frames most recently obtained.
+     *              If it ever happens, then the FIFO will be marked unusable with shutdown().
      */
     virtual void release(size_t count) = 0;
 
