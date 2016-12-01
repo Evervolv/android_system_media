@@ -22,69 +22,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-// FIXME futex portion is not supported on macOS, should use the macOS alternative
-#ifdef __linux__
-#include <linux/futex.h>
-#include <sys/syscall.h>
-#else
-#define FUTEX_WAIT 0
-#define FUTEX_WAIT_PRIVATE 0
-#define FUTEX_WAKE 0
-#define FUTEX_WAKE_PRIVATE 0
-#endif
-
+#include <audio_utils/clock_nanosleep.h>
 #include <audio_utils/fifo.h>
+#include <audio_utils/futex.h>
 #include <audio_utils/roundup.h>
 #include <cutils/log.h>
 #include <utils/Errors.h>
-
-#ifdef __linux__
-#ifdef __ANDROID__
-// bionic for Android provides clock_nanosleep
-#else
-// bionic for desktop Linux omits clock_nanosleep
-int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *request,
-        struct timespec *remain)
-{
-    return syscall(SYS_clock_nanosleep, clock_id, flags, request, remain);
-}
-#endif  // __ANDROID__
-#else   // __linux__
-// macOS <10.12 doesn't have clockid_t / CLOCK_MONOTONIC
-#ifndef CLOCK_MONOTONIC
-typedef int clockid_t;
-#define CLOCK_MONOTONIC 0
-#endif
-// macOS doesn't have clock_nanosleep
-int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *request,
-        struct timespec *remain)
-{
-    (void) clock_id;
-    (void) flags;
-    (void) request;
-    (void) remain;
-    errno = ENOSYS;
-    return -1;
-}
-#endif  // __linux__
-
-static int sys_futex(void *addr1, int op, int val1, const struct timespec *timeout, void *addr2,
-        int val3)
-{
-#ifdef __linux__
-    return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
-#else   // __linux__
-    // macOS doesn't have futex
-    (void) addr1;
-    (void) op;
-    (void) val1;
-    (void) timeout;
-    (void) addr2;
-    (void) val3;
-    errno = ENOSYS;
-    return -1;
-#endif  // __linux__
-}
 
 audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount,
         audio_utils_fifo_index& writerRear, audio_utils_fifo_index *throttleFront)
@@ -274,7 +217,8 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
             int op = FUTEX_WAIT;
             switch (mFifo.mThrottleFrontSync) {
             case AUDIO_UTILS_FIFO_SYNC_SLEEP:
-                err = clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout, NULL /*remain*/);
+                err = audio_utils_clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout,
+                        NULL /*remain*/);
                 if (err < 0) {
                     LOG_ALWAYS_FATAL_IF(errno != EINTR, "unexpected err=%d errno=%d", err, errno);
                     err = -errno;
@@ -571,7 +515,8 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         int op = FUTEX_WAIT;
         switch (mFifo.mWriterRearSync) {
         case AUDIO_UTILS_FIFO_SYNC_SLEEP:
-            err = clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout, NULL /*remain*/);
+            err = audio_utils_clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout,
+                    NULL /*remain*/);
             if (err < 0) {
                 LOG_ALWAYS_FATAL_IF(errno != EINTR, "unexpected err=%d errno=%d", err, errno);
                 err = -errno;

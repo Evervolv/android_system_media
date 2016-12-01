@@ -41,6 +41,7 @@ public:
 private:
     // Linux futex is 32 bits regardless of platform.
     // It would make more sense to declare this as atomic_uint32_t, but there is no such type name.
+    // TODO Support 64-bit index with 32-bit futex in low-order bits.
     std::atomic_uint_least32_t  mIndex; // accessed by both sides using atomic operations
     static_assert(sizeof(mIndex) == sizeof(uint32_t), "mIndex must be 32 bits");
 
