@@ -19,35 +19,11 @@
 
 #include <atomic>
 #include <stdlib.h>
+#include <audio_utils/fifo_index.h>
 
 #ifndef __cplusplus
 #error C API is no longer supported
 #endif
-
-/**
- * An index that may optionally be placed in shared memory.
- * Must be Plain Old Data (POD), so no virtual methods are allowed.
- * If in shared memory, exactly one process must explicitly call the constructor via placement new.
- * \see #audio_utils_fifo_sync
- */
-struct audio_utils_fifo_index {
-    friend class audio_utils_fifo_reader;
-    friend class audio_utils_fifo_writer;
-
-public:
-    audio_utils_fifo_index() : mIndex(0) { }
-    ~audio_utils_fifo_index() { }
-
-private:
-    // Linux futex is 32 bits regardless of platform.
-    // It would make more sense to declare this as atomic_uint32_t, but there is no such type name.
-    // TODO Support 64-bit index with 32-bit futex in low-order bits.
-    std::atomic_uint_least32_t  mIndex; // accessed by both sides using atomic operations
-    static_assert(sizeof(mIndex) == sizeof(uint32_t), "mIndex must be 32 bits");
-
-    // TODO Abstract out atomic operations to here
-    // TODO Replace friend by setter and getter, and abstract the futex
-};
 
 /** Indicates whether an index is also used for synchronization. */
 enum audio_utils_fifo_sync {

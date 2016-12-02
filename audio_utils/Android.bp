@@ -20,6 +20,7 @@ cc_library {
     srcs: [
         "channels.c",
         "fifo.cpp",
+        "fifo_index.cpp",
         "format.c",
         "limiter.c",
         "minifloat.c",
@@ -78,6 +79,7 @@ cc_library_static {
     defaults: ["audio_utils_defaults"],
     srcs: [
         "fifo.cpp",
+        "fifo_index.cpp",
         "primitives.c",
         "roundup.c",
     ],

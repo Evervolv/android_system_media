@@ -194,7 +194,7 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
         int retries = kRetries;
         uint32_t front;
         for (;;) {
-            front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex, std::memory_order_acquire);
+            front = mFifo.mThrottleFront->loadAcquire();
             // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(mLocalRear, front);
             if (filled < 0) {
@@ -233,7 +233,7 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
                 if (timeout->tv_sec == LONG_MAX) {
                     timeout = NULL;
                 }
-                err = sys_futex(&mFifo.mThrottleFront->mIndex, op, front, timeout, NULL, 0);
+                err = mFifo.mThrottleFront->wait(op, front, timeout);
                 if (err < 0) {
                     switch (errno) {
                     case EWOULDBLOCK:
@@ -300,13 +300,11 @@ void audio_utils_fifo_writer::release(size_t count)
             return;
         }
         if (mFifo.mThrottleFront != NULL) {
-            uint32_t front = atomic_load_explicit(&mFifo.mThrottleFront->mIndex,
-                    std::memory_order_acquire);
+            uint32_t front = mFifo.mThrottleFront->loadAcquire();
             // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(mLocalRear, front);
             mLocalRear = mFifo.sum(mLocalRear, count);
-            atomic_store_explicit(&mFifo.mWriterRear.mIndex, mLocalRear,
-                    std::memory_order_release);
+            mFifo.mWriterRear.storeRelease(mLocalRear);
             // TODO add comments
             int op = FUTEX_WAKE;
             switch (mFifo.mWriterRearSync) {
@@ -321,8 +319,7 @@ void audio_utils_fifo_writer::release(size_t count)
                         mIsArmed = true;
                     }
                     if (mIsArmed && filled + count > mTriggerLevel) {
-                        int err = sys_futex(&mFifo.mWriterRear.mIndex,
-                                op, INT32_MAX /*waiters*/, NULL, NULL, 0);
+                        int err = mFifo.mWriterRear.wake(op, INT32_MAX /*waiters*/);
                         // err is number of processes woken up
                         if (err < 0) {
                             LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
@@ -338,8 +335,7 @@ void audio_utils_fifo_writer::release(size_t count)
             }
         } else {
             mLocalRear = mFifo.sum(mLocalRear, count);
-            atomic_store_explicit(&mFifo.mWriterRear.mIndex, mLocalRear,
-                    std::memory_order_release);
+            mFifo.mWriterRear.storeRelease(mLocalRear);
         }
         mObtained -= count;
         mTotalReleased += count;
@@ -451,13 +447,11 @@ void audio_utils_fifo_reader::release(size_t count)
             return;
         }
         if (mThrottleFront != NULL) {
-            uint32_t rear = atomic_load_explicit(&mFifo.mWriterRear.mIndex,
-                    std::memory_order_acquire);
+            uint32_t rear = mFifo.mWriterRear.loadAcquire();
             // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(rear, mLocalFront);
             mLocalFront = mFifo.sum(mLocalFront, count);
-            atomic_store_explicit(&mThrottleFront->mIndex, mLocalFront,
-                    std::memory_order_release);
+            mThrottleFront->storeRelease(mLocalFront);
             // TODO add comments
             int op = FUTEX_WAKE;
             switch (mFifo.mThrottleFrontSync) {
@@ -472,8 +466,7 @@ void audio_utils_fifo_reader::release(size_t count)
                         mIsArmed = true;
                     }
                     if (mIsArmed && filled - count < mTriggerLevel) {
-                        int err = sys_futex(&mThrottleFront->mIndex,
-                                op, 1 /*waiters*/, NULL, NULL, 0);
+                        int err = mThrottleFront->wake(op, 1 /*waiters*/);
                         // err is number of processes woken up
                         if (err < 0 || err > 1) {
                             LOG_ALWAYS_FATAL("%s: unexpected err=%d errno=%d",
@@ -504,8 +497,7 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
     int retries = kRetries;
     uint32_t rear;
     for (;;) {
-        rear = atomic_load_explicit(&mFifo.mWriterRear.mIndex,
-                std::memory_order_acquire);
+        rear = mFifo.mWriterRear.loadAcquire();
         // TODO pull out "count == 0"
         if (count == 0 || rear != mLocalFront || timeout == NULL ||
                 (timeout->tv_sec == 0 && timeout->tv_nsec == 0)) {
@@ -531,7 +523,7 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
             if (timeout->tv_sec == LONG_MAX) {
                 timeout = NULL;
             }
-            err = sys_futex(&mFifo.mWriterRear.mIndex, op, rear, timeout, NULL, 0);
+            err = mFifo.mWriterRear.wait(op, rear, timeout);
             if (err < 0) {
                 switch (errno) {
                 case EWOULDBLOCK:
