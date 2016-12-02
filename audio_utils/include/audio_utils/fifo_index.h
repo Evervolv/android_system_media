@@ -27,7 +27,7 @@
  * If in shared memory, exactly one process must explicitly call the constructor via placement new.
  * \see #audio_utils_fifo_sync
  */
-struct audio_utils_fifo_index {
+class audio_utils_fifo_index {
 
 public:
     audio_utils_fifo_index() : mIndex(0) { }
@@ -45,5 +45,8 @@ private:
     std::atomic_uint_least32_t  mIndex; // accessed by both sides using atomic operations
     static_assert(sizeof(mIndex) == sizeof(uint32_t), "mIndex must be 32 bits");
 };
+
+static_assert(sizeof(audio_utils_fifo_index) == sizeof(uint32_t),
+        "audio_utils_fifo_index must be 32 bits");
 
 #endif  // !ANDROID_AUDIO_FIFO_INDEX_H
