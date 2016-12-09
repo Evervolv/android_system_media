@@ -500,6 +500,28 @@ typedef uint32_t audio_hw_sync_t;
 /* an invalid HW synchronization source indicating an error */
 #define AUDIO_HW_SYNC_INVALID 0
 
+/**
+ * Mmap buffer descriptor returned by audio_stream->create_mmap_buffer().
+ * note\ Used by streams opened in mmap mode.
+ */
+struct audio_mmap_buffer_info {
+    void*   shared_memory_address;  /**< base address of mmap memory buffer.
+                                         For use by local process only */
+    int32_t shared_memory_fd;       /**< FD for mmap memory buffer */
+    int32_t buffer_size_frames;     /**< total buffer size in frames */
+    int32_t burst_size_frames;      /**< transfer size granularity in frames */
+};
+
+/**
+ * Mmap buffer read/write position returned by audio_stream->get_mmap_position().
+ * note\ Used by streams opened in mmap mode.
+ */
+struct audio_mmap_position {
+    int64_t  time_nanoseconds; /**< timestamp in ns, CLOCK_MONOTONIC */
+    int32_t  position_frames;  /**< increasing 32 bit frame count reset when stream->stop()
+                                    is called */
+};
+
 static inline bool audio_is_output_device(audio_devices_t device)
 {
     if (((device & AUDIO_DEVICE_BIT_IN) == 0) &&
