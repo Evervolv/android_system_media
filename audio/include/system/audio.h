@@ -100,7 +100,7 @@ typedef enum {
     AUDIO_UNIQUE_ID_USE_PATCH = 4,
     AUDIO_UNIQUE_ID_USE_OUTPUT = 5,
     AUDIO_UNIQUE_ID_USE_INPUT = 6,
-    // 7 is available
+    AUDIO_UNIQUE_ID_USE_PLAYER = 7,
     AUDIO_UNIQUE_ID_USE_MAX = 8,  // must be a power-of-two
     AUDIO_UNIQUE_ID_USE_MASK = AUDIO_UNIQUE_ID_USE_MAX - 1
 } audio_unique_id_use_t;
