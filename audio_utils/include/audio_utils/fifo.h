@@ -247,6 +247,7 @@ public:
      *                Time is expressed as relative CLOCK_MONOTONIC.
      *                As an optimization, if \p timeout->tv_sec is the maximum positive value for
      *                time_t (LONG_MAX), then the implementation treats it as infinite timeout.
+     *                See fifo_index.h for explanation of why representation is struct timespec.
      *
      * \return Actual number of frames available, if greater than or equal to zero.
      *         Guaranteed to be <= \p count and == iovec[0].mLength + iovec[1].mLength.
@@ -353,6 +354,7 @@ public:
      *                Time is expressed as relative CLOCK_MONOTONIC.
      *                As an optimization, if \p timeout->tv_sec is the maximum positive value for
      *                time_t (LONG_MAX), then the implementation treats it as infinite timeout.
+     *                See fifo_index.h for explanation of why representation is struct timespec.
      *
      * \return Actual number of frames written, if greater than or equal to zero.
      *         Guaranteed to be <= \p count.
@@ -467,6 +469,7 @@ public:
      *                Time is expressed as relative CLOCK_MONOTONIC.
      *                As an optimization, if \p timeout->tv_sec is the maximum positive value for
      *                time_t (LONG_MAX), then the implementation treats it as infinite timeout.
+     *                See fifo_index.h for explanation of why representation is struct timespec.
      * \param lost    If non-NULL, set to the approximate number of frames lost before
      *                re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
      *
