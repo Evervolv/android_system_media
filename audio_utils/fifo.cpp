@@ -397,7 +397,16 @@ void audio_utils_fifo_writer::getHysteresis(uint32_t *armLevel, uint32_t *trigge
 ////////////////////////////////////////////////////////////////////////////////
 
 audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter) :
-    audio_utils_fifo_provider(fifo), mLocalFront(0),
+    audio_utils_fifo_provider(fifo),
+
+    // If we throttle the writer, then initialize our front index to zero so that we see all data
+    // currently in the buffer.
+    // Otherwise, ignore everything currently in the buffer by initializing our front index to the
+    // current value of writer's rear.  This avoids an immediate -EOVERFLOW (overrun) in the case
+    // where reader starts out more than one buffer behind writer.  The initial catch-up does not
+    // contribute towards the totalLost, totalFlushed, or totalReleased counters.
+    mLocalFront(throttlesWriter ? 0 : mFifo.mWriterRear.loadConsume()),
+
     mThrottleFront(throttlesWriter ? mFifo.mThrottleFront : NULL),
     mArmLevel(-1), mTriggerLevel(mFifo.mFrameCount),
     mIsArmed(true), // because initial fill level of zero is > mArmLevel

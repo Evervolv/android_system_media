@@ -455,6 +455,8 @@ public:
      * \param fifo Associated FIFO.  Passed by reference because it must be non-NULL.
      * \param throttlesWriter Whether this reader throttles the writer.
      *                        At most one reader can specify throttlesWriter == true.
+     *                        A non-throttling reader does not see any data written
+     *                        prior to construction of the reader.
      */
     explicit audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter = true);
     virtual ~audio_utils_fifo_reader();
