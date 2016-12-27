@@ -18,14 +18,15 @@
 /*#define LOG_NDEBUG 0*/
 
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
+
 #include <system/radio.h>
 #include <system/radio_metadata.h>
-#include <cutils/log.h>
-
 #include "radio_metadata_hidden.h"
+
+#include <android/log.h>
 
 const radio_metadata_type_t metadata_key_type_table[] =
 {
