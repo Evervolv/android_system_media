@@ -17,7 +17,7 @@
 /* #define LOG_NDEBUG 0 */
 #define LOG_TAG "audio_utils_format"
 
-#include <cutils/log.h>
+#include <android/log.h>
 #include <audio_utils/primitives.h>
 #include <audio_utils/format.h>
 

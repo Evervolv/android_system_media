@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-#include <inttypes.h>
+#define LOG_TAG "camera_metadata"
+
 #include <system/camera_metadata.h>
 #include <camera_metadata_hidden.h>
 
-#define LOG_TAG "camera_metadata"
-#include <cutils/log.h>
 #include <assert.h>
+#include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
+
+#include <log/log.h>
 
 #define OK              0
 #define ERROR           1
