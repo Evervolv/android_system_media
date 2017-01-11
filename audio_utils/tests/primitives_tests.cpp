@@ -20,8 +20,8 @@
 #include <math.h>
 #include <vector>
 
-#include <android/log.h>
 #include <gtest/gtest.h>
+#include <log/log.h>
 
 #include <audio_utils/primitives.h>
 #include <audio_utils/format.h>
