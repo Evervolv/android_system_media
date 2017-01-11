@@ -22,8 +22,8 @@
 #include <vector>
 #include <algorithm>
 
-#include <android/log.h>
 #include <gtest/gtest.h>
+#include <log/log.h>
 
 #include "system/camera_metadata.h"
 #include "camera_metadata_hidden.h"
