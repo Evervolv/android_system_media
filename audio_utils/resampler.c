@@ -20,7 +20,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include <android/log.h>
+#include <log/log.h>
+
 #include <system/audio.h>
 #include <audio_utils/resampler.h>
 #include <speex/speex_resampler.h>
