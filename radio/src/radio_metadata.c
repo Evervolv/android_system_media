@@ -22,11 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <log/log.h>
+
 #include <system/radio.h>
 #include <system/radio_metadata.h>
 #include "radio_metadata_hidden.h"
-
-#include <android/log.h>
 
 const radio_metadata_type_t metadata_key_type_table[] =
 {
