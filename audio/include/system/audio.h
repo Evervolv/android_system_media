@@ -63,6 +63,7 @@ typedef uint32_t audio_flags_mask_t;
  * in frameworks/base/media/java/android/media/AudioAttributes.java
  */
 enum {
+    AUDIO_FLAG_NONE                       = 0x0,
     AUDIO_FLAG_AUDIBILITY_ENFORCED        = 0x1,
     AUDIO_FLAG_SECURE                     = 0x2,
     AUDIO_FLAG_SCO                        = 0x4,
@@ -72,6 +73,7 @@ enum {
     AUDIO_FLAG_BYPASS_INTERRUPTION_POLICY = 0x40,
     AUDIO_FLAG_BYPASS_MUTE                = 0x80,
     AUDIO_FLAG_LOW_LATENCY                = 0x100,
+    AUDIO_FLAG_DEEP_BUFFER                = 0x200,
 };
 
 /* Audio attributes */
