@@ -1,7 +1,10 @@
 cc_library_shared {
     name: "libradio_metadata",
 
-    srcs: ["src/radio_metadata.c"],
+    srcs: [
+        "src/radio_metadata.c",
+        "src/RadioMetadataWrapper.cpp",
+    ],
 
     cflags: [
         "-Werror",
