@@ -850,6 +850,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_WMA:
     case AUDIO_FORMAT_WMA_PRO:
     case AUDIO_FORMAT_DSD:
+    case AUDIO_FORMAT_AC4:
     case AUDIO_FORMAT_LDAC:
         return true;
     default:
