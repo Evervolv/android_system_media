@@ -162,6 +162,7 @@ static void path_free(struct audio_route *ar)
     free(ar->mixer_path);
     ar->mixer_path = NULL;
     ar->mixer_path_size = 0;
+    ar->num_mixer_paths = 0;
 }
 
 static struct mixer_path *path_get_by_name(struct audio_route *ar,
