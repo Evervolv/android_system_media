@@ -36,7 +36,7 @@ cc_library {
     target: {
         android: {
             srcs: [
-                "conversion.cpp",
+                "mono_blend.cpp",
                 "resampler.c",
                 "echo_reference.c",
             ],
