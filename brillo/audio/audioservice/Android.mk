@@ -77,10 +77,10 @@ LOCAL_SRC_FILES := \
   test/audio_volume_handler_test.cpp
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
 LOCAL_SHARED_LIBRARIES := \
-  $(audio_service_shared_libraries) \
-  libbinderwrapper_test_support
+  $(audio_service_shared_libraries)
 LOCAL_STATIC_LIBRARIES := \
   libBionicGtestMain \
+  libbinderwrapper_test_support \
   libchrome_test_helpers \
   libgmock
 LOCAL_CFLAGS := -Werror -Wall
@@ -99,10 +99,10 @@ LOCAL_SRC_FILES := \
   test/brillo_audio_manager_test.cpp
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/aidl
 LOCAL_SHARED_LIBRARIES := \
-  $(audio_service_shared_libraries) \
-  libbinderwrapper_test_support
+  $(audio_service_shared_libraries)
 LOCAL_STATIC_LIBRARIES := \
   libBionicGtestMain \
+  libbinderwrapper_test_support \
   libchrome_test_helpers \
   libgmock
 LOCAL_CFLAGS := -Wno-sign-compare -Wall -Werror
