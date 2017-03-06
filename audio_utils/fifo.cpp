@@ -50,7 +50,7 @@ audio_utils_fifo_base::~audio_utils_fifo_base()
 uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment) const
         __attribute__((no_sanitize("integer")))
 {
-    if (mFudgeFactor) {
+    if (mFudgeFactor > 0) {
         uint32_t mask = mFrameCountP2 - 1;
         ALOG_ASSERT((index & mask) < mFrameCount);
         ALOG_ASSERT(increment <= mFrameCountP2);
@@ -76,7 +76,7 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
         return -EIO;
     }
     uint32_t diff = rear - front;
-    if (mFudgeFactor) {
+    if (mFudgeFactor > 0) {
         uint32_t mask = mFrameCountP2 - 1;
         uint32_t rearOffset = rear & mask;
         uint32_t frontOffset = front & mask;
@@ -86,22 +86,32 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
             shutdown();
             return -EIO;
         }
+        // genDiff is the difference between the generation count fields of rear and front,
+        // and is always a multiple of mFrameCountP2.
         uint32_t genDiff = (rear & ~mask) - (front & ~mask);
-        if (genDiff != 0) {
-            if (genDiff > mFrameCountP2) {
-                if (lost != NULL) {
-                    // TODO provide a more accurate estimate
-                    *lost = (genDiff / mFrameCountP2) * mFrameCount;
-                }
-                return -EOVERFLOW;
+        // It's OK for writer to be one generation beyond reader,
+        // but reader has lost frames if writer is further than one generation beyond.
+        if (genDiff > mFrameCountP2) {
+            if (lost != NULL) {
+                // Calculate the number of lost frames as the raw difference,
+                // less the mFrameCount frames that are still valid and can be read on retry,
+                // less the wasted indices that don't count as true lost frames.
+                *lost = diff - mFrameCount - mFudgeFactor * (genDiff / mFrameCountP2);
             }
+            return -EOVERFLOW;
+        }
+        // If writer is one generation beyond reader, skip over the wasted indices.
+        if (genDiff > 0) {
             diff -= mFudgeFactor;
+            // Note is still possible for diff > mFrameCount. BCD 16 - BCD 1 shows the problem.
+            // genDiff is 16, fudge is 6, decimal diff is 15 = (22 - 1 - 6).
+            // So we need to check diff for overflow one more time. See "if" a few lines below.
         }
     }
     // FIFO should not be overfull
     if (diff > mFrameCount) {
         if (lost != NULL) {
-            *lost = diff;
+            *lost = diff - mFrameCount;
         }
         return -EOVERFLOW;
     }
@@ -570,7 +580,8 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
     mTotalReleased += *lost;
     if (filled < 0) {
         if (filled == -EOVERFLOW) {
-            mLocalFront = rear;
+            // catch up with writer, but preserve the still valid frames in buffer
+            mLocalFront = rear - mFifo.mFrameCountP2;
         }
         // on error, return an empty slice
         err = filled;
