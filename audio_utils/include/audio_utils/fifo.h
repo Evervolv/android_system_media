@@ -151,7 +151,7 @@ public:
      *                     of \p frameCount, then the writes and reads won't do a partial transfer.
      *  \param frameSize   Size of each frame in bytes > 0,
      *                     \p frameSize * \p frameCount <= INT32_MAX.
-     *  \param buffer      Pointer to a caller-allocated buffer of \p frameCount frames.
+     *  \param buffer      Pointer to a non-NULL caller-allocated buffer of \p frameCount frames.
      *  \param writerRear  Writer's rear index.  Passed by reference because it must be non-NULL.
      *  \param throttleFront Pointer to the front index of at most one reader that throttles the
      *                       writer, or NULL for no throttling.
@@ -167,7 +167,7 @@ public:
      *                     of \p frameCount, then the writes and reads won't do a partial transfer.
      *  \param frameSize   Size of each frame in bytes > 0,
      *                     \p frameSize * \p frameCount <= INT32_MAX.
-     *  \param buffer      Pointer to a caller-allocated buffer of \p frameCount frames.
+     *  \param buffer      Pointer to a non-NULL caller-allocated buffer of \p frameCount frames.
      *  \param throttlesWriter Whether there is one reader that throttles the writer.
      */
     audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
@@ -178,7 +178,7 @@ public:
     /**
      * Return the frame size in bytes.
      *
-     * \return frame size in bytes.
+     * \return frame size in bytes, always > 0.
      */
     uint32_t frameSize() const
             { return mFrameSize; }
@@ -186,7 +186,7 @@ public:
     /**
      * Return a pointer to the caller-allocated buffer.
      *
-     * \return pointer to buffer.
+     * \return non-NULL pointer to buffer.
      */
     void *buffer() const
             { return mBuffer; }
@@ -194,7 +194,8 @@ public:
 private:
     // These fields are const after initialization
     const uint32_t mFrameSize;  // size of each frame in bytes
-    void * const   mBuffer;     // pointer to caller-allocated buffer of size mFrameCount frames
+    void * const   mBuffer;     // non-NULL pointer to caller-allocated buffer
+                                // of size mFrameCount frames
 
     // only used for single-process constructor
     audio_utils_fifo_index      mSingleProcessSharedRear;
@@ -348,6 +349,7 @@ public:
      * Write to FIFO.  Resets the number of releasable frames to zero.
      *
      * \param buffer  Pointer to source buffer containing \p count frames of data.
+     *                Pointer must be non-NULL if \p count is greater than zero.
      * \param count   Desired number of frames to write.
      * \param timeout Indicates the maximum time to block for at least one frame.
      *                NULL and {0, 0} both mean non-blocking.
@@ -465,6 +467,7 @@ public:
      * Read from FIFO.  Resets the number of releasable frames to zero.
      *
      * \param buffer  Pointer to destination buffer to be filled with up to \p count frames of data.
+     *                Pointer must be non-NULL if \p count is greater than zero.
      * \param count   Desired number of frames to read.
      * \param timeout Indicates the maximum time to block for at least one frame.
      *                NULL and {0, 0} both mean non-blocking.
