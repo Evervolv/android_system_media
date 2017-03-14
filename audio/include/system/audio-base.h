@@ -323,7 +323,7 @@ typedef enum {
     AUDIO_OUTPUT_FLAG_IEC958_NONAUDIO = 1024, // 0x400
     AUDIO_OUTPUT_FLAG_DIRECT_PCM = 8192, // 0x2000
     AUDIO_OUTPUT_FLAG_MMAP_NOIRQ = 16384, // 0x4000
-    AUDIO_OUTPUT_FLAG_VOIP_CALL_RX = 32768, // 0x8000
+    AUDIO_OUTPUT_FLAG_VOIP_RX = 32768, // 0x8000
 } audio_output_flags_t;
 
 typedef enum {
@@ -333,7 +333,7 @@ typedef enum {
     AUDIO_INPUT_FLAG_RAW = 4, // 0x4
     AUDIO_INPUT_FLAG_SYNC = 8, // 0x8
     AUDIO_INPUT_FLAG_MMAP_NOIRQ = 16, // 0x10
-    AUDIO_INPUT_FLAG_VOIP_CALL_TX = 32, // 0x20
+    AUDIO_INPUT_FLAG_VOIP_TX = 32, // 0x20
 } audio_input_flags_t;
 
 typedef enum {
