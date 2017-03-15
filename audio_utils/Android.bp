@@ -19,6 +19,7 @@ cc_library {
 
     srcs: [
         "channels.c",
+        "ErrorLog.cpp",
         "fifo.cpp",
         "fifo_index.cpp",
         "format.c",
