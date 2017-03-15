@@ -92,6 +92,14 @@ void proxy_prepare(alsa_device_proxy * proxy, alsa_device_profile* profile,
     } else {
         proxy->frame_size = 1;
     }
+
+    // let's check to make sure we can ACTUALLY use the maximum rate (with the channel count)
+    // Note that profile->sample_rates is sorted highest to lowest, so the scan will get
+    // us the highest working rate
+    int max_rate_index = proxy_scan_rates(proxy, profile->sample_rates);
+    if (max_rate_index >= 0) {
+        proxy->alsa_config.rate = profile->sample_rates[max_rate_index];
+    }
 }
 
 int proxy_open(alsa_device_proxy * proxy)
@@ -111,7 +119,7 @@ int proxy_open(alsa_device_proxy * proxy)
     }
 
     if (!pcm_is_ready(proxy->pcm)) {
-        ALOGE("  proxy_open() pcm_open() failed: %s", pcm_get_error(proxy->pcm));
+        ALOGE("  proxy_open() pcm_is_ready() failed: %s", pcm_get_error(proxy->pcm));
 #if defined(LOG_PCM_PARAMS)
         log_pcm_config(&proxy->alsa_config, "config");
 #endif
@@ -230,4 +238,34 @@ void proxy_dump(const alsa_device_proxy* proxy, int fd)
         dprintf(fd, "  period_count: %d\n", proxy->alsa_config.period_count);
         dprintf(fd, "  format: %d\n", proxy->alsa_config.format);
     }
+}
+
+int proxy_scan_rates(alsa_device_proxy * proxy, unsigned sample_rates[]) {
+    alsa_device_profile* profile = proxy->profile;
+    if (profile->card < 0 || profile->device < 0) {
+        return -EINVAL;
+    }
+
+    struct pcm_config alsa_config;
+    memcpy(&alsa_config, &proxy->alsa_config, sizeof(alsa_config));
+
+    struct pcm * alsa_pcm;
+    int rate_index = 0;
+    while (sample_rates[rate_index] != 0) {
+        alsa_config.rate = sample_rates[rate_index];
+        alsa_pcm = pcm_open(profile->card, profile->device,
+                profile->direction | PCM_MONOTONIC, &alsa_config);
+        if (alsa_pcm != NULL) {
+            if (pcm_is_ready(alsa_pcm)) {
+                pcm_close(alsa_pcm);
+                return rate_index;
+            }
+
+            pcm_close(alsa_pcm);
+        }
+
+        rate_index++;
+    }
+
+    return -EINVAL;
 }
