@@ -74,27 +74,3 @@ cc_binary_host {
         "-UNDEBUG",
     ],
 }
-
-cc_test {
-    name: "power_tests",
-    host_supported: true,
-
-    shared_libs: [
-        "libcutils",
-        "liblog",
-    ],
-    srcs: ["power_tests.cpp"],
-    cflags: [
-        "-Wall",
-        "-Werror",
-        "-Wextra",
-    ],
-    target: {
-        android: {
-            shared_libs: ["libaudioutils"],
-        },
-        host: {
-            static_libs: ["libaudioutils"],
-        },
-    }
-}
