@@ -24,8 +24,6 @@ cc_library {
         "format.c",
         "limiter.c",
         "minifloat.c",
-        "power.cpp",
-        "PowerLog.cpp",
         "primitives.c",
         "roundup.c",
     ],
