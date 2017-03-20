@@ -17,6 +17,11 @@
 #ifndef ANDROID_AUDIO_CLOCK_H
 #define ANDROID_AUDIO_CLOCK_H
 
+// This file can be included for either C or C++ source.
+
+#include <stdint.h>
+#include <stdio.h>
+#include <sys/time.h>
 #include <time.h>
 
 /**
@@ -27,12 +32,20 @@
  *                    null terminated if buffer_size is greater than zero.
  * \param buffer_size size of buffer.
  */
-static inline void audio_utils_ns_to_string(int64_t ns, char *buffer, int buffer_size)
+static inline void audio_utils_ns_to_string(int64_t ns, char *buffer, size_t buffer_size)
 {
+    if (buffer_size == 0) return;
+
     const int one_second = 1000000000;
     const time_t sec = ns / one_second;
     struct tm tm;
-    localtime_r(&sec, &tm);
+
+    // Supported on bionic, glibc, and macOS, but not mingw.
+    if (localtime_r(&sec, &tm) == NULL) {
+        buffer[0] = '\0';
+        return;
+    }
+
     if (snprintf(buffer, buffer_size, "%02d-%02d %02d:%02d:%02d.%03d",
         tm.tm_mon + 1, // localtime_r uses months in 0 - 11 range
         tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
@@ -56,11 +69,26 @@ static inline int64_t audio_utils_ns_from_timespec(const struct timespec *ts)
  * \return the real time clock in nanoseconds, or 0 on error.
  */
 static inline int64_t audio_utils_get_real_time_ns() {
+
+#if defined(__linux__)
+
     struct timespec now_ts;
     if (clock_gettime(CLOCK_REALTIME, &now_ts) == 0) {
         return audio_utils_ns_from_timespec(&now_ts);
     }
     return 0; // should not happen.
+
+#else
+
+    // Mac OS X compatible
+    struct timeval now_tv;
+    if (gettimeofday(&now_tv, NULL /* struct timezone * */) == 0) {
+        return now_tv.tv_sec * 1000000000LL + now_tv.tv_usec * 1000LL;
+    }
+    return 0; // should not happen.
+
+#endif
+
 }
 
 #endif  // !ANDROID_AUDIO_CLOCK_H
