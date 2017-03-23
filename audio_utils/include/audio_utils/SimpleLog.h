@@ -169,9 +169,8 @@ public:
         for (; it != mLog.end(); ++it) {
             const int64_t time = it->first;
             if (time < limitNs) continue;  // too old
-            char timeinfo[32];
-            audio_utils_ns_to_string(time, timeinfo, sizeof(timeinfo));
-            ss << prefix << timeinfo << " " << it->second.c_str() << "\n";
+            ss << prefix << audio_utils_time_string_from_ns(time).time
+                    << " " << it->second.c_str() << "\n";
         }
         return ss.str();
     }
