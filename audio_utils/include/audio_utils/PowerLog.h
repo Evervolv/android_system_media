@@ -21,7 +21,7 @@
 
 #include <mutex>
 #include <vector>
-
+#include <system/audio.h>
 #include <utils/Errors.h>
 
 namespace android {
@@ -51,7 +51,7 @@ public:
      * \param entries           total number of energy entries "bins" to use.
      * \param framesPerEntry    total number of audio frames used in each entry.
      */
-    explicit PowerLog(uint32_t sampleRate,
+    PowerLog(uint32_t sampleRate,
             uint32_t channelCount,
             audio_format_t format,
             size_t entries,
@@ -73,7 +73,8 @@ public:
      * \param limitNs           limit dump to data more recent than limitNs (0 disables).
      * \return the std::string for the log.
      */
-    std::string dumpToString(size_t lines = 0, int64_t limitNs = 0) const;
+    std::string dumpToString(
+            const char *prefix = "", size_t lines = 0, int64_t limitNs = 0) const;
 
     /**
      * \brief Dumps the log to a raw file descriptor.
@@ -84,7 +85,7 @@ public:
      * \return
      *   NO_ERROR on success or a negative number (-errno) on failure of write().
      */
-    status_t dump(int fd, size_t lines = 0, int64_t limitNs = 0) const;
+    status_t dump(int fd, const char *prefix = "", size_t lines = 0, int64_t limitNs = 0) const;
 
 private:
     mutable std::mutex mLock;     // monitor mutex
@@ -148,7 +149,8 @@ void power_log_log(power_log_t *power_log, const void *buffer, size_t frames, in
  *   NO_ERROR on success or a negative number (-errno) on failure of write().
  *   if power_log is NULL, BAD_VALUE is returned.
  */
-int power_log_dump(power_log_t *power_log, int fd, size_t lines, int64_t limit_ns);
+int power_log_dump(
+        power_log_t *power_log, int fd, const char *prefix,  size_t lines, int64_t limit_ns);
 
 /**
  * \brief Destroys the power log object.
