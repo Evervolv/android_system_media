@@ -186,12 +186,11 @@ std::string PowerLog::dumpToString(const char *prefix, size_t lines, int64_t lim
             }
             if (column == 0) {
                 // print time if at start of column
-                char timeinfo[32];
-                audio_utils_ns_to_string(time, timeinfo, array_size(timeinfo));
                 if (!first) {
                     ss << "\n";
                 }
-                ss << prefix << " " << timeinfo << (start ? ": [ ": ":   ");
+                ss << prefix << " " << audio_utils_time_string_from_ns(time).time
+                        << (start ? ": [ ": ":   ");
                 first = false;
                 start = false;
             }  else {

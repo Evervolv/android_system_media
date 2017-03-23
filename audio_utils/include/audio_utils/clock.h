@@ -55,6 +55,29 @@ static inline void audio_utils_ns_to_string(int64_t ns, char *buffer, size_t buf
 }
 
 /**
+ * An object that contains the formatted time string.
+ *
+ * The time string is 19 characters (including null termination).
+ * Example: "03-27 16:47:06.187"
+ *           MM DD HH MM SS MS
+ */
+typedef struct audio_utils_time_string {
+    char time[19]; /* minimum size buffer */
+} audio_utils_time_string_t;
+
+/**
+ * \brief Converts time in ns to a time string object, with format similar to logcat.
+ * \param ns          input time in nanoseconds to convert.
+ */
+static inline audio_utils_time_string_t audio_utils_time_string_from_ns(int64_t ns)
+{
+    audio_utils_time_string_t ts;
+
+    audio_utils_ns_to_string(ns, ts.time, sizeof(ts.time));
+    return ts;
+}
+
+/**
  * \brief Converts a timespec to nanoseconds.
  * \param ts   input timespec to convert.
  * \return     timespec converted to nanoseconds.
