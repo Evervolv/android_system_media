@@ -104,7 +104,7 @@ void PowerLog::log(const void *buffer, size_t frames, int64_t nowNs)
     }
 }
 
-std::string PowerLog::dumpToString(size_t lines, int64_t limitNs) const
+std::string PowerLog::dumpToString(const char *prefix, size_t lines, int64_t limitNs) const
 {
     std::lock_guard<std::mutex> guard(mLock);
 
@@ -142,7 +142,7 @@ std::string PowerLog::dumpToString(size_t lines, int64_t limitNs) const
                 continue;
             }
         }
-        if (column == 0 && time <= limitNs) {
+        if (column == 0 && time < limitNs) {
             break;
         }
         ++nonzeros;
@@ -162,9 +162,9 @@ std::string PowerLog::dumpToString(size_t lines, int64_t limitNs) const
     ss << std::fixed << std::setprecision(1);
     // ss << std::scientific;
     if (nonzeros == 0) {
-        ss << "      Signal power history: (none)\n";
+        ss << prefix << "Signal power history: (none)\n";
     } else {
-        ss << "      Signal power history:\n";
+        ss << prefix << "Signal power history:\n";
 
         size_t column = 0;
         bool first = true;
@@ -191,7 +191,7 @@ std::string PowerLog::dumpToString(size_t lines, int64_t limitNs) const
                 if (!first) {
                     ss << "\n";
                 }
-                ss << timeinfo << (start ? ": [ ": ":   ");
+                ss << prefix << " " << timeinfo << (start ? ": [ ": ":   ");
                 first = false;
                 start = false;
             }  else {
@@ -213,13 +213,13 @@ std::string PowerLog::dumpToString(size_t lines, int64_t limitNs) const
     return ss.str();
 }
 
-status_t PowerLog::dump(int fd, size_t lines, int64_t limitNs) const
+status_t PowerLog::dump(int fd, const char *prefix, size_t lines, int64_t limitNs) const
 {
     // Since dumpToString and write are thread safe, this function
     // is conceptually thread-safe but simultaneous calls to dump
     // by different threads to the same file descriptor may not write
     // the two logs in time order.
-    const std::string s = dumpToString(lines, limitNs);
+    const std::string s = dumpToString(prefix, lines, limitNs);
     if (s.size() > 0 && write(fd, s.c_str(), s.size()) < 0) {
         return -errno;
     }
@@ -237,7 +237,8 @@ power_log_t *power_log_create(uint32_t sample_rate,
         return nullptr;
     }
     return reinterpret_cast<power_log_t *>
-            (new PowerLog(sample_rate, channel_count, format, entries, frames_per_entry));
+            (new(std::nothrow)
+                    PowerLog(sample_rate, channel_count, format, entries, frames_per_entry));
 }
 
 void power_log_log(power_log_t *power_log,
@@ -249,12 +250,13 @@ void power_log_log(power_log_t *power_log,
     reinterpret_cast<PowerLog *>(power_log)->log(buffer, frames, now_ns);
 }
 
-int power_log_dump(power_log_t *power_log, int fd, size_t lines, int64_t limit_ns)
+int power_log_dump(
+        power_log_t *power_log, int fd, const char *prefix, size_t lines, int64_t limit_ns)
 {
     if (power_log == nullptr) {
         return BAD_VALUE;
     }
-    return reinterpret_cast<PowerLog *>(power_log)->dump(fd, lines, limit_ns);
+    return reinterpret_cast<PowerLog *>(power_log)->dump(fd, prefix, lines, limit_ns);
 }
 
 void power_log_destroy(power_log_t *power_log)
