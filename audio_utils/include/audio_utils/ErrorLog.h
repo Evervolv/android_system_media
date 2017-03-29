@@ -128,14 +128,11 @@ public:
             for (; offset >= 0; --offset) {
                 const auto &entry =
                         mEntries[(mIdx + numberOfEntries - offset) % numberOfEntries];
-                char firstTime[32];
-                char lastTime[32];
-                audio_utils_ns_to_string(entry.mFirstTime, firstTime, sizeof(firstTime));
-                audio_utils_ns_to_string(entry.mLastTime, lastTime, sizeof(lastTime));
+
                 ss << prefix << std::setw(5) <<  entry.mCode
                         << " " << std::setw(5) << entry.mCount
-                        << "  " << firstTime
-                        << "  " << lastTime << "\n";
+                        << "  " << audio_utils_time_string_from_ns(entry.mFirstTime).time
+                        << "  " << audio_utils_time_string_from_ns(entry.mLastTime).time << "\n";
             }
         }
         return ss.str();
