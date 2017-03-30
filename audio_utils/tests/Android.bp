@@ -98,3 +98,75 @@ cc_test {
         },
     }
 }
+
+cc_test {
+    name: "errorlog_tests",
+    host_supported: false,
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    srcs: ["errorlog_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    target: {
+        android: {
+            shared_libs: ["libaudioutils"],
+        },
+        host: {
+            static_libs: ["libaudioutils"],
+        },
+    }
+}
+
+cc_test {
+    name: "powerlog_tests",
+    host_supported: false,
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    srcs: ["powerlog_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    target: {
+        android: {
+            shared_libs: ["libaudioutils"],
+        },
+        host: {
+            static_libs: ["libaudioutils"],
+        },
+    }
+}
+
+cc_test {
+    name: "simplelog_tests",
+    host_supported: false,
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    srcs: ["simplelog_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    target: {
+        android: {
+            shared_libs: ["libaudioutils"],
+        },
+        host: {
+            static_libs: ["libaudioutils"],
+        },
+    }
+}
