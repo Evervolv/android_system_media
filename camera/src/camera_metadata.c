@@ -101,6 +101,7 @@ struct camera_metadata {
     metadata_size_t          data_count;
     metadata_size_t          data_capacity;
     metadata_uptrdiff_t      data_start; // Offset from camera_metadata
+    metadata_vendor_id_t     vendor_id;
     uint8_t                  reserved[];
 };
 
@@ -236,6 +237,7 @@ camera_metadata_t *place_camera_metadata(void *dst,
     size_t data_unaligned = (uint8_t*)(get_entries(metadata) +
             metadata->entry_capacity) - (uint8_t*)metadata;
     metadata->data_start = ALIGN_TO(data_unaligned, DATA_ALIGNMENT);
+    metadata->vendor_id = CAMERA_METADATA_INVALID_VENDOR_ID;
 
     assert(validate_camera_metadata_structure(metadata, NULL) == OK);
     return metadata;
@@ -298,6 +300,7 @@ camera_metadata_t* copy_camera_metadata(void *dst, size_t dst_size,
     metadata->flags = src->flags;
     metadata->entry_count = src->entry_count;
     metadata->data_count = src->data_count;
+    metadata->vendor_id = src->vendor_id;
 
     memcpy(get_entries(metadata), get_entries(src),
             sizeof(camera_metadata_buffer_entry_t[metadata->entry_count]));
@@ -456,7 +459,7 @@ int validate_camera_metadata_structure(const camera_metadata_t *metadata,
         // TODO: fix vendor_tag_ops across processes so we don't need to special
         //       case vendor-specific tags
         uint32_t tag_section = entry.tag >> 16;
-        int tag_type = get_camera_metadata_tag_type(entry.tag);
+        int tag_type = get_local_camera_metadata_tag_type(entry.tag, metadata);
         if (tag_type != (int)entry.type && tag_section < VENDOR_SECTION) {
             ALOGE("%s: Entry index %zu had tag type %d, but the type was %d",
                   __FUNCTION__, i, tag_type, entry.type);
@@ -480,8 +483,8 @@ int validate_camera_metadata_structure(const camera_metadata_t *metadata,
                 ALOGE("%s: Entry index %zu had bad data alignment (address %p),"
                       " expected align %zu, (tag name %s, data size %zu)",
                       __FUNCTION__, i, data, DATA_ALIGNMENT,
-                      get_camera_metadata_tag_name(entry.tag) ?: "unknown",
-                      data_size);
+                      get_local_camera_metadata_tag_name(entry.tag, metadata) ?
+                              : "unknown", data_size);
                 return ERROR;
             }
 
@@ -499,7 +502,7 @@ int validate_camera_metadata_structure(const camera_metadata_t *metadata,
             if (entry.data.offset != 0) {
                 ALOGE("%s: Entry index %zu had 0 items, but offset was non-0 "
                      "(%" PRIu32 "), tag name: %s", __FUNCTION__, i, entry.data.offset,
-                        get_camera_metadata_tag_name(entry.tag) ?: "unknown");
+                        get_local_camera_metadata_tag_name(entry.tag, metadata) ? : "unknown");
                 return ERROR;
             }
         } // else data stored inline, so we look at value which can be anything.
@@ -518,6 +521,13 @@ int append_camera_metadata(camera_metadata_t *dst,
     // Check for space
     if (dst->entry_capacity < src->entry_count + dst->entry_count) return ERROR;
     if (dst->data_capacity < src->data_count + dst->data_count) return ERROR;
+
+    if ((dst->vendor_id != CAMERA_METADATA_INVALID_VENDOR_ID) &&
+            (dst->vendor_id != src->vendor_id)) {
+        ALOGE("%s: Append for metadata from different vendors is "
+                "not supported!", __func__);
+        return ERROR;
+    }
 
     memcpy(get_entries(dst) + dst->entry_count, get_entries(src),
             sizeof(camera_metadata_buffer_entry_t[src->entry_count]));
@@ -543,6 +553,10 @@ int append_camera_metadata(camera_metadata_t *dst,
     }
     dst->entry_count += src->entry_count;
     dst->data_count += src->data_count;
+
+    if (dst->vendor_id == CAMERA_METADATA_INVALID_VENDOR_ID) {
+        dst->vendor_id = src->vendor_id;
+    }
 
     assert(validate_camera_metadata_structure(dst, NULL) == OK);
     return OK;
@@ -607,7 +621,7 @@ int add_camera_metadata_entry(camera_metadata_t *dst,
         const void *data,
         size_t data_count) {
 
-    int type = get_camera_metadata_tag_type(tag);
+    int type = get_local_camera_metadata_tag_type(tag, dst);
     if (type == -1) {
         ALOGE("%s: Unknown tag %04x.", __FUNCTION__, tag);
         return ERROR;
@@ -826,10 +840,16 @@ int update_camera_metadata_entry(camera_metadata_t *dst,
 }
 
 static const vendor_tag_ops_t *vendor_tag_ops = NULL;
+static const struct vendor_tag_cache_ops *vendor_cache_ops = NULL;
 
-const char *get_camera_metadata_section_name(uint32_t tag) {
+// Declared in system/media/private/camera/include/camera_metadata_hidden.h
+const char *get_local_camera_metadata_section_name_vendor_id(uint32_t tag,
+        metadata_vendor_id_t id) {
     uint32_t tag_section = tag >> 16;
-    if (tag_section >= VENDOR_SECTION && vendor_tag_ops != NULL) {
+    if (tag_section >= VENDOR_SECTION && vendor_cache_ops != NULL &&
+               id != CAMERA_METADATA_INVALID_VENDOR_ID) {
+           return vendor_cache_ops->get_section_name(tag, id);
+    } else if (tag_section >= VENDOR_SECTION && vendor_tag_ops != NULL) {
         return vendor_tag_ops->get_section_name(
             vendor_tag_ops,
             tag);
@@ -840,9 +860,14 @@ const char *get_camera_metadata_section_name(uint32_t tag) {
     return camera_metadata_section_names[tag_section];
 }
 
-const char *get_camera_metadata_tag_name(uint32_t tag) {
+// Declared in system/media/private/camera/include/camera_metadata_hidden.h
+const char *get_local_camera_metadata_tag_name_vendor_id(uint32_t tag,
+        metadata_vendor_id_t id) {
     uint32_t tag_section = tag >> 16;
-    if (tag_section >= VENDOR_SECTION && vendor_tag_ops != NULL) {
+    if (tag_section >= VENDOR_SECTION && vendor_cache_ops != NULL &&
+                id != CAMERA_METADATA_INVALID_VENDOR_ID) {
+            return vendor_cache_ops->get_tag_name(tag, id);
+    } else  if (tag_section >= VENDOR_SECTION && vendor_tag_ops != NULL) {
         return vendor_tag_ops->get_tag_name(
             vendor_tag_ops,
             tag);
@@ -855,9 +880,14 @@ const char *get_camera_metadata_tag_name(uint32_t tag) {
     return tag_info[tag_section][tag_index].tag_name;
 }
 
-int get_camera_metadata_tag_type(uint32_t tag) {
+// Declared in system/media/private/camera/include/camera_metadata_hidden.h
+int get_local_camera_metadata_tag_type_vendor_id(uint32_t tag,
+        metadata_vendor_id_t id) {
     uint32_t tag_section = tag >> 16;
-    if (tag_section >= VENDOR_SECTION && vendor_tag_ops != NULL) {
+    if (tag_section >= VENDOR_SECTION && vendor_cache_ops != NULL &&
+                id != CAMERA_METADATA_INVALID_VENDOR_ID) {
+            return vendor_cache_ops->get_tag_type(tag, id);
+    } else if (tag_section >= VENDOR_SECTION && vendor_tag_ops != NULL) {
         return vendor_tag_ops->get_tag_type(
             vendor_tag_ops,
             tag);
@@ -868,6 +898,42 @@ int get_camera_metadata_tag_type(uint32_t tag) {
     }
     uint32_t tag_index = tag & 0xFFFF;
     return tag_info[tag_section][tag_index].tag_type;
+}
+
+const char *get_camera_metadata_section_name(uint32_t tag) {
+    return get_local_camera_metadata_section_name(tag, NULL);
+}
+
+const char *get_camera_metadata_tag_name(uint32_t tag) {
+    return get_local_camera_metadata_tag_name(tag, NULL);
+}
+
+int get_camera_metadata_tag_type(uint32_t tag) {
+    return get_local_camera_metadata_tag_type(tag, NULL);
+}
+
+const char *get_local_camera_metadata_section_name(uint32_t tag,
+        const camera_metadata_t *meta) {
+    metadata_vendor_id_t id = (NULL == meta) ? CAMERA_METADATA_INVALID_VENDOR_ID :
+            meta->vendor_id;
+
+    return get_local_camera_metadata_section_name_vendor_id(tag, id);
+}
+
+const char *get_local_camera_metadata_tag_name(uint32_t tag,
+        const camera_metadata_t *meta) {
+    metadata_vendor_id_t id = (NULL == meta) ? CAMERA_METADATA_INVALID_VENDOR_ID :
+            meta->vendor_id;
+
+    return get_local_camera_metadata_tag_name_vendor_id(tag, id);
+}
+
+int get_local_camera_metadata_tag_type(uint32_t tag,
+        const camera_metadata_t *meta) {
+    metadata_vendor_id_t id = (NULL == meta) ? CAMERA_METADATA_INVALID_VENDOR_ID :
+            meta->vendor_id;
+
+    return get_local_camera_metadata_tag_type_vendor_id(tag, id);
 }
 
 int set_camera_metadata_vendor_tag_ops(const vendor_tag_query_ops_t* ops) {
@@ -881,6 +947,33 @@ int set_camera_metadata_vendor_tag_ops(const vendor_tag_query_ops_t* ops) {
 int set_camera_metadata_vendor_ops(const vendor_tag_ops_t* ops) {
     vendor_tag_ops = ops;
     return OK;
+}
+
+// Declared in system/media/private/camera/include/camera_metadata_hidden.h
+int set_camera_metadata_vendor_cache_ops(
+        const struct vendor_tag_cache_ops *query_cache_ops) {
+    vendor_cache_ops = query_cache_ops;
+    return OK;
+}
+
+// Declared in system/media/private/camera/include/camera_metadata_hidden.h
+void set_camera_metadata_vendor_id(camera_metadata_t *meta,
+        metadata_vendor_id_t id) {
+    if (NULL != meta) {
+        meta->vendor_id = id;
+    }
+}
+
+// Declared in system/media/private/camera/include/camera_metadata_hidden.h
+metadata_vendor_id_t get_camera_metadata_vendor_id(
+        const camera_metadata_t *meta) {
+    metadata_vendor_id_t ret = CAMERA_METADATA_INVALID_VENDOR_ID;
+
+    if (NULL != meta) {
+        ret = meta->vendor_id;
+    }
+
+    return ret;
 }
 
 static void print_data(int fd, const uint8_t *data_ptr, uint32_t tag, int type,
@@ -915,11 +1008,11 @@ void dump_indented_camera_metadata(const camera_metadata_t *metadata,
     for (i=0; i < metadata->entry_count; i++, entry++) {
 
         const char *tag_name, *tag_section;
-        tag_section = get_camera_metadata_section_name(entry->tag);
+        tag_section = get_local_camera_metadata_section_name(entry->tag, metadata);
         if (tag_section == NULL) {
             tag_section = "unknownSection";
         }
-        tag_name = get_camera_metadata_tag_name(entry->tag);
+        tag_name = get_local_camera_metadata_tag_name(entry->tag, metadata);
         if (tag_name == NULL) {
             tag_name = "unknownTag";
         }
