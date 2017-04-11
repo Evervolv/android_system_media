@@ -523,10 +523,12 @@ int append_camera_metadata(camera_metadata_t *dst,
     if (dst->data_capacity < src->data_count + dst->data_count) return ERROR;
 
     if ((dst->vendor_id != CAMERA_METADATA_INVALID_VENDOR_ID) &&
-            (dst->vendor_id != src->vendor_id)) {
-        ALOGE("%s: Append for metadata from different vendors is "
-                "not supported!", __func__);
-        return ERROR;
+            (src->vendor_id != CAMERA_METADATA_INVALID_VENDOR_ID)) {
+        if (dst->vendor_id != src->vendor_id) {
+            ALOGE("%s: Append for metadata from different vendors is"
+                    "not supported!", __func__);
+            return ERROR;
+        }
     }
 
     memcpy(get_entries(dst) + dst->entry_count, get_entries(src),
