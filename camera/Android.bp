@@ -19,7 +19,7 @@ cc_library_shared {
         "-Wextra",
         "-Werror",
         "-fvisibility=hidden",
-        "-std=c99",
+        "-std=c11",
     ],
 
     product_variables: {
