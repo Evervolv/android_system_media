@@ -85,13 +85,14 @@ protected:
      * \param front Caller should supply an unvalidated mFront.
      * \param lost  If non-NULL, set to the approximate number of frames lost before
      *              re-synchronization when -EOVERFLOW occurs, or set to zero when no frames lost.
+     * \param flush Whether to flush the entire buffer on -EOVERFLOW.
      *
      * \return The zero or positive difference <= mFrameCount, or a negative error code.
      * \retval -EIO        corrupted indices, no recovery is possible
      * \retval -EOVERFLOW  reader doesn't throttle writer, and frames were lost because reader
      *                     isn't keeping up with writer; see \p lost
      */
-    int32_t diff(uint32_t rear, uint32_t front, size_t *lost = NULL) const;
+    int32_t diff(uint32_t rear, uint32_t front, size_t *lost = NULL, bool flush = false) const;
 
     /**
      * Mark the FIFO as shutdown (permanently unusable), usually due to an -EIO status from an API.
@@ -454,13 +455,17 @@ public:
      * Single-process and multi-process use same constructor here,
      * but different FIFO constructors.
      *
-     * \param fifo Associated FIFO.  Passed by reference because it must be non-NULL.
+     * \param fifo            Associated FIFO.  Passed by reference because it must be non-NULL.
      * \param throttlesWriter Whether this reader throttles the writer.
      *                        At most one reader can specify throttlesWriter == true.
      *                        A non-throttling reader does not see any data written
      *                        prior to construction of the reader.
+     * \param flush           Whether to flush (discard) the entire buffer on -EOVERFLOW.
+     *                        The advantage of flushing is that it increases the chance that next
+     *                        read will be successful.  The disadvantage is that it loses more data.
      */
-    explicit audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter = true);
+    explicit audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter = true,
+                                     bool flush = false);
     virtual ~audio_utils_fifo_reader();
 
     /**
@@ -603,6 +608,8 @@ private:
     // Points to shared front index if this reader throttles writer, or NULL if we don't throttle
     // FIXME consider making it a boolean
     audio_utils_fifo_index*     mThrottleFront;
+
+    bool        mFlush;             // whether to flush the entire buffer on -EOVERFLOW
 
     int32_t     mArmLevel;          // arm if filled > arm level before release()
     uint32_t    mTriggerLevel;      // trigger if armed and filled < trigger level after release()
