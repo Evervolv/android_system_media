@@ -278,6 +278,13 @@ ANDROID_API
 camera_metadata_t *copy_camera_metadata(void *dst, size_t dst_size,
         const camera_metadata_t *src);
 
+
+// Non 0 eturn values for validate_camera_metadata_structure
+enum {
+    CAMERA_METADATA_VALIDATION_ERROR = 1,
+    CAMERA_METADATA_VALIDATION_SHIFTED = 2,
+};
+
 /**
  * Validate that a metadata is structurally sane. That is, its internal
  * state is such that we won't get buffer overflows or run into other
@@ -289,7 +296,10 @@ camera_metadata_t *copy_camera_metadata(void *dst, size_t dst_size,
  *
  * The expected_size argument is optional.
  *
- * Returns 0 on success. A non-0 value is returned on error.
+ * Returns 0: on success
+ *         CAMERA_METADATA_VALIDATION_ERROR: on error
+ *         CAMERA_METADATA_VALIDATION_SHIFTED: when the data is not properly aligned, but can be
+ *                 copied to a properly aligned camera_metadata buffer and the copy will be valid.
  */
 ANDROID_API
 int validate_camera_metadata_structure(const camera_metadata_t *metadata,
