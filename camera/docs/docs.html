@@ -4293,9 +4293,13 @@ capture intents.<wbr/></p>
 <p>The output images for request B may have contents captured before the output images for
 request A,<wbr/> and the result metadata for request B may be older than the result metadata for
 request A.<wbr/></p>
-<p>Note that when enableZsl is <code>true</code>,<wbr/> it is not guaranteed to get output images captured in the
-past for requests with STILL_<wbr/>CAPTURE capture intent.<wbr/></p>
-<p>The value of enableZsl in capture templates is always <code>false</code> if present.<wbr/></p>
+<p>Note that when enableZsl is <code>true</code>,<wbr/> it is not guaranteed to get output images captured in
+the past for requests with STILL_<wbr/>CAPTURE capture intent.<wbr/></p>
+<p>For applications targeting SDK versions O and newer,<wbr/> the value of enableZsl in
+TEMPLATE_<wbr/>STILL_<wbr/>CAPTURE template may be <code>true</code>.<wbr/> The value in other templates is always
+<code>false</code> if present.<wbr/></p>
+<p>For applications targeting SDK versions older than O,<wbr/> the value of enableZsl in all
+capture templates is always <code>false</code> if present.<wbr/></p>
             </td>
           </tr>
 
@@ -9021,9 +9025,13 @@ capture intents.<wbr/></p>
 <p>The output images for request B may have contents captured before the output images for
 request A,<wbr/> and the result metadata for request B may be older than the result metadata for
 request A.<wbr/></p>
-<p>Note that when enableZsl is <code>true</code>,<wbr/> it is not guaranteed to get output images captured in the
-past for requests with STILL_<wbr/>CAPTURE capture intent.<wbr/></p>
-<p>The value of enableZsl in capture templates is always <code>false</code> if present.<wbr/></p>
+<p>Note that when enableZsl is <code>true</code>,<wbr/> it is not guaranteed to get output images captured in
+the past for requests with STILL_<wbr/>CAPTURE capture intent.<wbr/></p>
+<p>For applications targeting SDK versions O and newer,<wbr/> the value of enableZsl in
+TEMPLATE_<wbr/>STILL_<wbr/>CAPTURE template may be <code>true</code>.<wbr/> The value in other templates is always
+<code>false</code> if present.<wbr/></p>
+<p>For applications targeting SDK versions older than O,<wbr/> the value of enableZsl in all
+capture templates is always <code>false</code> if present.<wbr/></p>
             </td>
           </tr>
 
