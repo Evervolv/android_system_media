@@ -101,8 +101,8 @@ struct camera_metadata {
     metadata_size_t          data_count;
     metadata_size_t          data_capacity;
     metadata_uptrdiff_t      data_start; // Offset from camera_metadata
+    uint32_t                 padding;    // padding to 8 bytes boundary
     metadata_vendor_id_t     vendor_id;
-    uint8_t                  reserved[];
 };
 
 /**
@@ -120,6 +120,49 @@ typedef union camera_metadata_data {
     double  d;
     camera_metadata_rational_t r;
 } camera_metadata_data_t;
+
+_Static_assert(sizeof(metadata_size_t) == 4,
+         "Size of metadata_size_t must be 4");
+_Static_assert(sizeof(metadata_uptrdiff_t) == 4,
+         "Size of metadata_uptrdiff_t must be 4");
+_Static_assert(sizeof(metadata_vendor_id_t) == 8,
+         "Size of metadata_vendor_id_t must be 8");
+_Static_assert(sizeof(camera_metadata_data_t) == 8,
+         "Size of camera_metadata_data_t must be 8");
+
+_Static_assert(offsetof(camera_metadata_buffer_entry_t, tag) == 0,
+         "Offset of tag must be 0");
+_Static_assert(offsetof(camera_metadata_buffer_entry_t, count) == 4,
+         "Offset of count must be 4");
+_Static_assert(offsetof(camera_metadata_buffer_entry_t, data) == 8,
+         "Offset of data must be 8");
+_Static_assert(offsetof(camera_metadata_buffer_entry_t, type) == 12,
+         "Offset of type must be 12");
+_Static_assert(sizeof(camera_metadata_buffer_entry_t) == 16,
+         "Size of camera_metadata_buffer_entry_t must be 16");
+
+_Static_assert(offsetof(camera_metadata_t, size) == 0,
+         "Offset of size must be 0");
+_Static_assert(offsetof(camera_metadata_t, version) == 4,
+         "Offset of version must be 4");
+_Static_assert(offsetof(camera_metadata_t, flags) == 8,
+         "Offset of flags must be 8");
+_Static_assert(offsetof(camera_metadata_t, entry_count) == 12,
+         "Offset of entry_count must be 12");
+_Static_assert(offsetof(camera_metadata_t, entry_capacity) == 16,
+         "Offset of entry_capacity must be 16");
+_Static_assert(offsetof(camera_metadata_t, entries_start) == 20,
+         "Offset of entries_start must be 20");
+_Static_assert(offsetof(camera_metadata_t, data_count) == 24,
+         "Offset of data_count must be 24");
+_Static_assert(offsetof(camera_metadata_t, data_capacity) == 28,
+         "Offset of data_capacity must be 28");
+_Static_assert(offsetof(camera_metadata_t, data_start) == 32,
+         "Offset of data_start must be 32");
+_Static_assert(offsetof(camera_metadata_t, vendor_id) == 40,
+         "Offset of vendor_id must be 40");
+_Static_assert(sizeof(camera_metadata_t) == 48,
+         "Size of camera_metadata_t must be 48");
 
 /**
  * The preferred alignment of a packet of camera metadata. In general,
