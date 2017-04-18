@@ -65,7 +65,7 @@ uint32_t audio_utils_fifo_base::sum(uint32_t index, uint32_t increment) const
     }
 }
 
-int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost) const
+int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost, bool flush) const
         __attribute__((no_sanitize("integer")))
 {
     // TODO replace multiple returns by a single return point so this isn't needed
@@ -96,7 +96,7 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
                 // Calculate the number of lost frames as the raw difference,
                 // less the mFrameCount frames that are still valid and can be read on retry,
                 // less the wasted indices that don't count as true lost frames.
-                *lost = diff - mFrameCount - mFudgeFactor * (genDiff / mFrameCountP2);
+                *lost = diff - (flush ? 0 : mFrameCount) - mFudgeFactor * (genDiff/mFrameCountP2);
             }
             return -EOVERFLOW;
         }
@@ -111,7 +111,7 @@ int32_t audio_utils_fifo_base::diff(uint32_t rear, uint32_t front, size_t *lost)
     // FIFO should not be overfull
     if (diff > mFrameCount) {
         if (lost != NULL) {
-            *lost = diff - mFrameCount;
+            *lost = diff - (flush ? 0 : mFrameCount);
         }
         return -EOVERFLOW;
     }
@@ -406,7 +406,8 @@ void audio_utils_fifo_writer::getHysteresis(uint32_t *armLevel, uint32_t *trigge
 
 ////////////////////////////////////////////////////////////////////////////////
 
-audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter) :
+audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool throttlesWriter,
+        bool flush) :
     audio_utils_fifo_provider(fifo),
 
     // If we throttle the writer, then initialize our front index to zero so that we see all data
@@ -418,6 +419,7 @@ audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool th
     mLocalFront(throttlesWriter ? 0 : mFifo.mWriterRear.loadConsume()),
 
     mThrottleFront(throttlesWriter ? mFifo.mThrottleFront : NULL),
+    mFlush(flush),
     mArmLevel(-1), mTriggerLevel(mFifo.mFrameCount),
     mIsArmed(true), // because initial fill level of zero is > mArmLevel
     mTotalLost(0), mTotalFlushed(0)
@@ -575,13 +577,13 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         lost = &ourLost;
     }
     // returns -EIO if mIsShutdown
-    int32_t filled = mFifo.diff(rear, mLocalFront, lost);
+    int32_t filled = mFifo.diff(rear, mLocalFront, lost, mFlush);
     mTotalLost += *lost;
     mTotalReleased += *lost;
     if (filled < 0) {
         if (filled == -EOVERFLOW) {
             // catch up with writer, but preserve the still valid frames in buffer
-            mLocalFront = rear - mFifo.mFrameCountP2;
+            mLocalFront = rear - (mFlush ? 0 : mFifo.mFrameCountP2 /*sic*/);
         }
         // on error, return an empty slice
         err = filled;
