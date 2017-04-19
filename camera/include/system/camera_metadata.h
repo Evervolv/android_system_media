@@ -279,7 +279,7 @@ camera_metadata_t *copy_camera_metadata(void *dst, size_t dst_size,
         const camera_metadata_t *src);
 
 
-// Non 0 eturn values for validate_camera_metadata_structure
+// Non-zero return values for validate_camera_metadata_structure
 enum {
     CAMERA_METADATA_VALIDATION_ERROR = 1,
     CAMERA_METADATA_VALIDATION_SHIFTED = 2,
@@ -299,7 +299,8 @@ enum {
  * Returns 0: on success
  *         CAMERA_METADATA_VALIDATION_ERROR: on error
  *         CAMERA_METADATA_VALIDATION_SHIFTED: when the data is not properly aligned, but can be
- *                 copied to a properly aligned camera_metadata buffer and the copy will be valid.
+ *                 used as input of clone_camera_metadata and the returned metadata will be valid.
+ *
  */
 ANDROID_API
 int validate_camera_metadata_structure(const camera_metadata_t *metadata,
