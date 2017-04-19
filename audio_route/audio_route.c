@@ -881,7 +881,7 @@ struct audio_route *audio_route_init(unsigned int card, const char *xml_path)
     file = fopen(xml_path, "r");
 
     if (!file) {
-        ALOGE("Failed to open %s", xml_path);
+        ALOGE("Failed to open %s: %s", xml_path, strerror(errno));
         goto err_fopen;
     }
 
