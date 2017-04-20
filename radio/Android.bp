@@ -1,5 +1,6 @@
 cc_library_shared {
     name: "libradio_metadata",
+    vendor_available: true,
 
     srcs: [
         "src/radio_metadata.c",
@@ -11,6 +12,9 @@ cc_library_shared {
         "-Wall",
         "-fvisibility=hidden",
     ],
+
+    header_libs: ["libsystem_headers"],
+    export_header_lib_headers: ["libsystem_headers"],
 
     local_include_dirs: ["include"],
     export_include_dirs: ["include"],
