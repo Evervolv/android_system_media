@@ -1,0 +1,4 @@
+cc_library_headers {
+    name: "libaudioeffects",
+    export_include_dirs: ["include"],
+}
