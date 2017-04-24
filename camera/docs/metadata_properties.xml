@@ -2822,10 +2822,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           request A, and the result metadata for request B may be older than the result metadata for
           request A.
 
-          Note that when enableZsl is `true`, it is not guaranteed to get output images captured in the
-          past for requests with STILL_CAPTURE capture intent.
+          Note that when enableZsl is `true`, it is not guaranteed to get output images captured in
+          the past for requests with STILL_CAPTURE capture intent.
 
-          The value of enableZsl in capture templates is always `false` if present.
+          For applications targeting SDK versions O and newer, the value of enableZsl in
+          TEMPLATE_STILL_CAPTURE template may be `true`. The value in other templates is always
+          `false` if present.
+
+          For applications targeting SDK versions older than O, the value of enableZsl in all
+          capture templates is always `false` if present.
           </details>
           <hal_details>
           It is valid for HAL to produce regular output images for requests with STILL_CAPTURE
