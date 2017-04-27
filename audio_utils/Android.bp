@@ -22,6 +22,7 @@ cc_library {
         "ErrorLog.cpp",
         "fifo.cpp",
         "fifo_index.cpp",
+        "fifo_writer32.cpp",
         "format.c",
         "limiter.c",
         "minifloat.c",
