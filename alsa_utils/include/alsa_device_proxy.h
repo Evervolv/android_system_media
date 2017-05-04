@@ -34,7 +34,7 @@ typedef struct {
 
 
 /* State */
-void proxy_prepare(alsa_device_proxy * proxy, alsa_device_profile * profile,
+int proxy_prepare(alsa_device_proxy * proxy, alsa_device_profile * profile,
                    struct pcm_config * config);
 int proxy_open(alsa_device_proxy * proxy);
 void proxy_close(alsa_device_proxy * proxy);
