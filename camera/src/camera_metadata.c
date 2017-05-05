@@ -420,13 +420,14 @@ int validate_camera_metadata_structure(const camera_metadata_t *metadata,
         };
 
         for (size_t i = 0; i < sizeof(alignments)/sizeof(alignments[0]); ++i) {
-            uintptr_t aligned_ptr = ALIGN_TO(metadata, alignments[i].alignment);
+            uintptr_t aligned_ptr = ALIGN_TO((uintptr_t) metadata + alignmentOffset,
+                    alignments[i].alignment);
 
             if ((uintptr_t)metadata + alignmentOffset != aligned_ptr) {
                 ALOGE("%s: Metadata pointer is not aligned (actual %p, "
-                      "expected %p) to type %s",
+                      "expected %p, offset %" PRIuPTR ") to type %s",
                       __FUNCTION__, metadata,
-                      (void*)aligned_ptr, alignments[i].name);
+                      (void*)aligned_ptr, alignmentOffset, alignments[i].name);
                 return CAMERA_METADATA_VALIDATION_ERROR;
             }
         }
