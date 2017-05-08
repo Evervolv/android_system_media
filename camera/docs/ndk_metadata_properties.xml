@@ -2849,6 +2849,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           For applications targeting SDK versions older than O, the value of enableZsl in all
           capture templates is always `false` if present.
+
+          For application-operated ZSL, use CAMERA3_TEMPLATE_ZERO_SHUTTER_LAG template.
           </details>
           <hal_details>
           It is valid for HAL to produce regular output images for requests with STILL_CAPTURE
