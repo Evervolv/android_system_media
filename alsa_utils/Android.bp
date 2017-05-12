@@ -14,6 +14,7 @@
 
 cc_library_shared {
     name: "libalsautils",
+    vendor: true,
     srcs: [
         "alsa_device_profile.c",
         "alsa_device_proxy.c",
