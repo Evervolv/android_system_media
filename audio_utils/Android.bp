@@ -14,6 +14,7 @@ cc_defaults {
 
 cc_library {
     name: "libaudioutils",
+    vendor_available: true,
     host_supported: true,
     defaults: ["audio_utils_defaults"],
 
@@ -56,6 +57,7 @@ cc_library {
 
 cc_library_static {
     name: "libaudioutils_fixedfft",
+    vendor_available: true,
     defaults: ["audio_utils_defaults"],
 
     arch: {
