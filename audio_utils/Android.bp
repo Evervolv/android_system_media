@@ -28,6 +28,14 @@ cc_library {
         "roundup.c",
     ],
 
+    header_libs: [
+        "libaudio_system_headers",
+    ],
+
+    export_header_lib_headers: [
+        "libaudio_system_headers",
+    ],
+
     shared_libs: [
         "libcutils",
         "liblog",
