@@ -15,10 +15,10 @@
  */
 
 //#define LOG_NDEBUG 0
-#define LOG_TAG "audio_utils_conversion"
+#define LOG_TAG "audio_utils_mono_blend"
 
 #include <math.h>
-#include <audio_utils/conversion.h>
+#include <audio_utils/mono_blend.h>
 #include <utils/Log.h>
 #include <audio_utils/limiter.h>
 
