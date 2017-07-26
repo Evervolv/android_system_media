@@ -41,7 +41,7 @@ class AudioDeviceHandlerTest : public testing::Test {
  public:
   void SetUp() override {
     EXPECT_TRUE(temp_dir_.CreateUniqueTempDir());
-    h2w_file_path_ = temp_dir_.GetPath().Append("h2wstate");
+    h2w_file_path_ = temp_dir_.path().Append("h2wstate");
   }
 
   void TearDown() override { handler_.Reset(); }
