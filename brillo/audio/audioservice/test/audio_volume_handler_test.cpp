@@ -43,7 +43,7 @@ class AudioVolumeHandlerTest : public testing::Test {
  public:
   void SetUp() override {
     EXPECT_TRUE(temp_dir_.CreateUniqueTempDir());
-    volume_file_path_ = temp_dir_.path().Append("vol_file");
+    volume_file_path_ = temp_dir_.GetPath().Append("vol_file");
     handler_.SetVolumeFilePathForTesting(volume_file_path_);
   }
 
