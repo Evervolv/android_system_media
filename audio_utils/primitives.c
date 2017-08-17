@@ -524,3 +524,58 @@ size_t memcpy_by_index_array_initialization_dst_index(int8_t *idxary, size_t idx
     }
     return dst_idx;
 }
+
+void accumulate_i16(int16_t *dst, const int16_t *src, size_t count) {
+    while (count--) {
+        *dst = clamp16((int32_t)*dst + *src++);
+        ++dst;
+    }
+}
+
+void accumulate_u8(uint8_t *dst, const uint8_t *src, size_t count) {
+    int32_t sum;
+    while (count--) {
+        // 8-bit samples are centered around 0x80.
+        sum = *dst + *src++ - 0x80;
+        // Clamp to [0, 0xff].
+        *dst++ = (sum & 0x100) ? (~sum >> 9) : sum;
+    }
+}
+
+void accumulate_p24(uint8_t *dst, const uint8_t *src, size_t count) {
+    while (count--) {
+        // Unpack.
+        int32_t dst_q8_23 = 0;
+        int32_t src_q8_23 = 0;
+        memcpy_to_q8_23_from_p24(&dst_q8_23, dst, 1);
+        memcpy_to_q8_23_from_p24(&src_q8_23, src, 1);
+
+        // Accumulate and overwrite.
+        dst_q8_23 += src_q8_23;
+        memcpy_to_p24_from_q8_23(dst, &dst_q8_23, 1);
+
+        // Move on to next sample.
+        dst += 3;
+        src += 3;
+  }
+}
+
+void accumulate_q8_23(int32_t *dst, const int32_t *src, size_t count) {
+    while (count--) {
+        *dst = clamp24_from_q8_23(*dst + *src++);
+        ++dst;
+    }
+}
+
+void accumulate_i32(int32_t *dst, const int32_t *src, size_t count) {
+    while (count--) {
+        *dst = clamp32((int64_t)*dst + *src++);
+        ++dst;
+    }
+}
+
+void accumulate_float(float *dst, const float *src, size_t count) {
+    while (count--) {
+        *dst++ += *src++;
+    }
+}
