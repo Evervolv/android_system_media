@@ -35,6 +35,8 @@ static const int32_t lim16pos = (1 << 15) - 1;
 static const int32_t lim16neg = -(1 << 15);
 static const int32_t lim24pos = (1 << 23) - 1;
 static const int32_t lim24neg = -(1 << 23);
+static const int64_t lim32pos = 0x000000007fffffff;
+static const int64_t lim32neg = 0xffffffff80000000;
 
 inline void testClamp8(float f)
 {
@@ -688,4 +690,162 @@ TEST(audio_utils_channels, adjust_channels) {
     delete[] u16ref;
     delete[] u16expand;
     delete[] u16ary;
+}
+
+template<typename T, typename TComparison>
+void checkAddedClamped(T *out, const T *in1, const T *in2, size_t size,
+        TComparison limNeg, TComparison limPos)
+{
+    for (size_t i = 0; i < size; ++i) {
+        TComparison added = (TComparison)in1[i] + in2[i];
+        if (added <= limNeg) {
+            EXPECT_EQ(limNeg, out[i]);
+        } else if (added >= limPos) {
+            EXPECT_EQ(limPos, out[i]);
+        } else {
+            EXPECT_EQ(added, out[i]);
+        }
+    }
+}
+
+void checkAddedClampedp24(uint8_t *pary, const uint8_t *in1,
+        const uint8_t *in2, size_t size) {
+    // Convert to q8_23 for comparison.
+    int32_t *outi32ary = new int32_t[size];
+    int32_t *in1i32ary = new int32_t[size];
+    int32_t *in2i32ary = new int32_t[size];
+    memcpy_to_q8_23_from_p24(outi32ary, pary, size);
+    memcpy_to_q8_23_from_p24(in1i32ary, in1, size);
+    memcpy_to_q8_23_from_p24(in2i32ary, in2, size);
+    checkAddedClamped(
+            outi32ary, in1i32ary, in2i32ary, size, lim24neg, lim24pos);
+    delete[] in2i32ary;
+    delete[] in1i32ary;
+    delete[] outi32ary;
+}
+
+void checkAddedClampedu8(uint8_t *out, const uint8_t *in1,
+        const uint8_t *in2, size_t size) {
+    // uint8_t data is centered around 0x80, not 0, so checkAddedClamped
+    // won't work. Convert to i16 first.
+    int16_t *outi16ary = new int16_t[size];
+    int16_t *in1i16ary = new int16_t[size];
+    int16_t *in2i16ary = new int16_t[size];
+    memcpy_to_i16_from_u8(outi16ary, out, size);
+    memcpy_to_i16_from_u8(in1i16ary, in1, size);
+    memcpy_to_i16_from_u8(in2i16ary, in2, size);
+    // Only the higher order bits are used.
+    checkAddedClamped(outi16ary, in1i16ary, in2i16ary, size,
+            -0x8000, 0x7f00);
+    delete[] in2i16ary;
+    delete[] in1i16ary;
+    delete[] outi16ary;
+}
+
+TEST(audio_utils_primitives, accumulate) {
+    int16_t *i16ref = new int16_t[65536];
+    int16_t *i16add = new int16_t[65536];
+    int16_t *i16ary = new int16_t[65536];
+
+    for (size_t i = 0; i < 65536; ++i) {
+        i16ref[i] = i16ary[i] = i16add[(i+1) % 65536] = i - 32768;
+    }
+
+    // Test i16.
+    accumulate_i16(i16ary, i16add, 65536);
+    checkAddedClamped(i16ary, i16ref, i16add, 65536, lim16neg,
+            lim16pos);
+
+    // Test i32.
+    int32_t *i32ary = new int32_t[65536];
+    int32_t *i32add = new int32_t[65536];
+    int32_t *i32ref = new int32_t[65536];
+    // Convert sample data to i32 to perform accumulate function.
+    memcpy_to_i32_from_i16(i32ary, i16ref, 65536);
+    memcpy_to_i32_from_i16(i32add, i16add, 65536);
+    // Ensure the reference matches the inital output after conversion.
+    memcpy(i32ref, i32ary, 65536 * sizeof(i32ary[0]));
+    // Accumulate and check.
+    accumulate_i32(i32ary, i32add, 65536);
+    checkAddedClamped(
+            i32ary, i32ref, i32add, 65536, lim32neg, lim32pos);
+    // Cleanup
+    delete[] i32ref;
+    delete[] i32add;
+    delete[] i32ary;
+
+    // Test u8.
+    uint8_t *u8ary = new uint8_t[65536];
+    uint8_t *u8add = new uint8_t[65536];
+    uint8_t *u8ref = new uint8_t[65536];
+    // Convert sample data to u8 to perform accumulate function.
+    memcpy_to_u8_from_i16(u8ary, i16ref, 65536);
+    memcpy_to_u8_from_i16(u8add, i16add, 65536);
+    // Ensure the reference matches the inital output after conversion.
+    memcpy(u8ref, u8ary, 65536 * sizeof(u8ary[0]));
+    // Accumulate and check.
+    accumulate_u8(u8ary, u8add, 65536);
+    checkAddedClampedu8(u8ary, u8ref, u8add, 65536);
+    // Cleanup.
+    delete[] u8ref;
+    delete[] u8add;
+    delete[] u8ary;
+
+    // Test 24 bit packed.
+    uint8_t *pary = new uint8_t[65536 * 3];
+    uint8_t *padd = new uint8_t[65536 * 3];
+    uint8_t *pref = new uint8_t[65536 * 3];
+    // Convert sample data to p24 to perform accumulate function.
+    memcpy_to_p24_from_i16(pary, i16ref, 65536);
+    memcpy_to_p24_from_i16(padd, i16add, 65536);
+    // Ensure the reference matches the inital output after conversion.
+    memcpy(pref, pary, 65536 * sizeof(pary[0]) * 3);
+    // Accumulate and check.
+    accumulate_p24(pary, padd, 65536);
+    checkAddedClampedp24(pary, pref, padd, 65536);
+    // Cleanup.
+    delete[] pref;
+    delete[] padd;
+    delete[] pary;
+
+    // Test 24 bit unpacked.
+    int32_t *q8_23ary = new int32_t[65536];
+    int32_t *q8_23add = new int32_t[65536];
+    int32_t *q8_23ref = new int32_t[65536];
+    // Convert sample data to q8_23 to perform accumulate function.
+    memcpy_to_q8_23_from_i16(q8_23ary, i16ref, 65536);
+    memcpy_to_q8_23_from_i16(q8_23add, i16add, 65536);
+    // Ensure the reference matches the inital output after conversion.
+    memcpy(q8_23ref, q8_23ary, 65536 * sizeof(q8_23ary[0]));
+    // Accumulate and check.
+    accumulate_q8_23(q8_23ary, q8_23add, 65536);
+    checkAddedClamped(
+            q8_23ary, q8_23ref, q8_23add, 65536, lim24neg, lim24pos);
+    // Cleanup.
+    delete[] q8_23ref;
+    delete[] q8_23add;
+    delete[] q8_23ary;
+
+    // Test float.
+    float *fary = new float[65536];
+    float *fadd = new float[65536];
+    float *fref = new float[65536];
+    // Convert sample data to float to perform accumulate function.
+    memcpy_to_float_from_i16(fary, i16ref, 65536);
+    memcpy_to_float_from_i16(fadd, i16add, 65536);
+    // Ensure the reference matches the inital output after conversion.
+    memcpy(fref, fary, 65536 * sizeof(fary[0]));
+    // Accumulate and check. Floats aren't clamped by accumulate,
+    // but given the input is in the [-1.0, 1.0) range output should be in
+    // [-2.0, 2.0) range.
+    accumulate_float(fary, fadd, 65536);
+    checkAddedClamped(fary, fref, fadd, 65536, -2.0f, 2.0f);
+    // Cleanup.
+    delete[] fref;
+    delete[] fadd;
+    delete[] fary;
+
+    delete[] i16ary;
+    delete[] i16add;
+    delete[] i16ref;
 }

@@ -578,12 +578,94 @@ size_t memcpy_by_index_array_initialization_dst_index(int8_t *idxary, size_t idx
         uint32_t dst_mask, uint32_t src_mask);
 
 /**
+ * Add and clamp signed 16-bit samples.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to add
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void accumulate_i16(int16_t *dst, const int16_t *src, size_t count);
+
+/**
+ * Add and clamp unsigned 8-bit samples.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to add
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void accumulate_u8(uint8_t *dst, const uint8_t *src, size_t count);
+
+/**
+ * Add and clamp packed 24-bit Q0.23 samples.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to add
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void accumulate_p24(uint8_t *dst, const uint8_t *src, size_t count);
+
+/**
+ * Add and clamp 32-bit Q8.23 samples.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to add
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void accumulate_q8_23(int32_t *dst, const int32_t *src, size_t count);
+
+/**
+ * Add and clamp signed 32-bit Q0.31 samples.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to add
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void accumulate_i32(int32_t *dst, const int32_t *src, size_t count);
+
+/**
+ * Add float samples. Result is not clamped.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to add
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void accumulate_float(float *dst, const float *src, size_t count);
+
+/**
  * Clamp (aka hard limit or clip) a signed 32-bit sample to 16-bit range.
  */
 static inline int16_t clamp16(int32_t sample)
 {
     if ((sample>>15) ^ (sample>>31))
         sample = 0x7FFF ^ (sample>>31);
+    return sample;
+}
+
+/**
+ * Clamp (aka hard limit or clip) a signed 64-bit sample to 32-bit range.
+ */
+static inline int32_t clamp32(int64_t sample)
+{
+    if ((sample>>31) ^ (sample>>63))
+        sample = 0x7fffffff ^ (sample>>63);
     return sample;
 }
 

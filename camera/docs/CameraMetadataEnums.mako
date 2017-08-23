@@ -42,6 +42,9 @@ ${value.notes | javadoc(metadata)}\
      * @deprecated Please refer to this API documentation to find the alternatives
     % endif
      */
+    % if value.deprecated:
+    @Deprecated
+    % endif
     public static final int ${jenum_value(entry, value)} = ${enum_calculate_value_string(value)};
 
   % endfor
