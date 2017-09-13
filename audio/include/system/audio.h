@@ -225,6 +225,7 @@ typedef uint32_t audio_devices_t;
  * hardware playback
  * The version and size fields must be initialized by the caller by using
  * one of the constants defined here.
+ * Must be aligned to transmit as raw memory through Binder.
  */
 typedef struct {
     uint16_t version;                   // version of the info structure
@@ -240,7 +241,7 @@ typedef struct {
     uint32_t bit_width;
     uint32_t offload_buffer_size;       // offload fragment size
     audio_usage_t usage;
-} audio_offload_info_t;
+} __attribute__((aligned(8))) audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
             ((((maj) & 0xff) << 8) | ((min) & 0xff))
@@ -267,13 +268,14 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
 /* common audio stream configuration parameters
  * You should memset() the entire structure to zero before use to
  * ensure forward compatibility
+ * Must be aligned to transmit as raw memory through Binder.
  */
-struct audio_config {
+struct __attribute__((aligned(8))) audio_config {
     uint32_t sample_rate;
     audio_channel_mask_t channel_mask;
     audio_format_t  format;
     audio_offload_info_t offload_info;
-    size_t frame_count;
+    uint32_t frame_count;
 };
 typedef struct audio_config audio_config_t;
 
