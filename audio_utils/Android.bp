@@ -35,10 +35,12 @@ cc_library {
 
     header_libs: [
         "libaudio_system_headers",
+        "libutils_headers",
     ],
 
     export_header_lib_headers: [
         "libaudio_system_headers",
+        "libutils_headers",
     ],
 
     shared_libs: [
