@@ -155,8 +155,14 @@ static void path_free(struct audio_route *ar)
     for (i = 0; i < ar->num_mixer_paths; i++) {
         free(ar->mixer_path[i].name);
         if (ar->mixer_path[i].setting) {
-            free(ar->mixer_path[i].setting->value.ptr);
+            size_t j;
+            for (j = 0; j < ar->mixer_path[i].length; j++) {
+                free(ar->mixer_path[i].setting[j].value.ptr);
+            }
             free(ar->mixer_path[i].setting);
+            ar->mixer_path[i].size = 0;
+            ar->mixer_path[i].length = 0;
+            ar->mixer_path[i].setting = NULL;
         }
     }
     free(ar->mixer_path);
@@ -476,12 +482,14 @@ static void start_tag(void *data, const XML_Char *tag_name,
             if (state->level == 1) {
                 /* top level path: create and stash the path */
                 state->path = path_create(ar, (char *)attr_name);
+                if (state->path == NULL)
+                    ALOGE("path created failed, please check the path if existed");
             } else {
                 /* nested path */
                 struct mixer_path *sub_path = path_get_by_name(ar, attr_name);
                 if (!sub_path) {
                     ALOGE("unable to find sub path '%s'", attr_name);
-                } else {
+                } else if (state->path != NULL) {
                     path_add_path(ar, state->path, sub_path);
                 }
             }
@@ -556,7 +564,8 @@ static void start_tag(void *data, const XML_Char *tag_name,
                 mixer_value.index = atoi((char *)attr_id);
             else
                 mixer_value.index = -1;
-            path_add_value(ar, state->path, &mixer_value);
+            if (state->path != NULL)
+                path_add_value(ar, state->path, &mixer_value);
         }
     }
 
