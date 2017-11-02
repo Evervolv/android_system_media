@@ -429,6 +429,7 @@ typedef struct audio_buffer_s {
     size_t   frameCount;        // number of frames in buffer
     union {
         void*       raw;        // raw pointer to start of buffer
+        float*      f32;        // pointer to float 32 bit data at start of buffer
         int32_t*    s32;        // pointer to signed 32 bit data at start of buffer
         int16_t*    s16;        // pointer to signed 16 bit data at start of buffer
         uint8_t*    u8;         // pointer to unsigned 8 bit data at start of buffer
