@@ -849,3 +849,16 @@ TEST(audio_utils_primitives, accumulate) {
     delete[] i16add;
     delete[] i16ref;
 }
+
+
+TEST(audio_utils_primitives, MemcpyToFloatFromFloatWithClamping) {
+    std::vector<float> src = {-INFINITY, -2, -1, -0, 0, 0.009, 1.000001, 9999999, INFINITY, NAN};
+    std::vector<float> dst(src.size());
+    float absMax = 1;
+    std::vector<float> expected = {-1, -1, -1, -0, 0, 0.009, 1, 1, 1, 1};
+    ASSERT_EQ(expected.size(), src.size());
+
+    memcpy_to_float_from_float_with_clamping(dst.data(), src.data(), src.size(), absMax);
+
+    ASSERT_EQ(dst, expected) << "src=" << testing::PrintToString(src);
+}

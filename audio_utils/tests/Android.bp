@@ -24,6 +24,21 @@ cc_test {
 }
 
 cc_binary {
+    name: "primitives_benchmark",
+    host_supported: true,
+
+    srcs: ["primitives_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+    static_libs: [
+        "libgoogle-benchmark",
+        "libaudioutils",
+    ],
+}
+
+cc_binary {
     name: "fifo_tests",
     host_supported: true,
     srcs: ["fifo_tests.cpp"],
