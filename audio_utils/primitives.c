@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <math.h>
 #include <cutils/bitops.h>  /* for popcount() */
 #include <audio_utils/primitives.h>
 #include "private/private.h"
@@ -253,6 +254,18 @@ void memcpy_to_float_from_i32(float *dst, const int32_t *src, size_t count)
 {
     while (count--) {
         *dst++ = float_from_i32(*src++);
+    }
+}
+
+void memcpy_to_float_from_float_with_clamping(float *dst, const float *src, size_t count,
+                                              float absMax) {
+    // Note: using NEON intrinsics (vminq_f32, vld1q_f32...) did NOT accelerate
+    // the function when benchmarked. The compiler already vectorize using FMINNM f32x4 & similar.
+    // Note: clamping induce a ~20% overhead compared to memcpy for count in [64, 512]
+    //       See primitives_benchmark
+    while (count--) {
+        const float sample = *src++;
+        *dst++ = fmax(-absMax, fmin(absMax, sample));
     }
 }
 
