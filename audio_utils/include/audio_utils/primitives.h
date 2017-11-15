@@ -380,6 +380,22 @@ void memcpy_to_i32_from_float(int32_t *dst, const float *src, size_t count);
 void memcpy_to_float_from_i32(float *dst, const int32_t *src, size_t count);
 
 /**
+ * Copy samples from unrestricted float to range restricted float [-absMax, absMax].
+ * Any float sample not in the range [-absMax, absMax] will be clamped in this range.
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to copy
+ *  \param absMax  Maximum of the absolute value of the copied samples.
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ * Note: NAN is clamped to absMax and not 0 for performance reason (~2xfaster).
+ */
+void memcpy_to_float_from_float_with_clamping(float *dst, const float *src, size_t count,
+                                              float absMax);
+
+/**
  * Downmix pairs of interleaved stereo input 16-bit samples to mono output 16-bit samples.
  *
  *  \param dst     Destination buffer
