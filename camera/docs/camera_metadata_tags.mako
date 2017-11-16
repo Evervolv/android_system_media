@@ -80,7 +80,7 @@ typedef enum camera_metadata_tag {
     ${entry.name + " = " | csym,ljust(50)}// ${annotated_type(entry) | ljust(12)} | ${entry.applied_visibility}
             ${path_name(find_parent_section(entry)) | csym}_START,
         % else:
-    ${entry.name + "," | csym,ljust(50)}// ${annotated_type(entry) | ljust(12)} | ${entry.applied_visibility}
+    ${entry.name + "," | csym,ljust(50)}// ${annotated_type(entry) | ljust(12)} | ${entry.applied_visibility | ljust(12)} | HIDL v${entry.hal_version}
         % endif
       % endfor
     ${path_name(sec) | csym}_END,

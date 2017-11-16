@@ -35,7 +35,7 @@ fi
 
 thisdir=$(cd "$(dirname "$0")"; pwd)
 fwkdir="$ANDROID_BUILD_TOP/frameworks/base/core/java/android/hardware/camera2/"
-fwkdir_html="$ANDROID_BUILD_TOP/frameworks/base/docs/html"
+fwkdir_html="$ANDROID_BUILD_TOP/frameworks/base/docs/html/reference"
 ctsdir="$ANDROID_BUILD_TOP/cts/tests/camera/src/android/hardware/camera2/cts"
 outdir="$ANDROID_PRODUCT_OUT/obj/ETC/system-media-camera-docs_intermediates"
 ndk_header_dir="$ANDROID_BUILD_TOP/frameworks/av/camera/ndk/include/camera"
@@ -61,12 +61,7 @@ function gen_file_abs() {
     local in="$1"
     local out="$2"
     local intermediates="$3"
-    local ndk="$4"
-    local spec_file=$thisdir/metadata_properties.xml
-
-    if [[ "$ndk" == "yes" ]]; then
-      spec_file=$thisdir/ndk_metadata_properties.xml
-    fi
+    local spec_file=$thisdir/metadata_definitions.xml
 
     python $thisdir/metadata_parser_xml.py $spec_file $in $out
 
@@ -192,7 +187,7 @@ function copy_directory() {
 }
 
 $thisdir/metadata-check-dependencies || exit 1
-$thisdir/metadata-validate $thisdir/metadata_properties.xml || exit 1
+$thisdir/metadata-validate $thisdir/metadata_definitions.xml || exit 1
 $thisdir/metadata-parser-sanity-check || exit 1
 
 # Generate HTML properties documentation
@@ -203,7 +198,7 @@ gen_file camera_metadata_tag_info.mako ../src/camera_metadata_tag_info.c || exit
 gen_file camera_metadata_tags.mako ../include/system/camera_metadata_tags.h || exit 1
 
 #Generate NDK header
-gen_file_abs ndk_camera_metadata_tags.mako "$ndk_header_dir/NdkCameraMetadataTags.h" yes yes || exit 1
+gen_file_abs ndk_camera_metadata_tags.mako "$ndk_header_dir/NdkCameraMetadataTags.h" yes || exit 1
 
 # Generate Java API definitions
 mkdir -p "${outdir}"

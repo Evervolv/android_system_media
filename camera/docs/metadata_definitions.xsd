@@ -142,6 +142,9 @@
             <element name="details" type="string" maxOccurs="1"
                 minOccurs="0">
             </element>
+            <element name="ndk_details" type="string" maxOccurs="1"
+                minOccurs="0">
+            </element>
             <element name="hal_details" type="string" maxOccurs="1"
                 minOccurs="0">
             </element>
@@ -236,6 +239,7 @@
                 </restriction>
             </simpleType>
         </attribute>
+        <attribute name="hal_version" type="decimal" default="3.2" />
     </complexType>
 
     <complexType name="EnumType">
@@ -258,9 +262,11 @@
 
     <complexType name="EnumValueType" mixed="true">
 
-        <sequence>
-            <element name="notes" type="string" minOccurs="0" maxOccurs="1" />
-        </sequence>
+        <all>
+            <element name="notes" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="sdk_notes" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="ndk_notes" type="string" minOccurs="0" maxOccurs="1" />
+        </all>
 
         <attribute name="deprecated" default="false">
             <simpleType>

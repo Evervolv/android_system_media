@@ -34,6 +34,9 @@
     % if value.notes:
 ${value.notes | javadoc(metadata)}\
     % endif
+    % if value.sdk_notes:
+${value.sdk_notes | javadoc(metadata)}\
+    % endif
      * @see ${target_class}#${entry.name | jkey_identifier}
     % if entry.applied_visibility in ('hidden', 'ndk_public') or value.hidden:
      * @hide
