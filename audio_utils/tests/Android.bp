@@ -26,6 +26,11 @@ cc_test {
 cc_binary {
     name: "primitives_benchmark",
     host_supported: true,
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
 
     srcs: ["primitives_benchmark.cpp"],
     cflags: [
