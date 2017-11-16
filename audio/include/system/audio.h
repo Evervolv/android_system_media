@@ -984,6 +984,20 @@ __END_DECLS
 #define AUDIO_HARDWARE_MODULE_ID_STUB "stub"
 
 /**
+ * Multi-Stream Decoder (MSD) HAL service name. MSD HAL is used to mix
+ * encoded streams together with PCM streams, producing re-encoded
+ * streams or PCM streams.
+ *
+ * The service must register itself using this name, and audioserver
+ * tries to instantiate a device factory using this name as well.
+ * Note that the HIDL implementation library file name *must* have the
+ * suffix "msd" in order to be picked up by HIDL that is:
+ *
+ *   android.hardware.audio@x.x-implmsd.so
+ */
+#define AUDIO_HAL_SERVICE_NAME_MSD "msd"
+
+/**
  * Parameter definitions.
  * Note that in the framework code it's recommended to use AudioParameter.h
  * instead of these preprocessor defines, and for sure avoid just copying
