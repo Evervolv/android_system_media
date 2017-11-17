@@ -5215,6 +5215,68 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           via {@link android.hardware.camera2.CameraCharacteristics#getKeys}.
           </hal_details>
         </entry>
+        <entry name="availableSessionKeys" type="int32" visibility="ndk_public"
+               container="array" hwlevel="legacy" hal_version="3.4">
+          <array>
+            <size>n</size>
+          </array>
+          <description>A subset of the available request keys that the camera device
+          can pass as part of the capture session initialization.</description>
+
+          <details> This is a subset of android.request.availableRequestKeys which
+          contains a list of keys that are difficult to apply per-frame and
+          can result in unexpected delays when modified during the capture session
+          lifetime. Typical examples include parameters that require a
+          time-consuming hardware re-configuration or internal camera pipeline
+          change. For performance reasons we advise clients to pass their initial
+          values as part of 
+          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.i
+          Once the camera capture session is enabled it is also recommended to avoid
+          changing them from their initial values set in
+          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.
+          Control over session parameters can still be exerted in capture requests
+          but clients should be aware and expect delays during their application.
+          An example usage scenario could look like this:
+
+          * The camera client starts by quering the session parameter key list via
+            {@link android.hardware.camera2.CameraCharacteristics#getAvailableSessionKeys|ACameraManager_getCameraCharacteristics}.
+          * Before triggering the capture session create sequence, a capture request
+            must be built via
+            {@link CameraDevice#createCaptureRequest|ACameraDevice_createCaptureRequest}
+            using an appropriate template matching the particular use case.
+          * The client should go over the list of session parameters and check
+            whether some of the keys listed matches with the parameters that
+            they intend to modify as part of the first capture request.
+          * If there is no such match, the capture request can be  passed
+            unmodified to
+            {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.
+          * If matches do exist, the client should update the respective values
+            and pass the request to
+            {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.
+          * After the capture session initialization completes the session parameter
+            key list can continue to serve as reference when posting or updating
+            further requests. As mentioned above further changes to session
+            parameters should ideally be avoided, if updates are necessary
+            however clients could expect a delay/glitch during the
+            parameter switch.
+
+          </details>
+          <hal_details>
+          Vendor tags can be listed here. Vendor tag metadata should also
+          use the extensions C api (refer to
+          android.hardware.camera.device.V3_4.StreamConfiguration.sessionParams for more details).
+
+          Setting/getting vendor tags will be checked against the metadata
+          vendor extensions API and not against this field.
+
+          The HAL must not consume any request tags in the session parameters that
+          are not listed either here or in the vendor tag list.
+
+          The public camera2 API will always make the vendor tags visible
+          via
+          {@link android.hardware.camera2.CameraCharacteristics#getAvailableSessionKeys}.
+          </hal_details>
+        </entry>
       </static>
     </section>
     <section name="scaler">
