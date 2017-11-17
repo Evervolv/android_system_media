@@ -346,7 +346,7 @@ ${          insert_toc_body(kind)}\
             </td>
 
             <td class="entry_hal_version">
-              ${prop.hal_version | md_html, linkify_tags(metadata), wbr}
+              ${"%d.%d" % (prop.hal_major_version, prop.hal_minor_version) | md_html, linkify_tags(metadata), wbr}
             </td>
 
             <td class="entry_tags">
