@@ -74,23 +74,29 @@ void memcpy_to_float_from_q4_27(float *dst, const int32_t *src, size_t count)
 
 void memcpy_to_float_from_i16(float *dst, const int16_t *src, size_t count)
 {
+    dst += count;
+    src += count;
     for (; count > 0; --count) {
-        *dst++ = float_from_i16(*src++);
+        *--dst = float_from_i16(*--src);
     }
 }
 
 void memcpy_to_float_from_u8(float *dst, const uint8_t *src, size_t count)
 {
+    dst += count;
+    src += count;
     for (; count > 0; --count) {
-        *dst++ = float_from_u8(*src++);
+        *--dst = float_from_u8(*--src);
     }
 }
 
 void memcpy_to_float_from_p24(float *dst, const uint8_t *src, size_t count)
 {
+    dst += count;
+    src += count * 3;
     for (; count > 0; --count) {
-        *dst++ = float_from_p24(src);
-        src += 3;
+        src -= 3;
+        *--dst = float_from_p24(src);
     }
 }
 
@@ -108,27 +114,32 @@ void memcpy_to_i16_from_p24(int16_t *dst, const uint8_t *src, size_t count)
 
 void memcpy_to_i32_from_p24(int32_t *dst, const uint8_t *src, size_t count)
 {
+    dst += count;
+    src += count * 3;
     for (; count > 0; --count) {
+        src -= 3;
 #if HAVE_BIG_ENDIAN
-        *dst++ = (src[2] << 8) | (src[1] << 16) | (src[0] << 24);
+        *--dst = (src[2] << 8) | (src[1] << 16) | (src[0] << 24);
 #else
-        *dst++ = (src[0] << 8) | (src[1] << 16) | (src[2] << 24);
+        *--dst = (src[0] << 8) | (src[1] << 16) | (src[2] << 24);
 #endif
-        src += 3;
     }
 }
 
 void memcpy_to_p24_from_i16(uint8_t *dst, const int16_t *src, size_t count)
 {
+    dst += count * 3;
+    src += count;
     for (; count > 0; --count) {
+        dst -= 3;
 #if HAVE_BIG_ENDIAN
-        *dst++ = *src >> 8;
-        *dst++ = *src++;
-        *dst++ = 0;
+        dst[0] = *--src >> 8;
+        dst[1] = *src;
+        dst[2] = 0;
 #else
-        *dst++ = 0;
-        *dst++ = *src;
-        *dst++ = *src++ >> 8;
+        dst[0] = 0;
+        dst[1] = *--src;
+        dst[2] = *src >> 8;
 #endif
     }
 }
@@ -186,8 +197,10 @@ void memcpy_to_p24_from_i32(uint8_t *dst, const int32_t *src, size_t count)
 
 void memcpy_to_q8_23_from_i16(int32_t *dst, const int16_t *src, size_t count)
 {
+    dst += count;
+    src += count;
     for (; count > 0; --count) {
-        *dst++ = (int32_t)*src++ << 8;
+        *--dst = (int32_t)*--src << 8;
     }
 }
 
@@ -200,13 +213,15 @@ void memcpy_to_q8_23_from_float_with_clamp(int32_t *dst, const float *src, size_
 
 void memcpy_to_q8_23_from_p24(int32_t *dst, const uint8_t *src, size_t count)
 {
+    dst += count;
+    src += count * 3;
     for (; count > 0; --count) {
+        src -= 3;
 #if HAVE_BIG_ENDIAN
-        *dst++ = (int8_t)src[0] << 16 | src[1] << 8 | src[2];
+        *--dst = (int8_t)src[0] << 16 | src[1] << 8 | src[2];
 #else
-        *dst++ = (int8_t)src[2] << 16 | src[1] << 8 | src[0];
+        *--dst = (int8_t)src[2] << 16 | src[1] << 8 | src[0];
 #endif
-        src += 3;
     }
 }
 
@@ -233,8 +248,10 @@ void memcpy_to_float_from_q8_23(float *dst, const int32_t *src, size_t count)
 
 void memcpy_to_i32_from_i16(int32_t *dst, const int16_t *src, size_t count)
 {
+    dst += count;
+    src += count;
     for (; count > 0; --count) {
-        *dst++ = (int32_t)*src++ << 16;
+        *--dst = (int32_t)*--src << 16;
     }
 }
 
@@ -274,11 +291,13 @@ void downmix_to_mono_i16_from_stereo_i16(int16_t *dst, const int16_t *src, size_
 
 void upmix_to_stereo_i16_from_mono_i16(int16_t *dst, const int16_t *src, size_t count)
 {
+    dst += count * 2;
+    src += count;
     for (; count > 0; --count) {
-        int32_t temp = *src++;
+        const int32_t temp = *--src;
+        dst -= 2;
         dst[0] = temp;
         dst[1] = temp;
-        dst += 2;
     }
 }
 
@@ -292,11 +311,13 @@ void downmix_to_mono_float_from_stereo_float(float *dst, const float *src, size_
 
 void upmix_to_stereo_float_from_mono_float(float *dst, const float *src, size_t frames)
 {
+    dst += frames * 2;
+    src += frames;
     for (; frames > 0; --frames) {
-        float temp = *src++;
+        const float temp = *--src;
+        dst -= 2;
         dst[0] = temp;
         dst[1] = temp;
-        dst += 2;
     }
 }
 

@@ -84,4 +84,57 @@ static void BM_MemcpyFloat(benchmark::State& state) {
 
 BENCHMARK(BM_MemcpyFloat)->RangeMultiplier(2)->Ranges({{10, 8<<12}});
 
+static void BM_MemcpyToFloatFromI16(benchmark::State& state) {
+    const size_t count = state.range(0);
+
+    std::vector<int16_t> src(count);
+    std::vector<float> dst(count);
+
+    // Initialize src buffer with deterministic pseudo-random values
+    std::minstd_rand gen(count);
+    std::uniform_int_distribution<> dis(INT16_MIN, INT16_MAX);
+    for (size_t i = 0; i < count; i++) {
+        src[i] = dis(gen);
+    }
+
+    // Run the test
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(src.data());
+        benchmark::DoNotOptimize(dst.data());
+        memcpy_to_float_from_i16(dst.data(), src.data(), count);
+        benchmark::ClobberMemory();
+    }
+
+    state.SetComplexityN(state.range(0));
+}
+
+BENCHMARK(BM_MemcpyToFloatFromI16)->RangeMultiplier(2)->Ranges({{10, 8<<12}});
+
+
+static void BM_MemcpyToI16FromFloat(benchmark::State& state) {
+    const size_t count = state.range(0);
+
+    std::vector<float> src(count);
+    std::vector<int16_t> dst(count);
+
+    // Initialize src buffer with deterministic pseudo-random values
+    std::minstd_rand gen(count);
+    std::uniform_real_distribution<> dis;
+    for (size_t i = 0; i < count; i++) {
+        src[i] = dis(gen);
+    }
+
+    // Run the test
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(src.data());
+        benchmark::DoNotOptimize(dst.data());
+        memcpy_to_i16_from_float(dst.data(), src.data(), count);
+        benchmark::ClobberMemory();
+    }
+
+    state.SetComplexityN(state.range(0));
+}
+
+BENCHMARK(BM_MemcpyToI16FromFloat)->RangeMultiplier(2)->Ranges({{10, 8<<12}});
+
 BENCHMARK_MAIN();

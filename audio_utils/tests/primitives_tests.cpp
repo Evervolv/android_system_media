@@ -659,6 +659,20 @@ TEST(audio_utils_primitives, memcpy_by_index_array_src_index) {
     delete[] u24ary;
 }
 
+TEST(audio_utils_primitives, updown_mix) {
+    const size_t size = 32767;
+    std::vector<int16_t> i16ref(size * 2);
+    std::vector<int16_t> i16ary(size * 2);
+
+    for (size_t i = 0; i < size; ++i) {
+        i16ref[i] = i;
+    }
+    upmix_to_stereo_i16_from_mono_i16(i16ary.data(), i16ref.data(), size);
+    downmix_to_mono_i16_from_stereo_i16(i16ary.data(), i16ary.data(), size);
+
+    EXPECT_EQ(0, memcmp(i16ary.data(), i16ref.data(), sizeof(i16ref[0]) * size));
+}
+
 TEST(audio_utils_channels, adjust_channels) {
     uint16_t *u16ref = new uint16_t[65536];
     uint16_t *u16expand = new uint16_t[65536*2];
