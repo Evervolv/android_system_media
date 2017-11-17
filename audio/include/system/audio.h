@@ -84,7 +84,7 @@ typedef struct {
     audio_source_t       source;
     audio_flags_mask_t   flags;
     char                 tags[AUDIO_ATTRIBUTES_TAGS_MAX_SIZE]; /* UTF8 */
-} audio_attributes_t;
+} __attribute__((packed)) audio_attributes_t; // sent through Binder;
 
 /* a unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
  * effect ID (int), audio_module_handle_t, and audio_patch_handle_t.
