@@ -84,7 +84,7 @@ typedef struct {
     audio_source_t       source;
     audio_flags_mask_t   flags;
     char                 tags[AUDIO_ATTRIBUTES_TAGS_MAX_SIZE]; /* UTF8 */
-} audio_attributes_t;
+} __attribute__((packed)) audio_attributes_t; // sent through Binder;
 
 /* a unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
  * effect ID (int), audio_module_handle_t, and audio_patch_handle_t.
@@ -225,6 +225,7 @@ typedef uint32_t audio_devices_t;
  * hardware playback
  * The version and size fields must be initialized by the caller by using
  * one of the constants defined here.
+ * Must be aligned to transmit as raw memory through Binder.
  */
 typedef struct {
     uint16_t version;                   // version of the info structure
@@ -240,7 +241,7 @@ typedef struct {
     uint32_t bit_width;
     uint32_t offload_buffer_size;       // offload fragment size
     audio_usage_t usage;
-} audio_offload_info_t;
+} __attribute__((aligned(8))) audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
             ((((maj) & 0xff) << 8) | ((min) & 0xff))
@@ -267,13 +268,14 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
 /* common audio stream configuration parameters
  * You should memset() the entire structure to zero before use to
  * ensure forward compatibility
+ * Must be aligned to transmit as raw memory through Binder.
  */
-struct audio_config {
+struct __attribute__((aligned(8))) audio_config {
     uint32_t sample_rate;
     audio_channel_mask_t channel_mask;
     audio_format_t  format;
     audio_offload_info_t offload_info;
-    size_t frame_count;
+    uint32_t frame_count;
 };
 typedef struct audio_config audio_config_t;
 
@@ -987,6 +989,20 @@ __END_DECLS
 #define AUDIO_HARDWARE_MODULE_ID_REMOTE_SUBMIX "r_submix"
 #define AUDIO_HARDWARE_MODULE_ID_CODEC_OFFLOAD "codec_offload"
 #define AUDIO_HARDWARE_MODULE_ID_STUB "stub"
+
+/**
+ * Multi-Stream Decoder (MSD) HAL service name. MSD HAL is used to mix
+ * encoded streams together with PCM streams, producing re-encoded
+ * streams or PCM streams.
+ *
+ * The service must register itself using this name, and audioserver
+ * tries to instantiate a device factory using this name as well.
+ * Note that the HIDL implementation library file name *must* have the
+ * suffix "msd" in order to be picked up by HIDL that is:
+ *
+ *   android.hardware.audio@x.x-implmsd.so
+ */
+#define AUDIO_HAL_SERVICE_NAME_MSD "msd"
 
 /**
  * Parameter definitions.

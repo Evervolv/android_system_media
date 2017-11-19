@@ -17,7 +17,7 @@
 #
 
 """
-A parser for metadata_properties.xml can also render the resulting model
+A parser for metadata_definitions.xml can also render the resulting model
 over a Mako template.
 
 Usage:
@@ -200,6 +200,10 @@ class MetadataParserXml:
     d['type_name'] = entry.get('typedef')
 
     #
+    # Initial HIDL HAL version the entry was added in
+    d['hal_version'] = entry.get('hal_version')
+
+    #
     # Enum
     #
     if entry.get('enum', 'false') == 'true':
@@ -210,6 +214,8 @@ class MetadataParserXml:
       enum_hiddens = []
       enum_ndk_hiddens = []
       enum_notes = {}
+      enum_sdk_notes = {}
+      enum_ndk_notes = {}
       enum_ids = {}
       for value in entry.enum.find_all('value'):
 
@@ -232,6 +238,14 @@ class MetadataParserXml:
         if notes is not None:
           enum_notes[value_body] = notes.string
 
+        sdk_notes = value.find('sdk_notes')
+        if sdk_notes is not None:
+          enum_sdk_notes[value_body] = sdk_notes.string
+
+        ndk_notes = value.find('ndk_notes')
+        if ndk_notes is not None:
+          enum_ndk_notes[value_body] = ndk_notes.string
+
         if value.attrs.get('id') is not None:
           enum_ids[value_body] = value['id']
 
@@ -241,6 +255,8 @@ class MetadataParserXml:
       d['enum_hiddens'] = enum_hiddens
       d['enum_ndk_hiddens'] = enum_ndk_hiddens
       d['enum_notes'] = enum_notes
+      d['enum_sdk_notes'] = enum_sdk_notes
+      d['enum_ndk_notes'] = enum_ndk_notes
       d['enum_ids'] = enum_ids
       d['enum'] = True
 
@@ -272,7 +288,7 @@ class MetadataParserXml:
   def _parse_entry_optional(self, entry):
     d = {}
 
-    optional_elements = ['description', 'range', 'units', 'details', 'hal_details']
+    optional_elements = ['description', 'range', 'units', 'details', 'hal_details', 'ndk_details']
     for i in optional_elements:
       prop = find_child_tag(entry, i)
 

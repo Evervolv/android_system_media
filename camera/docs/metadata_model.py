@@ -18,7 +18,7 @@
 
 """
 A set of classes (models) each closely representing an XML node in the
-metadata_properties.xml file.
+metadata_definitions.xml file.
 
   Node: Base class for most nodes.
   Entry: A node corresponding to <entry> elements.
@@ -963,10 +963,12 @@ class EnumValue(Node):
     hidden: A boolean, True if the enum should be hidden.
     ndk_hidden: A boolean, True if the enum should be hidden in NDK
     notes: A string describing the notes, or None.
+    sdk_notes: A string describing extra notes for public SDK only
+    ndk_notes: A string describing extra notes for public NDK only
     parent: An edge to the parent, always an Enum instance.
   """
   def __init__(self, name, parent,
-      id=None, deprecated=False, optional=False, hidden=False, notes=None, ndk_hidden=False):
+      id=None, deprecated=False, optional=False, hidden=False, notes=None, sdk_notes=None, ndk_notes=None, ndk_hidden=False):
     self._name = name                    # str, e.g. 'ON' or 'OFF'
     self._id = id                        # int, e.g. '0'
     self._deprecated = deprecated        # bool
@@ -974,6 +976,8 @@ class EnumValue(Node):
     self._hidden = hidden                # bool
     self._ndk_hidden = ndk_hidden        # bool
     self._notes = notes                  # None or str
+    self._sdk_notes = sdk_notes          # None or str
+    self._ndk_notes = ndk_notes          # None or str
     self._parent = parent
 
   @property
@@ -1000,6 +1004,14 @@ class EnumValue(Node):
   def notes(self):
     return self._notes
 
+  @property
+  def sdk_notes(self):
+    return self._sdk_notes
+
+  @property
+  def ndk_notes(self):
+    return self._ndk_notes
+
   def _get_children(self):
     return None
 
@@ -1014,10 +1026,10 @@ class Enum(Node):
         non-empty id property.
   """
   def __init__(self, parent, values, ids={}, deprecateds=[],
-      optionals=[], hiddens=[], notes={}, ndk_hiddens=[]):
+      optionals=[], hiddens=[], notes={}, sdk_notes={}, ndk_notes={}, ndk_hiddens=[]):
     self._values =                                                             \
       [ EnumValue(val, self, ids.get(val), val in deprecateds, val in optionals, val in hiddens,  \
-                  notes.get(val), val in ndk_hiddens)                                              \
+                  notes.get(val), sdk_notes.get(val), ndk_notes.get(val), val in ndk_hiddens)     \
         for val in values ]
 
     self._parent = parent
@@ -1099,6 +1111,8 @@ class Entry(Node):
       name: A string with the fully qualified name, e.g. 'android.shading.mode'
       type: A string describing the type, e.g. 'int32'
       kind: A string describing the kind, e.g. 'static'
+      hal_version: A string for the initial HIDL HAL metadata version this entry
+                   was added in
 
     Args (if container):
       container: A string describing the container, e.g. 'array' or 'tuple'
@@ -1120,6 +1134,7 @@ class Entry(Node):
       units: A string with the units of the values, e.g. 'inches'
       details: A string with the detailed documentation for the entry
       hal_details: A string with the HAL implementation details for the entry
+      ndk_details: A string with the extra NDK API documentation for the entry=
       tag_ids: A list of tag ID strings, e.g. ['BC', 'V1']
       type_notes: A string with the notes for the type
       visibility: A string describing the visibility, eg 'system', 'hidden',
@@ -1153,6 +1168,10 @@ class Entry(Node):
   @property
   def kind(self):
     return self._kind
+
+  @property
+  def hal_version(self):
+    return self._hal_version
 
   @property
   def visibility(self):
@@ -1232,6 +1251,14 @@ class Entry(Node):
     return self._hal_details
 
   @property
+  def ndk_details(self):
+    return self._ndk_details
+
+  @property
+  def applied_ndk_details(self):
+    return (self._details or "") + (self._ndk_details or "")
+
+  @property
   def tags(self):
     if self._tags is None:
       return None
@@ -1273,6 +1300,10 @@ class Entry(Node):
     self._container = kwargs.get('container')
     self._container_sizes = kwargs.get('container_sizes')
 
+    self._hal_version = kwargs.get('hal_version')
+    if self._hal_version is None:
+      self._hal_version = '3.2'
+
     # access these via the 'enum' prop
     enum_values = kwargs.get('enum_values')
     enum_deprecateds = kwargs.get('enum_deprecateds')
@@ -1280,6 +1311,8 @@ class Entry(Node):
     enum_hiddens = kwargs.get('enum_hiddens')
     enum_ndk_hiddens = kwargs.get('enum_ndk_hiddens')
     enum_notes = kwargs.get('enum_notes')  # { value => notes }
+    enum_sdk_notes = kwargs.get('enum_sdk_notes')  # { value => sdk_notes }
+    enum_ndk_notes = kwargs.get('enum_ndk_notes')  # { value => ndk_notes }
     enum_ids = kwargs.get('enum_ids')  # { value => notes }
     self._tuple_values = kwargs.get('tuple_values')
 
@@ -1288,6 +1321,7 @@ class Entry(Node):
     self._units = kwargs.get('units')
     self._details = kwargs.get('details')
     self._hal_details = kwargs.get('hal_details')
+    self._ndk_details = kwargs.get('ndk_details')
 
     self._tag_ids = kwargs.get('tag_ids', [])
     self._tags = None  # Filled in by Metadata::_construct_tags
@@ -1298,7 +1332,7 @@ class Entry(Node):
 
     if kwargs.get('enum', False):
       self._enum = Enum(self, enum_values, enum_ids, enum_deprecateds, enum_optionals,
-                        enum_hiddens, enum_notes, enum_ndk_hiddens)
+                        enum_hiddens, enum_notes, enum_sdk_notes, enum_ndk_notes, enum_ndk_hiddens)
     else:
       self._enum = None
 
@@ -1414,6 +1448,8 @@ class Clone(Entry):
       type: A string describing the type, e.g. 'int32'
       kind: A string describing the kind, e.g. 'static'
       target_kind: A string for the kind of the target entry, e.g. 'dynamic'
+      hal_version: A string for the initial HIDL HAL metadata version this entry
+                   was added in
 
     Args (if container):
       container: A string describing the container, e.g. 'array' or 'tuple'
@@ -1436,6 +1472,7 @@ class Clone(Entry):
       units: A string with the units of the values, e.g. 'inches'
       details: A string with the detailed documentation for the entry
       hal_details: A string with the HAL implementation details for the entry
+      ndk_details: A string with the extra NDK documentation for the entry
       tag_ids: A list of tag ID strings, e.g. ['BC', 'V1']
       type_notes: A string with the notes for the type
 
@@ -1489,7 +1526,7 @@ class MergedEntry(Entry):
       entry: An Entry or Clone instance
     """
     props_distinct = ['description', 'units', 'range', 'details',
-                      'hal_details', 'tags', 'kind']
+                      'hal_details', 'ndk_details', 'tags', 'kind']
 
     for p in props_distinct:
       p = '_' + p
@@ -1509,7 +1546,8 @@ class MergedEntry(Entry):
                     'hwlevel',
                     'deprecated',
                     'optional',
-                    'typedef'
+                    'typedef',
+                    'hal_version'
                    ]
 
     for p in props_common:

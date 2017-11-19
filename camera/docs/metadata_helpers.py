@@ -33,7 +33,7 @@ from collections import OrderedDict
 IMAGE_SRC_METADATA="images/camera2/metadata/"
 
 # Prepend this path to each <img src="foo"> in javadocs
-JAVADOC_IMAGE_SRC_METADATA="../../../../" + IMAGE_SRC_METADATA
+JAVADOC_IMAGE_SRC_METADATA="/reference/" + IMAGE_SRC_METADATA
 NDKDOC_IMAGE_SRC_METADATA="../" + IMAGE_SRC_METADATA
 
 _context_buf = None
@@ -821,7 +821,7 @@ def javadoc(metadata, indent = 4):
     javatext = md(text, JAVADOC_IMAGE_SRC_METADATA)
 
     # Identity transform for javadoc links
-    def javadoc_link_filter(target, shortname):
+    def javadoc_link_filter(target, target_ndk, shortname):
       return '{@link %s %s}' % (target, shortname)
 
     javatext = filter_links(javatext, javadoc_link_filter)
@@ -906,6 +906,29 @@ def ndkdoc(metadata, indent = 4):
     # render with markdown => HTML
     # Turn off the table plugin since doxygen doesn't recognize generated <thead> <tbody> tags
     ndktext = md(text, NDKDOC_IMAGE_SRC_METADATA, False)
+
+    # Simple transform for ndk doc links
+    def ndkdoc_link_filter(target, target_ndk, shortname):
+      if target_ndk is not None:
+        return '{@link %s %s}' % (target_ndk, shortname)
+
+      # Create HTML link to Javadoc
+      if shortname == '':
+        lastdot = target.rfind('.')
+        if lastdot == -1:
+          shortname = target
+        else:
+          shortname = target[lastdot + 1:]
+
+      target = target.replace('.','/')
+      if target.find('#') != -1:
+        target = target.replace('#','.html#')
+      else:
+        target = target + '.html'
+
+      return '<a href="https://developer.android.com/reference/%s">%s</a>' % (target, shortname)
+
+    ndktext = filter_links(ndktext, ndkdoc_link_filter)
 
     # Convert metadata entry "android.x.y.z" to form
     # NDK tag format of "ACAMERA_X_Y_Z"
@@ -1163,18 +1186,19 @@ def filter_links(text, filter_function, summary_function = None):
     def name_match(name):
       return lambda node: node.name == name
 
-    tag_match = r"\{@link\s+([^\s\}]+)([^\}]*)\}"
+    tag_match = r"\{@link\s+([^\s\}\|]+)(?:\|([^\s\}]+))*([^\}]*)\}"
 
     def filter_sub(match):
       whole_match = match.group(0)
       target = match.group(1)
-      shortname = match.group(2).strip()
+      target_ndk = match.group(2)
+      shortname = match.group(3).strip()
 
-      #print "Found link '%s' as '%s' -> '%s'" % (target, shortname, filter_function(target, shortname))
+      #print "Found link '%s' ndk '%s' as '%s' -> '%s'" % (target, target_ndk, shortname, filter_function(target, target_ndk, shortname))
 
       # Replace match with crossref
       target_set.add(target)
-      return filter_function(target, shortname)
+      return filter_function(target, target_ndk, shortname)
 
     text = re.sub(tag_match, filter_sub, text)
 
