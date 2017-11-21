@@ -41,15 +41,15 @@ __BEGIN_DECLS
  * is dithered and the remaining fraction is converted to the output Q.15, with clamping
  * on the 4 integer guard bits.
  *
- * For interleaved stereo, c is the number of sample pairs,
+ * For interleaved stereo, pairs is the number of sample pairs,
  * and out is an array of interleaved pairs of 16-bit samples per channel.
- * For mono, c is the number of samples / 2, and out is an array of 16-bit samples.
+ * For mono, pairs is the number of samples / 2, and out is an array of 16-bit samples.
  * The name "dither" is a misnomer; the current implementation does not actually dither
  * but uses truncation.  This may change.
  * The out and sums buffers must either be completely separate (non-overlapping), or
  * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
-void ditherAndClamp(int32_t* out, const int32_t *sums, size_t c);
+void ditherAndClamp(int32_t *out, const int32_t *sums, size_t pairs);
 
 /**
  * Expand and copy samples from unsigned 8-bit offset by 0x80 to signed 16-bit.
