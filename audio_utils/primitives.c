@@ -28,6 +28,13 @@ void ditherAndClamp(int32_t *out, const int32_t *sums, size_t pairs)
     }
 }
 
+void memcpy_to_i16_from_q4_27(int16_t *dst, const int32_t *src, size_t count)
+{
+    for (; count > 0; --count) {
+        *dst++ = clamp16(*src++ >> 12);
+    }
+}
+
 void memcpy_to_i16_from_u8(int16_t *dst, const uint8_t *src, size_t count)
 {
     dst += count;

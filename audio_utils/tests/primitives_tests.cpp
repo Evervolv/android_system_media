@@ -38,6 +38,13 @@ static const int32_t lim24neg = -(1 << 23);
 static const int64_t lim32pos = 0x000000007fffffff;
 static const int64_t lim32neg = 0xffffffff80000000;
 
+// Use memset here since it is generally the fastest method of clearing data,
+// but could be changed to std::fill or assignment should those prove faster.
+template <typename T>
+static void zeroFill(T &container) {
+    memset(container.data(), 0, container.size() * sizeof(container[0]));
+}
+
 inline void testClamp8(float f)
 {
     // f is in native u8 scaling to test rounding
@@ -189,30 +196,33 @@ TEST(audio_utils_primitives, clamp_to_int) {
 
 TEST(audio_utils_primitives, memcpy) {
     // test round-trip.
-    int16_t *i16ref = new int16_t[65536];
-    int16_t *i16ary = new int16_t[65536];
-    int32_t *i32ary = new int32_t[65536];
-    float *fary = new float[65536];
-    uint8_t *pary = new uint8_t[65536*3];
+    constexpr size_t size = 65536;
+    std::vector<int16_t> i16ref(size);
+    std::vector<int16_t> i16ary(size);
+    std::vector<int32_t> i32ary(size);
+    std::vector<float> fary(size);
+    std::vector<uint8_t> pary(size * 3);
 
-    for (size_t i = 0; i < 65536; ++i) {
+
+    // set signed reference monotonic array from -32768 to 32767
+    for (size_t i = 0; i < i16ref.size(); ++i) {
         i16ref[i] = i16ary[i] = i - 32768;
     }
 
     // do round-trip testing i16 and float
-    memcpy_to_float_from_i16(fary, i16ary, 65536);
-    memset(i16ary, 0, 65536 * sizeof(i16ary[0]));
-    checkMonotone(fary, 65536);
+    memcpy_to_float_from_i16(fary.data(), i16ary.data(), fary.size());
+    zeroFill(i16ary);
+    checkMonotone(fary.data(), fary.size());
 
-    memcpy_to_i16_from_float(i16ary, fary, 65536);
-    memset(fary, 0, 65536 * sizeof(fary[0]));
-    checkMonotone(i16ary, 65536);
+    memcpy_to_i16_from_float(i16ary.data(), fary.data(), i16ary.size());
+    zeroFill(fary);
+    checkMonotone(i16ary.data(), i16ary.size());
 
     // TODO make a template case for the following?
 
     // do round-trip testing p24 to i16 and float
-    memcpy_to_p24_from_i16(pary, i16ary, 65536);
-    memset(i16ary, 0, 65536 * sizeof(i16ary[0]));
+    memcpy_to_p24_from_i16(pary.data(), i16ary.data(), size /* note pary elem is 3 bytes */);
+    zeroFill(i16ary);
 
     // check an intermediate format at a position(???)
 #if 0
@@ -220,114 +230,121 @@ TEST(audio_utils_primitives, memcpy) {
             1025, (unsigned) pary[1025*3],
             1025, (unsigned) pary[1025*3+1],
             1025, (unsigned) pary[1025*3+2]
-            );
+    );
 #endif
 
-    memcpy_to_float_from_p24(fary, pary, 65536);
-    memset(pary, 0, 65536 * 3 * sizeof(pary[0]));
-    checkMonotone(fary, 65536);
+    memcpy_to_float_from_p24(fary.data(), pary.data(), fary.size());
+    zeroFill(pary);
+    checkMonotone(fary.data(), fary.size());
 
-    memcpy_to_p24_from_float(pary, fary, 65536);
-    memset(fary, 0, 65536 * sizeof(fary[0]));
+    memcpy_to_p24_from_float(pary.data(), fary.data(), size /* note pary elem is 3 bytes */);
+    zeroFill(fary);
+    checkMonotonep24(pary.data(), pary.size() /* this is * 3*/);
 
-    memcpy_to_i16_from_p24(i16ary, pary, 65536);
-    memset(pary, 0, 65536 * 3 * sizeof(pary[0]));
-    checkMonotone(i16ary, 65536);
+    memcpy_to_i16_from_p24(i16ary.data(), pary.data(), i16ary.size());
+    zeroFill(pary);
+    checkMonotone(i16ary.data(), i16ary.size());
 
     // do round-trip testing q8_23 to i16 and float
-    memcpy_to_q8_23_from_i16(i32ary, i16ary, 65536);
-    memset(i16ary, 0, 65536 * sizeof(i16ary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_q8_23_from_i16(i32ary.data(), i16ary.data(), i32ary.size());
+    zeroFill(i16ary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_float_from_q8_23(fary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotone(fary, 65536);
+    memcpy_to_float_from_q8_23(fary.data(), i32ary.data(), fary.size());
+    zeroFill(i32ary);
+    checkMonotone(fary.data(), fary.size());
 
-    memcpy_to_q8_23_from_float_with_clamp(i32ary, fary, 65536);
-    memset(fary, 0, 65536 * sizeof(fary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_q8_23_from_float_with_clamp(i32ary.data(), fary.data(), i32ary.size());
+    zeroFill(fary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_i16_from_q8_23(i16ary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotone(i16ary, 65536);
+    memcpy_to_i16_from_q8_23(i16ary.data(), i32ary.data(), i16ary.size());
+    zeroFill(i32ary);
+    checkMonotone(i16ary.data(), i16ary.size());
 
     // do round-trip testing i32 to i16 and float
-    memcpy_to_i32_from_i16(i32ary, i16ary, 65536);
-    memset(i16ary, 0, 65536 * sizeof(i16ary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_i32_from_i16(i32ary.data(), i16ary.data(), i32ary.size());
+    zeroFill(i16ary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_float_from_i32(fary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotone(fary, 65536);
+    memcpy_to_float_from_i32(fary.data(), i32ary.data(), fary.size());
+    zeroFill(i32ary);
+    checkMonotone(fary.data(), fary.size());
 
-    memcpy_to_i32_from_float(i32ary, fary, 65536);
-    memset(fary, 0, 65536 * sizeof(fary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_i32_from_float(i32ary.data(), fary.data(), i32ary.size());
+    zeroFill(fary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_i16_from_i32(i16ary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotone(i16ary, 65536);
+    memcpy_to_i16_from_i32(i16ary.data(), i32ary.data(), i16ary.size());
+    zeroFill(i32ary);
+    checkMonotone(i16ary.data(), i16ary.size());
 
     // do round-trip test i16 -> p24 -> i32 -> p24 -> q8_23 -> p24 -> i16
-    memcpy_to_p24_from_i16(pary, i16ary, 65536);
-    memset(i16ary, 0, 65536 * sizeof(i16ary[0]));
-    checkMonotonep24(pary, 65536 * 3);
+    memcpy_to_p24_from_i16(pary.data(), i16ary.data(), size /* note pary elem is 3 bytes */);
+    zeroFill(i16ary);
+    checkMonotonep24(pary.data(), pary.size() /* this is * 3*/);
 
-    memcpy_to_i32_from_p24(i32ary, pary, 65536);
-    memset(pary, 0, 65536 * 3 * sizeof(pary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_i32_from_p24(i32ary.data(), pary.data(), i32ary.size());
+    zeroFill(pary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_p24_from_i32(pary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotonep24(pary, 65536 * 3);
+    memcpy_to_p24_from_i32(pary.data(), i32ary.data(), size /* note pary elem is 3 bytes */);
+    zeroFill(i32ary);
+    checkMonotonep24(pary.data(), pary.size() /* this is * 3*/);
 
-    memcpy_to_q8_23_from_p24(i32ary, pary, 65536);
-    memset(pary, 0, 65536 * 3 * sizeof(pary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_q8_23_from_p24(i32ary.data(), pary.data(), i32ary.size());
+    zeroFill(pary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_p24_from_q8_23(pary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotonep24(pary, 65536 * 3);
+    memcpy_to_p24_from_q8_23(pary.data(), i32ary.data(), size /* note pary elem is 3 bytes */);
+    zeroFill(i32ary);
+    checkMonotonep24(pary.data(), pary.size() /* this is * 3*/);
 
-    memcpy_to_i16_from_p24(i16ary, pary, 65536);
-    memset(pary, 0, 65536 * 3 * sizeof(pary[0]));
-    checkMonotone(i16ary, 65536);
+    memcpy_to_i16_from_p24(i16ary.data(), pary.data(), i16ary.size());
+    zeroFill(pary);
+    checkMonotone(i16ary.data(), i16ary.size());
 
     // do partial round-trip testing q4_27 to i16 and float
-    memcpy_to_float_from_i16(fary, i16ary, 65536);
-    //memset(i16ary, 0, 65536 * sizeof(i16ary[0])); // not cleared: we don't do full roundtrip
+    memcpy_to_float_from_i16(fary.data(), i16ary.data(), fary.size());
+    zeroFill(i16ary);
 
-    memcpy_to_q4_27_from_float(i32ary, fary, 65536);
-    memset(fary, 0, 65536 * sizeof(fary[0]));
-    checkMonotone(i32ary, 65536);
+    memcpy_to_q4_27_from_float(i32ary.data(), fary.data(), i32ary.size());
+    zeroFill(fary);
+    checkMonotone(i32ary.data(), i32ary.size());
 
-    memcpy_to_float_from_q4_27(fary, i32ary, 65536);
-    memset(i32ary, 0, 65536 * sizeof(i32ary[0]));
-    checkMonotone(fary, 65536);
+    memcpy_to_i16_from_q4_27(i16ary.data(), i32ary.data(), i16ary.size());
+    checkMonotone(i16ary.data(), i16ary.size());
+    EXPECT_EQ(0, memcmp(i16ary.data(), i16ref.data(), i16ary.size() * sizeof(i16ary[0])));
+
+    zeroFill(i16ary);
+
+    // ditherAndClamp() has non-standard parameters - memcpy_to_float_from_q4_27() is preferred
+    ditherAndClamp(reinterpret_cast<int32_t *>(i16ary.data()),
+            i32ary.data(), i16ary.size() / 2);
+    checkMonotone(i16ary.data(), i16ary.size());
+    EXPECT_EQ(0, memcmp(i16ary.data(), i16ref.data(), i16ary.size() * sizeof(i16ary[0])));
+
+    memcpy_to_float_from_q4_27(fary.data(), i32ary.data(), fary.size());
+    zeroFill(i32ary);
+    checkMonotone(fary.data(), fary.size());
 
     // at the end, our i16ary must be the same. (Monotone should be equivalent to this)
-    EXPECT_EQ(0, memcmp(i16ary, i16ref, 65536*sizeof(i16ary[0])));
+    EXPECT_EQ(0, memcmp(i16ary.data(), i16ref.data(), i16ary.size() * sizeof(i16ary[0])));
 
     // test round-trip for u8 and float.
-    uint8_t *u8ref = new uint8_t[256];
-    uint8_t *u8ary = new uint8_t[256];
+    constexpr size_t u8size = 256;
+    std::vector<uint8_t> u8ref(u8size);
+    std::vector<uint8_t> u8ary(u8size);
 
-    for (unsigned i = 0; i < 256; ++i) {
+    for (size_t i = 0; i < u8ref.size(); ++i) {
         u8ref[i] = i;
     }
 
-    memcpy_to_float_from_u8(fary, u8ref, 256);
-    memcpy_to_u8_from_float(u8ary, fary, 256);
+    constexpr size_t testsize = std::min(u8size, size);
+    memcpy_to_float_from_u8(fary.data(), u8ref.data(), testsize);
+    memcpy_to_u8_from_float(u8ary.data(), fary.data(), testsize);
 
-    EXPECT_EQ(0, memcmp(u8ary, u8ref, 256 * sizeof(u8ary[0])));
-
-    delete[] u8ref;
-    delete[] u8ary;
-    delete[] i16ref;
-    delete[] i16ary;
-    delete[] i32ary;
-    delete[] fary;
-    delete[] pary;
+    EXPECT_EQ(0, memcmp(u8ary.data(), u8ref.data(), u8ary.size() * sizeof(u8ary[0])));
 }
 
 template<typename T>
