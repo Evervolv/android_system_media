@@ -141,7 +141,8 @@ void memcpy_to_float_from_q4_27(float *dst, const int32_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_float_from_i16(float *dst, const int16_t *src, size_t count);
 
@@ -154,7 +155,8 @@ void memcpy_to_float_from_i16(float *dst, const int16_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_float_from_u8(float *dst, const uint8_t *src, size_t count);
 
@@ -168,7 +170,8 @@ void memcpy_to_float_from_u8(float *dst, const uint8_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_float_from_p24(float *dst, const uint8_t *src, size_t count);
 
@@ -195,7 +198,8 @@ void memcpy_to_i16_from_p24(int16_t *dst, const uint8_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_i32_from_p24(int32_t *dst, const uint8_t *src, size_t count);
 
@@ -209,7 +213,8 @@ void memcpy_to_i32_from_p24(int32_t *dst, const uint8_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_p24_from_i16(uint8_t *dst, const int16_t *src, size_t count);
 
@@ -237,7 +242,8 @@ void memcpy_to_p24_from_float(uint8_t *dst, const float *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.
  */
 void memcpy_to_p24_from_q8_23(uint8_t *dst, const int32_t *src, size_t count);
 
@@ -264,7 +270,8 @@ void memcpy_to_p24_from_i32(uint8_t *dst, const int32_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_q8_23_from_i16(int32_t *dst, const int16_t *src, size_t count);
 
@@ -291,7 +298,8 @@ void memcpy_to_q8_23_from_float_with_clamp(int32_t *dst, const float *src, size_
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_q8_23_from_p24(int32_t *dst, const uint8_t *src, size_t count);
 
@@ -347,7 +355,8 @@ void memcpy_to_float_from_q8_23(float *dst, const int32_t *src, size_t count);
  *  \param src     Source buffer
  *  \param count   Number of samples to copy
  *
- * The destination and source buffers must be completely separate.
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void memcpy_to_i32_from_i16(int32_t *dst, const int16_t *src, size_t count);
 
@@ -415,7 +424,8 @@ void downmix_to_mono_i16_from_stereo_i16(int16_t *dst, const int16_t *src, size_
  *  \param src     Source buffer
  *  \param count   Number of mono samples to upmix
  *
- * The destination and source buffers must be completely separate (non-overlapping).
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void upmix_to_stereo_i16_from_mono_i16(int16_t *dst, const int16_t *src, size_t count);
 
@@ -440,7 +450,8 @@ void downmix_to_mono_float_from_stereo_float(float *dst, const float *src, size_
  *  \param src     Source buffer
  *  \param count   Number of mono samples to upmix
  *
- * The destination and source buffers must be completely separate (non-overlapping).
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void upmix_to_stereo_float_from_mono_float(float *dst, const float *src, size_t count);
 
