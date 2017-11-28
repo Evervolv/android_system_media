@@ -34,6 +34,9 @@ __BEGIN_DECLS
  */
 
 /**
+ * Deprecated. Use memcpy_to_i16_from_q4_27() instead (double the pairs for the count).
+ * Neither this function nor memcpy_to_i16_from_q4_27() actually dither.
+ *
  * Dither and clamp pairs of 32-bit input samples (sums) to 16-bit output samples (out).
  * Each 32-bit input sample can be viewed as a signed fixed-point Q19.12 of which the
  * .12 fraction bits are dithered and the 19 integer bits are clamped to signed 16 bits.
@@ -50,6 +53,18 @@ __BEGIN_DECLS
  * they must both start at the same address.  Partially overlapping buffers are not supported.
  */
 void ditherAndClamp(int32_t *out, const int32_t *sums, size_t pairs);
+
+/**
+ * Copy samples from signed fixed-point 32-bit Q4.27 to 16-bit Q0.15
+ *
+ *  \param dst     Destination buffer
+ *  \param src     Source buffer
+ *  \param count   Number of samples to copy
+ *
+ * The destination and source buffers must either be completely separate (non-overlapping), or
+ * they must both start at the same address.  Partially overlapping buffers are not supported.
+ */
+void memcpy_to_i16_from_q4_27(int16_t *dst, const int32_t *src, size_t count);
 
 /**
  * Expand and copy samples from unsigned 8-bit offset by 0x80 to signed 16-bit.
