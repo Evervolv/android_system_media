@@ -295,6 +295,8 @@
             ><a href="#dynamic_android.control.postRawSensitivityBoost">android.control.postRawSensitivityBoost</a></li>
             <li
             ><a href="#dynamic_android.control.enableZsl">android.control.enableZsl</a></li>
+            <li
+            ><a href="#dynamic_android.control.afSceneChange">android.control.afSceneChange</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -9350,6 +9352,73 @@ capture templates is always <code>false</code> if present.<wbr/></p>
 capture intent.<wbr/></p>
             </td>
           </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.control.afSceneChange">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>control.<wbr/>af<wbr/>Scene<wbr/>Change
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">int32</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">NOT_DETECTED</span>
+                    <span class="entry_type_enum_notes"><p>Scene change is not detected within the AF region(s).<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">DETECTED</span>
+                    <span class="entry_type_enum_notes"><p>Scene change is detected within the AF region(s).<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Whether a significant scene change is detected within the currently-set AF
+region(s).<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When the camera focus routine detects a change in the scene it is looking at,<wbr/>
+such as a large shift in camera viewpoint,<wbr/> significant motion in the scene,<wbr/> or a
+significant illumination change,<wbr/> this value will be set to DETECTED for a single capture
+result.<wbr/> Otherwise the value will be NOT_<wbr/>DETECTED.<wbr/> The threshold for detection is similar
+to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus modes.<wbr/></p>
+<p>afSceneChange may be DETECTED only if afMode is AF_<wbr/>MODE_<wbr/>CONTINUOUS_<wbr/>VIDEO or
+AF_<wbr/>MODE_<wbr/>CONTINUOUS_<wbr/>PICTURE.<wbr/> In other AF modes,<wbr/> afSceneChange must be NOT_<wbr/>DETECTED.<wbr/></p>
+<p>This key will be available if the camera device advertises this key via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableCaptureResultKeys">CameraCharacteristics#getAvailableCaptureResultKeys</a>.<wbr/></p>
+            </td>
+          </tr>
+
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->

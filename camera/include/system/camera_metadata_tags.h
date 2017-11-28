@@ -161,6 +161,7 @@ typedef enum camera_metadata_tag {
     ANDROID_CONTROL_POST_RAW_SENSITIVITY_BOOST_RANGE, // int32[]      | public       | HIDL v3.2
     ANDROID_CONTROL_POST_RAW_SENSITIVITY_BOOST,       // int32        | public       | HIDL v3.2
     ANDROID_CONTROL_ENABLE_ZSL,                       // enum         | public       | HIDL v3.2
+    ANDROID_CONTROL_AF_SCENE_CHANGE,                  // enum         | public       | HIDL v3.3
     ANDROID_CONTROL_END,
 
     ANDROID_DEMOSAIC_MODE =                           // enum         | system
@@ -611,6 +612,12 @@ typedef enum camera_metadata_enum_android_control_enable_zsl {
     ANDROID_CONTROL_ENABLE_ZSL_FALSE,
     ANDROID_CONTROL_ENABLE_ZSL_TRUE,
 } camera_metadata_enum_android_control_enable_zsl_t;
+
+// ANDROID_CONTROL_AF_SCENE_CHANGE
+typedef enum camera_metadata_enum_android_control_af_scene_change {
+    ANDROID_CONTROL_AF_SCENE_CHANGE_NOT_DETECTED,
+    ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED,
+} camera_metadata_enum_android_control_af_scene_change_t;
 
 
 // ANDROID_DEMOSAIC_MODE
