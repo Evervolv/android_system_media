@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <math.h>
 #include <cutils/bitops.h>  /* for popcount() */
 #include <audio_utils/primitives.h>
 #include "private/private.h"
@@ -332,9 +331,7 @@ size_t nonZeroMono32(const int32_t *samples, size_t count)
 {
     size_t nonZero = 0;
     for (; count > 0; --count) {
-        if (*samples++ != 0) {
-            nonZero++;
-        }
+        nonZero += *samples++ != 0;
     }
     return nonZero;
 }
@@ -343,9 +340,7 @@ size_t nonZeroMono16(const int16_t *samples, size_t count)
 {
     size_t nonZero = 0;
     for (; count > 0; --count) {
-        if (*samples++ != 0) {
-            nonZero++;
-        }
+        nonZero += *samples++ != 0;
     }
     return nonZero;
 }
@@ -354,9 +349,7 @@ size_t nonZeroStereo32(const int32_t *frames, size_t count)
 {
     size_t nonZero = 0;
     for (; count > 0; --count) {
-        if (frames[0] != 0 || frames[1] != 0) {
-            nonZero++;
-        }
+        nonZero += frames[0] != 0 || frames[1] != 0;
         frames += 2;
     }
     return nonZero;
@@ -366,9 +359,7 @@ size_t nonZeroStereo16(const int16_t *frames, size_t count)
 {
     size_t nonZero = 0;
     for (; count > 0; --count) {
-        if (frames[0] != 0 || frames[1] != 0) {
-            nonZero++;
-        }
+        nonZero += frames[0] != 0 || frames[1] != 0;
         frames += 2;
     }
     return nonZero;

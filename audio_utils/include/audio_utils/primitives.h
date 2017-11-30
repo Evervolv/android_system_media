@@ -17,6 +17,7 @@
 #ifndef ANDROID_AUDIO_PRIMITIVES_H
 #define ANDROID_AUDIO_PRIMITIVES_H
 
+#include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/cdefs.h>
@@ -721,10 +722,12 @@ static inline int32_t clamp32(int64_t sample)
  * depending on the sign bit inside NaN (whose representation is not unique).
  * Nevertheless, strictly speaking, NaN behavior should be considered undefined.
  *
- * Rounding of 0.5 lsb is to even (default for IEEE 754).
+ * OLD code disabled: Rounding of 0.5 lsb is to even (default for IEEE 754).
+ * NEW code enabled: Rounding of 0.5 lsb is away from 0.
  */
 static inline int16_t clamp16_from_float(float f)
 {
+#if 0
     /* Offset is used to expand the valid range of [-1.0, 1.0) into the 16 lsbs of the
      * floating point significand. The normal shift is 3<<22, but the -15 offset
      * is used to multiply by 32768.
@@ -748,6 +751,10 @@ static inline int16_t clamp16_from_float(float f)
     else if (u.i > limpos)
         u.i = 32767;
     return u.i; /* Return lower 16 bits, the part of interest in the significand. */
+#else
+    static const float scale = 1 << 15;
+    return roundf(fmaxf(fminf(f * scale, scale - 1.f), -scale));
+#endif
 }
 
 /**
@@ -760,10 +767,12 @@ static inline int16_t clamp16_from_float(float f)
  * depending on the sign bit inside NaN (whose representation is not unique).
  * Nevertheless, strictly speaking, NaN behavior should be considered undefined.
  *
- * Rounding of 0.5 lsb is to even (default for IEEE 754).
+ * OLD code disabled: Rounding of 0.5 lsb is to even (default for IEEE 754).
+ * NEW code enabled: Rounding of 0.5 lsb is away from 0.
  */
 static inline uint8_t clamp8_from_float(float f)
 {
+#if 0
     /* Offset is used to expand the valid range of [-1.0, 1.0) into the 16 lsbs of the
      * floating point significand. The normal shift is 3<<22, but the -7 offset
      * is used to multiply by 128.
@@ -787,13 +796,17 @@ static inline uint8_t clamp8_from_float(float f)
     if (u.i > limpos)
         return 255;
     return u.i; /* Return lower 8 bits, the part of interest in the significand. */
+#else
+    return roundf(fmaxf(fminf(f * 128.f + 128.f, 255.f), 0.f));
+#endif
 }
 
 /**
  * Convert a single-precision floating point value to a Q0.23 integer value, stored in a
  * 32 bit signed integer (technically stored as Q8.23, but clamped to Q0.23).
  *
- * Rounds to nearest, ties away from 0.
+ * OLD code disabled: Rounds to nearest, ties away from 0.
+ * NEW code enabled: Rounding of 0.5 lsb is away from 0.
  *
  * Values outside the range [-1.0, 1.0) are properly clamped to -8388608 and 8388607,
  * including -Inf and +Inf. NaN values are considered undefined, and behavior may change
@@ -801,6 +814,7 @@ static inline uint8_t clamp8_from_float(float f)
  */
 static inline int32_t clamp24_from_float(float f)
 {
+#if 0
     static const float scale = (float)(1 << 23);
     static const float limpos = 0x7fffff / scale;
     static const float limneg = -0x800000 / scale;
@@ -815,6 +829,10 @@ static inline int32_t clamp24_from_float(float f)
      * ensure that we round to nearest, ties away from 0.
      */
     return f > 0 ? f + 0.5 : f - 0.5;
+#else
+    static const float scale = 1 << 23;
+    return roundf(fmaxf(fminf(f * scale, scale - 1.f), -scale));
+#endif
 }
 
 /**
