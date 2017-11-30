@@ -1149,6 +1149,20 @@
         </li>
       </ul> <!-- toc_section -->
     </li>
+    <li>
+      <span class="toc_section_header"><a href="#section_logicalMultiCamera">logicalMultiCamera</a></span>
+      <ul class="toc_section">
+        <li>
+          <span class="toc_kind_header">static</span>
+          <ul class="toc_section">
+            <li
+            ><a href="#static_android.logicalMultiCamera.physicalIds">android.logicalMultiCamera.physicalIds</a></li>
+            <li
+            ><a href="#static_android.logicalMultiCamera.sensorSyncType">android.logicalMultiCamera.sensorSyncType</a></li>
+          </ul>
+        </li>
+      </ul> <!-- toc_section -->
+    </li>
   </ul>
 
 
@@ -16870,6 +16884,45 @@ to the inertial sensors.<wbr/></p>
   <a href="#static_android.control.aeAvailableTargetFpsRanges">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Target<wbr/>Fps<wbr/>Ranges</a>.<wbr/></li>
 </ul></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">LOGICAL_MULTI_CAMERA (v3.3)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras that are
+also exposed to the application.<wbr/></p>
+<p>This capability requires the camera device to support the following:</p>
+<ul>
+<li>This camera device must list the following static metadata entries in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>:<ul>
+<li><a href="#static_android.logicalMultiCamera.physicalIds">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>physical<wbr/>Ids</a></li>
+<li><a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a></li>
+</ul>
+</li>
+<li>The underlying physical cameras' static metadata must list the following entries,<wbr/>
+  so that the application can correlate pixels from the physical streams:<ul>
+<li><a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a></li>
+<li><a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a></li>
+<li><a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a></li>
+<li><a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a></li>
+<li><a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a></li>
+</ul>
+</li>
+<li>The logical camera device must be LIMITED or higher device.<wbr/></li>
+</ul>
+<p>Both the logical camera device and its underlying physical devices support the
+mandatory stream combinations required for their device levels.<wbr/></p>
+<p>Additionally,<wbr/> for each guaranteed stream combination,<wbr/> the logical camera supports:</p>
+<ul>
+<li>Replacing one logical <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a>
+  or raw stream with two physical streams of the same size and format,<wbr/> each from a
+  separate physical camera,<wbr/> given that the size and format are supported by both
+  physical cameras.<wbr/></li>
+<li>Adding two raw streams,<wbr/> each from one physical camera,<wbr/> if the logical camera doesn't
+  advertise RAW capability,<wbr/> but the underlying physical cameras do.<wbr/> This is usually
+  the case when the physical cameras have different sensor sizes.<wbr/></li>
+</ul>
+<p>Using physical streams in place of a logical stream of the same size and format will
+not slow down the frame rate of the capture,<wbr/> as long as the minimum frame duration
+of the physical and logical streams are the same.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -16954,6 +17007,9 @@ addition to the other keys explicitly mentioned in the DEPTH_<wbr/>OUTPUT
 enum notes.<wbr/> The entry <a href="#static_android.depth.maxDepthSamples">android.<wbr/>depth.<wbr/>max<wbr/>Depth<wbr/>Samples</a> must be available
 if the DEPTH_<wbr/>POINT_<wbr/>CLOUD format is supported (HAL pixel format BLOB,<wbr/> dataspace
 DEPTH).<wbr/></p>
+<p>For a camera device with LOGICAL_<wbr/>MULTI_<wbr/>CAMERA capability,<wbr/> it should operate in the
+same way as a physical camera device based on its hardware level and capabilities.<wbr/>
+It's recommended that its feature set is superset of that of individual physical cameras.<wbr/></p>
             </td>
           </tr>
 
@@ -28870,6 +28926,176 @@ corrupted during depth measurement.<wbr/></p>
       </tbody>
 
   <!-- end of section -->
+  <tr><td colspan="7" id="section_logicalMultiCamera" class="section">logicalMultiCamera</td></tr>
+
+
+      <tr><td colspan="7" class="kind">static</td></tr>
+
+      <thead class="entries_header">
+        <tr>
+          <th class="th_name">Property Name</th>
+          <th class="th_type">Type</th>
+          <th class="th_description">Description</th>
+          <th class="th_units">Units</th>
+          <th class="th_range">Range</th>
+          <th class="th_hal_version">Initial HIDL HAL version</th>
+          <th class="th_tags">Tags</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        
+
+        
+
+        
+
+        
+
+                
+          <tr class="entry" id="static_android.logicalMultiCamera.physicalIds">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>physical<wbr/>Ids
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">byte</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [hidden]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>String containing the ids of the underlying physical cameras.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              UTF-8 null-terminated string
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_LOGICALCAMERA">LOGICALCAMERA</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For a logical camera,<wbr/> this is concatenation of all underlying physical camera ids.<wbr/>
+The null terminator for physical camera id must be preserved so that the whole string
+can be tokenized using '\0' to generate list of physical camera ids.<wbr/></p>
+<p>For example,<wbr/> if the physical camera ids of the logical camera are "2" and "3",<wbr/> the
+value of this tag will be ['2',<wbr/> '\0',<wbr/> '3',<wbr/> '\0'].<wbr/></p>
+<p>The number of physical camera ids must be no less than 2.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.logicalMultiCamera.sensorSyncType">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">APPROXIMATE (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>A software mechanism is used to synchronize between the physical cameras.<wbr/> As a result,<wbr/>
+the timestamp of an image from a physical stream is only an approximation of the
+image sensor start-of-exposure time.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">CALIBRATED (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>The camera device supports frame timestamp synchronization at the hardware level,<wbr/>
+and the timestamp of a physical stream image accurately reflects its
+start-of-exposure time.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The accuracy of frame timestamp synchronization between physical cameras</p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_LOGICALCAMERA">LOGICALCAMERA</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The accuracy of the frame timestamp synchronization determines the physical cameras'
+ability to start exposure at the same time.<wbr/> If the sensorSyncType is CALIBRATED,<wbr/>
+the physical camera sensors usually run in master-slave mode so that their shutter
+time is synchronized.<wbr/> For APPROXIMATE sensorSyncType,<wbr/> the camera sensors usually run in
+master-master mode,<wbr/> and there could be offset between their start of exposure.<wbr/></p>
+<p>In both cases,<wbr/> all images generated for a particular capture request still carry the same
+timestamps,<wbr/> so that they can be used to look up the matching frame number and
+onCaptureStarted callback.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+        
+
+      <!-- end of kind -->
+      </tbody>
+
+  <!-- end of section -->
 <!-- </namespace> -->
   </table>
 
@@ -29083,6 +29309,14 @@ corrupted during depth measurement.<wbr/></p>
           <li><a href="#dynamic_android.noiseReduction.mode">android.noiseReduction.mode</a> (dynamic)</li>
         </ul>
       </li> <!-- tag_REPROC -->
+      <li id="tag_LOGICALCAMERA">LOGICALCAMERA - 
+        Entry is required for logical multi-camera capability.
+    
+        <ul class="tags_entries">
+          <li><a href="#static_android.logicalMultiCamera.physicalIds">android.logicalMultiCamera.physicalIds</a> (static)</li>
+          <li><a href="#static_android.logicalMultiCamera.sensorSyncType">android.logicalMultiCamera.sensorSyncType</a> (static)</li>
+        </ul>
+      </li> <!-- tag_LOGICALCAMERA -->
       <li id="tag_FUTURE">FUTURE - 
         Entry is  under-specified and is not required for now. This is for book-keeping purpose,
         do not implement or use it, it may be revised for future.

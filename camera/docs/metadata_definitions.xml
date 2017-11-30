@@ -39,6 +39,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <tag id="REPROC">
         Entry is required for the YUV or PRIVATE reprocessing capability.
     </tag>
+    <tag id="LOGICALCAMERA">
+        Entry is required for logical multi-camera capability.
+    </tag>
     <tag id="FUTURE">
         Entry is  under-specified and is not required for now. This is for book-keeping purpose,
         do not implement or use it, it may be revised for future.
@@ -5137,6 +5140,45 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 android.control.aeAvailableTargetFpsRanges.
               </notes>
             </value>
+            <value optional="true" hal_version="3.3">LOGICAL_MULTI_CAMERA
+              <notes>
+              The camera device is a logical camera backed by two or more physical cameras that are
+              also exposed to the application.
+
+              This capability requires the camera device to support the following:
+
+              * This camera device must list the following static metadata entries in {@link
+                android.hardware.camera2.CameraCharacteristics}:
+                  - android.logicalMultiCamera.physicalIds
+                  - android.logicalMultiCamera.sensorSyncType
+              * The underlying physical cameras' static metadata must list the following entries,
+                so that the application can correlate pixels from the physical streams:
+                  - android.lens.poseReference
+                  - android.lens.poseRotation
+                  - android.lens.poseTranslation
+                  - android.lens.intrinsicCalibration
+                  - android.lens.radialDistortion
+              * The logical camera device must be LIMITED or higher device.
+
+              Both the logical camera device and its underlying physical devices support the
+              mandatory stream combinations required for their device levels.
+
+              Additionally, for each guaranteed stream combination, the logical camera supports:
+
+              * Replacing one logical {@link android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888 YUV_420_888}
+                or raw stream with two physical streams of the same size and format, each from a
+                separate physical camera, given that the size and format are supported by both
+                physical cameras.
+              * Adding two raw streams, each from one physical camera, if the logical camera doesn't
+                advertise RAW capability, but the underlying physical cameras do. This is usually
+                the case when the physical cameras have different sensor sizes.
+
+              Using physical streams in place of a logical stream of the same size and format will
+              not slow down the frame rate of the capture, as long as the minimum frame duration
+              of the physical and logical streams are the same.
+              </notes>
+            </value>
+
           </enum>
           <description>List of capabilities that this camera device
           advertises as fully supporting.</description>
@@ -5202,6 +5244,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           enum notes. The entry android.depth.maxDepthSamples must be available
           if the DEPTH_POINT_CLOUD format is supported (HAL pixel format BLOB, dataspace
           DEPTH).
+
+          For a camera device with LOGICAL_MULTI_CAMERA capability, it should operate in the
+          same way as a physical camera device based on its hardware level and capabilities.
+          It's recommended that its feature set is superset of that of individual physical cameras.
           </hal_details>
         </entry>
         <entry name="availableRequestKeys" type="int32" visibility="ndk_public"
@@ -9293,6 +9339,62 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           measure depth values, which causes the color image to be
           corrupted during depth measurement.
           </details>
+        </entry>
+      </static>
+    </section>
+    <section name="logicalMultiCamera">
+      <static>
+        <entry name="physicalIds" type="byte" visibility="hidden"
+               container="array" hwlevel="limited" hal_version="3.3">
+          <array>
+            <size>n</size>
+          </array>
+          <description>String containing the ids of the underlying physical cameras.
+          </description>
+          <units>UTF-8 null-terminated string</units>
+          <details>
+            For a logical camera, this is concatenation of all underlying physical camera ids.
+            The null terminator for physical camera id must be preserved so that the whole string
+            can be tokenized using '\0' to generate list of physical camera ids.
+
+            For example, if the physical camera ids of the logical camera are "2" and "3", the
+            value of this tag will be ['2', '\0', '3', '\0'].
+
+            The number of physical camera ids must be no less than 2.
+          </details>
+          <tag id="LOGICALCAMERA" />
+        </entry>
+        <entry name="sensorSyncType" type="byte" visibility="public"
+               enum="true" hwlevel="limited" hal_version="3.3">
+          <enum>
+            <value>APPROXIMATE
+              <notes>
+              A software mechanism is used to synchronize between the physical cameras. As a result,
+              the timestamp of an image from a physical stream is only an approximation of the
+              image sensor start-of-exposure time.
+              </notes>
+            </value>
+            <value>CALIBRATED
+              <notes>
+              The camera device supports frame timestamp synchronization at the hardware level,
+              and the timestamp of a physical stream image accurately reflects its
+              start-of-exposure time.
+              </notes>
+            </value>
+          </enum>
+          <description>The accuracy of frame timestamp synchronization between physical cameras</description>
+          <details>
+          The accuracy of the frame timestamp synchronization determines the physical cameras'
+          ability to start exposure at the same time. If the sensorSyncType is CALIBRATED,
+          the physical camera sensors usually run in master-slave mode so that their shutter
+          time is synchronized. For APPROXIMATE sensorSyncType, the camera sensors usually run in
+          master-master mode, and there could be offset between their start of exposure.
+
+          In both cases, all images generated for a particular capture request still carry the same
+          timestamps, so that they can be used to look up the matching frame number and
+          onCaptureStarted callback.
+          </details>
+          <tag id="LOGICALCAMERA" />
         </entry>
       </static>
     </section>
