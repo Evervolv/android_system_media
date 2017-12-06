@@ -2863,6 +2863,28 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
       <dynamic>
         <clone entry="android.control.enableZsl" kind="controls">
         </clone>
+        <entry name="afSceneChange" type="int32" visibility="public" enum="true" hal_version="3.3">
+          <enum>
+            <value>NOT_DETECTED
+            <notes>Scene change is not detected within the AF region(s).</notes></value>
+            <value>DETECTED
+            <notes>Scene change is detected within the AF region(s).</notes></value>
+          </enum>
+          <description>Whether a significant scene change is detected within the currently-set AF
+          region(s).</description>
+          <details>When the camera focus routine detects a change in the scene it is looking at,
+          such as a large shift in camera viewpoint, significant motion in the scene, or a
+          significant illumination change, this value will be set to DETECTED for a single capture
+          result. Otherwise the value will be NOT_DETECTED. The threshold for detection is similar
+          to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus modes.
+
+          afSceneChange may be DETECTED only if afMode is AF_MODE_CONTINUOUS_VIDEO or
+          AF_MODE_CONTINUOUS_PICTURE. In other AF modes, afSceneChange must be NOT_DETECTED.
+
+          This key will be available if the camera device advertises this key via {@link
+          android.hardware.camera2.CameraCharacteristics#getAvailableCaptureResultKeys|ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS}.
+          </details>
+        </entry>
       </dynamic>
     </section>
     <section name="demosaic">
