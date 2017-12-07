@@ -423,520 +423,521 @@ typedef enum camera_metadata_tag {
 
 // ANDROID_COLOR_CORRECTION_MODE
 typedef enum camera_metadata_enum_android_color_correction_mode {
-    ANDROID_COLOR_CORRECTION_MODE_TRANSFORM_MATRIX,
-    ANDROID_COLOR_CORRECTION_MODE_FAST,
-    ANDROID_COLOR_CORRECTION_MODE_HIGH_QUALITY,
+    ANDROID_COLOR_CORRECTION_MODE_TRANSFORM_MATRIX                  , // HIDL v3.2
+    ANDROID_COLOR_CORRECTION_MODE_FAST                              , // HIDL v3.2
+    ANDROID_COLOR_CORRECTION_MODE_HIGH_QUALITY                      , // HIDL v3.2
 } camera_metadata_enum_android_color_correction_mode_t;
 
 // ANDROID_COLOR_CORRECTION_ABERRATION_MODE
 typedef enum camera_metadata_enum_android_color_correction_aberration_mode {
-    ANDROID_COLOR_CORRECTION_ABERRATION_MODE_OFF,
-    ANDROID_COLOR_CORRECTION_ABERRATION_MODE_FAST,
-    ANDROID_COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY,
+    ANDROID_COLOR_CORRECTION_ABERRATION_MODE_OFF                    , // HIDL v3.2
+    ANDROID_COLOR_CORRECTION_ABERRATION_MODE_FAST                   , // HIDL v3.2
+    ANDROID_COLOR_CORRECTION_ABERRATION_MODE_HIGH_QUALITY           , // HIDL v3.2
 } camera_metadata_enum_android_color_correction_aberration_mode_t;
 
 
 // ANDROID_CONTROL_AE_ANTIBANDING_MODE
 typedef enum camera_metadata_enum_android_control_ae_antibanding_mode {
-    ANDROID_CONTROL_AE_ANTIBANDING_MODE_OFF,
-    ANDROID_CONTROL_AE_ANTIBANDING_MODE_50HZ,
-    ANDROID_CONTROL_AE_ANTIBANDING_MODE_60HZ,
-    ANDROID_CONTROL_AE_ANTIBANDING_MODE_AUTO,
+    ANDROID_CONTROL_AE_ANTIBANDING_MODE_OFF                         , // HIDL v3.2
+    ANDROID_CONTROL_AE_ANTIBANDING_MODE_50HZ                        , // HIDL v3.2
+    ANDROID_CONTROL_AE_ANTIBANDING_MODE_60HZ                        , // HIDL v3.2
+    ANDROID_CONTROL_AE_ANTIBANDING_MODE_AUTO                        , // HIDL v3.2
 } camera_metadata_enum_android_control_ae_antibanding_mode_t;
 
 // ANDROID_CONTROL_AE_LOCK
 typedef enum camera_metadata_enum_android_control_ae_lock {
-    ANDROID_CONTROL_AE_LOCK_OFF,
-    ANDROID_CONTROL_AE_LOCK_ON,
+    ANDROID_CONTROL_AE_LOCK_OFF                                     , // HIDL v3.2
+    ANDROID_CONTROL_AE_LOCK_ON                                      , // HIDL v3.2
 } camera_metadata_enum_android_control_ae_lock_t;
 
 // ANDROID_CONTROL_AE_MODE
 typedef enum camera_metadata_enum_android_control_ae_mode {
-    ANDROID_CONTROL_AE_MODE_OFF,
-    ANDROID_CONTROL_AE_MODE_ON,
-    ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH,
-    ANDROID_CONTROL_AE_MODE_ON_ALWAYS_FLASH,
-    ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE,
+    ANDROID_CONTROL_AE_MODE_OFF                                     , // HIDL v3.2
+    ANDROID_CONTROL_AE_MODE_ON                                      , // HIDL v3.2
+    ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH                           , // HIDL v3.2
+    ANDROID_CONTROL_AE_MODE_ON_ALWAYS_FLASH                         , // HIDL v3.2
+    ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE                    , // HIDL v3.2
 } camera_metadata_enum_android_control_ae_mode_t;
 
 // ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER
 typedef enum camera_metadata_enum_android_control_ae_precapture_trigger {
-    ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_IDLE,
-    ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_START,
-    ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL,
+    ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_IDLE                      , // HIDL v3.2
+    ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_START                     , // HIDL v3.2
+    ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL                    , // HIDL v3.2
 } camera_metadata_enum_android_control_ae_precapture_trigger_t;
 
 // ANDROID_CONTROL_AF_MODE
 typedef enum camera_metadata_enum_android_control_af_mode {
-    ANDROID_CONTROL_AF_MODE_OFF,
-    ANDROID_CONTROL_AF_MODE_AUTO,
-    ANDROID_CONTROL_AF_MODE_MACRO,
-    ANDROID_CONTROL_AF_MODE_CONTINUOUS_VIDEO,
-    ANDROID_CONTROL_AF_MODE_CONTINUOUS_PICTURE,
-    ANDROID_CONTROL_AF_MODE_EDOF,
+    ANDROID_CONTROL_AF_MODE_OFF                                     , // HIDL v3.2
+    ANDROID_CONTROL_AF_MODE_AUTO                                    , // HIDL v3.2
+    ANDROID_CONTROL_AF_MODE_MACRO                                   , // HIDL v3.2
+    ANDROID_CONTROL_AF_MODE_CONTINUOUS_VIDEO                        , // HIDL v3.2
+    ANDROID_CONTROL_AF_MODE_CONTINUOUS_PICTURE                      , // HIDL v3.2
+    ANDROID_CONTROL_AF_MODE_EDOF                                    , // HIDL v3.2
 } camera_metadata_enum_android_control_af_mode_t;
 
 // ANDROID_CONTROL_AF_TRIGGER
 typedef enum camera_metadata_enum_android_control_af_trigger {
-    ANDROID_CONTROL_AF_TRIGGER_IDLE,
-    ANDROID_CONTROL_AF_TRIGGER_START,
-    ANDROID_CONTROL_AF_TRIGGER_CANCEL,
+    ANDROID_CONTROL_AF_TRIGGER_IDLE                                 , // HIDL v3.2
+    ANDROID_CONTROL_AF_TRIGGER_START                                , // HIDL v3.2
+    ANDROID_CONTROL_AF_TRIGGER_CANCEL                               , // HIDL v3.2
 } camera_metadata_enum_android_control_af_trigger_t;
 
 // ANDROID_CONTROL_AWB_LOCK
 typedef enum camera_metadata_enum_android_control_awb_lock {
-    ANDROID_CONTROL_AWB_LOCK_OFF,
-    ANDROID_CONTROL_AWB_LOCK_ON,
+    ANDROID_CONTROL_AWB_LOCK_OFF                                    , // HIDL v3.2
+    ANDROID_CONTROL_AWB_LOCK_ON                                     , // HIDL v3.2
 } camera_metadata_enum_android_control_awb_lock_t;
 
 // ANDROID_CONTROL_AWB_MODE
 typedef enum camera_metadata_enum_android_control_awb_mode {
-    ANDROID_CONTROL_AWB_MODE_OFF,
-    ANDROID_CONTROL_AWB_MODE_AUTO,
-    ANDROID_CONTROL_AWB_MODE_INCANDESCENT,
-    ANDROID_CONTROL_AWB_MODE_FLUORESCENT,
-    ANDROID_CONTROL_AWB_MODE_WARM_FLUORESCENT,
-    ANDROID_CONTROL_AWB_MODE_DAYLIGHT,
-    ANDROID_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT,
-    ANDROID_CONTROL_AWB_MODE_TWILIGHT,
-    ANDROID_CONTROL_AWB_MODE_SHADE,
+    ANDROID_CONTROL_AWB_MODE_OFF                                    , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_AUTO                                   , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_INCANDESCENT                           , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_FLUORESCENT                            , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_WARM_FLUORESCENT                       , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_DAYLIGHT                               , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_CLOUDY_DAYLIGHT                        , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_TWILIGHT                               , // HIDL v3.2
+    ANDROID_CONTROL_AWB_MODE_SHADE                                  , // HIDL v3.2
 } camera_metadata_enum_android_control_awb_mode_t;
 
 // ANDROID_CONTROL_CAPTURE_INTENT
 typedef enum camera_metadata_enum_android_control_capture_intent {
-    ANDROID_CONTROL_CAPTURE_INTENT_CUSTOM,
-    ANDROID_CONTROL_CAPTURE_INTENT_PREVIEW,
-    ANDROID_CONTROL_CAPTURE_INTENT_STILL_CAPTURE,
-    ANDROID_CONTROL_CAPTURE_INTENT_VIDEO_RECORD,
-    ANDROID_CONTROL_CAPTURE_INTENT_VIDEO_SNAPSHOT,
-    ANDROID_CONTROL_CAPTURE_INTENT_ZERO_SHUTTER_LAG,
-    ANDROID_CONTROL_CAPTURE_INTENT_MANUAL,
+    ANDROID_CONTROL_CAPTURE_INTENT_CUSTOM                           , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_PREVIEW                          , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_STILL_CAPTURE                    , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_VIDEO_RECORD                     , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_VIDEO_SNAPSHOT                   , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_ZERO_SHUTTER_LAG                 , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_MANUAL                           , // HIDL v3.2
 } camera_metadata_enum_android_control_capture_intent_t;
 
 // ANDROID_CONTROL_EFFECT_MODE
 typedef enum camera_metadata_enum_android_control_effect_mode {
-    ANDROID_CONTROL_EFFECT_MODE_OFF,
-    ANDROID_CONTROL_EFFECT_MODE_MONO,
-    ANDROID_CONTROL_EFFECT_MODE_NEGATIVE,
-    ANDROID_CONTROL_EFFECT_MODE_SOLARIZE,
-    ANDROID_CONTROL_EFFECT_MODE_SEPIA,
-    ANDROID_CONTROL_EFFECT_MODE_POSTERIZE,
-    ANDROID_CONTROL_EFFECT_MODE_WHITEBOARD,
-    ANDROID_CONTROL_EFFECT_MODE_BLACKBOARD,
-    ANDROID_CONTROL_EFFECT_MODE_AQUA,
+    ANDROID_CONTROL_EFFECT_MODE_OFF                                 , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_MONO                                , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_NEGATIVE                            , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_SOLARIZE                            , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_SEPIA                               , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_POSTERIZE                           , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_WHITEBOARD                          , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_BLACKBOARD                          , // HIDL v3.2
+    ANDROID_CONTROL_EFFECT_MODE_AQUA                                , // HIDL v3.2
 } camera_metadata_enum_android_control_effect_mode_t;
 
 // ANDROID_CONTROL_MODE
 typedef enum camera_metadata_enum_android_control_mode {
-    ANDROID_CONTROL_MODE_OFF,
-    ANDROID_CONTROL_MODE_AUTO,
-    ANDROID_CONTROL_MODE_USE_SCENE_MODE,
-    ANDROID_CONTROL_MODE_OFF_KEEP_STATE,
+    ANDROID_CONTROL_MODE_OFF                                        , // HIDL v3.2
+    ANDROID_CONTROL_MODE_AUTO                                       , // HIDL v3.2
+    ANDROID_CONTROL_MODE_USE_SCENE_MODE                             , // HIDL v3.2
+    ANDROID_CONTROL_MODE_OFF_KEEP_STATE                             , // HIDL v3.2
 } camera_metadata_enum_android_control_mode_t;
 
 // ANDROID_CONTROL_SCENE_MODE
 typedef enum camera_metadata_enum_android_control_scene_mode {
-    ANDROID_CONTROL_SCENE_MODE_DISABLED                         = 0,
-    ANDROID_CONTROL_SCENE_MODE_FACE_PRIORITY,
-    ANDROID_CONTROL_SCENE_MODE_ACTION,
-    ANDROID_CONTROL_SCENE_MODE_PORTRAIT,
-    ANDROID_CONTROL_SCENE_MODE_LANDSCAPE,
-    ANDROID_CONTROL_SCENE_MODE_NIGHT,
-    ANDROID_CONTROL_SCENE_MODE_NIGHT_PORTRAIT,
-    ANDROID_CONTROL_SCENE_MODE_THEATRE,
-    ANDROID_CONTROL_SCENE_MODE_BEACH,
-    ANDROID_CONTROL_SCENE_MODE_SNOW,
-    ANDROID_CONTROL_SCENE_MODE_SUNSET,
-    ANDROID_CONTROL_SCENE_MODE_STEADYPHOTO,
-    ANDROID_CONTROL_SCENE_MODE_FIREWORKS,
-    ANDROID_CONTROL_SCENE_MODE_SPORTS,
-    ANDROID_CONTROL_SCENE_MODE_PARTY,
-    ANDROID_CONTROL_SCENE_MODE_CANDLELIGHT,
-    ANDROID_CONTROL_SCENE_MODE_BARCODE,
-    ANDROID_CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO,
-    ANDROID_CONTROL_SCENE_MODE_HDR,
-    ANDROID_CONTROL_SCENE_MODE_FACE_PRIORITY_LOW_LIGHT,
-    ANDROID_CONTROL_SCENE_MODE_DEVICE_CUSTOM_START              = 100,
-    ANDROID_CONTROL_SCENE_MODE_DEVICE_CUSTOM_END                = 127,
+    ANDROID_CONTROL_SCENE_MODE_DISABLED                              = 0, // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_FACE_PRIORITY                        , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_ACTION                               , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_PORTRAIT                             , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_LANDSCAPE                            , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_NIGHT                                , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_NIGHT_PORTRAIT                       , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_THEATRE                              , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_BEACH                                , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_SNOW                                 , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_SUNSET                               , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_STEADYPHOTO                          , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_FIREWORKS                            , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_SPORTS                               , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_PARTY                                , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_CANDLELIGHT                          , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_BARCODE                              , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_HIGH_SPEED_VIDEO                     , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_HDR                                  , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_FACE_PRIORITY_LOW_LIGHT              , // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_DEVICE_CUSTOM_START                   = 100, // HIDL v3.2
+    ANDROID_CONTROL_SCENE_MODE_DEVICE_CUSTOM_END                     = 127, // HIDL v3.2
 } camera_metadata_enum_android_control_scene_mode_t;
 
 // ANDROID_CONTROL_VIDEO_STABILIZATION_MODE
 typedef enum camera_metadata_enum_android_control_video_stabilization_mode {
-    ANDROID_CONTROL_VIDEO_STABILIZATION_MODE_OFF,
-    ANDROID_CONTROL_VIDEO_STABILIZATION_MODE_ON,
+    ANDROID_CONTROL_VIDEO_STABILIZATION_MODE_OFF                    , // HIDL v3.2
+    ANDROID_CONTROL_VIDEO_STABILIZATION_MODE_ON                     , // HIDL v3.2
 } camera_metadata_enum_android_control_video_stabilization_mode_t;
 
 // ANDROID_CONTROL_AE_STATE
 typedef enum camera_metadata_enum_android_control_ae_state {
-    ANDROID_CONTROL_AE_STATE_INACTIVE,
-    ANDROID_CONTROL_AE_STATE_SEARCHING,
-    ANDROID_CONTROL_AE_STATE_CONVERGED,
-    ANDROID_CONTROL_AE_STATE_LOCKED,
-    ANDROID_CONTROL_AE_STATE_FLASH_REQUIRED,
-    ANDROID_CONTROL_AE_STATE_PRECAPTURE,
+    ANDROID_CONTROL_AE_STATE_INACTIVE                               , // HIDL v3.2
+    ANDROID_CONTROL_AE_STATE_SEARCHING                              , // HIDL v3.2
+    ANDROID_CONTROL_AE_STATE_CONVERGED                              , // HIDL v3.2
+    ANDROID_CONTROL_AE_STATE_LOCKED                                 , // HIDL v3.2
+    ANDROID_CONTROL_AE_STATE_FLASH_REQUIRED                         , // HIDL v3.2
+    ANDROID_CONTROL_AE_STATE_PRECAPTURE                             , // HIDL v3.2
 } camera_metadata_enum_android_control_ae_state_t;
 
 // ANDROID_CONTROL_AF_STATE
 typedef enum camera_metadata_enum_android_control_af_state {
-    ANDROID_CONTROL_AF_STATE_INACTIVE,
-    ANDROID_CONTROL_AF_STATE_PASSIVE_SCAN,
-    ANDROID_CONTROL_AF_STATE_PASSIVE_FOCUSED,
-    ANDROID_CONTROL_AF_STATE_ACTIVE_SCAN,
-    ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED,
-    ANDROID_CONTROL_AF_STATE_NOT_FOCUSED_LOCKED,
-    ANDROID_CONTROL_AF_STATE_PASSIVE_UNFOCUSED,
+    ANDROID_CONTROL_AF_STATE_INACTIVE                               , // HIDL v3.2
+    ANDROID_CONTROL_AF_STATE_PASSIVE_SCAN                           , // HIDL v3.2
+    ANDROID_CONTROL_AF_STATE_PASSIVE_FOCUSED                        , // HIDL v3.2
+    ANDROID_CONTROL_AF_STATE_ACTIVE_SCAN                            , // HIDL v3.2
+    ANDROID_CONTROL_AF_STATE_FOCUSED_LOCKED                         , // HIDL v3.2
+    ANDROID_CONTROL_AF_STATE_NOT_FOCUSED_LOCKED                     , // HIDL v3.2
+    ANDROID_CONTROL_AF_STATE_PASSIVE_UNFOCUSED                      , // HIDL v3.2
 } camera_metadata_enum_android_control_af_state_t;
 
 // ANDROID_CONTROL_AWB_STATE
 typedef enum camera_metadata_enum_android_control_awb_state {
-    ANDROID_CONTROL_AWB_STATE_INACTIVE,
-    ANDROID_CONTROL_AWB_STATE_SEARCHING,
-    ANDROID_CONTROL_AWB_STATE_CONVERGED,
-    ANDROID_CONTROL_AWB_STATE_LOCKED,
+    ANDROID_CONTROL_AWB_STATE_INACTIVE                              , // HIDL v3.2
+    ANDROID_CONTROL_AWB_STATE_SEARCHING                             , // HIDL v3.2
+    ANDROID_CONTROL_AWB_STATE_CONVERGED                             , // HIDL v3.2
+    ANDROID_CONTROL_AWB_STATE_LOCKED                                , // HIDL v3.2
 } camera_metadata_enum_android_control_awb_state_t;
 
 // ANDROID_CONTROL_AE_LOCK_AVAILABLE
 typedef enum camera_metadata_enum_android_control_ae_lock_available {
-    ANDROID_CONTROL_AE_LOCK_AVAILABLE_FALSE,
-    ANDROID_CONTROL_AE_LOCK_AVAILABLE_TRUE,
+    ANDROID_CONTROL_AE_LOCK_AVAILABLE_FALSE                         , // HIDL v3.2
+    ANDROID_CONTROL_AE_LOCK_AVAILABLE_TRUE                          , // HIDL v3.2
 } camera_metadata_enum_android_control_ae_lock_available_t;
 
 // ANDROID_CONTROL_AWB_LOCK_AVAILABLE
 typedef enum camera_metadata_enum_android_control_awb_lock_available {
-    ANDROID_CONTROL_AWB_LOCK_AVAILABLE_FALSE,
-    ANDROID_CONTROL_AWB_LOCK_AVAILABLE_TRUE,
+    ANDROID_CONTROL_AWB_LOCK_AVAILABLE_FALSE                        , // HIDL v3.2
+    ANDROID_CONTROL_AWB_LOCK_AVAILABLE_TRUE                         , // HIDL v3.2
 } camera_metadata_enum_android_control_awb_lock_available_t;
 
 // ANDROID_CONTROL_ENABLE_ZSL
 typedef enum camera_metadata_enum_android_control_enable_zsl {
-    ANDROID_CONTROL_ENABLE_ZSL_FALSE,
-    ANDROID_CONTROL_ENABLE_ZSL_TRUE,
+    ANDROID_CONTROL_ENABLE_ZSL_FALSE                                , // HIDL v3.2
+    ANDROID_CONTROL_ENABLE_ZSL_TRUE                                 , // HIDL v3.2
 } camera_metadata_enum_android_control_enable_zsl_t;
 
 // ANDROID_CONTROL_AF_SCENE_CHANGE
 typedef enum camera_metadata_enum_android_control_af_scene_change {
-    ANDROID_CONTROL_AF_SCENE_CHANGE_NOT_DETECTED,
-    ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED,
+    ANDROID_CONTROL_AF_SCENE_CHANGE_NOT_DETECTED                    , // HIDL v3.3
+    ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED                        , // HIDL v3.3
 } camera_metadata_enum_android_control_af_scene_change_t;
 
 
 // ANDROID_DEMOSAIC_MODE
 typedef enum camera_metadata_enum_android_demosaic_mode {
-    ANDROID_DEMOSAIC_MODE_FAST,
-    ANDROID_DEMOSAIC_MODE_HIGH_QUALITY,
+    ANDROID_DEMOSAIC_MODE_FAST                                      , // HIDL v3.2
+    ANDROID_DEMOSAIC_MODE_HIGH_QUALITY                              , // HIDL v3.2
 } camera_metadata_enum_android_demosaic_mode_t;
 
 
 // ANDROID_EDGE_MODE
 typedef enum camera_metadata_enum_android_edge_mode {
-    ANDROID_EDGE_MODE_OFF,
-    ANDROID_EDGE_MODE_FAST,
-    ANDROID_EDGE_MODE_HIGH_QUALITY,
-    ANDROID_EDGE_MODE_ZERO_SHUTTER_LAG,
+    ANDROID_EDGE_MODE_OFF                                           , // HIDL v3.2
+    ANDROID_EDGE_MODE_FAST                                          , // HIDL v3.2
+    ANDROID_EDGE_MODE_HIGH_QUALITY                                  , // HIDL v3.2
+    ANDROID_EDGE_MODE_ZERO_SHUTTER_LAG                              , // HIDL v3.2
 } camera_metadata_enum_android_edge_mode_t;
 
 
 // ANDROID_FLASH_MODE
 typedef enum camera_metadata_enum_android_flash_mode {
-    ANDROID_FLASH_MODE_OFF,
-    ANDROID_FLASH_MODE_SINGLE,
-    ANDROID_FLASH_MODE_TORCH,
+    ANDROID_FLASH_MODE_OFF                                          , // HIDL v3.2
+    ANDROID_FLASH_MODE_SINGLE                                       , // HIDL v3.2
+    ANDROID_FLASH_MODE_TORCH                                        , // HIDL v3.2
 } camera_metadata_enum_android_flash_mode_t;
 
 // ANDROID_FLASH_STATE
 typedef enum camera_metadata_enum_android_flash_state {
-    ANDROID_FLASH_STATE_UNAVAILABLE,
-    ANDROID_FLASH_STATE_CHARGING,
-    ANDROID_FLASH_STATE_READY,
-    ANDROID_FLASH_STATE_FIRED,
-    ANDROID_FLASH_STATE_PARTIAL,
+    ANDROID_FLASH_STATE_UNAVAILABLE                                 , // HIDL v3.2
+    ANDROID_FLASH_STATE_CHARGING                                    , // HIDL v3.2
+    ANDROID_FLASH_STATE_READY                                       , // HIDL v3.2
+    ANDROID_FLASH_STATE_FIRED                                       , // HIDL v3.2
+    ANDROID_FLASH_STATE_PARTIAL                                     , // HIDL v3.2
 } camera_metadata_enum_android_flash_state_t;
 
 
 // ANDROID_FLASH_INFO_AVAILABLE
 typedef enum camera_metadata_enum_android_flash_info_available {
-    ANDROID_FLASH_INFO_AVAILABLE_FALSE,
-    ANDROID_FLASH_INFO_AVAILABLE_TRUE,
+    ANDROID_FLASH_INFO_AVAILABLE_FALSE                              , // HIDL v3.2
+    ANDROID_FLASH_INFO_AVAILABLE_TRUE                               , // HIDL v3.2
 } camera_metadata_enum_android_flash_info_available_t;
 
 
 // ANDROID_HOT_PIXEL_MODE
 typedef enum camera_metadata_enum_android_hot_pixel_mode {
-    ANDROID_HOT_PIXEL_MODE_OFF,
-    ANDROID_HOT_PIXEL_MODE_FAST,
-    ANDROID_HOT_PIXEL_MODE_HIGH_QUALITY,
+    ANDROID_HOT_PIXEL_MODE_OFF                                      , // HIDL v3.2
+    ANDROID_HOT_PIXEL_MODE_FAST                                     , // HIDL v3.2
+    ANDROID_HOT_PIXEL_MODE_HIGH_QUALITY                             , // HIDL v3.2
 } camera_metadata_enum_android_hot_pixel_mode_t;
 
 
 
 // ANDROID_LENS_OPTICAL_STABILIZATION_MODE
 typedef enum camera_metadata_enum_android_lens_optical_stabilization_mode {
-    ANDROID_LENS_OPTICAL_STABILIZATION_MODE_OFF,
-    ANDROID_LENS_OPTICAL_STABILIZATION_MODE_ON,
+    ANDROID_LENS_OPTICAL_STABILIZATION_MODE_OFF                     , // HIDL v3.2
+    ANDROID_LENS_OPTICAL_STABILIZATION_MODE_ON                      , // HIDL v3.2
 } camera_metadata_enum_android_lens_optical_stabilization_mode_t;
 
 // ANDROID_LENS_FACING
 typedef enum camera_metadata_enum_android_lens_facing {
-    ANDROID_LENS_FACING_FRONT,
-    ANDROID_LENS_FACING_BACK,
-    ANDROID_LENS_FACING_EXTERNAL,
+    ANDROID_LENS_FACING_FRONT                                       , // HIDL v3.2
+    ANDROID_LENS_FACING_BACK                                        , // HIDL v3.2
+    ANDROID_LENS_FACING_EXTERNAL                                    , // HIDL v3.2
 } camera_metadata_enum_android_lens_facing_t;
 
 // ANDROID_LENS_STATE
 typedef enum camera_metadata_enum_android_lens_state {
-    ANDROID_LENS_STATE_STATIONARY,
-    ANDROID_LENS_STATE_MOVING,
+    ANDROID_LENS_STATE_STATIONARY                                   , // HIDL v3.2
+    ANDROID_LENS_STATE_MOVING                                       , // HIDL v3.2
 } camera_metadata_enum_android_lens_state_t;
 
 
 // ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION
 typedef enum camera_metadata_enum_android_lens_info_focus_distance_calibration {
-    ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION_UNCALIBRATED,
-    ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION_APPROXIMATE,
-    ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED,
+    ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION_UNCALIBRATED       , // HIDL v3.2
+    ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION_APPROXIMATE        , // HIDL v3.2
+    ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION_CALIBRATED         , // HIDL v3.2
 } camera_metadata_enum_android_lens_info_focus_distance_calibration_t;
 
 
 // ANDROID_NOISE_REDUCTION_MODE
 typedef enum camera_metadata_enum_android_noise_reduction_mode {
-    ANDROID_NOISE_REDUCTION_MODE_OFF,
-    ANDROID_NOISE_REDUCTION_MODE_FAST,
-    ANDROID_NOISE_REDUCTION_MODE_HIGH_QUALITY,
-    ANDROID_NOISE_REDUCTION_MODE_MINIMAL,
-    ANDROID_NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG,
+    ANDROID_NOISE_REDUCTION_MODE_OFF                                , // HIDL v3.2
+    ANDROID_NOISE_REDUCTION_MODE_FAST                               , // HIDL v3.2
+    ANDROID_NOISE_REDUCTION_MODE_HIGH_QUALITY                       , // HIDL v3.2
+    ANDROID_NOISE_REDUCTION_MODE_MINIMAL                            , // HIDL v3.2
+    ANDROID_NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG                   , // HIDL v3.2
 } camera_metadata_enum_android_noise_reduction_mode_t;
 
 
 // ANDROID_QUIRKS_PARTIAL_RESULT
 typedef enum camera_metadata_enum_android_quirks_partial_result {
-    ANDROID_QUIRKS_PARTIAL_RESULT_FINAL,
-    ANDROID_QUIRKS_PARTIAL_RESULT_PARTIAL,
+    ANDROID_QUIRKS_PARTIAL_RESULT_FINAL                             , // HIDL v3.2
+    ANDROID_QUIRKS_PARTIAL_RESULT_PARTIAL                           , // HIDL v3.2
 } camera_metadata_enum_android_quirks_partial_result_t;
 
 
 // ANDROID_REQUEST_METADATA_MODE
 typedef enum camera_metadata_enum_android_request_metadata_mode {
-    ANDROID_REQUEST_METADATA_MODE_NONE,
-    ANDROID_REQUEST_METADATA_MODE_FULL,
+    ANDROID_REQUEST_METADATA_MODE_NONE                              , // HIDL v3.2
+    ANDROID_REQUEST_METADATA_MODE_FULL                              , // HIDL v3.2
 } camera_metadata_enum_android_request_metadata_mode_t;
 
 // ANDROID_REQUEST_TYPE
 typedef enum camera_metadata_enum_android_request_type {
-    ANDROID_REQUEST_TYPE_CAPTURE,
-    ANDROID_REQUEST_TYPE_REPROCESS,
+    ANDROID_REQUEST_TYPE_CAPTURE                                    , // HIDL v3.2
+    ANDROID_REQUEST_TYPE_REPROCESS                                  , // HIDL v3.2
 } camera_metadata_enum_android_request_type_t;
 
 // ANDROID_REQUEST_AVAILABLE_CAPABILITIES
 typedef enum camera_metadata_enum_android_request_available_capabilities {
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_RAW,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT,
-    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO,
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE      , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR            , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MANUAL_POST_PROCESSING   , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_RAW                      , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING     , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS     , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE            , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_YUV_REPROCESSING         , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT             , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO
+                                                                     , // HIDL v3.2
 } camera_metadata_enum_android_request_available_capabilities_t;
 
 
 // ANDROID_SCALER_AVAILABLE_FORMATS
 typedef enum camera_metadata_enum_android_scaler_available_formats {
-    ANDROID_SCALER_AVAILABLE_FORMATS_RAW16                      = 0x20,
-    ANDROID_SCALER_AVAILABLE_FORMATS_RAW_OPAQUE                 = 0x24,
-    ANDROID_SCALER_AVAILABLE_FORMATS_YV12                       = 0x32315659,
-    ANDROID_SCALER_AVAILABLE_FORMATS_YCrCb_420_SP               = 0x11,
-    ANDROID_SCALER_AVAILABLE_FORMATS_IMPLEMENTATION_DEFINED     = 0x22,
-    ANDROID_SCALER_AVAILABLE_FORMATS_YCbCr_420_888              = 0x23,
-    ANDROID_SCALER_AVAILABLE_FORMATS_BLOB                       = 0x21,
+    ANDROID_SCALER_AVAILABLE_FORMATS_RAW16                           = 0x20, // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_FORMATS_RAW_OPAQUE                      = 0x24, // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_FORMATS_YV12                            = 0x32315659, // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_FORMATS_YCrCb_420_SP                    = 0x11, // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_FORMATS_IMPLEMENTATION_DEFINED          = 0x22, // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_FORMATS_YCbCr_420_888                   = 0x23, // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_FORMATS_BLOB                            = 0x21, // HIDL v3.2
 } camera_metadata_enum_android_scaler_available_formats_t;
 
 // ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS
 typedef enum camera_metadata_enum_android_scaler_available_stream_configurations {
-    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
-    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_INPUT,
+    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT           , // HIDL v3.2
+    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_INPUT            , // HIDL v3.2
 } camera_metadata_enum_android_scaler_available_stream_configurations_t;
 
 // ANDROID_SCALER_CROPPING_TYPE
 typedef enum camera_metadata_enum_android_scaler_cropping_type {
-    ANDROID_SCALER_CROPPING_TYPE_CENTER_ONLY,
-    ANDROID_SCALER_CROPPING_TYPE_FREEFORM,
+    ANDROID_SCALER_CROPPING_TYPE_CENTER_ONLY                        , // HIDL v3.2
+    ANDROID_SCALER_CROPPING_TYPE_FREEFORM                           , // HIDL v3.2
 } camera_metadata_enum_android_scaler_cropping_type_t;
 
 
 // ANDROID_SENSOR_REFERENCE_ILLUMINANT1
 typedef enum camera_metadata_enum_android_sensor_reference_illuminant1 {
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_DAYLIGHT               = 1,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_FLUORESCENT            = 2,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_TUNGSTEN               = 3,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_FLASH                  = 4,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_FINE_WEATHER           = 9,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_CLOUDY_WEATHER         = 10,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_SHADE                  = 11,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_DAYLIGHT_FLUORESCENT   = 12,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_DAY_WHITE_FLUORESCENT  = 13,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_COOL_WHITE_FLUORESCENT = 14,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_WHITE_FLUORESCENT      = 15,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_STANDARD_A             = 17,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_STANDARD_B             = 18,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_STANDARD_C             = 19,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D55                    = 20,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D65                    = 21,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D75                    = 22,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D50                    = 23,
-    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_ISO_STUDIO_TUNGSTEN    = 24,
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_DAYLIGHT                    = 1, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_FLUORESCENT                 = 2, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_TUNGSTEN                    = 3, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_FLASH                       = 4, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_FINE_WEATHER                = 9, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_CLOUDY_WEATHER              = 10, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_SHADE                       = 11, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_DAYLIGHT_FLUORESCENT        = 12, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_DAY_WHITE_FLUORESCENT       = 13, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_COOL_WHITE_FLUORESCENT      = 14, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_WHITE_FLUORESCENT           = 15, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_STANDARD_A                  = 17, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_STANDARD_B                  = 18, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_STANDARD_C                  = 19, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D55                         = 20, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D65                         = 21, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D75                         = 22, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_D50                         = 23, // HIDL v3.2
+    ANDROID_SENSOR_REFERENCE_ILLUMINANT1_ISO_STUDIO_TUNGSTEN         = 24, // HIDL v3.2
 } camera_metadata_enum_android_sensor_reference_illuminant1_t;
 
 // ANDROID_SENSOR_TEST_PATTERN_MODE
 typedef enum camera_metadata_enum_android_sensor_test_pattern_mode {
-    ANDROID_SENSOR_TEST_PATTERN_MODE_OFF,
-    ANDROID_SENSOR_TEST_PATTERN_MODE_SOLID_COLOR,
-    ANDROID_SENSOR_TEST_PATTERN_MODE_COLOR_BARS,
-    ANDROID_SENSOR_TEST_PATTERN_MODE_COLOR_BARS_FADE_TO_GRAY,
-    ANDROID_SENSOR_TEST_PATTERN_MODE_PN9,
-    ANDROID_SENSOR_TEST_PATTERN_MODE_CUSTOM1                    = 256,
+    ANDROID_SENSOR_TEST_PATTERN_MODE_OFF                            , // HIDL v3.2
+    ANDROID_SENSOR_TEST_PATTERN_MODE_SOLID_COLOR                    , // HIDL v3.2
+    ANDROID_SENSOR_TEST_PATTERN_MODE_COLOR_BARS                     , // HIDL v3.2
+    ANDROID_SENSOR_TEST_PATTERN_MODE_COLOR_BARS_FADE_TO_GRAY        , // HIDL v3.2
+    ANDROID_SENSOR_TEST_PATTERN_MODE_PN9                            , // HIDL v3.2
+    ANDROID_SENSOR_TEST_PATTERN_MODE_CUSTOM1                         = 256, // HIDL v3.2
 } camera_metadata_enum_android_sensor_test_pattern_mode_t;
 
 
 // ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
 typedef enum camera_metadata_enum_android_sensor_info_color_filter_arrangement {
-    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGGB,
-    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GRBG,
-    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GBRG,
-    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_BGGR,
-    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGB,
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGGB               , // HIDL v3.2
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GRBG               , // HIDL v3.2
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GBRG               , // HIDL v3.2
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_BGGR               , // HIDL v3.2
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGB                , // HIDL v3.2
 } camera_metadata_enum_android_sensor_info_color_filter_arrangement_t;
 
 // ANDROID_SENSOR_INFO_TIMESTAMP_SOURCE
 typedef enum camera_metadata_enum_android_sensor_info_timestamp_source {
-    ANDROID_SENSOR_INFO_TIMESTAMP_SOURCE_UNKNOWN,
-    ANDROID_SENSOR_INFO_TIMESTAMP_SOURCE_REALTIME,
+    ANDROID_SENSOR_INFO_TIMESTAMP_SOURCE_UNKNOWN                    , // HIDL v3.2
+    ANDROID_SENSOR_INFO_TIMESTAMP_SOURCE_REALTIME                   , // HIDL v3.2
 } camera_metadata_enum_android_sensor_info_timestamp_source_t;
 
 // ANDROID_SENSOR_INFO_LENS_SHADING_APPLIED
 typedef enum camera_metadata_enum_android_sensor_info_lens_shading_applied {
-    ANDROID_SENSOR_INFO_LENS_SHADING_APPLIED_FALSE,
-    ANDROID_SENSOR_INFO_LENS_SHADING_APPLIED_TRUE,
+    ANDROID_SENSOR_INFO_LENS_SHADING_APPLIED_FALSE                  , // HIDL v3.2
+    ANDROID_SENSOR_INFO_LENS_SHADING_APPLIED_TRUE                   , // HIDL v3.2
 } camera_metadata_enum_android_sensor_info_lens_shading_applied_t;
 
 
 // ANDROID_SHADING_MODE
 typedef enum camera_metadata_enum_android_shading_mode {
-    ANDROID_SHADING_MODE_OFF,
-    ANDROID_SHADING_MODE_FAST,
-    ANDROID_SHADING_MODE_HIGH_QUALITY,
+    ANDROID_SHADING_MODE_OFF                                        , // HIDL v3.2
+    ANDROID_SHADING_MODE_FAST                                       , // HIDL v3.2
+    ANDROID_SHADING_MODE_HIGH_QUALITY                               , // HIDL v3.2
 } camera_metadata_enum_android_shading_mode_t;
 
 
 // ANDROID_STATISTICS_FACE_DETECT_MODE
 typedef enum camera_metadata_enum_android_statistics_face_detect_mode {
-    ANDROID_STATISTICS_FACE_DETECT_MODE_OFF,
-    ANDROID_STATISTICS_FACE_DETECT_MODE_SIMPLE,
-    ANDROID_STATISTICS_FACE_DETECT_MODE_FULL,
+    ANDROID_STATISTICS_FACE_DETECT_MODE_OFF                         , // HIDL v3.2
+    ANDROID_STATISTICS_FACE_DETECT_MODE_SIMPLE                      , // HIDL v3.2
+    ANDROID_STATISTICS_FACE_DETECT_MODE_FULL                        , // HIDL v3.2
 } camera_metadata_enum_android_statistics_face_detect_mode_t;
 
 // ANDROID_STATISTICS_HISTOGRAM_MODE
 typedef enum camera_metadata_enum_android_statistics_histogram_mode {
-    ANDROID_STATISTICS_HISTOGRAM_MODE_OFF,
-    ANDROID_STATISTICS_HISTOGRAM_MODE_ON,
+    ANDROID_STATISTICS_HISTOGRAM_MODE_OFF                           , // HIDL v3.2
+    ANDROID_STATISTICS_HISTOGRAM_MODE_ON                            , // HIDL v3.2
 } camera_metadata_enum_android_statistics_histogram_mode_t;
 
 // ANDROID_STATISTICS_SHARPNESS_MAP_MODE
 typedef enum camera_metadata_enum_android_statistics_sharpness_map_mode {
-    ANDROID_STATISTICS_SHARPNESS_MAP_MODE_OFF,
-    ANDROID_STATISTICS_SHARPNESS_MAP_MODE_ON,
+    ANDROID_STATISTICS_SHARPNESS_MAP_MODE_OFF                       , // HIDL v3.2
+    ANDROID_STATISTICS_SHARPNESS_MAP_MODE_ON                        , // HIDL v3.2
 } camera_metadata_enum_android_statistics_sharpness_map_mode_t;
 
 // ANDROID_STATISTICS_HOT_PIXEL_MAP_MODE
 typedef enum camera_metadata_enum_android_statistics_hot_pixel_map_mode {
-    ANDROID_STATISTICS_HOT_PIXEL_MAP_MODE_OFF,
-    ANDROID_STATISTICS_HOT_PIXEL_MAP_MODE_ON,
+    ANDROID_STATISTICS_HOT_PIXEL_MAP_MODE_OFF                       , // HIDL v3.2
+    ANDROID_STATISTICS_HOT_PIXEL_MAP_MODE_ON                        , // HIDL v3.2
 } camera_metadata_enum_android_statistics_hot_pixel_map_mode_t;
 
 // ANDROID_STATISTICS_SCENE_FLICKER
 typedef enum camera_metadata_enum_android_statistics_scene_flicker {
-    ANDROID_STATISTICS_SCENE_FLICKER_NONE,
-    ANDROID_STATISTICS_SCENE_FLICKER_50HZ,
-    ANDROID_STATISTICS_SCENE_FLICKER_60HZ,
+    ANDROID_STATISTICS_SCENE_FLICKER_NONE                           , // HIDL v3.2
+    ANDROID_STATISTICS_SCENE_FLICKER_50HZ                           , // HIDL v3.2
+    ANDROID_STATISTICS_SCENE_FLICKER_60HZ                           , // HIDL v3.2
 } camera_metadata_enum_android_statistics_scene_flicker_t;
 
 // ANDROID_STATISTICS_LENS_SHADING_MAP_MODE
 typedef enum camera_metadata_enum_android_statistics_lens_shading_map_mode {
-    ANDROID_STATISTICS_LENS_SHADING_MAP_MODE_OFF,
-    ANDROID_STATISTICS_LENS_SHADING_MAP_MODE_ON,
+    ANDROID_STATISTICS_LENS_SHADING_MAP_MODE_OFF                    , // HIDL v3.2
+    ANDROID_STATISTICS_LENS_SHADING_MAP_MODE_ON                     , // HIDL v3.2
 } camera_metadata_enum_android_statistics_lens_shading_map_mode_t;
 
 
 
 // ANDROID_TONEMAP_MODE
 typedef enum camera_metadata_enum_android_tonemap_mode {
-    ANDROID_TONEMAP_MODE_CONTRAST_CURVE,
-    ANDROID_TONEMAP_MODE_FAST,
-    ANDROID_TONEMAP_MODE_HIGH_QUALITY,
-    ANDROID_TONEMAP_MODE_GAMMA_VALUE,
-    ANDROID_TONEMAP_MODE_PRESET_CURVE,
+    ANDROID_TONEMAP_MODE_CONTRAST_CURVE                             , // HIDL v3.2
+    ANDROID_TONEMAP_MODE_FAST                                       , // HIDL v3.2
+    ANDROID_TONEMAP_MODE_HIGH_QUALITY                               , // HIDL v3.2
+    ANDROID_TONEMAP_MODE_GAMMA_VALUE                                , // HIDL v3.2
+    ANDROID_TONEMAP_MODE_PRESET_CURVE                               , // HIDL v3.2
 } camera_metadata_enum_android_tonemap_mode_t;
 
 // ANDROID_TONEMAP_PRESET_CURVE
 typedef enum camera_metadata_enum_android_tonemap_preset_curve {
-    ANDROID_TONEMAP_PRESET_CURVE_SRGB,
-    ANDROID_TONEMAP_PRESET_CURVE_REC709,
+    ANDROID_TONEMAP_PRESET_CURVE_SRGB                               , // HIDL v3.2
+    ANDROID_TONEMAP_PRESET_CURVE_REC709                             , // HIDL v3.2
 } camera_metadata_enum_android_tonemap_preset_curve_t;
 
 
 // ANDROID_LED_TRANSMIT
 typedef enum camera_metadata_enum_android_led_transmit {
-    ANDROID_LED_TRANSMIT_OFF,
-    ANDROID_LED_TRANSMIT_ON,
+    ANDROID_LED_TRANSMIT_OFF                                        , // HIDL v3.2
+    ANDROID_LED_TRANSMIT_ON                                         , // HIDL v3.2
 } camera_metadata_enum_android_led_transmit_t;
 
 // ANDROID_LED_AVAILABLE_LEDS
 typedef enum camera_metadata_enum_android_led_available_leds {
-    ANDROID_LED_AVAILABLE_LEDS_TRANSMIT,
+    ANDROID_LED_AVAILABLE_LEDS_TRANSMIT                             , // HIDL v3.2
 } camera_metadata_enum_android_led_available_leds_t;
 
 
 // ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL
 typedef enum camera_metadata_enum_android_info_supported_hardware_level {
-    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
-    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_FULL,
-    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
-    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_3,
+    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED                   , // HIDL v3.2
+    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_FULL                      , // HIDL v3.2
+    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY                    , // HIDL v3.2
+    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_3                         , // HIDL v3.2
 } camera_metadata_enum_android_info_supported_hardware_level_t;
 
 
 // ANDROID_BLACK_LEVEL_LOCK
 typedef enum camera_metadata_enum_android_black_level_lock {
-    ANDROID_BLACK_LEVEL_LOCK_OFF,
-    ANDROID_BLACK_LEVEL_LOCK_ON,
+    ANDROID_BLACK_LEVEL_LOCK_OFF                                    , // HIDL v3.2
+    ANDROID_BLACK_LEVEL_LOCK_ON                                     , // HIDL v3.2
 } camera_metadata_enum_android_black_level_lock_t;
 
 
 // ANDROID_SYNC_FRAME_NUMBER
 typedef enum camera_metadata_enum_android_sync_frame_number {
-    ANDROID_SYNC_FRAME_NUMBER_CONVERGING                        = -1,
-    ANDROID_SYNC_FRAME_NUMBER_UNKNOWN                           = -2,
+    ANDROID_SYNC_FRAME_NUMBER_CONVERGING                             = -1, // HIDL v3.2
+    ANDROID_SYNC_FRAME_NUMBER_UNKNOWN                                = -2, // HIDL v3.2
 } camera_metadata_enum_android_sync_frame_number_t;
 
 // ANDROID_SYNC_MAX_LATENCY
 typedef enum camera_metadata_enum_android_sync_max_latency {
-    ANDROID_SYNC_MAX_LATENCY_PER_FRAME_CONTROL                  = 0,
-    ANDROID_SYNC_MAX_LATENCY_UNKNOWN                            = -1,
+    ANDROID_SYNC_MAX_LATENCY_PER_FRAME_CONTROL                       = 0, // HIDL v3.2
+    ANDROID_SYNC_MAX_LATENCY_UNKNOWN                                 = -1, // HIDL v3.2
 } camera_metadata_enum_android_sync_max_latency_t;
 
 
 
 // ANDROID_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS
 typedef enum camera_metadata_enum_android_depth_available_depth_stream_configurations {
-    ANDROID_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS_OUTPUT,
-    ANDROID_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS_INPUT,
+    ANDROID_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS_OUTPUT      , // HIDL v3.2
+    ANDROID_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS_INPUT       , // HIDL v3.2
 } camera_metadata_enum_android_depth_available_depth_stream_configurations_t;
 
 // ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE
 typedef enum camera_metadata_enum_android_depth_depth_is_exclusive {
-    ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_FALSE,
-    ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_TRUE,
+    ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_FALSE                          , // HIDL v3.2
+    ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_TRUE                           , // HIDL v3.2
 } camera_metadata_enum_android_depth_depth_is_exclusive_t;
 
 
