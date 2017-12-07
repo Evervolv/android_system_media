@@ -1349,6 +1349,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             For example, the application may wish to manually control
             android.sensor.exposureTime, android.sensor.sensitivity, etc.
             </notes></value>
+            <value hal_version="3.3">MOTION_TRACKING
+            <notes>This request is for a motion tracking use case, where
+            the application will use camera and inertial sensor data to
+            locate and track objects in the world.
+
+            The camera device auto-exposure routine will limit the exposure time
+            of the camera to no more than 20 milliseconds, to minimize motion blur.
+            </notes></value>
           </enum>
           <description>Information to the camera device 3A (auto-exposure,
           auto-focus, auto-white balance) routines about the purpose
@@ -1357,10 +1365,13 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>This control (except for MANUAL) is only effective if
           `android.control.mode != OFF` and any 3A routine is active.
 
-          ZERO_SHUTTER_LAG will be supported if android.request.availableCapabilities
-          contains PRIVATE_REPROCESSING or YUV_REPROCESSING. MANUAL will be supported if
-          android.request.availableCapabilities contains MANUAL_SENSOR. Other intent values are
-          always supported.
+          All intents are supported by all devices, except that:
+            * ZERO_SHUTTER_LAG will be supported if android.request.availableCapabilities contains
+          PRIVATE_REPROCESSING or YUV_REPROCESSING.
+            * MANUAL will be supported if android.request.availableCapabilities contains
+          MANUAL_SENSOR.
+            * MOTION_TRACKING will be supported if android.request.availableCapabilities contains
+          MOTION_TRACKING.
           </details>
           <tag id="BC" />
         </entry>
@@ -3841,36 +3852,33 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <units>Meters</units>
           <details>
             The position of the camera device's lens optical center,
-            as a three-dimensional vector `(x,y,z)`, relative to the
-            optical center of the largest camera device facing in the
-            same direction as this camera, in the {@link
-            android.hardware.SensorEvent Android sensor coordinate
-            axes}. Note that only the axis definitions are shared with
-            the sensor coordinate system, but not the origin.
+            as a three-dimensional vector `(x,y,z)`.
 
-            If this device is the largest or only camera device with a
-            given facing, then this position will be `(0, 0, 0)`; a
-            camera device with a lens optical center located 3 cm from
-            the main sensor along the +X axis (to the right from the
-            user's perspective) will report `(0.03, 0, 0)`.
+            Prior to Android P, or when android.lens.poseReference is PRIMARY_CAMERA, this position
+            is relative to the optical center of the largest camera device facing in the same
+            direction as this camera, in the {@link android.hardware.SensorEvent Android sensor
+            coordinate axes}. Note that only the axis definitions are shared with the sensor
+            coordinate system, but not the origin.
 
-            To transform a pixel coordinates between two cameras
-            facing the same direction, first the source camera
-            android.lens.radialDistortion must be corrected for.  Then
-            the source camera android.lens.intrinsicCalibration needs
-            to be applied, followed by the android.lens.poseRotation
-            of the source camera, the translation of the source camera
-            relative to the destination camera, the
-            android.lens.poseRotation of the destination camera, and
-            finally the inverse of android.lens.intrinsicCalibration
-            of the destination camera. This obtains a
-            radial-distortion-free coordinate in the destination
-            camera pixel coordinates.
+            If this device is the largest or only camera device with a given facing, then this
+            position will be `(0, 0, 0)`; a camera device with a lens optical center located 3 cm
+            from the main sensor along the +X axis (to the right from the user's perspective) will
+            report `(0.03, 0, 0)`.
 
-            To compare this against a real image from the destination
-            camera, the destination camera image then needs to be
-            corrected for radial distortion before comparison or
-            sampling.
+            To transform a pixel coordinates between two cameras facing the same direction, first
+            the source camera android.lens.radialDistortion must be corrected for.  Then the source
+            camera android.lens.intrinsicCalibration needs to be applied, followed by the
+            android.lens.poseRotation of the source camera, the translation of the source camera
+            relative to the destination camera, the android.lens.poseRotation of the destination
+            camera, and finally the inverse of android.lens.intrinsicCalibration of the destination
+            camera. This obtains a radial-distortion-free coordinate in the destination camera pixel
+            coordinates.
+
+            To compare this against a real image from the destination camera, the destination camera
+            image then needs to be corrected for radial distortion before comparison or sampling.
+
+            When android.lens.poseReference is GYROSCOPE, then this position is relative to
+            the center of the primary gyroscope on the device.
           </details>
           <tag id="DEPTH" />
         </entry>
@@ -4078,6 +4086,37 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <clone entry="android.lens.radialDistortion" kind="static">
         </clone>
       </dynamic>
+      <static>
+        <entry name="poseReference" type="byte" visibility="public" enum="true" hal_version="3.3">
+          <enum>
+            <value>PRIMARY_CAMERA
+            <notes>The value of android.lens.poseTranslation is relative to the optical center of
+            the largest camera device facing the same direction as this camera.
+
+            This default value for API levels before Android P.
+            </notes>
+            </value>
+            <value>GYROSCOPE
+            <notes>The value of android.lens.poseTranslation is relative to the position of the
+            primary gyroscope of this Android device.
+
+            This is the value reported by all devices that support the MOTION_TRACKING capability.
+            </notes>
+            </value>
+          </enum>
+          <description>
+            The origin for android.lens.poseTranslation.
+          </description>
+          <details>
+            Different calibration methods and use cases can produce better or worse results
+            depending on the selected coordinate origin.
+
+            For devices designed to support the MOTION_TRACKING capability, the GYROSCOPE origin
+            makes device calibration and later usage by applications combining camera and gyroscope
+            information together simpler.
+          </details>
+        </entry>
+      </static>
     </section>
     <section name="noiseReduction">
       <controls>
@@ -4945,6 +4984,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                   - android.lens.intrinsicCalibration
                   - android.lens.radialDistortion
               * The android.depth.depthIsExclusive entry is listed by this device.
+              * As of Android P, the android.lens.poseReference entry is listed by this device.
               * A LIMITED camera with only the DEPTH_OUTPUT capability does not have to support
                 normal YUV_420_888, JPEG, and PRIV-format outputs. It only has to support the DEPTH16
                 format.
@@ -5039,6 +5079,42 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               reconfigurations, which may introduce extra latency. It is recommended that
               the application avoids unnecessary maximum target FPS changes as much as possible
               during high speed streaming.
+              </notes>
+            </value>
+            <value optional="true" hal_version="3.3" >MOTION_TRACKING
+              <notes>
+              The device supports controls and metadata required for accurate motion tracking for
+              use cases such as augmented reality, electronic image stabilization, and so on.
+
+              This means this camera device has accurate optical calibration and timestamps relative
+              to the inertial sensors.
+
+              This capability requires the camera device to support the following:
+
+              * Capture request templates {@link
+                android.hardware.camera2.CameraDevice#TEMPLATE_MOTION_TRACKING_PREVIEW} and {@link
+                android.hardware.camera2.CameraDevice#TEMPLATE_MOTION_TRACKING_BEST} are defined.
+              * The stream configurations listed in {@link
+                android.hardware.camera2.CameraDevice#createCaptureSession} for MOTION_TRACKING are
+                supported, either at 30 or 60fps maximum frame rate.
+              * The following camera characteristics and capture result metadata are provided:
+                  - android.lens.intrinsicCalibration
+                  - android.lens.radialDistortion
+                  - android.lens.poseRotation
+                  - android.lens.poseTranslation
+                  - android.lens.poseReference with value GYROSCOPE
+              * The android.sensor.info.timestampSource field has value `REALTIME`. When compared to
+                timestamps from the device's gyroscopes, the clock difference for events occuring at
+                the same actual time instant will be less than 1 ms.
+              * The value of the android.sensor.rollingShutterSkew field is accurate to within 1 ms.
+              * The value of android.sensor.exposureTime is guaranteed to be available in the
+                capture result.
+              * The android.control.captureIntent control supports MOTION_TRACKING to limit maximum
+                exposure to 20 milliseconds.
+              * The stream configurations required for MOTION_TRACKING (listed at {@link
+                android.hardware.camera2.CameraDevice#createCaptureSession}) can operate at least at
+                30fps; optionally, they can operate at 60fps, and '[60, 60]' is listed in
+                android.control.aeAvailableTargetFpsRanges.
               </notes>
             </value>
           </enum>
@@ -5229,8 +5305,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           lifetime. Typical examples include parameters that require a
           time-consuming hardware re-configuration or internal camera pipeline
           change. For performance reasons we advise clients to pass their initial
-          values as part of
-          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.i
+          values as part of 
+          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.
           Once the camera capture session is enabled it is also recommended to avoid
           changing them from their initial values set in
           {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.

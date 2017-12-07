@@ -320,6 +320,8 @@ static tag_info_t android_lens[ANDROID_LENS_END -
     { "intrinsicCalibration",          TYPE_FLOAT  },
     [ ANDROID_LENS_RADIAL_DISTORTION - ANDROID_LENS_START ] =
     { "radialDistortion",              TYPE_FLOAT  },
+    [ ANDROID_LENS_POSE_REFERENCE - ANDROID_LENS_START ] =
+    { "poseReference",                 TYPE_BYTE   },
 };
 
 static tag_info_t android_lens_info[ANDROID_LENS_INFO_END -
@@ -1004,6 +1006,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "MANUAL";
                     ret = 0;
                     break;
+                case ANDROID_CONTROL_CAPTURE_INTENT_MOTION_TRACKING:
+                    msg = "MOTION_TRACKING";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
@@ -1643,6 +1649,21 @@ int camera_metadata_enum_snprint(uint32_t tag,
         case ANDROID_LENS_RADIAL_DISTORTION: {
             break;
         }
+        case ANDROID_LENS_POSE_REFERENCE: {
+            switch (value) {
+                case ANDROID_LENS_POSE_REFERENCE_PRIMARY_CAMERA:
+                    msg = "PRIMARY_CAMERA";
+                    ret = 0;
+                    break;
+                case ANDROID_LENS_POSE_REFERENCE_GYROSCOPE:
+                    msg = "GYROSCOPE";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
 
         case ANDROID_LENS_INFO_AVAILABLE_APERTURES: {
             break;
@@ -1847,6 +1868,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     break;
                 case ANDROID_REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO:
                     msg = "CONSTRAINED_HIGH_SPEED_VIDEO";
+                    ret = 0;
+                    break;
+                case ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MOTION_TRACKING:
+                    msg = "MOTION_TRACKING";
                     ret = 0;
                     break;
                 default:
