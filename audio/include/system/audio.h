@@ -1178,6 +1178,10 @@ __END_DECLS
 /* Screen state */
 #define AUDIO_PARAMETER_KEY_SCREEN_STATE "screen_state"
 
+/* User's preferred audio language setting (in ISO 639-2/T three-letter string code)
+ * used to select a specific language presentation for next generation audio codecs. */
+#define AUDIO_PARAMETER_KEY_AUDIO_LANGUAGE_PREFERRED "audio_language_preferred"
+
 /**
  *  audio stream parameters
  */
