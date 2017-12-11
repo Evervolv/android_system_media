@@ -107,7 +107,7 @@ typedef enum camera_metadata_section_start {
  * system/media/camera/src/camera_metadata_tag_info.c
  */
 typedef enum camera_metadata_tag {
-    ANDROID_COLOR_CORRECTION_MODE =                   // enum         | public
+    ANDROID_COLOR_CORRECTION_MODE =                   // enum         | public       | HIDL v3.2
             ANDROID_COLOR_CORRECTION_START,
     ANDROID_COLOR_CORRECTION_TRANSFORM,               // rational[]   | public       | HIDL v3.2
     ANDROID_COLOR_CORRECTION_GAINS,                   // float[]      | public       | HIDL v3.2
@@ -116,7 +116,7 @@ typedef enum camera_metadata_tag {
                                                       // byte[]       | public       | HIDL v3.2
     ANDROID_COLOR_CORRECTION_END,
 
-    ANDROID_CONTROL_AE_ANTIBANDING_MODE =             // enum         | public
+    ANDROID_CONTROL_AE_ANTIBANDING_MODE =             // enum         | public       | HIDL v3.2
             ANDROID_CONTROL_START,
     ANDROID_CONTROL_AE_EXPOSURE_COMPENSATION,         // int32        | public       | HIDL v3.2
     ANDROID_CONTROL_AE_LOCK,                          // enum         | public       | HIDL v3.2
@@ -164,17 +164,17 @@ typedef enum camera_metadata_tag {
     ANDROID_CONTROL_AF_SCENE_CHANGE,                  // enum         | public       | HIDL v3.3
     ANDROID_CONTROL_END,
 
-    ANDROID_DEMOSAIC_MODE =                           // enum         | system
+    ANDROID_DEMOSAIC_MODE =                           // enum         | system       | HIDL v3.2
             ANDROID_DEMOSAIC_START,
     ANDROID_DEMOSAIC_END,
 
-    ANDROID_EDGE_MODE =                               // enum         | public
+    ANDROID_EDGE_MODE =                               // enum         | public       | HIDL v3.2
             ANDROID_EDGE_START,
     ANDROID_EDGE_STRENGTH,                            // byte         | system       | HIDL v3.2
     ANDROID_EDGE_AVAILABLE_EDGE_MODES,                // byte[]       | public       | HIDL v3.2
     ANDROID_EDGE_END,
 
-    ANDROID_FLASH_FIRING_POWER =                      // byte         | system
+    ANDROID_FLASH_FIRING_POWER =                      // byte         | system       | HIDL v3.2
             ANDROID_FLASH_START,
     ANDROID_FLASH_FIRING_TIME,                        // int64        | system       | HIDL v3.2
     ANDROID_FLASH_MODE,                               // enum         | public       | HIDL v3.2
@@ -183,17 +183,17 @@ typedef enum camera_metadata_tag {
     ANDROID_FLASH_STATE,                              // enum         | public       | HIDL v3.2
     ANDROID_FLASH_END,
 
-    ANDROID_FLASH_INFO_AVAILABLE =                    // enum         | public
+    ANDROID_FLASH_INFO_AVAILABLE =                    // enum         | public       | HIDL v3.2
             ANDROID_FLASH_INFO_START,
     ANDROID_FLASH_INFO_CHARGE_DURATION,               // int64        | system       | HIDL v3.2
     ANDROID_FLASH_INFO_END,
 
-    ANDROID_HOT_PIXEL_MODE =                          // enum         | public
+    ANDROID_HOT_PIXEL_MODE =                          // enum         | public       | HIDL v3.2
             ANDROID_HOT_PIXEL_START,
     ANDROID_HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES,      // byte[]       | public       | HIDL v3.2
     ANDROID_HOT_PIXEL_END,
 
-    ANDROID_JPEG_GPS_COORDINATES =                    // double[]     | ndk_public
+    ANDROID_JPEG_GPS_COORDINATES =                    // double[]     | ndk_public   | HIDL v3.2
             ANDROID_JPEG_START,
     ANDROID_JPEG_GPS_PROCESSING_METHOD,               // byte         | ndk_public   | HIDL v3.2
     ANDROID_JPEG_GPS_TIMESTAMP,                       // int64        | ndk_public   | HIDL v3.2
@@ -206,7 +206,7 @@ typedef enum camera_metadata_tag {
     ANDROID_JPEG_SIZE,                                // int32        | system       | HIDL v3.2
     ANDROID_JPEG_END,
 
-    ANDROID_LENS_APERTURE =                           // float        | public
+    ANDROID_LENS_APERTURE =                           // float        | public       | HIDL v3.2
             ANDROID_LENS_START,
     ANDROID_LENS_FILTER_DENSITY,                      // float        | public       | HIDL v3.2
     ANDROID_LENS_FOCAL_LENGTH,                        // float        | public       | HIDL v3.2
@@ -221,7 +221,7 @@ typedef enum camera_metadata_tag {
     ANDROID_LENS_RADIAL_DISTORTION,                   // float[]      | public       | HIDL v3.2
     ANDROID_LENS_END,
 
-    ANDROID_LENS_INFO_AVAILABLE_APERTURES =           // float[]      | public
+    ANDROID_LENS_INFO_AVAILABLE_APERTURES =           // float[]      | public       | HIDL v3.2
             ANDROID_LENS_INFO_START,
     ANDROID_LENS_INFO_AVAILABLE_FILTER_DENSITIES,     // float[]      | public       | HIDL v3.2
     ANDROID_LENS_INFO_AVAILABLE_FOCAL_LENGTHS,        // float[]      | public       | HIDL v3.2
@@ -232,14 +232,14 @@ typedef enum camera_metadata_tag {
     ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION,     // enum         | public       | HIDL v3.2
     ANDROID_LENS_INFO_END,
 
-    ANDROID_NOISE_REDUCTION_MODE =                    // enum         | public
+    ANDROID_NOISE_REDUCTION_MODE =                    // enum         | public       | HIDL v3.2
             ANDROID_NOISE_REDUCTION_START,
     ANDROID_NOISE_REDUCTION_STRENGTH,                 // byte         | system       | HIDL v3.2
     ANDROID_NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES,
                                                       // byte[]       | public       | HIDL v3.2
     ANDROID_NOISE_REDUCTION_END,
 
-    ANDROID_QUIRKS_METERING_CROP_REGION =             // byte         | system
+    ANDROID_QUIRKS_METERING_CROP_REGION =             // byte         | system       | HIDL v3.2
             ANDROID_QUIRKS_START,
     ANDROID_QUIRKS_TRIGGER_AF_WITH_AUTO,              // byte         | system       | HIDL v3.2
     ANDROID_QUIRKS_USE_ZSL_FORMAT,                    // byte         | system       | HIDL v3.2
@@ -247,7 +247,7 @@ typedef enum camera_metadata_tag {
     ANDROID_QUIRKS_PARTIAL_RESULT,                    // enum         | hidden       | HIDL v3.2
     ANDROID_QUIRKS_END,
 
-    ANDROID_REQUEST_FRAME_COUNT =                     // int32        | hidden
+    ANDROID_REQUEST_FRAME_COUNT =                     // int32        | hidden       | HIDL v3.2
             ANDROID_REQUEST_START,
     ANDROID_REQUEST_ID,                               // int32        | hidden       | HIDL v3.2
     ANDROID_REQUEST_INPUT_STREAMS,                    // int32[]      | system       | HIDL v3.2
@@ -266,7 +266,7 @@ typedef enum camera_metadata_tag {
     ANDROID_REQUEST_AVAILABLE_CHARACTERISTICS_KEYS,   // int32[]      | ndk_public   | HIDL v3.2
     ANDROID_REQUEST_END,
 
-    ANDROID_SCALER_CROP_REGION =                      // int32[]      | public
+    ANDROID_SCALER_CROP_REGION =                      // int32[]      | public       | HIDL v3.2
             ANDROID_SCALER_START,
     ANDROID_SCALER_AVAILABLE_FORMATS,                 // enum[]       | hidden       | HIDL v3.2
     ANDROID_SCALER_AVAILABLE_JPEG_MIN_DURATIONS,      // int64[]      | hidden       | HIDL v3.2
@@ -283,7 +283,7 @@ typedef enum camera_metadata_tag {
     ANDROID_SCALER_CROPPING_TYPE,                     // enum         | public       | HIDL v3.2
     ANDROID_SCALER_END,
 
-    ANDROID_SENSOR_EXPOSURE_TIME =                    // int64        | public
+    ANDROID_SENSOR_EXPOSURE_TIME =                    // int64        | public       | HIDL v3.2
             ANDROID_SENSOR_START,
     ANDROID_SENSOR_FRAME_DURATION,                    // int64        | public       | HIDL v3.2
     ANDROID_SENSOR_SENSITIVITY,                       // int32        | public       | HIDL v3.2
@@ -317,7 +317,7 @@ typedef enum camera_metadata_tag {
     ANDROID_SENSOR_OPAQUE_RAW_SIZE,                   // int32[]      | system       | HIDL v3.2
     ANDROID_SENSOR_END,
 
-    ANDROID_SENSOR_INFO_ACTIVE_ARRAY_SIZE =           // int32[]      | public
+    ANDROID_SENSOR_INFO_ACTIVE_ARRAY_SIZE =           // int32[]      | public       | HIDL v3.2
             ANDROID_SENSOR_INFO_START,
     ANDROID_SENSOR_INFO_SENSITIVITY_RANGE,            // int32[]      | public       | HIDL v3.2
     ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT,     // enum         | public       | HIDL v3.2
@@ -332,13 +332,13 @@ typedef enum camera_metadata_tag {
                                                       // int32[]      | public       | HIDL v3.2
     ANDROID_SENSOR_INFO_END,
 
-    ANDROID_SHADING_MODE =                            // enum         | public
+    ANDROID_SHADING_MODE =                            // enum         | public       | HIDL v3.2
             ANDROID_SHADING_START,
     ANDROID_SHADING_STRENGTH,                         // byte         | system       | HIDL v3.2
     ANDROID_SHADING_AVAILABLE_MODES,                  // byte[]       | public       | HIDL v3.2
     ANDROID_SHADING_END,
 
-    ANDROID_STATISTICS_FACE_DETECT_MODE =             // enum         | public
+    ANDROID_STATISTICS_FACE_DETECT_MODE =             // enum         | public       | HIDL v3.2
             ANDROID_STATISTICS_START,
     ANDROID_STATISTICS_HISTOGRAM_MODE,                // enum         | system       | HIDL v3.2
     ANDROID_STATISTICS_SHARPNESS_MAP_MODE,            // enum         | system       | HIDL v3.2
@@ -359,7 +359,7 @@ typedef enum camera_metadata_tag {
     ANDROID_STATISTICS_END,
 
     ANDROID_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES = 
-                                                      // byte[]       | public
+                                                      // byte[]       | public       | HIDL v3.2
             ANDROID_STATISTICS_INFO_START,
     ANDROID_STATISTICS_INFO_HISTOGRAM_BUCKET_COUNT,   // int32        | system       | HIDL v3.2
     ANDROID_STATISTICS_INFO_MAX_FACE_COUNT,           // int32        | public       | HIDL v3.2
@@ -372,7 +372,7 @@ typedef enum camera_metadata_tag {
                                                       // byte[]       | public       | HIDL v3.2
     ANDROID_STATISTICS_INFO_END,
 
-    ANDROID_TONEMAP_CURVE_BLUE =                      // float[]      | ndk_public
+    ANDROID_TONEMAP_CURVE_BLUE =                      // float[]      | ndk_public   | HIDL v3.2
             ANDROID_TONEMAP_START,
     ANDROID_TONEMAP_CURVE_GREEN,                      // float[]      | ndk_public   | HIDL v3.2
     ANDROID_TONEMAP_CURVE_RED,                        // float[]      | ndk_public   | HIDL v3.2
@@ -383,30 +383,30 @@ typedef enum camera_metadata_tag {
     ANDROID_TONEMAP_PRESET_CURVE,                     // enum         | public       | HIDL v3.2
     ANDROID_TONEMAP_END,
 
-    ANDROID_LED_TRANSMIT =                            // enum         | hidden
+    ANDROID_LED_TRANSMIT =                            // enum         | hidden       | HIDL v3.2
             ANDROID_LED_START,
     ANDROID_LED_AVAILABLE_LEDS,                       // enum[]       | hidden       | HIDL v3.2
     ANDROID_LED_END,
 
-    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL =           // enum         | public
+    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL =           // enum         | public       | HIDL v3.2
             ANDROID_INFO_START,
     ANDROID_INFO_END,
 
-    ANDROID_BLACK_LEVEL_LOCK =                        // enum         | public
+    ANDROID_BLACK_LEVEL_LOCK =                        // enum         | public       | HIDL v3.2
             ANDROID_BLACK_LEVEL_START,
     ANDROID_BLACK_LEVEL_END,
 
-    ANDROID_SYNC_FRAME_NUMBER =                       // enum         | ndk_public
+    ANDROID_SYNC_FRAME_NUMBER =                       // enum         | ndk_public   | HIDL v3.2
             ANDROID_SYNC_START,
     ANDROID_SYNC_MAX_LATENCY,                         // enum         | public       | HIDL v3.2
     ANDROID_SYNC_END,
 
-    ANDROID_REPROCESS_EFFECTIVE_EXPOSURE_FACTOR =     // float        | java_public
+    ANDROID_REPROCESS_EFFECTIVE_EXPOSURE_FACTOR =     // float        | java_public  | HIDL v3.2
             ANDROID_REPROCESS_START,
     ANDROID_REPROCESS_MAX_CAPTURE_STALL,              // int32        | java_public  | HIDL v3.2
     ANDROID_REPROCESS_END,
 
-    ANDROID_DEPTH_MAX_DEPTH_SAMPLES =                 // int32        | system
+    ANDROID_DEPTH_MAX_DEPTH_SAMPLES =                 // int32        | system       | HIDL v3.2
             ANDROID_DEPTH_START,
     ANDROID_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS,
                                                       // enum[]       | ndk_public   | HIDL v3.2

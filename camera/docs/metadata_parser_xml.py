@@ -303,7 +303,7 @@ class MetadataParserXml:
 
     return d
 
-  def render(self, template, output_name=None):
+  def render(self, template, output_name=None, hal_version="3.2"):
     """
     Render the metadata model using a Mako template as the view.
 
@@ -315,9 +315,13 @@ class MetadataParserXml:
     Args:
       template: path to a Mako template file
       output_name: path to the output file, or None to use stdout
+      hal_version: target HAL version, used when generating HIDL HAL outputs.
+                   Must be a string of form "X.Y" where X and Y are integers.
     """
     buf = StringIO.StringIO()
     metadata_helpers._context_buf = buf
+    metadata_helpers._hal_major_version = int(hal_version.partition('.')[0])
+    metadata_helpers._hal_minor_version = int(hal_version.partition('.')[2])
 
     helpers = [(i, getattr(metadata_helpers, i))
                 for i in dir(metadata_helpers) if not i.startswith('_')]
@@ -344,14 +348,16 @@ class MetadataParserXml:
 if __name__ == "__main__":
   if len(sys.argv) <= 2:
     print >> sys.stderr,                                                       \
-           "Usage: %s <filename.xml> <template.mako> [<output_file>]"          \
+           "Usage: %s <filename.xml> <template.mako> [<output_file>] [<hal_version>]"          \
            % (sys.argv[0])
     sys.exit(0)
 
   file_name = sys.argv[1]
   template_name = sys.argv[2]
   output_name = sys.argv[3] if len(sys.argv) > 3 else None
+  hal_version = sys.argv[4] if len(sys.argv) > 4 else "3.2"
+
   parser = MetadataParserXml.create_from_file(file_name)
-  parser.render(template_name, output_name)
+  parser.render(template_name, output_name, hal_version)
 
   sys.exit(0)

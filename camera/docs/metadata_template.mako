@@ -120,8 +120,8 @@
                 hwlevel="${prop.hwlevel}"
           % endif
 
-          % if prop.hal_version != '3.2':
-                hal_version="${prop.hal_version}"
+          % if (prop.hal_major_version, prop.hal_minor_version) != (3,2):
+                hal_version="${prop.hal_major_version}.${prop.hal_minor_version}"
           % endif
             >
 

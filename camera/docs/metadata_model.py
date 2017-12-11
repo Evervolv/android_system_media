@@ -690,6 +690,7 @@ class Section(Node):
     kinds: A sequence of Kind children.
     merged_kinds: A sequence of virtual Kind children,
                   with each Kind's children merged by the kind.name
+    hal_versions: A set of tuples (major, minor) describing all the HAL versions entries in this section have
   """
   def __init__(self, name, parent, description=None, kinds=[]):
     self._name = name
@@ -699,7 +700,6 @@ class Section(Node):
 
     self._leafs = []
 
-
   @property
   def description(self):
     return self._description
@@ -707,6 +707,16 @@ class Section(Node):
   @property
   def kinds(self):
     return (i for i in self._kinds)
+
+  @property
+  def hal_versions(self):
+    hal_versions = set()
+    for i in self._kinds:
+      for entry in i.entries:
+        hal_versions.add( (entry.hal_major_version, entry.hal_minor_version) )
+      for namespace in i.namespaces:
+        hal_versions.update(namespace.hal_versions)
+    return hal_versions
 
   def sort_children(self):
     self.validate_tree()
@@ -884,6 +894,7 @@ class InnerNamespace(Node):
     namespaces: A sequence of InnerNamespace children.
     entries: A sequence of Entry/Clone children.
     merged_entries: A sequence of MergedEntry virtual nodes from entries
+    hal_versions: A set of tuples (major, minor) describing all the HAL versions entries in this section have
   """
   def __init__(self, name, parent):
     self._name        = name
@@ -899,6 +910,15 @@ class InnerNamespace(Node):
   @property
   def entries(self):
     return self._entries
+
+  @property
+  def hal_versions(self):
+    hal_versions = set()
+    for entry in self.entries:
+      hal_versions.add( (entry.hal_major_version, entry.hal_minor_version) )
+    for namespace in self.namespaces:
+      hal_versions.update(namespace.hal_versions)
+    return hal_versions
 
   @property
   def merged_entries(self):
@@ -1170,8 +1190,12 @@ class Entry(Node):
     return self._kind
 
   @property
-  def hal_version(self):
-    return self._hal_version
+  def hal_major_version(self):
+    return self._hal_major_version
+
+  @property
+  def hal_minor_version(self):
+    return self._hal_minor_version
 
   @property
   def visibility(self):
@@ -1300,9 +1324,13 @@ class Entry(Node):
     self._container = kwargs.get('container')
     self._container_sizes = kwargs.get('container_sizes')
 
-    self._hal_version = kwargs.get('hal_version')
-    if self._hal_version is None:
-      self._hal_version = '3.2'
+    hal_version = kwargs.get('hal_version')
+    if hal_version is None:
+      self._hal_major_version = 3
+      self._hal_minor_version = 2
+    else:
+      self._hal_major_version = int(hal_version.partition('.')[0])
+      self._hal_minor_version = int(hal_version.partition('.')[2])
 
     # access these via the 'enum' prop
     enum_values = kwargs.get('enum_values')
@@ -1547,7 +1575,8 @@ class MergedEntry(Entry):
                     'deprecated',
                     'optional',
                     'typedef',
-                    'hal_version'
+                    'hal_major_version',
+                    'hal_minor_version'
                    ]
 
     for p in props_common:

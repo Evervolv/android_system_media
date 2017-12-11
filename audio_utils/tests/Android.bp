@@ -190,3 +190,26 @@ cc_test {
         },
     }
 }
+
+cc_test {
+    name: "channels_tests",
+    host_supported: true,
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    srcs: ["channels_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    target: {
+        android: {
+            shared_libs: ["libaudioutils"],
+        },
+        host: {
+            static_libs: ["libaudioutils"],
+        },
+    }
+}
