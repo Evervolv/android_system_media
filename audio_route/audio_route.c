@@ -784,7 +784,6 @@ int audio_route_reset_path(struct audio_route *ar, const char *name)
 static int audio_route_update_path(struct audio_route *ar, const char *name, bool reverse)
 {
     struct mixer_path *path;
-    int32_t i, end;
     unsigned int j;
 
     if (!ar) {
@@ -798,14 +797,12 @@ static int audio_route_update_path(struct audio_route *ar, const char *name, boo
         return -1;
     }
 
-    i = reverse ? (path->length - 1) : 0;
-    end = reverse ? -1 : (int32_t)path->length;
 
-    while (i != end) {
+    for (size_t i = 0; i < path->length; ++i) {
         unsigned int ctl_index;
         enum mixer_ctl_type type;
 
-        ctl_index = path->setting[i].ctl_index;
+        ctl_index = path->setting[reverse ? path->length - 1 - i : i].ctl_index;
 
         struct mixer_state * ms = &ar->mixer_state[ctl_index];
 
@@ -836,8 +833,6 @@ static int audio_route_update_path(struct audio_route *ar, const char *name, boo
                 break;
             }
         }
-
-        i = reverse ? (i - 1) : (i + 1);
     }
     return 0;
 }
