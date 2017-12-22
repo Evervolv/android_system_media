@@ -788,7 +788,7 @@ def javadoc(metadata, indent = 4):
   javadoc comment section, given a set of metadata
 
   Args:
-    metadata: A Metadata instance, representing the the top-level root
+    metadata: A Metadata instance, representing the top-level root
       of the metadata for cross-referencing
     indent: baseline level of indentation for javadoc block
   Returns:
@@ -877,7 +877,7 @@ def ndkdoc(metadata, indent = 4):
   NDK camera API C/C++ comment section, given a set of metadata
 
   Args:
-    metadata: A Metadata instance, representing the the top-level root
+    metadata: A Metadata instance, representing the top-level root
       of the metadata for cross-referencing
     indent: baseline level of indentation for comment block
   Returns:
@@ -969,6 +969,98 @@ def ndkdoc(metadata, indent = 4):
     return ndktext
 
   return ndkdoc_formatter
+
+def hidldoc(metadata, indent = 4):
+  """
+  Returns a function to format a markdown syntax text block as a
+  HIDL camera HAL module C/C++ comment section, given a set of metadata
+
+  Args:
+    metadata: A Metadata instance, representing the top-level root
+      of the metadata for cross-referencing
+    indent: baseline level of indentation for comment block
+  Returns:
+    A function that transforms a String text block as follows:
+    - Indent and * for insertion into a comment block
+    - Trailing whitespace removed
+    - Entire body rendered via markdown
+    - All tag names converted to appropriate HIDL tag name for each tag
+
+  Example:
+    "This is a comment for NDK\n" +
+    "     with multiple lines, that should be   \n" +
+    "     formatted better\n" +
+    "\n" +
+    "    That covers multiple lines as well\n"
+    "    And references android.control.mode\n"
+
+    transforms to
+    "    * This is a comment for NDK\n" +
+    "    * with multiple lines, that should be\n" +
+    "    * formatted better\n" +
+    "    * That covers multiple lines as well\n" +
+    "    * and references ANDROID_CONTROL_MODE\n" +
+    "    *\n" +
+    "    * @see ANDROID_CONTROL_MODE\n"
+  """
+  def hidldoc_formatter(text):
+    # render with markdown => HTML
+    # Turn off the table plugin since doxygen doesn't recognize generated <thead> <tbody> tags
+    hidltext = md(text, NDKDOC_IMAGE_SRC_METADATA, False)
+
+    # Simple transform for hidl doc links
+    def hidldoc_link_filter(target, target_ndk, shortname):
+      if target_ndk is not None:
+        return '{@link %s %s}' % (target_ndk, shortname)
+
+      # Create HTML link to Javadoc
+      if shortname == '':
+        lastdot = target.rfind('.')
+        if lastdot == -1:
+          shortname = target
+        else:
+          shortname = target[lastdot + 1:]
+
+      target = target.replace('.','/')
+      if target.find('#') != -1:
+        target = target.replace('#','.html#')
+      else:
+        target = target + '.html'
+
+      return '<a href="https://developer.android.com/reference/%s">%s</a>' % (target, shortname)
+
+    hidltext = filter_links(hidltext, hidldoc_link_filter)
+
+    # Convert metadata entry "android.x.y.z" to form
+    # HIDL tag format of "ANDROID_X_Y_Z"
+    def hidldoc_crossref_filter(node):
+      return csym(node.name)
+
+    # For each public tag "android.x.y.z" referenced, add a
+    # "@see ANDROID_X_Y_Z"
+    def hidldoc_crossref_see_filter(node_set):
+      text = '\n'
+      for node in node_set:
+        text = text + '\n@see %s' % (csym(node.name))
+
+      return text if text != '\n' else ''
+
+    hidltext = filter_tags(hidltext, metadata, hidldoc_crossref_filter, hidldoc_crossref_see_filter)
+
+    comment_prefix = " " * indent + " * ";
+
+    def line_filter(line):
+      # Indent each line
+      # Add ' * ' to it for stylistic reasons
+      # Strip right side of trailing whitespace
+      return (comment_prefix + line).rstrip()
+
+    # Process each line with above filter
+    hidltext = "\n".join(line_filter(i) for i in hidltext.split("\n")) + "\n"
+
+    return hidltext
+
+  return hidldoc_formatter
 
 def dedent(text):
   """
@@ -1271,6 +1363,20 @@ def filter_added_in_hal_version(entries, hal_major_version, hal_minor_version):
     An iterable of Entry nodes
   """
   return (e for e in entries if e.hal_major_version == hal_major_version and e.hal_minor_version == hal_minor_version)
+
+def filter_has_enum_values_added_in_hal_version(entries, hal_major_version, hal_minor_version):
+  """
+  Filter the given entries to those that have a new enum value added in the given HIDL HAL version
+
+  Args:
+    entries: An iterable of Entry nodes
+    hal_major_version: Major HIDL version to filter for
+    hal_minor_version: Minor HIDL version to filter for
+
+  Yields:
+    An iterable of Entry nodes
+  """
+  return (e for e in entries if e.has_new_values_added_in_hal_version(hal_major_version, hal_minor_version))
 
 def filter_ndk_visible(entries):
   """

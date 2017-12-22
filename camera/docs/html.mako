@@ -301,7 +301,7 @@ ${          insert_toc_body(kind)}\
                 <ul class="entry_type_enum">
                   % for value in prop.enum.values:
                   <li>
-                    <span class="entry_type_enum_name">${value.name}</span>
+                    <span class="entry_type_enum_name">${value.name} (v${value.hal_major_version}.${value.hal_minor_version})</span>
                   % if value.deprecated:
                     <span class="entry_type_enum_deprecated">[deprecated]</span>
                   % endif:
