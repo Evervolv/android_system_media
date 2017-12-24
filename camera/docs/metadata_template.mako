@@ -157,6 +157,9 @@
                     % if value.id is not None:
                              id="${value.id}"
                     % endif
+                    % if not (value.hal_major_version == prop.hal_major_version and value.hal_minor_version == prop.hal_minor_version):
+                             hal_version=${"%d.%d" % (value.hal_major_version, value.hal_minor_version)}
+                    % endif
                       >${value.name}
                     % if value.notes is not None:
                              <notes>${value.notes}</notes>

@@ -986,9 +986,11 @@ class EnumValue(Node):
     sdk_notes: A string describing extra notes for public SDK only
     ndk_notes: A string describing extra notes for public NDK only
     parent: An edge to the parent, always an Enum instance.
+    hal_major_version: The major HIDL HAL version this value was first added in
+    hal_minor_version: The minor HIDL HAL version this value was first added in
   """
   def __init__(self, name, parent,
-      id=None, deprecated=False, optional=False, hidden=False, notes=None, sdk_notes=None, ndk_notes=None, ndk_hidden=False):
+      id=None, deprecated=False, optional=False, hidden=False, notes=None, sdk_notes=None, ndk_notes=None, ndk_hidden=False, hal_version='3.2'):
     self._name = name                    # str, e.g. 'ON' or 'OFF'
     self._id = id                        # int, e.g. '0'
     self._deprecated = deprecated        # bool
@@ -999,6 +1001,16 @@ class EnumValue(Node):
     self._sdk_notes = sdk_notes          # None or str
     self._ndk_notes = ndk_notes          # None or str
     self._parent = parent
+    if hal_version is None:
+      if parent is not None and parent.parent is not None:
+        self._hal_major_version = parent.parent.hal_major_version
+        self._hal_minor_version = parent.parent.hal_minor_version
+      else:
+        self._hal_major_version = 3
+        self._hal_minor_version = 2
+    else:
+      self._hal_major_version = int(hal_version.partition('.')[0])
+      self._hal_minor_version = int(hal_version.partition('.')[2])
 
   @property
   def id(self):
@@ -1032,6 +1044,14 @@ class EnumValue(Node):
   def ndk_notes(self):
     return self._ndk_notes
 
+  @property
+  def hal_major_version(self):
+    return self._hal_major_version
+
+  @property
+  def hal_minor_version(self):
+    return self._hal_minor_version
+
   def _get_children(self):
     return None
 
@@ -1046,14 +1066,13 @@ class Enum(Node):
         non-empty id property.
   """
   def __init__(self, parent, values, ids={}, deprecateds=[],
-      optionals=[], hiddens=[], notes={}, sdk_notes={}, ndk_notes={}, ndk_hiddens=[]):
-    self._values =                                                             \
-      [ EnumValue(val, self, ids.get(val), val in deprecateds, val in optionals, val in hiddens,  \
-                  notes.get(val), sdk_notes.get(val), ndk_notes.get(val), val in ndk_hiddens)     \
-        for val in values ]
-
+      optionals=[], hiddens=[], notes={}, sdk_notes={}, ndk_notes={}, ndk_hiddens=[], hal_versions={}):
     self._parent = parent
     self._name = None
+    self._values =                                                             \
+      [ EnumValue(val, self, ids.get(val), val in deprecateds, val in optionals, val in hiddens,  \
+                  notes.get(val), sdk_notes.get(val), ndk_notes.get(val), val in ndk_hiddens, hal_versions.get(val))     \
+        for val in values ]
 
   @property
   def values(self):
@@ -1062,6 +1081,9 @@ class Enum(Node):
   @property
   def has_values_with_id(self):
     return bool(any(i for i in self.values if i.id))
+
+  def has_new_values_added_in_hal_version(self, hal_major_version, hal_minor_version):
+    return bool(any(i for i in self.values if i.hal_major_version == hal_major_version and i.hal_minor_version == hal_minor_version))
 
   def _get_children(self):
     return (i for i in self._values)
@@ -1147,6 +1169,7 @@ class Entry(Node):
       enum_optionals: A list of optional enum values, e.g. ['OFF']
       enum_notes: A dictionary of value->notes strings.
       enum_ids: A dictionary of value->id strings.
+      enum_hal_versions: A dictionary of value->hal version strings
 
     Args (optional):
       description: A string with a description of the entry.
@@ -1301,6 +1324,12 @@ class Entry(Node):
   def enum(self):
     return self._enum
 
+  def has_new_values_added_in_hal_version(self, hal_major_version, hal_minor_version):
+    if self._enum is not None:
+      return self._enum.has_new_values_added_in_hal_version(hal_major_version,hal_minor_version)
+    else:
+      return False
+
   def _get_children(self):
     if self.enum:
       yield self.enum
@@ -1342,6 +1371,8 @@ class Entry(Node):
     enum_sdk_notes = kwargs.get('enum_sdk_notes')  # { value => sdk_notes }
     enum_ndk_notes = kwargs.get('enum_ndk_notes')  # { value => ndk_notes }
     enum_ids = kwargs.get('enum_ids')  # { value => notes }
+    enum_hal_versions = kwargs.get('enum_hal_versions') # { value => hal_versions }
+
     self._tuple_values = kwargs.get('tuple_values')
 
     self._description = kwargs.get('description')
@@ -1360,7 +1391,7 @@ class Entry(Node):
 
     if kwargs.get('enum', False):
       self._enum = Enum(self, enum_values, enum_ids, enum_deprecateds, enum_optionals,
-                        enum_hiddens, enum_notes, enum_sdk_notes, enum_ndk_notes, enum_ndk_hiddens)
+                        enum_hiddens, enum_notes, enum_sdk_notes, enum_ndk_notes, enum_ndk_hiddens, enum_hal_versions)
     else:
       self._enum = None
 

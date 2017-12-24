@@ -301,6 +301,7 @@
             </simpleType>
         </attribute>
         <attribute name="id" type="string" />
+        <attribute name="hal_version" type="decimal" default="3.2" />
     </complexType>
 
     <complexType name="CloneType">

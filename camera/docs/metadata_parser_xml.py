@@ -217,6 +217,7 @@ class MetadataParserXml:
       enum_sdk_notes = {}
       enum_ndk_notes = {}
       enum_ids = {}
+      enum_hal_versions = {}
       for value in entry.enum.find_all('value'):
 
         value_body = self._strings_no_nl(value)
@@ -249,6 +250,9 @@ class MetadataParserXml:
         if value.attrs.get('id') is not None:
           enum_ids[value_body] = value['id']
 
+        if value.attrs.get('hal_version') is not None:
+          enum_hal_versions[value_body] = value['hal_version']
+
       d['enum_values'] = enum_values
       d['enum_deprecateds'] = enum_deprecateds
       d['enum_optionals'] = enum_optionals
@@ -258,6 +262,7 @@ class MetadataParserXml:
       d['enum_sdk_notes'] = enum_sdk_notes
       d['enum_ndk_notes'] = enum_ndk_notes
       d['enum_ids'] = enum_ids
+      d['enum_hal_versions'] = enum_hal_versions
       d['enum'] = True
 
     #
