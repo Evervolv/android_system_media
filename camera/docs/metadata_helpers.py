@@ -176,7 +176,8 @@ def protobuf_type(entry):
     "double"                 : "double",
     "int32"                  : "int32",
     "int64"                  : "int64",
-    "enumList"               : "int32"
+    "enumList"               : "int32",
+    "string"                 : "string"
   }
 
   if typeName not in typename_to_protobuftype:

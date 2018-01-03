@@ -391,6 +391,7 @@ typedef enum camera_metadata_tag {
 
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL =           // enum         | public       | HIDL v3.2
             ANDROID_INFO_START,
+    ANDROID_INFO_VERSION,                             // byte         | public       | HIDL v3.3
     ANDROID_INFO_END,
 
     ANDROID_BLACK_LEVEL_LOCK =                        // enum         | public       | HIDL v3.2

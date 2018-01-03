@@ -1057,6 +1057,8 @@
           <ul class="toc_section">
             <li
             ><a href="#static_android.info.supportedHardwareLevel">android.info.supportedHardwareLevel</a></li>
+            <li
+            ><a href="#static_android.info.version">android.info.version</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -17103,7 +17105,7 @@ can result in unexpected delays when modified during the capture session
 lifetime.<wbr/> Typical examples include parameters that require a
 time-consuming hardware re-configuration or internal camera pipeline
 change.<wbr/> For performance reasons we advise clients to pass their initial
-values as part of 
+values as part of
 <a href="https://developer.android.com/reference/SessionConfiguration.html#setSessionParameters">SessionConfiguration#setSessionParameters</a>.<wbr/>i
 Once the camera capture session is enabled it is also recommended to avoid
 changing them from their initial values set in
@@ -27380,6 +27382,68 @@ superset of the previous level,<wbr/> and they share the same essential operatio
 <p>Camera HAL3+ must not implement LEGACY mode.<wbr/> It is there for backwards compatibility in
 the <code>android.<wbr/>hardware.<wbr/>camera2</code> user-facing API only on legacy HALv1 devices,<wbr/> and is
 implemented by the camera framework code.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.info.version">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>info.<wbr/>version
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">byte</span>
+
+              <span class="entry_type_visibility"> [public as string]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>A short string for manufacturer version information about the camera device,<wbr/> such as
+ISP hardware,<wbr/> sensors,<wbr/> etc.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This can be used in <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_IMAGE_DESCRIPTION">TAG_<wbr/>IMAGE_<wbr/>DESCRIPTION</a>
+in jpeg EXIF.<wbr/> This key may be absent if no version information is available on the
+device.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The string must consist of only alphanumeric characters,<wbr/> punctuation,<wbr/> and
+whitespace,<wbr/> i.<wbr/>e.<wbr/> it must match regular expression "[\p{Alnum}\p{Punct}\p{Space}]*".<wbr/>
+It must not exceed 256 characters.<wbr/></p>
             </td>
           </tr>
 
