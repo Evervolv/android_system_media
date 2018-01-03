@@ -49,20 +49,20 @@ import android.hardware.camera.metadata@${hal_major_version()}.${i};
  * Top level hierarchy definitions for camera metadata. *_INFO sections are for
  * the static metadata that can be retrived without opening the camera device.
  */
-enum CameraMetadataSection : ${'uint32_t' if first_hal_minor_version(hal_major_version()) == hal_minor_version() else 'android.hardware.camera.metadata@%d.%d::CameraMetadataSection' % (hal_major_version(), hal_minor_version()-1)} {
+enum CameraMetadataSection : ${'uint32_t' if first_hal_minor_version(hal_major_version()) == hal_minor_version() else '@%d.%d::CameraMetadataSection' % (hal_major_version(), hal_minor_version()-1)} {
   % endif
   % if first_hal_minor_version(hal_major_version()) != hal_minor_version():
     ${path_name(section) | csym} =
-        android.hardware.camera.metadata@${hal_major_version()}.${hal_minor_version()-1}::CameraMetadataSection::ANDROID_SECTION_COUNT,
+        android.hardware.camera.metadata@${hal_major_version()}.${hal_minor_version()-1}::CameraMetadataSection:ANDROID_SECTION_COUNT,
   % else:
     ${path_name(section) | csym},
   % endif
 
 % endfor
 % if gotSections:
-    ANDROID_SECTION_COUNT,
+    ANDROID_SECTION_COUNT${'' if first_hal_minor_version(hal_major_version()) == hal_minor_version() else '_%d_%d' % (hal_major_version(),hal_minor_version())},
 
-    VENDOR_SECTION = 0x8000,
+    VENDOR_SECTION${'' if first_hal_minor_version(hal_major_version()) == hal_minor_version() else '_%d_%d' % (hal_major_version(),hal_minor_version())} = 0x8000,
 
 };
 
@@ -75,7 +75,11 @@ enum CameraMetadataSectionStart : ${'uint32_t' if first_hal_minor_version(hal_ma
     ${path_name(i) + '.start' | csym} = CameraMetadataSection:${path_name(i) | csym} << 16,
 
   % endfor
+  % if first_hal_minor_version(hal_major_version()) != hal_minor_version() :
+    VENDOR_SECTION_START${'_%d_%d' % (hal_major_version(),hal_minor_version())} = CameraMetadataSection:VENDOR_SECTION${'_%d_%d' % (hal_major_version(),hal_minor_version())} << 16,
+  % else:
     VENDOR_SECTION_START = CameraMetadataSection:VENDOR_SECTION << 16,
+  % endif
 
 };
 
