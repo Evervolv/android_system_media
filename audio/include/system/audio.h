@@ -1105,6 +1105,12 @@ __END_DECLS
 #define AUDIO_PARAMETER_STREAM_INPUT_SOURCE "input_source"   /* audio_source_t */
 #define AUDIO_PARAMETER_STREAM_SAMPLING_RATE "sampling_rate" /* uint32_t */
 
+/* Request the presentation id to be decoded by a next gen audio decoder */
+#define AUDIO_PARAMETER_STREAM_PRESENTATION_ID "presentation_id" /* int32_t */
+
+/* Request the program id to be decoded by a next gen audio decoder */
+#define AUDIO_PARAMETER_STREAM_PROGRAM_ID "program_id"           /* int32_t */
+
 #define AUDIO_PARAMETER_DEVICE_CONNECT "connect"            /* audio_devices_t */
 #define AUDIO_PARAMETER_DEVICE_DISCONNECT "disconnect"      /* audio_devices_t */
 
