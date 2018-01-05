@@ -972,6 +972,65 @@ typedef struct audio_uuid_s {
     uint8_t node[6];
 } audio_uuid_t;
 
+//TODO: audio_microphone_location_t need to move to HAL v4.0
+typedef enum {
+    AUDIO_MICROPHONE_LOCATION_UNKNOW = 0,
+    AUDIO_MICROPHONE_LOCATION_MAINBODY = 1,
+    AUDIO_MICROPHONE_LOCATION_MAINBODY_MOVABLE = 2,
+    AUDIO_MICROPHONE_LOCATION_PERIPHERAL = 3,
+    AUDIO_MICROPHONE_LOCATION_CNT = 4,
+} audio_microphone_location_t;
+
+//TODO: audio_microphone_directionality_t need to move to HAL v4.0
+typedef enum {
+    AUDIO_MICROPHONE_DIRECTIONALITY_UNKNOW = 0,
+    AUDIO_MICROPHONE_DIRECTIONALITY_OMNI = 1,
+    AUDIO_MICROPHONE_DIRECTIONALITY_BI_DIRECTIONAL = 2,
+    AUDIO_MICROPHONE_DIRECTIONALITY_CARDIOID = 3,
+    AUDIO_MICROPHONE_DIRECTIONALITY_HYPER_CARDIOID = 4,
+    AUDIO_MICROPHONE_DIRECTIONALITY_SUPER_CARDIOID = 5,
+    AUDIO_MICROPHONE_DIRECTIONALITY_CNT = 6,
+} audio_microphone_directionality_t;
+
+/* A 3D point which could be used to represent geometric location
+ * or orientation of a microphone.
+ */
+struct audio_microphone_coordinate {
+    float x;
+    float y;
+    float z;
+};
+
+/* An number to indicate which group the microphone locate. Main body is
+ * usually group 0. Developer could use this value to group the microphones
+ * that locate on the same peripheral or attachments.
+ */
+typedef int audio_microphone_group_t;
+
+/* the maximum length for the microphone id */
+#define AUDIO_MICROPHONE_ID_MAX_LEN 32
+/* max number of frequency responses in a frequency response table */
+#define AUDIO_MICROPHONE_MAX_FREQUENCY_RESPONSES 32
+
+struct audio_microphone_characteristic_t {
+    char                               device_id[AUDIO_MICROPHONE_ID_MAX_LEN];
+    audio_port_handle_t                id;
+    audio_port_type_t                  type;
+    char                               address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
+    audio_microphone_location_t        location;
+    audio_microphone_group_t           group;
+    unsigned int                       index_in_the_group;
+    float                              sensitivity;
+    float                              max_spl;
+    float                              min_spl;
+    audio_microphone_directionality_t  directionality;
+    unsigned int                       num_frequency_responses;
+    float frequency_responses[2][AUDIO_MICROPHONE_MAX_FREQUENCY_RESPONSES];
+    struct audio_microphone_coordinate geometric_location;
+    struct audio_microphone_coordinate orientation;
+};
+
+
 __END_DECLS
 
 /**
