@@ -639,6 +639,8 @@ static tag_info_t android_info[ANDROID_INFO_END -
         ANDROID_INFO_START] = {
     [ ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL - ANDROID_INFO_START ] =
     { "supportedHardwareLevel",        TYPE_BYTE   },
+    [ ANDROID_INFO_VERSION - ANDROID_INFO_START ] =
+    { "version",                       TYPE_BYTE   },
 };
 
 static tag_info_t android_black_level[ANDROID_BLACK_LEVEL_END -
@@ -2540,6 +2542,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_INFO_VERSION: {
             break;
         }
 

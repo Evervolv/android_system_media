@@ -5229,7 +5229,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           lifetime. Typical examples include parameters that require a
           time-consuming hardware re-configuration or internal camera pipeline
           change. For performance reasons we advise clients to pass their initial
-          values as part of 
+          values as part of
           {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.i
           Once the camera capture session is enabled it is also recommended to avoid
           changing them from their initial values set in
@@ -8709,6 +8709,22 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Camera HAL3+ must not implement LEGACY mode. It is there for backwards compatibility in
           the `android.hardware.camera2` user-facing API only on legacy HALv1 devices, and is
           implemented by the camera framework code.
+          </hal_details>
+        </entry>
+        <entry name="version" type="byte" visibility="public" typedef="string" hal_version="3.3">
+          <description>
+              A short string for manufacturer version information about the camera device, such as
+              ISP hardware, sensors, etc.
+          </description>
+          <details>
+              This can be used in {@link android.media.ExifInterface#TAG_IMAGE_DESCRIPTION TAG_IMAGE_DESCRIPTION}
+              in jpeg EXIF. This key may be absent if no version information is available on the
+              device.
+          </details>
+          <hal_details>
+              The string must consist of only alphanumeric characters, punctuation, and
+              whitespace, i.e. it must match regular expression "[\p{Alnum}\p{Punct}\p{Space}]*".
+              It must not exceed 256 characters.
           </hal_details>
         </entry>
       </static>
