@@ -5292,7 +5292,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </hal_details>
         </entry>
         <entry name="availableSessionKeys" type="int32" visibility="ndk_public"
-               container="array" hwlevel="legacy" hal_version="3.4">
+               container="array" hwlevel="legacy" hal_version="3.3">
           <array>
             <size>n</size>
           </array>
