@@ -219,6 +219,7 @@ typedef enum camera_metadata_tag {
     ANDROID_LENS_STATE,                               // enum         | public       | HIDL v3.2
     ANDROID_LENS_INTRINSIC_CALIBRATION,               // float[]      | public       | HIDL v3.2
     ANDROID_LENS_RADIAL_DISTORTION,                   // float[]      | public       | HIDL v3.2
+    ANDROID_LENS_POSE_REFERENCE,                      // enum         | public       | HIDL v3.3
     ANDROID_LENS_END,
 
     ANDROID_LENS_INFO_AVAILABLE_APERTURES =           // float[]      | public       | HIDL v3.2
@@ -513,6 +514,7 @@ typedef enum camera_metadata_enum_android_control_capture_intent {
     ANDROID_CONTROL_CAPTURE_INTENT_VIDEO_SNAPSHOT                   , // HIDL v3.2
     ANDROID_CONTROL_CAPTURE_INTENT_ZERO_SHUTTER_LAG                 , // HIDL v3.2
     ANDROID_CONTROL_CAPTURE_INTENT_MANUAL                           , // HIDL v3.2
+    ANDROID_CONTROL_CAPTURE_INTENT_MOTION_TRACKING                  , // HIDL v3.3
 } camera_metadata_enum_android_control_capture_intent_t;
 
 // ANDROID_CONTROL_EFFECT_MODE
@@ -690,6 +692,12 @@ typedef enum camera_metadata_enum_android_lens_state {
     ANDROID_LENS_STATE_MOVING                                       , // HIDL v3.2
 } camera_metadata_enum_android_lens_state_t;
 
+// ANDROID_LENS_POSE_REFERENCE
+typedef enum camera_metadata_enum_android_lens_pose_reference {
+    ANDROID_LENS_POSE_REFERENCE_PRIMARY_CAMERA                      , // HIDL v3.3
+    ANDROID_LENS_POSE_REFERENCE_GYROSCOPE                           , // HIDL v3.3
+} camera_metadata_enum_android_lens_pose_reference_t;
+
 
 // ANDROID_LENS_INFO_FOCUS_DISTANCE_CALIBRATION
 typedef enum camera_metadata_enum_android_lens_info_focus_distance_calibration {
@@ -741,6 +749,7 @@ typedef enum camera_metadata_enum_android_request_available_capabilities {
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT             , // HIDL v3.2
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO
                                                                      , // HIDL v3.2
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MOTION_TRACKING          , // HIDL v3.3
 } camera_metadata_enum_android_request_available_capabilities_t;
 
 

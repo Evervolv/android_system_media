@@ -98,6 +98,7 @@ message CameraDeviceInfo {
     repeated int32 android_hotPixel_availableHotPixelModes = 458752;
     repeated Size android_jpeg_availableThumbnailSizes = 524288;
     optional int32 android_lens_facing = 589824;
+    optional int32 android_lens_poseReference = 589825;
     repeated float android_lens_info_availableApertures = 655360;
     repeated float android_lens_info_availableFilterDensities = 655361;
     repeated float android_lens_info_availableFocalLengths = 655362;
