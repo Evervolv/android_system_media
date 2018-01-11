@@ -627,6 +627,22 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 sequence.
               </notes>
             </value>
+            <value hal_version="3.3">ON_EXTERNAL_FLASH
+              <notes>
+                An external flash has been turned on.
+
+                It informs the camera device that an external flash has been turned on, and that
+                metering (and continuous focus if active) should be quickly recaculated to account
+                for the external flash. Otherwise, this mode acts like ON.
+
+                When the external flash is turned off, AE mode should be changed to one of the
+                other available AE modes.
+
+                If the camera device supports AE external flash mode, aeState must be
+                FLASH_REQUIRED after the camera device finishes AE scan and it's too dark without
+                flash.
+              </notes>
+            </value>
           </enum>
           <description>The desired mode for the camera device's
           auto-exposure routine.</description>
@@ -2323,7 +2339,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           :------------:|:----------------:|:---------:|:-----------------------:
           INACTIVE      |                  | INACTIVE  | Camera device auto exposure algorithm is disabled
 
-          When android.control.aeMode is AE_MODE_ON_*:
+          When android.control.aeMode is AE_MODE_ON*:
 
             State        | Transition Cause                             | New State      | Notes
           :-------------:|:--------------------------------------------:|:--------------:|:-----------------:
@@ -2346,11 +2362,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Any state (excluding LOCKED) | android.control.aePrecaptureTrigger is START | PRECAPTURE     | Start AE precapture metering sequence
           Any state (excluding LOCKED) | android.control.aePrecaptureTrigger is CANCEL| INACTIVE       | Currently active precapture metering sequence is canceled
 
+          If the camera device supports AE external flash mode (ON_EXTERNAL_FLASH is included in
+          android.control.aeAvailableModes), aeState must be FLASH_REQUIRED after the camera device
+          finishes AE scan and it's too dark without flash.
+
           For the above table, the camera device may skip reporting any state changes that happen
           without application intervention (i.e. mode switch, trigger, locking). Any state that
           can be skipped in that manner is called a transient state.
 
-          For example, for above AE modes (AE_MODE_ON_*), in addition to the state transitions
+          For example, for above AE modes (AE_MODE_ON*), in addition to the state transitions
           listed in above table, it is also legal for the camera device to skip one or more
           transient states between two results. See below table for examples:
 
@@ -5305,7 +5325,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           lifetime. Typical examples include parameters that require a
           time-consuming hardware re-configuration or internal camera pipeline
           change. For performance reasons we advise clients to pass their initial
-          values as part of 
+          values as part of
           {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}.
           Once the camera capture session is enabled it is also recommended to avoid
           changing them from their initial values set in
