@@ -358,6 +358,10 @@ typedef enum camera_metadata_tag {
     ANDROID_STATISTICS_SCENE_FLICKER,                 // enum         | public       | HIDL v3.2
     ANDROID_STATISTICS_HOT_PIXEL_MAP,                 // int32[]      | public       | HIDL v3.2
     ANDROID_STATISTICS_LENS_SHADING_MAP_MODE,         // enum         | public       | HIDL v3.2
+    ANDROID_STATISTICS_OIS_DATA_MODE,                 // enum         | public       | HIDL v3.3
+    ANDROID_STATISTICS_OIS_TIMESTAMPS,                // int64[]      | public       | HIDL v3.3
+    ANDROID_STATISTICS_OIS_X_SHIFTS,                  // float[]      | public       | HIDL v3.3
+    ANDROID_STATISTICS_OIS_Y_SHIFTS,                  // float[]      | public       | HIDL v3.3
     ANDROID_STATISTICS_END,
 
     ANDROID_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES = 
@@ -372,6 +376,7 @@ typedef enum camera_metadata_tag {
                                                       // byte[]       | public       | HIDL v3.2
     ANDROID_STATISTICS_INFO_AVAILABLE_LENS_SHADING_MAP_MODES,
                                                       // byte[]       | public       | HIDL v3.2
+    ANDROID_STATISTICS_INFO_AVAILABLE_OIS_DATA_MODES, // byte[]       | public       | HIDL v3.3
     ANDROID_STATISTICS_INFO_END,
 
     ANDROID_TONEMAP_CURVE_BLUE =                      // float[]      | ndk_public   | HIDL v3.2
@@ -879,6 +884,12 @@ typedef enum camera_metadata_enum_android_statistics_lens_shading_map_mode {
     ANDROID_STATISTICS_LENS_SHADING_MAP_MODE_OFF                    , // HIDL v3.2
     ANDROID_STATISTICS_LENS_SHADING_MAP_MODE_ON                     , // HIDL v3.2
 } camera_metadata_enum_android_statistics_lens_shading_map_mode_t;
+
+// ANDROID_STATISTICS_OIS_DATA_MODE
+typedef enum camera_metadata_enum_android_statistics_ois_data_mode {
+    ANDROID_STATISTICS_OIS_DATA_MODE_OFF                            , // HIDL v3.3
+    ANDROID_STATISTICS_OIS_DATA_MODE_ON                             , // HIDL v3.3
+} camera_metadata_enum_android_statistics_ois_data_mode_t;
 
 
 

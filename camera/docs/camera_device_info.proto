@@ -146,6 +146,7 @@ message CameraDeviceInfo {
     optional int32 android_statistics_info_maxFaceCount = 1245185;
     repeated bool android_statistics_info_availableHotPixelMapModes = 1245186;
     repeated int32 android_statistics_info_availableLensShadingMapModes = 1245187;
+    repeated int32 android_statistics_info_availableOisDataModes = 1245188;
     optional int32 android_tonemap_maxCurvePoints = 1310720;
     repeated int32 android_tonemap_availableToneMapModes = 1310721;
     optional int32 android_info_supportedHardwareLevel = 1441792;
