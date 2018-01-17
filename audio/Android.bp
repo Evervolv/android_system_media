@@ -1,7 +1,6 @@
 cc_library_headers {
     name: "libaudio_system_headers",
     host_supported: true,
-    vendor_available: true,
 
     header_libs: ["libcutils_headers"],
     export_header_lib_headers: ["libcutils_headers"],
