@@ -407,6 +407,9 @@ static tag_info_t android_request[ANDROID_REQUEST_END -
     { "availableCharacteristicsKeys",  TYPE_INT32  },
     [ ANDROID_REQUEST_AVAILABLE_SESSION_KEYS - ANDROID_REQUEST_START ] =
     { "availableSessionKeys",          TYPE_INT32  },
+    [ ANDROID_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS - ANDROID_REQUEST_START ] =
+    { "availablePhysicalCameraRequestKeys",
+                                        TYPE_INT32  },
 };
 
 static tag_info_t android_scaler[ANDROID_SCALER_END -
@@ -1909,6 +1912,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_REQUEST_AVAILABLE_SESSION_KEYS: {
+            break;
+        }
+        case ANDROID_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS: {
             break;
         }
 

@@ -270,6 +270,8 @@ typedef enum camera_metadata_tag {
     ANDROID_REQUEST_AVAILABLE_RESULT_KEYS,            // int32[]      | ndk_public   | HIDL v3.2
     ANDROID_REQUEST_AVAILABLE_CHARACTERISTICS_KEYS,   // int32[]      | ndk_public   | HIDL v3.2
     ANDROID_REQUEST_AVAILABLE_SESSION_KEYS,           // int32[]      | ndk_public   | HIDL v3.3
+    ANDROID_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS,
+                                                      // int32[]      | hidden       | HIDL v3.3
     ANDROID_REQUEST_END,
 
     ANDROID_SCALER_CROP_REGION =                      // int32[]      | public       | HIDL v3.2
