@@ -27438,6 +27438,27 @@ FULL-level capabilities.<wbr/></p>
   <code>RAW</code>)</li>
 </ul></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">EXTERNAL (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>This camera device is backed by an external camera connected to this Android device.<wbr/></p>
+<p>The device has capability identical to a LIMITED level device,<wbr/> with the following
+exceptions:</p>
+<ul>
+<li>The device may not report lens/<wbr/>sensor related information such as<ul>
+<li><a href="#controls_android.lens.focalLength">android.<wbr/>lens.<wbr/>focal<wbr/>Length</a></li>
+<li><a href="#static_android.lens.info.hyperfocalDistance">android.<wbr/>lens.<wbr/>info.<wbr/>hyperfocal<wbr/>Distance</a></li>
+<li><a href="#static_android.sensor.info.physicalSize">android.<wbr/>sensor.<wbr/>info.<wbr/>physical<wbr/>Size</a></li>
+<li><a href="#static_android.sensor.info.whiteLevel">android.<wbr/>sensor.<wbr/>info.<wbr/>white<wbr/>Level</a></li>
+<li><a href="#static_android.sensor.blackLevelPattern">android.<wbr/>sensor.<wbr/>black<wbr/>Level<wbr/>Pattern</a></li>
+<li><a href="#static_android.sensor.info.colorFilterArrangement">android.<wbr/>sensor.<wbr/>info.<wbr/>color<wbr/>Filter<wbr/>Arrangement</a></li>
+<li><a href="#dynamic_android.sensor.rollingShutterSkew">android.<wbr/>sensor.<wbr/>rolling<wbr/>Shutter<wbr/>Skew</a></li>
+</ul>
+</li>
+<li>The device will report 0 for <a href="#static_android.sensor.orientation">android.<wbr/>sensor.<wbr/>orientation</a></li>
+<li>The device has less guarantee on stable framerate,<wbr/> as the framerate partly depends
+  on the external camera being used.<wbr/></li>
+</ul></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -27526,6 +27547,9 @@ superset of the previous level,<wbr/> and they share the same essential operatio
 <p>Camera HAL3+ must not implement LEGACY mode.<wbr/> It is there for backwards compatibility in
 the <code>android.<wbr/>hardware.<wbr/>camera2</code> user-facing API only on legacy HALv1 devices,<wbr/> and is
 implemented by the camera framework code.<wbr/></p>
+<p>EXTERNAL level devices have lower peformance bar in CTS since the peformance might depend
+on the external camera being used and is not fully controlled by the device manufacturer.<wbr/>
+The ITS test suite is exempted for the same reason.<wbr/></p>
             </td>
           </tr>
 

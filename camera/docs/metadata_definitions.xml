@@ -8738,6 +8738,27 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 `RAW`)
               </notes>
             </value>
+            <value hal_version="3.3">
+              EXTERNAL
+              <notes>
+              This camera device is backed by an external camera connected to this Android device.
+
+              The device has capability identical to a LIMITED level device, with the following
+              exceptions:
+
+              * The device may not report lens/sensor related information such as
+                  - android.lens.focalLength
+                  - android.lens.info.hyperfocalDistance
+                  - android.sensor.info.physicalSize
+                  - android.sensor.info.whiteLevel
+                  - android.sensor.blackLevelPattern
+                  - android.sensor.info.colorFilterArrangement
+                  - android.sensor.rollingShutterSkew
+              * The device will report 0 for android.sensor.orientation
+              * The device has less guarantee on stable framerate, as the framerate partly depends
+                on the external camera being used.
+              </notes>
+            </value>
           </enum>
           <description>
           Generally classifies the overall set of the camera device functionality.
@@ -8805,6 +8826,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Camera HAL3+ must not implement LEGACY mode. It is there for backwards compatibility in
           the `android.hardware.camera2` user-facing API only on legacy HALv1 devices, and is
           implemented by the camera framework code.
+
+          EXTERNAL level devices have lower peformance bar in CTS since the peformance might depend
+          on the external camera being used and is not fully controlled by the device manufacturer.
+          The ITS test suite is exempted for the same reason.
           </hal_details>
         </entry>
         <entry name="version" type="byte" visibility="public" typedef="string" hal_version="3.3">
