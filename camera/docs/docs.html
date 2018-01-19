@@ -9418,7 +9418,7 @@ capture intent.<wbr/></p>
               android.<wbr/>control.<wbr/>af<wbr/>Scene<wbr/>Change
             </td>
             <td class="entry_type">
-                <span class="entry_type_name entry_type_name_enum">int32</span>
+                <span class="entry_type_name entry_type_name_enum">byte</span>
 
               <span class="entry_type_visibility"> [public]</span>
 
@@ -9468,8 +9468,6 @@ such as a large shift in camera viewpoint,<wbr/> significant motion in the scene
 significant illumination change,<wbr/> this value will be set to DETECTED for a single capture
 result.<wbr/> Otherwise the value will be NOT_<wbr/>DETECTED.<wbr/> The threshold for detection is similar
 to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus modes.<wbr/></p>
-<p>afSceneChange may be DETECTED only if afMode is AF_<wbr/>MODE_<wbr/>CONTINUOUS_<wbr/>VIDEO or
-AF_<wbr/>MODE_<wbr/>CONTINUOUS_<wbr/>PICTURE.<wbr/> In other AF modes,<wbr/> afSceneChange must be NOT_<wbr/>DETECTED.<wbr/></p>
 <p>This key will be available if the camera device advertises this key via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableCaptureResultKeys">CameraCharacteristics#getAvailableCaptureResultKeys</a>.<wbr/></p>
             </td>
           </tr>

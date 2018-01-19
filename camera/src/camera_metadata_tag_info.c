@@ -219,7 +219,7 @@ static tag_info_t android_control[ANDROID_CONTROL_END -
     [ ANDROID_CONTROL_ENABLE_ZSL - ANDROID_CONTROL_START ] =
     { "enableZsl",                     TYPE_BYTE   },
     [ ANDROID_CONTROL_AF_SCENE_CHANGE - ANDROID_CONTROL_START ] =
-    { "afSceneChange",                 TYPE_INT32  },
+    { "afSceneChange",                 TYPE_BYTE   },
 };
 
 static tag_info_t android_demosaic[ANDROID_DEMOSAIC_END -
