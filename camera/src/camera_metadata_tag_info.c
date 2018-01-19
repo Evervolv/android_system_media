@@ -832,6 +832,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "ON_AUTO_FLASH_REDEYE";
                     ret = 0;
                     break;
+                case ANDROID_CONTROL_AE_MODE_ON_EXTERNAL_FLASH:
+                    msg = "ON_EXTERNAL_FLASH";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
