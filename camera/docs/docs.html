@@ -2448,6 +2448,18 @@ reduction.<wbr/></p>
 reduction flash will fire during the precapture
 sequence.<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">ON_EXTERNAL_FLASH (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>An external flash has been turned on.<wbr/></p>
+<p>It informs the camera device that an external flash has been turned on,<wbr/> and that
+metering (and continuous focus if active) should be quickly recaculated to account
+for the external flash.<wbr/> Otherwise,<wbr/> this mode acts like ON.<wbr/></p>
+<p>When the external flash is turned off,<wbr/> AE mode should be changed to one of the
+other available AE modes.<wbr/></p>
+<p>If the camera device supports AE external flash mode,<wbr/> aeState must be
+FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
+flash.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -6334,6 +6346,18 @@ reduction.<wbr/></p>
 reduction flash will fire during the precapture
 sequence.<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">ON_EXTERNAL_FLASH (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>An external flash has been turned on.<wbr/></p>
+<p>It informs the camera device that an external flash has been turned on,<wbr/> and that
+metering (and continuous focus if active) should be quickly recaculated to account
+for the external flash.<wbr/> Otherwise,<wbr/> this mode acts like ON.<wbr/></p>
+<p>When the external flash is turned off,<wbr/> AE mode should be changed to one of the
+other available AE modes.<wbr/></p>
+<p>If the camera device supports AE external flash mode,<wbr/> aeState must be
+FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
+flash.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -6795,7 +6819,7 @@ be good to use.<wbr/></p>
 </tr>
 </tbody>
 </table>
-<p>When <a href="#controls_android.control.aeMode">android.<wbr/>control.<wbr/>ae<wbr/>Mode</a> is AE_<wbr/>MODE_<wbr/>ON_<wbr/>*:</p>
+<p>When <a href="#controls_android.control.aeMode">android.<wbr/>control.<wbr/>ae<wbr/>Mode</a> is AE_<wbr/>MODE_<wbr/>ON*:</p>
 <table>
 <thead>
 <tr>
@@ -6916,10 +6940,13 @@ be good to use.<wbr/></p>
 </tr>
 </tbody>
 </table>
+<p>If the camera device supports AE external flash mode (ON_<wbr/>EXTERNAL_<wbr/>FLASH is included in
+<a href="#static_android.control.aeAvailableModes">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Modes</a>),<wbr/> aeState must be FLASH_<wbr/>REQUIRED after the camera device
+finishes AE scan and it's too dark without flash.<wbr/></p>
 <p>For the above table,<wbr/> the camera device may skip reporting any state changes that happen
 without application intervention (i.<wbr/>e.<wbr/> mode switch,<wbr/> trigger,<wbr/> locking).<wbr/> Any state that
 can be skipped in that manner is called a transient state.<wbr/></p>
-<p>For example,<wbr/> for above AE modes (AE_<wbr/>MODE_<wbr/>ON_<wbr/>*),<wbr/> in addition to the state transitions
+<p>For example,<wbr/> for above AE modes (AE_<wbr/>MODE_<wbr/>ON*),<wbr/> in addition to the state transitions
 listed in above table,<wbr/> it is also legal for the camera device to skip one or more
 transient states between two results.<wbr/> See below table for examples:</p>
 <table>
@@ -17222,7 +17249,7 @@ can result in unexpected delays when modified during the capture session
 lifetime.<wbr/> Typical examples include parameters that require a
 time-consuming hardware re-configuration or internal camera pipeline
 change.<wbr/> For performance reasons we advise clients to pass their initial
-values as part of 
+values as part of
 <a href="https://developer.android.com/reference/SessionConfiguration.html#setSessionParameters">SessionConfiguration#setSessionParameters</a>.<wbr/>
 Once the camera capture session is enabled it is also recommended to avoid
 changing them from their initial values set in

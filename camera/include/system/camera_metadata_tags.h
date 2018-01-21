@@ -460,6 +460,7 @@ typedef enum camera_metadata_enum_android_control_ae_mode {
     ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH                           , // HIDL v3.2
     ANDROID_CONTROL_AE_MODE_ON_ALWAYS_FLASH                         , // HIDL v3.2
     ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE                    , // HIDL v3.2
+    ANDROID_CONTROL_AE_MODE_ON_EXTERNAL_FLASH                       , // HIDL v3.3
 } camera_metadata_enum_android_control_ae_mode_t;
 
 // ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER
