@@ -1137,5 +1137,8 @@ __END_DECLS
 #define AUDIO_OFFLOAD_CODEC_DELAY_SAMPLES  "delay_samples"
 #define AUDIO_OFFLOAD_CODEC_PADDING_SAMPLES  "padding_samples"
 
+// FIXME: a temporary declaration for the incall music flag, will be removed when
+// declared in types.hal for audio HAL V4.0 and auto imported to audio-base.h
+#define AUDIO_OUTPUT_FLAG_INCALL_MUSIC 0x10000
 
 #endif  // ANDROID_AUDIO_CORE_H
