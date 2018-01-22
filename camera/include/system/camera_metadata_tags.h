@@ -61,6 +61,7 @@ typedef enum camera_metadata_section {
     ANDROID_SYNC,
     ANDROID_REPROCESS,
     ANDROID_DEPTH,
+    ANDROID_LOGICAL_MULTI_CAMERA,
     ANDROID_SECTION_COUNT,
 
     VENDOR_SECTION = 0x8000
@@ -97,6 +98,9 @@ typedef enum camera_metadata_section_start {
     ANDROID_SYNC_START             = ANDROID_SYNC              << 16,
     ANDROID_REPROCESS_START        = ANDROID_REPROCESS         << 16,
     ANDROID_DEPTH_START            = ANDROID_DEPTH             << 16,
+    ANDROID_LOGICAL_MULTI_CAMERA_START
+                                   = ANDROID_LOGICAL_MULTI_CAMERA
+                                                                << 16,
     VENDOR_SECTION_START           = VENDOR_SECTION            << 16
 } camera_metadata_section_start_t;
 
@@ -417,6 +421,11 @@ typedef enum camera_metadata_tag {
     ANDROID_DEPTH_AVAILABLE_DEPTH_STALL_DURATIONS,    // int64[]      | ndk_public   | HIDL v3.2
     ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE,                 // enum         | public       | HIDL v3.2
     ANDROID_DEPTH_END,
+
+    ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS =       // byte[]       | hidden       | HIDL v3.3
+            ANDROID_LOGICAL_MULTI_CAMERA_START,
+    ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE,    // enum         | public       | HIDL v3.3
+    ANDROID_LOGICAL_MULTI_CAMERA_END,
 
 } camera_metadata_tag_t;
 
@@ -751,6 +760,7 @@ typedef enum camera_metadata_enum_android_request_available_capabilities {
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_CONSTRAINED_HIGH_SPEED_VIDEO
                                                                      , // HIDL v3.2
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MOTION_TRACKING          , // HIDL v3.3
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA     , // HIDL v3.3
 } camera_metadata_enum_android_request_available_capabilities_t;
 
 
@@ -952,5 +962,12 @@ typedef enum camera_metadata_enum_android_depth_depth_is_exclusive {
     ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_FALSE                          , // HIDL v3.2
     ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_TRUE                           , // HIDL v3.2
 } camera_metadata_enum_android_depth_depth_is_exclusive_t;
+
+
+// ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE
+typedef enum camera_metadata_enum_android_logical_multi_camera_sensor_sync_type {
+    ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE_APPROXIMATE       , // HIDL v3.3
+    ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE_CALIBRATED        , // HIDL v3.3
+} camera_metadata_enum_android_logical_multi_camera_sensor_sync_type_t;
 
 
