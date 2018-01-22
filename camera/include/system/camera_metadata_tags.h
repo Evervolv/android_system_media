@@ -916,6 +916,7 @@ typedef enum camera_metadata_enum_android_info_supported_hardware_level {
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_FULL                      , // HIDL v3.2
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY                    , // HIDL v3.2
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_3                         , // HIDL v3.2
+    ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL                  , // HIDL v3.3
 } camera_metadata_enum_android_info_supported_hardware_level_t;
 
 
