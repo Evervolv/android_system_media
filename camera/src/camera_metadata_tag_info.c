@@ -590,6 +590,14 @@ static tag_info_t android_statistics[ANDROID_STATISTICS_END -
     { "hotPixelMap",                   TYPE_INT32  },
     [ ANDROID_STATISTICS_LENS_SHADING_MAP_MODE - ANDROID_STATISTICS_START ] =
     { "lensShadingMapMode",            TYPE_BYTE   },
+    [ ANDROID_STATISTICS_OIS_DATA_MODE - ANDROID_STATISTICS_START ] =
+    { "oisDataMode",                   TYPE_BYTE   },
+    [ ANDROID_STATISTICS_OIS_TIMESTAMPS - ANDROID_STATISTICS_START ] =
+    { "oisTimestamps",                 TYPE_INT64  },
+    [ ANDROID_STATISTICS_OIS_X_SHIFTS - ANDROID_STATISTICS_START ] =
+    { "oisXShifts",                    TYPE_FLOAT  },
+    [ ANDROID_STATISTICS_OIS_Y_SHIFTS - ANDROID_STATISTICS_START ] =
+    { "oisYShifts",                    TYPE_FLOAT  },
 };
 
 static tag_info_t android_statistics_info[ANDROID_STATISTICS_INFO_END -
@@ -610,6 +618,8 @@ static tag_info_t android_statistics_info[ANDROID_STATISTICS_INFO_END -
     { "availableHotPixelMapModes",     TYPE_BYTE   },
     [ ANDROID_STATISTICS_INFO_AVAILABLE_LENS_SHADING_MAP_MODES - ANDROID_STATISTICS_INFO_START ] =
     { "availableLensShadingMapModes",  TYPE_BYTE   },
+    [ ANDROID_STATISTICS_INFO_AVAILABLE_OIS_DATA_MODES - ANDROID_STATISTICS_INFO_START ] =
+    { "availableOisDataModes",         TYPE_BYTE   },
 };
 
 static tag_info_t android_tonemap[ANDROID_TONEMAP_END -
@@ -2452,6 +2462,30 @@ int camera_metadata_enum_snprint(uint32_t tag,
             }
             break;
         }
+        case ANDROID_STATISTICS_OIS_DATA_MODE: {
+            switch (value) {
+                case ANDROID_STATISTICS_OIS_DATA_MODE_OFF:
+                    msg = "OFF";
+                    ret = 0;
+                    break;
+                case ANDROID_STATISTICS_OIS_DATA_MODE_ON:
+                    msg = "ON";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_STATISTICS_OIS_TIMESTAMPS: {
+            break;
+        }
+        case ANDROID_STATISTICS_OIS_X_SHIFTS: {
+            break;
+        }
+        case ANDROID_STATISTICS_OIS_Y_SHIFTS: {
+            break;
+        }
 
         case ANDROID_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES: {
             break;
@@ -2475,6 +2509,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_STATISTICS_INFO_AVAILABLE_LENS_SHADING_MAP_MODES: {
+            break;
+        }
+        case ANDROID_STATISTICS_INFO_AVAILABLE_OIS_DATA_MODES: {
             break;
         }
 

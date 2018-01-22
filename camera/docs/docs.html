@@ -903,6 +903,8 @@
             ><a href="#controls_android.statistics.hotPixelMapMode">android.statistics.hotPixelMapMode</a></li>
             <li
             ><a href="#controls_android.statistics.lensShadingMapMode">android.statistics.lensShadingMapMode</a></li>
+            <li
+            ><a href="#controls_android.statistics.oisDataMode">android.statistics.oisDataMode</a></li>
           </ul>
         </li>
         <li>
@@ -925,6 +927,8 @@
             ><a href="#static_android.statistics.info.availableHotPixelMapModes">android.statistics.info.availableHotPixelMapModes</a></li>
             <li
             ><a href="#static_android.statistics.info.availableLensShadingMapModes">android.statistics.info.availableLensShadingMapModes</a></li>
+            <li
+            ><a href="#static_android.statistics.info.availableOisDataModes">android.statistics.info.availableOisDataModes</a></li>
 
           </ul>
         </li>
@@ -969,6 +973,14 @@
             ><a href="#dynamic_android.statistics.hotPixelMap">android.statistics.hotPixelMap</a></li>
             <li
             ><a href="#dynamic_android.statistics.lensShadingMapMode">android.statistics.lensShadingMapMode</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.oisDataMode">android.statistics.oisDataMode</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.oisTimestamps">android.statistics.oisTimestamps</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.oisXShifts">android.statistics.oisXShifts</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.oisYShifts">android.statistics.oisYShifts</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -24021,6 +24033,69 @@ the output result metadata.<wbr/></p>
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="controls_android.statistics.oisDataMode">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OFF (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>Do not include OIS data in the capture result.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">ON (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>Include OIS data in the capture result.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Whether the camera device will output the OIS data in output
+result metadata.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p>android.<wbr/>Statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes</p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When set to ON,<wbr/>
+<a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>,<wbr/> android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>X,<wbr/>
+android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y will provide OIS data in the output result metadata.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -24458,6 +24533,63 @@ are supported by this camera device.<wbr/></p>
 contain only OFF.<wbr/></p>
 <p>ON is always supported on devices with the RAW capability.<wbr/>
 LEGACY mode devices will always only support OFF.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.statistics.info.availableOisDataModes">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">byte</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [public as enumList]</span>
+
+
+
+
+                <div class="entry_type_notes">list of enums</div>
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>List of OIS data output modes for <a href="#controls_android.statistics.oisDataMode">android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode</a> that
+are supported by this camera device.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p>Any value listed in <a href="#controls_android.statistics.oisDataMode">android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode</a></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>If no OIS data output is available for this camera device,<wbr/> this key will
+contain only OFF.<wbr/></p>
             </td>
           </tr>
 
@@ -25768,6 +25900,242 @@ shading map in output result metadata.<wbr/></p>
 <a href="#dynamic_android.statistics.lensShadingMap">android.<wbr/>statistics.<wbr/>lens<wbr/>Shading<wbr/>Map</a> will be provided in
 the output result metadata.<wbr/></p>
 <p>ON is always supported on devices with the RAW capability.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.oisDataMode">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OFF (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>Do not include OIS data in the capture result.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">ON (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>Include OIS data in the capture result.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Whether the camera device will output the OIS data in output
+result metadata.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p>android.<wbr/>Statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes</p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When set to ON,<wbr/>
+<a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>,<wbr/> android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>X,<wbr/>
+android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y will provide OIS data in the output result metadata.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.oisTimestamps">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int64</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of timestamps of OIS samples,<wbr/> in nanoseconds.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              nanoseconds
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The array contains the timestamps of OIS samples.<wbr/> The timestamps are in the same
+timebase as and comparable to <a href="#dynamic_android.sensor.timestamp">android.<wbr/>sensor.<wbr/>timestamp</a>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.oisXShifts">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>ois<wbr/>XShifts
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of shifts of OIS samples,<wbr/> in x direction.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              Pixels in active array.<wbr/>
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The array contains the amount of shifts in x direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
+A positive value is a shift from left to right in active array coordinate system.<wbr/> For
+example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> an shift of
+(3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
+<p>The number of shifts must match the number of timestamps in
+<a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.oisYShifts">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>ois<wbr/>YShifts
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of shifts of OIS samples,<wbr/> in y direction.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              Pixels in active array.<wbr/>
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The array contains the amount of shifts in y direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
+A positive value is a shift from top to bottom in active array coordinate system.<wbr/> For
+example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> an shift of
+(0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
+<p>The number of shifts must match the number of timestamps in
+<a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
             </td>
           </tr>
 
