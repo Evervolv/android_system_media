@@ -5419,6 +5419,42 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           {@link android.hardware.camera2.CameraCharacteristics#getAvailableSessionKeys}.
           </hal_details>
         </entry>
+        <entry name="availablePhysicalCameraRequestKeys" type="int32" visibility="hidden"
+               container="array" hwlevel="limited" hal_version="3.3">
+          <array>
+            <size>n</size>
+          </array>
+          <description>A subset of the available request keys that can be overriden for
+          physical devices backing a logical multi-camera.</description>
+          <details>
+          This is a subset of android.request.availableRequestKeys which contains a list
+          of keys that can be overriden using {@link CaptureRequest.Builder#setPhysicalCameraKey}.
+          The respective value of such request key can be obtained by calling
+          {@link CaptureRequest.Builder#getPhysicalCameraKey}. Capture requests that contain
+          individual physical device requests must be built via
+          {@link android.hardware.camera2.CameraDevice#createCaptureRequest(int, Set)}.
+          Such extended capture requests can be passed only to
+          {@link CameraCaptureSession#capture} or {@link CameraCaptureSession#captureBurst} and
+          not to {@link CameraCaptureSession#setRepeatingRequest} or
+          {@link CameraCaptureSession#setRepeatingBurst}.
+          </details>
+          <hal_details>
+          Vendor tags can be listed here. Vendor tag metadata should also
+          use the extensions C api (refer to
+          android.hardware.camera.device.V3_4.CaptureRequest.physicalCameraSettings for more
+          details).
+
+          Setting/getting vendor tags will be checked against the metadata
+          vendor extensions API and not against this field.
+
+          The HAL must not consume any request tags in the session parameters that
+          are not listed either here or in the vendor tag list.
+
+          The public camera2 API will always make the vendor tags visible
+          via
+          {@link android.hardware.camera2.CameraCharacteristics#getAvailablePhysicalCameraRequestKeys}.
+          </hal_details>
+        </entry>
       </static>
     </section>
     <section name="scaler">

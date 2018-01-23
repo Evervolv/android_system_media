@@ -663,6 +663,8 @@
             ><a href="#static_android.request.availableCharacteristicsKeys">android.request.availableCharacteristicsKeys</a></li>
             <li
             ><a href="#static_android.request.availableSessionKeys">android.request.availableSessionKeys</a></li>
+            <li
+            ><a href="#static_android.request.availablePhysicalCameraRequestKeys">android.request.availablePhysicalCameraRequestKeys</a></li>
           </ul>
         </li>
         <li>
@@ -17366,6 +17368,88 @@ are not listed either here or in the vendor tag list.<wbr/></p>
 <p>The public camera2 API will always make the vendor tags visible
 via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableSessionKeys">CameraCharacteristics#getAvailableSessionKeys</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.request.availablePhysicalCameraRequestKeys">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>request.<wbr/>available<wbr/>Physical<wbr/>Camera<wbr/>Request<wbr/>Keys
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [hidden]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>A subset of the available request keys that can be overriden for
+physical devices backing a logical multi-camera.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This is a subset of <a href="#static_android.request.availableRequestKeys">android.<wbr/>request.<wbr/>available<wbr/>Request<wbr/>Keys</a> which contains a list
+of keys that can be overriden using <a href="https://developer.android.com/reference/CaptureRequest/Builder.html#setPhysicalCameraKey">Builder#setPhysicalCameraKey</a>.<wbr/>
+The respective value of such request key can be obtained by calling
+<a href="https://developer.android.com/reference/CaptureRequest/Builder.html#getPhysicalCameraKey">Builder#getPhysicalCameraKey</a>.<wbr/> Capture requests that contain
+individual physical device requests must be built via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureRequest(int,">Set)</a>.<wbr/>
+Such extended capture requests can be passed only to
+<a href="https://developer.android.com/reference/CameraCaptureSession.html#capture">CameraCaptureSession#capture</a> or <a href="https://developer.android.com/reference/CameraCaptureSession.html#captureBurst">CameraCaptureSession#captureBurst</a> and
+not to <a href="https://developer.android.com/reference/CameraCaptureSession.html#setRepeatingRequest">CameraCaptureSession#setRepeatingRequest</a> or
+<a href="https://developer.android.com/reference/CameraCaptureSession.html#setRepeatingBurst">CameraCaptureSession#setRepeatingBurst</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Vendor tags can be listed here.<wbr/> Vendor tag metadata should also
+use the extensions C api (refer to
+android.<wbr/>hardware.<wbr/>camera.<wbr/>device.<wbr/>V3_<wbr/>4.<wbr/>Capture<wbr/>Request.<wbr/>physical<wbr/>Camera<wbr/>Settings for more
+details).<wbr/></p>
+<p>Setting/<wbr/>getting vendor tags will be checked against the metadata
+vendor extensions API and not against this field.<wbr/></p>
+<p>The HAL must not consume any request tags in the session parameters that
+are not listed either here or in the vendor tag list.<wbr/></p>
+<p>The public camera2 API will always make the vendor tags visible
+via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailablePhysicalCameraRequestKeys">CameraCharacteristics#getAvailablePhysicalCameraRequestKeys</a>.<wbr/></p>
             </td>
           </tr>
 
