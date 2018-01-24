@@ -12,13 +12,8 @@ cc_defaults {
     ],
 }
 
-cc_library {
-    name: "libaudioutils",
-    vendor_available: true,
-    vndk: {
-        enabled: true,
-    },
-    host_supported: true,
+cc_defaults {
+    name: "libaudioutils_default",
     defaults: ["audio_utils_defaults"],
 
     srcs: [
@@ -37,12 +32,10 @@ cc_library {
     ],
 
     header_libs: [
-        "libaudio_system_headers",
         "libutils_headers",
     ],
 
     export_header_lib_headers: [
-        "libaudio_system_headers",
         "libutils_headers",
     ],
 
@@ -67,6 +60,28 @@ cc_library {
             cflags: ["-D__unused=__attribute__((unused))"],
         },
     },
+}
+cc_library {
+    name: "libaudioutils_system",
+    host_supported: true,
+    defaults: ["libaudioutils_default"],
+    header_libs: [
+        "libaudio_system_headers",
+    ],
+    export_header_lib_headers: [
+        "libaudio_system_headers",
+    ],
+}
+cc_library {
+    name: "libaudioutils",
+    vendor: true,
+    defaults: ["libaudioutils_default"],
+    header_libs: [
+        "android.hardware.audio.common.legacy@2.0",
+    ],
+    export_header_lib_headers: [
+        "android.hardware.audio.common.legacy@2.0",
+    ],
 }
 
 cc_library_static {

@@ -17,7 +17,6 @@
 #ifndef ANDROID_SYSTEM_MEDIA_ALSA_UTILS_ALSA_FORMAT_H
 #define ANDROID_SYSTEM_MEDIA_ALSA_UTILS_ALSA_FORMAT_H
 
-#include <system/audio.h>
 
 #include <tinyalsa/asoundlib.h>
 
