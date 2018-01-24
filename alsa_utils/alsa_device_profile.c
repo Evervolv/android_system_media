@@ -22,7 +22,6 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
 #include <cutils/properties.h>
 
 #include <log/log.h>

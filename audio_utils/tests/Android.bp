@@ -15,10 +15,10 @@ cc_test {
     ],
     target: {
         android: {
-            shared_libs: ["libaudioutils_system"],
+            shared_libs: ["libaudioutils"],
         },
         host: {
-            static_libs: ["libaudioutils_system"],
+            static_libs: ["libaudioutils"],
         },
     }
 }
@@ -39,7 +39,7 @@ cc_binary {
     ],
     static_libs: [
         "libgoogle-benchmark",
-        "libaudioutils_system",
+        "libaudioutils",
     ],
 }
 
@@ -47,7 +47,7 @@ cc_binary {
     name: "fifo_tests",
     host_supported: true,
     srcs: ["fifo_tests.cpp"],
-    shared_libs: ["libaudioutils_system"],
+    shared_libs: ["libaudioutils"],
     static_libs: ["libsndfile"],
     cflags: [
         "-Werror",
@@ -59,7 +59,7 @@ cc_binary {
     name: "fifo_multiprocess",
     host_supported: false,
     srcs: ["fifo_multiprocess.cpp"],
-    shared_libs: ["libaudioutils_system", "libcutils"],
+    shared_libs: ["libaudioutils", "libcutils"],
     static_libs: ["libsndfile"],
     cflags: [
         "-Werror",
@@ -75,7 +75,7 @@ cc_binary_host {
         "getch.c",
     ],
     static_libs: [
-        "libaudioutils_system",
+        "libaudioutils",
         "liblog",
     ],
     cflags: [
@@ -87,7 +87,7 @@ cc_binary_host {
 cc_binary_host {
     name: "limiter_tests",
     srcs: ["limiter_tests.c"],
-    static_libs: ["libaudioutils_system"],
+    static_libs: ["libaudioutils"],
     cflags: [
         "-Werror",
         "-Wall",
@@ -111,10 +111,10 @@ cc_test {
     ],
     target: {
         android: {
-            shared_libs: ["libaudioutils_system"],
+            shared_libs: ["libaudioutils"],
         },
         host: {
-            static_libs: ["libaudioutils_system"],
+            static_libs: ["libaudioutils"],
         },
     }
 }
@@ -135,10 +135,10 @@ cc_test {
     ],
     target: {
         android: {
-            shared_libs: ["libaudioutils_system"],
+            shared_libs: ["libaudioutils"],
         },
         host: {
-            static_libs: ["libaudioutils_system"],
+            static_libs: ["libaudioutils"],
         },
     }
 }
@@ -159,10 +159,10 @@ cc_test {
     ],
     target: {
         android: {
-            shared_libs: ["libaudioutils_system"],
+            shared_libs: ["libaudioutils"],
         },
         host: {
-            static_libs: ["libaudioutils_system"],
+            static_libs: ["libaudioutils"],
         },
     }
 }
@@ -183,10 +183,10 @@ cc_test {
     ],
     target: {
         android: {
-            shared_libs: ["libaudioutils_system"],
+            shared_libs: ["libaudioutils"],
         },
         host: {
-            static_libs: ["libaudioutils_system"],
+            static_libs: ["libaudioutils"],
         },
     }
 }
@@ -206,10 +206,10 @@ cc_test {
     ],
     target: {
         android: {
-            shared_libs: ["libaudioutils_system"],
+            shared_libs: ["libaudioutils"],
         },
         host: {
-            static_libs: ["libaudioutils_system"],
+            static_libs: ["libaudioutils"],
         },
     }
 }
