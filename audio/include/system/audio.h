@@ -1007,6 +1007,12 @@ struct audio_microphone_coordinate {
  */
 typedef int audio_microphone_group_t;
 
+typedef enum {
+    AUDIO_MICROPHONE_CHANNEL_MAPPING_UNUSED = 0,
+    AUDIO_MICROPHONE_CHANNEL_MAPPING_DIRECT = 1,
+    AUDIO_MICROPHONE_CHANNEL_MAPPING_PROCESSED = 2,
+} audio_microphone_channel_mapping_t;
+
 /* the maximum length for the microphone id */
 #define AUDIO_MICROPHONE_ID_MAX_LEN 32
 /* max number of frequency responses in a frequency response table */
@@ -1017,6 +1023,7 @@ struct audio_microphone_characteristic_t {
     audio_port_handle_t                id;
     audio_port_type_t                  type;
     char                               address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
+    audio_microphone_channel_mapping_t channel_mapping[AUDIO_CHANNEL_COUNT_MAX];
     audio_microphone_location_t        location;
     audio_microphone_group_t           group;
     unsigned int                       index_in_the_group;
@@ -1029,7 +1036,6 @@ struct audio_microphone_characteristic_t {
     struct audio_microphone_coordinate geometric_location;
     struct audio_microphone_coordinate orientation;
 };
-
 
 __END_DECLS
 
