@@ -1021,7 +1021,7 @@ typedef enum {
 struct audio_microphone_characteristic_t {
     char                               device_id[AUDIO_MICROPHONE_ID_MAX_LEN];
     audio_port_handle_t                id;
-    audio_port_type_t                  type;
+    audio_devices_t                    type;
     char                               address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
     audio_microphone_channel_mapping_t channel_mapping[AUDIO_CHANNEL_COUNT_MAX];
     audio_microphone_location_t        location;
