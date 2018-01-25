@@ -16888,19 +16888,24 @@ also exposed to the application.<wbr/></p>
 <li><a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a></li>
 </ul>
 </li>
+<li>The SENSOR_<wbr/>INFO_<wbr/>TIMESTAMP_<wbr/>SOURCE of the logical device and physical devices must be
+  the same.<wbr/></li>
 <li>The logical camera device must be LIMITED or higher device.<wbr/></li>
 </ul>
 <p>Both the logical camera device and its underlying physical devices support the
 mandatory stream combinations required for their device levels.<wbr/></p>
 <p>Additionally,<wbr/> for each guaranteed stream combination,<wbr/> the logical camera supports:</p>
 <ul>
-<li>Replacing one logical <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a>
+<li>For each guaranteed stream combination,<wbr/> the logical camera supports replacing one
+  logical <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a>
   or raw stream with two physical streams of the same size and format,<wbr/> each from a
   separate physical camera,<wbr/> given that the size and format are supported by both
   physical cameras.<wbr/></li>
-<li>Adding two raw streams,<wbr/> each from one physical camera,<wbr/> if the logical camera doesn't
-  advertise RAW capability,<wbr/> but the underlying physical cameras do.<wbr/> This is usually
-  the case when the physical cameras have different sensor sizes.<wbr/></li>
+<li>If the logical camera doesn't advertise RAW capability,<wbr/> but the underlying physical
+  cameras do,<wbr/> the logical camera will support guaranteed stream combinations for RAW
+  capability,<wbr/> except that the RAW streams will be physical streams,<wbr/> each from a separate
+  physical camera.<wbr/> This is usually the case when the physical cameras have different
+  sensor sizes.<wbr/></li>
 </ul>
 <p>Using physical streams in place of a logical stream of the same size and format will
 not slow down the frame rate of the capture,<wbr/> as long as the minimum frame duration
