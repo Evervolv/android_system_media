@@ -974,7 +974,7 @@ typedef struct audio_uuid_s {
 
 //TODO: audio_microphone_location_t need to move to HAL v4.0
 typedef enum {
-    AUDIO_MICROPHONE_LOCATION_UNKNOW = 0,
+    AUDIO_MICROPHONE_LOCATION_UNKNOWN = 0,
     AUDIO_MICROPHONE_LOCATION_MAINBODY = 1,
     AUDIO_MICROPHONE_LOCATION_MAINBODY_MOVABLE = 2,
     AUDIO_MICROPHONE_LOCATION_PERIPHERAL = 3,
@@ -983,7 +983,7 @@ typedef enum {
 
 //TODO: audio_microphone_directionality_t need to move to HAL v4.0
 typedef enum {
-    AUDIO_MICROPHONE_DIRECTIONALITY_UNKNOW = 0,
+    AUDIO_MICROPHONE_DIRECTIONALITY_UNKNOWN = 0,
     AUDIO_MICROPHONE_DIRECTIONALITY_OMNI = 1,
     AUDIO_MICROPHONE_DIRECTIONALITY_BI_DIRECTIONAL = 2,
     AUDIO_MICROPHONE_DIRECTIONALITY_CARDIOID = 3,
@@ -1021,7 +1021,7 @@ typedef enum {
 struct audio_microphone_characteristic_t {
     char                               device_id[AUDIO_MICROPHONE_ID_MAX_LEN];
     audio_port_handle_t                id;
-    audio_devices_t                    type;
+    audio_devices_t                    device;
     char                               address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
     audio_microphone_channel_mapping_t channel_mapping[AUDIO_CHANNEL_COUNT_MAX];
     audio_microphone_location_t        location;
@@ -1104,6 +1104,12 @@ __END_DECLS
 #define AUDIO_PARAMETER_STREAM_FRAME_COUNT "frame_count"     /* size_t */
 #define AUDIO_PARAMETER_STREAM_INPUT_SOURCE "input_source"   /* audio_source_t */
 #define AUDIO_PARAMETER_STREAM_SAMPLING_RATE "sampling_rate" /* uint32_t */
+
+/* Request the presentation id to be decoded by a next gen audio decoder */
+#define AUDIO_PARAMETER_STREAM_PRESENTATION_ID "presentation_id" /* int32_t */
+
+/* Request the program id to be decoded by a next gen audio decoder */
+#define AUDIO_PARAMETER_STREAM_PROGRAM_ID "program_id"           /* int32_t */
 
 #define AUDIO_PARAMETER_DEVICE_CONNECT "connect"            /* audio_devices_t */
 #define AUDIO_PARAMETER_DEVICE_DISCONNECT "disconnect"      /* audio_devices_t */
