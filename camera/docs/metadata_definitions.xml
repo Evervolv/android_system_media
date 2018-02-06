@@ -5430,10 +5430,6 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           {@link CaptureRequest.Builder#getPhysicalCameraKey}. Capture requests that contain
           individual physical device requests must be built via
           {@link android.hardware.camera2.CameraDevice#createCaptureRequest(int, Set)}.
-          Such extended capture requests can be passed only to
-          {@link CameraCaptureSession#capture} or {@link CameraCaptureSession#captureBurst} and
-          not to {@link CameraCaptureSession#setRepeatingRequest} or
-          {@link CameraCaptureSession#setRepeatingBurst}.
           </details>
           <hal_details>
           Vendor tags can be listed here. Vendor tag metadata should also
@@ -5446,6 +5442,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           The HAL must not consume any request tags in the session parameters that
           are not listed either here or in the vendor tag list.
+
+          There should be no overlap between this set of keys and the available session keys
+          {@link android.hardware.camera2.CameraCharacteristics#getAvailableSessionKeys} along
+          with any other controls that can have impact on the dual-camera sync.
 
           The public camera2 API will always make the vendor tags visible
           via
