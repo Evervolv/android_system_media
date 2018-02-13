@@ -13755,13 +13755,12 @@ is therefore no larger than <code>|<wbr/>r|<wbr/> &lt;= sqrt(2)</code>.<wbr/></p
                     <span class="entry_type_enum_name">PRIMARY_CAMERA (v3.3)</span>
                     <span class="entry_type_enum_notes"><p>The value of <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a> is relative to the optical center of
 the largest camera device facing the same direction as this camera.<wbr/></p>
-<p>This default value for API levels before Android P.<wbr/></p></span>
+<p>This is the default value for API levels before Android P.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">GYROSCOPE (v3.3)</span>
                     <span class="entry_type_enum_notes"><p>The value of <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a> is relative to the position of the
-primary gyroscope of this Android device.<wbr/></p>
-<p>This is the value reported by all devices that support the MOTION_<wbr/>TRACKING capability.<wbr/></p></span>
+primary gyroscope of this Android device.<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -13792,9 +13791,6 @@ primary gyroscope of this Android device.<wbr/></p>
             <td class="entry_details" colspan="6">
               <p>Different calibration methods and use cases can produce better or worse results
 depending on the selected coordinate origin.<wbr/></p>
-<p>For devices designed to support the MOTION_<wbr/>TRACKING capability,<wbr/> the GYROSCOPE origin
-makes device calibration and later usage by applications combining camera and gyroscope
-information together simpler.<wbr/></p>
             </td>
           </tr>
 
@@ -16866,35 +16862,10 @@ during high speed streaming.<wbr/></p></span>
                   <li>
                     <span class="entry_type_enum_name">MOTION_TRACKING (v3.3)</span>
                     <span class="entry_type_enum_optional">[optional]</span>
-                    <span class="entry_type_enum_notes"><p>The device supports controls and metadata required for accurate motion tracking for
-use cases such as augmented reality,<wbr/> electronic image stabilization,<wbr/> and so on.<wbr/></p>
-<p>This means this camera device has accurate optical calibration and timestamps relative
-to the inertial sensors.<wbr/></p>
-<p>This capability requires the camera device to support the following:</p>
-<ul>
-<li>Capture request templates <a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#TEMPLATE_MOTION_TRACKING_PREVIEW">Camera<wbr/>Device#TEMPLATE_<wbr/>MOTION_<wbr/>TRACKING_<wbr/>PREVIEW</a> and <a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#TEMPLATE_MOTION_TRACKING_BEST">Camera<wbr/>Device#TEMPLATE_<wbr/>MOTION_<wbr/>TRACKING_<wbr/>BEST</a> are defined.<wbr/></li>
-<li>The stream configurations listed in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureSession">CameraDevice#createCaptureSession</a> for MOTION_<wbr/>TRACKING are
-  supported,<wbr/> either at 30 or 60fps maximum frame rate.<wbr/></li>
-<li>The following camera characteristics and capture result metadata are provided:<ul>
-<li><a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a></li>
-<li><a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a></li>
-<li><a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a></li>
-<li><a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a></li>
-<li><a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> with value GYROSCOPE</li>
-</ul>
-</li>
-<li>The <a href="#static_android.sensor.info.timestampSource">android.<wbr/>sensor.<wbr/>info.<wbr/>timestamp<wbr/>Source</a> field has value <code>REALTIME</code>.<wbr/> When compared to
-  timestamps from the device's gyroscopes,<wbr/> the clock difference for events occuring at
-  the same actual time instant will be less than 1 ms.<wbr/></li>
-<li>The value of the <a href="#dynamic_android.sensor.rollingShutterSkew">android.<wbr/>sensor.<wbr/>rolling<wbr/>Shutter<wbr/>Skew</a> field is accurate to within 1 ms.<wbr/></li>
-<li>The value of <a href="#controls_android.sensor.exposureTime">android.<wbr/>sensor.<wbr/>exposure<wbr/>Time</a> is guaranteed to be available in the
-  capture result.<wbr/></li>
-<li>The <a href="#controls_android.control.captureIntent">android.<wbr/>control.<wbr/>capture<wbr/>Intent</a> control supports MOTION_<wbr/>TRACKING to limit maximum
-  exposure to 20 milliseconds.<wbr/></li>
-<li>The stream configurations required for MOTION_<wbr/>TRACKING (listed at <a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureSession">CameraDevice#createCaptureSession</a>) can operate at least at
-  30fps; optionally,<wbr/> they can operate at 60fps,<wbr/> and '[60,<wbr/> 60]' is listed in
-  <a href="#static_android.control.aeAvailableTargetFpsRanges">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Target<wbr/>Fps<wbr/>Ranges</a>.<wbr/></li>
-</ul></span>
+                    <span class="entry_type_enum_notes"><p>The camera device supports the MOTION_<wbr/>TRACKING value for
+<a href="#controls_android.control.captureIntent">android.<wbr/>control.<wbr/>capture<wbr/>Intent</a>,<wbr/> which limits maximum exposure time to 20 ms.<wbr/></p>
+<p>This limits the motion blur of capture images,<wbr/> resulting in better image tracking
+results for use cases such as image stabilization or augmented reality.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">LOGICAL_MULTI_CAMERA (v3.3)</span>
@@ -24144,7 +24115,7 @@ the output result metadata.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Whether the camera device will output the OIS data in output
+              <p>A control for selecting whether OIS position information is included in output
 result metadata.<wbr/></p>
             </td>
 
@@ -24170,7 +24141,7 @@ result metadata.<wbr/></p>
             <td class="entry_details" colspan="6">
               <p>When set to ON,<wbr/>
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>,<wbr/> android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>X,<wbr/>
-android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y will provide OIS data in the output result metadata.<wbr/></p>
+and android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y provide OIS data in the output result metadata.<wbr/></p>
             </td>
           </tr>
 
@@ -26018,7 +25989,7 @@ the output result metadata.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Whether the camera device will output the OIS data in output
+              <p>A control for selecting whether OIS position information is included in output
 result metadata.<wbr/></p>
             </td>
 
@@ -26044,7 +26015,7 @@ result metadata.<wbr/></p>
             <td class="entry_details" colspan="6">
               <p>When set to ON,<wbr/>
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>,<wbr/> android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>X,<wbr/>
-android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y will provide OIS data in the output result metadata.<wbr/></p>
+and android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y provide OIS data in the output result metadata.<wbr/></p>
             </td>
           </tr>
 

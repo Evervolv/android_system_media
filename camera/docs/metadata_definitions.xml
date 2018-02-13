@@ -4113,14 +4113,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <notes>The value of android.lens.poseTranslation is relative to the optical center of
             the largest camera device facing the same direction as this camera.
 
-            This default value for API levels before Android P.
+            This is the default value for API levels before Android P.
             </notes>
             </value>
             <value>GYROSCOPE
             <notes>The value of android.lens.poseTranslation is relative to the position of the
             primary gyroscope of this Android device.
-
-            This is the value reported by all devices that support the MOTION_TRACKING capability.
             </notes>
             </value>
           </enum>
@@ -4130,10 +4128,6 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>
             Different calibration methods and use cases can produce better or worse results
             depending on the selected coordinate origin.
-
-            For devices designed to support the MOTION_TRACKING capability, the GYROSCOPE origin
-            makes device calibration and later usage by applications combining camera and gyroscope
-            information together simpler.
           </details>
         </entry>
       </static>
@@ -5103,38 +5097,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             </value>
             <value optional="true" hal_version="3.3" >MOTION_TRACKING
               <notes>
-              The device supports controls and metadata required for accurate motion tracking for
-              use cases such as augmented reality, electronic image stabilization, and so on.
+              The camera device supports the MOTION_TRACKING value for
+              android.control.captureIntent, which limits maximum exposure time to 20 ms.
 
-              This means this camera device has accurate optical calibration and timestamps relative
-              to the inertial sensors.
-
-              This capability requires the camera device to support the following:
-
-              * Capture request templates {@link
-                android.hardware.camera2.CameraDevice#TEMPLATE_MOTION_TRACKING_PREVIEW} and {@link
-                android.hardware.camera2.CameraDevice#TEMPLATE_MOTION_TRACKING_BEST} are defined.
-              * The stream configurations listed in {@link
-                android.hardware.camera2.CameraDevice#createCaptureSession} for MOTION_TRACKING are
-                supported, either at 30 or 60fps maximum frame rate.
-              * The following camera characteristics and capture result metadata are provided:
-                  - android.lens.intrinsicCalibration
-                  - android.lens.radialDistortion
-                  - android.lens.poseRotation
-                  - android.lens.poseTranslation
-                  - android.lens.poseReference with value GYROSCOPE
-              * The android.sensor.info.timestampSource field has value `REALTIME`. When compared to
-                timestamps from the device's gyroscopes, the clock difference for events occuring at
-                the same actual time instant will be less than 1 ms.
-              * The value of the android.sensor.rollingShutterSkew field is accurate to within 1 ms.
-              * The value of android.sensor.exposureTime is guaranteed to be available in the
-                capture result.
-              * The android.control.captureIntent control supports MOTION_TRACKING to limit maximum
-                exposure to 20 milliseconds.
-              * The stream configurations required for MOTION_TRACKING (listed at {@link
-                android.hardware.camera2.CameraDevice#createCaptureSession}) can operate at least at
-                30fps; optionally, they can operate at 60fps, and '[60, 60]' is listed in
-                android.control.aeAvailableTargetFpsRanges.
+              This limits the motion blur of capture images, resulting in better image tracking
+              results for use cases such as image stabilization or augmented reality.
               </notes>
             </value>
             <value optional="true" hal_version="3.3">LOGICAL_MULTI_CAMERA
@@ -8337,12 +8304,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value>ON
             <notes>Include OIS data in the capture result.</notes></value>
           </enum>
-          <description>Whether the camera device will output the OIS data in output
+          <description>A control for selecting whether OIS position information is included in output
           result metadata.</description>
           <range>android.Statistics.info.availableOisDataModes</range>
           <details>When set to ON,
           android.statistics.oisTimestamps, android.statistics.oisShiftPixelX,
-          android.statistics.oisShiftPixelY will provide OIS data in the output result metadata.
+          and android.statistics.oisShiftPixelY provide OIS data in the output result metadata.
           </details>
         </entry>
       </controls>
