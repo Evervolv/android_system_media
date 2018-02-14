@@ -17395,11 +17395,7 @@ of keys that can be overriden using <a href="https://developer.android.com/refer
 The respective value of such request key can be obtained by calling
 <a href="https://developer.android.com/reference/CaptureRequest/Builder.html#getPhysicalCameraKey">Builder#getPhysicalCameraKey</a>.<wbr/> Capture requests that contain
 individual physical device requests must be built via
-<a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureRequest(int,">Set)</a>.<wbr/>
-Such extended capture requests can be passed only to
-<a href="https://developer.android.com/reference/CameraCaptureSession.html#capture">CameraCaptureSession#capture</a> or <a href="https://developer.android.com/reference/CameraCaptureSession.html#captureBurst">CameraCaptureSession#captureBurst</a> and
-not to <a href="https://developer.android.com/reference/CameraCaptureSession.html#setRepeatingRequest">CameraCaptureSession#setRepeatingRequest</a> or
-<a href="https://developer.android.com/reference/CameraCaptureSession.html#setRepeatingBurst">CameraCaptureSession#setRepeatingBurst</a>.<wbr/></p>
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureRequest(int,">Set)</a>.<wbr/></p>
             </td>
           </tr>
 
@@ -17416,6 +17412,9 @@ details).<wbr/></p>
 vendor extensions API and not against this field.<wbr/></p>
 <p>The HAL must not consume any request tags in the session parameters that
 are not listed either here or in the vendor tag list.<wbr/></p>
+<p>There should be no overlap between this set of keys and the available session keys
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableSessionKeys">CameraCharacteristics#getAvailableSessionKeys</a> along
+with any other controls that can have impact on the dual-camera sync.<wbr/></p>
 <p>The public camera2 API will always make the vendor tags visible
 via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailablePhysicalCameraRequestKeys">CameraCharacteristics#getAvailablePhysicalCameraRequestKeys</a>.<wbr/></p>
