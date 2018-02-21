@@ -926,6 +926,12 @@ static inline size_t audio_bytes_per_sample(audio_format_t format)
     return size;
 }
 
+static inline size_t audio_bytes_per_frame(uint32_t channel_count, audio_format_t format)
+{
+    // cannot overflow for reasonable channel_count
+    return channel_count * audio_bytes_per_sample(format);
+}
+
 /* converts device address to string sent to audio HAL via set_parameters */
 static inline char *audio_device_address_to_parameter(audio_devices_t device, const char *address)
 {
