@@ -983,6 +983,8 @@
             ><a href="#dynamic_android.statistics.oisXShifts">android.statistics.oisXShifts</a></li>
             <li
             ><a href="#dynamic_android.statistics.oisYShifts">android.statistics.oisYShifts</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.oisSamples">android.statistics.oisSamples</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -24093,7 +24095,7 @@ the output result metadata.<wbr/></p>
                 
           <tr class="entry" id="controls_android.statistics.oisDataMode">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="1">
               android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
             </td>
             <td class="entry_type">
@@ -24137,16 +24139,6 @@ result metadata.<wbr/></p>
             <td class="entry_tags">
             </td>
 
-          </tr>
-          <tr class="entries_header">
-            <th class="th_details" colspan="6">Details</th>
-          </tr>
-          <tr class="entry_cont">
-            <td class="entry_details" colspan="6">
-              <p>When set to ON,<wbr/>
-<a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>,<wbr/> android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>X,<wbr/>
-and android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y provide OIS data in the output result metadata.<wbr/></p>
-            </td>
           </tr>
 
 
@@ -25967,7 +25959,7 @@ the output result metadata.<wbr/></p>
                 
           <tr class="entry" id="dynamic_android.statistics.oisDataMode">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="1">
               android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
             </td>
             <td class="entry_type">
@@ -26012,16 +26004,6 @@ result metadata.<wbr/></p>
             </td>
 
           </tr>
-          <tr class="entries_header">
-            <th class="th_details" colspan="6">Details</th>
-          </tr>
-          <tr class="entry_cont">
-            <td class="entry_details" colspan="6">
-              <p>When set to ON,<wbr/>
-<a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>,<wbr/> android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>X,<wbr/>
-and android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y provide OIS data in the output result metadata.<wbr/></p>
-            </td>
-          </tr>
 
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
@@ -26040,7 +26022,7 @@ and android.<wbr/>statistics.<wbr/>ois<wbr/>Shift<wbr/>Pixel<wbr/>Y provide OIS 
                 <span class="entry_type_array">
                   n
                 </span>
-              <span class="entry_type_visibility"> [public]</span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
 
 
 
@@ -26095,7 +26077,7 @@ timebase as and comparable to <a href="#dynamic_android.sensor.timestamp">androi
                 <span class="entry_type_array">
                   n
                 </span>
-              <span class="entry_type_visibility"> [public]</span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
 
 
 
@@ -26130,7 +26112,7 @@ timebase as and comparable to <a href="#dynamic_android.sensor.timestamp">androi
             <td class="entry_details" colspan="6">
               <p>The array contains the amount of shifts in x direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
 A positive value is a shift from left to right in active array coordinate system.<wbr/> For
-example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> an shift of
+example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of
 (3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
 <p>The number of shifts must match the number of timestamps in
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
@@ -26154,7 +26136,7 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
                 <span class="entry_type_array">
                   n
                 </span>
-              <span class="entry_type_visibility"> [public]</span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
 
 
 
@@ -26189,10 +26171,71 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
             <td class="entry_details" colspan="6">
               <p>The array contains the amount of shifts in y direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
 A positive value is a shift from top to bottom in active array coordinate system.<wbr/> For
-example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> an shift of
+example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of
 (0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
 <p>The number of shifts must match the number of timestamps in
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.oisSamples">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>ois<wbr/>Samples
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [java_public as oisSample]</span>
+
+              <span class="entry_type_synthetic">[synthetic] </span>
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of OIS samples.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Each OIS sample contains the timestamp and the amount of shifts in x and y direction,<wbr/>
+in pixels,<wbr/> of the OIS sample.<wbr/></p>
+<p>A positive value for a shift in x direction is a shift from left to right in active array
+coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array
+coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
+<p>A positive value for a shift in y direction is a shift from top to bottom in active array
+coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array
+coordinates,<wbr/> a shift of (0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
             </td>
           </tr>
 

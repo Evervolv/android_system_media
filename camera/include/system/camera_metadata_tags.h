@@ -365,9 +365,9 @@ typedef enum camera_metadata_tag {
     ANDROID_STATISTICS_HOT_PIXEL_MAP,                 // int32[]      | public       | HIDL v3.2
     ANDROID_STATISTICS_LENS_SHADING_MAP_MODE,         // enum         | public       | HIDL v3.2
     ANDROID_STATISTICS_OIS_DATA_MODE,                 // enum         | public       | HIDL v3.3
-    ANDROID_STATISTICS_OIS_TIMESTAMPS,                // int64[]      | public       | HIDL v3.3
-    ANDROID_STATISTICS_OIS_X_SHIFTS,                  // float[]      | public       | HIDL v3.3
-    ANDROID_STATISTICS_OIS_Y_SHIFTS,                  // float[]      | public       | HIDL v3.3
+    ANDROID_STATISTICS_OIS_TIMESTAMPS,                // int64[]      | ndk_public   | HIDL v3.3
+    ANDROID_STATISTICS_OIS_X_SHIFTS,                  // float[]      | ndk_public   | HIDL v3.3
+    ANDROID_STATISTICS_OIS_Y_SHIFTS,                  // float[]      | ndk_public   | HIDL v3.3
     ANDROID_STATISTICS_END,
 
     ANDROID_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES = 
