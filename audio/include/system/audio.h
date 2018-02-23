@@ -27,6 +27,7 @@
 #include <cutils/bitops.h>
 
 #include "audio-base.h"
+#include "audio-base-utils.h"
 
 __BEGIN_DECLS
 
@@ -42,20 +43,6 @@ __BEGIN_DECLS
 
 /* AudioFlinger and AudioPolicy services use I/O handles to identify audio sources and sinks */
 typedef int audio_io_handle_t;
-
-/* Do not change these values without updating their counterparts
- * in frameworks/base/media/java/android/media/AudioAttributes.java
- */
-typedef enum {
-    AUDIO_CONTENT_TYPE_UNKNOWN      = 0,
-    AUDIO_CONTENT_TYPE_SPEECH       = 1,
-    AUDIO_CONTENT_TYPE_MUSIC        = 2,
-    AUDIO_CONTENT_TYPE_MOVIE        = 3,
-    AUDIO_CONTENT_TYPE_SONIFICATION = 4,
-
-    AUDIO_CONTENT_TYPE_CNT,
-    AUDIO_CONTENT_TYPE_MAX          = AUDIO_CONTENT_TYPE_CNT - 1,
-} audio_content_type_t;
 
 typedef uint32_t audio_flags_mask_t;
 
@@ -197,6 +184,21 @@ static inline audio_channel_mask_t audio_channel_mask_from_representation_and_bi
 {
     return (audio_channel_mask_t) ((representation << AUDIO_CHANNEL_COUNT_MAX) | bits);
 }
+
+/**
+ * Expresses the convention when stereo audio samples are stored interleaved
+ * in an array.  This should improve readability by allowing code to use
+ * symbolic indices instead of hard-coded [0] and [1].
+ *
+ * For multi-channel beyond stereo, the platform convention is that channels
+ * are interleaved in order from least significant channel mask bit to most
+ * significant channel mask bit, with unused bits skipped.  Any exceptions
+ * to this convention will be noted at the appropriate API.
+ */
+enum {
+    AUDIO_INTERLEAVE_LEFT = 0,
+    AUDIO_INTERLEAVE_RIGHT = 1,
+};
 
 /* This enum is deprecated */
 typedef enum {
@@ -530,6 +532,10 @@ struct audio_mmap_position {
     int32_t  position_frames;  /**< increasing 32 bit frame count reset when stream->stop()
                                     is called */
 };
+
+/******************************
+ *  Helper functions
+ *****************************/
 
 static inline bool audio_is_output_device(audio_devices_t device)
 {
@@ -1158,5 +1164,6 @@ __END_DECLS
 // FIXME: a temporary declaration for the incall music flag, will be removed when
 // declared in types.hal for audio HAL V4.0 and auto imported to audio-base.h
 #define AUDIO_OUTPUT_FLAG_INCALL_MUSIC 0x10000
+
 
 #endif  // ANDROID_AUDIO_CORE_H
