@@ -127,6 +127,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <typedef name="reprocessFormatsMap">
       <language name="java">android.hardware.camera2.params.ReprocessFormatsMap</language>
     </typedef>
+    <typedef name="oisSample">
+      <language name="java">android.hardware.camera2.params.OisSample</language>
+    </typedef>
   </types>
 
   <namespace name="android">
@@ -8307,21 +8310,24 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value>OFF
             <notes>Do not include OIS data in the capture result.</notes></value>
             <value>ON
-            <notes>Include OIS data in the capture result.</notes></value>
+            <notes>Include OIS data in the capture result.</notes>
+            <sdk_notes>android.statistics.oisSamples provides OIS sample data in the
+            output result metadata.
+            </sdk_notes>
+            <ndk_notes>android.statistics.oisTimestamps, android.statistics.oisXShifts,
+            and android.statistics.oisYShifts provide OIS data in the output result metadata.
+            </ndk_notes>
+            </value>
           </enum>
           <description>A control for selecting whether OIS position information is included in output
           result metadata.</description>
           <range>android.Statistics.info.availableOisDataModes</range>
-          <details>When set to ON,
-          android.statistics.oisTimestamps, android.statistics.oisShiftPixelX,
-          and android.statistics.oisShiftPixelY provide OIS data in the output result metadata.
-          </details>
         </entry>
       </controls>
       <dynamic>
         <clone entry="android.statistics.oisDataMode" kind="controls">
         </clone>
-        <entry name="oisTimestamps" type="int64" visibility="public" container="array" hal_version="3.3">
+        <entry name="oisTimestamps" type="int64" visibility="ndk_public" container="array" hal_version="3.3">
           <array>
             <size>n</size>
           </array>
@@ -8334,7 +8340,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           timebase as and comparable to android.sensor.timestamp.
           </details>
         </entry>
-        <entry name="oisXShifts" type="float" visibility="public" container="array" hal_version="3.3">
+        <entry name="oisXShifts" type="float" visibility="ndk_public" container="array" hal_version="3.3">
           <array>
             <size>n</size>
           </array>
@@ -8345,14 +8351,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>
           The array contains the amount of shifts in x direction, in pixels, based on OIS samples.
           A positive value is a shift from left to right in active array coordinate system. For
-          example, if the optical center is (1000, 500) in active array coordinates, an shift of
+          example, if the optical center is (1000, 500) in active array coordinates, a shift of
           (3, 0) puts the new optical center at (1003, 500).
 
           The number of shifts must match the number of timestamps in
           android.statistics.oisTimestamps.
           </details>
         </entry>
-        <entry name="oisYShifts" type="float" visibility="public" container="array" hal_version="3.3">
+        <entry name="oisYShifts" type="float" visibility="ndk_public" container="array" hal_version="3.3">
           <array>
             <size>n</size>
           </array>
@@ -8363,11 +8369,32 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>
           The array contains the amount of shifts in y direction, in pixels, based on OIS samples.
           A positive value is a shift from top to bottom in active array coordinate system. For
-          example, if the optical center is (1000, 500) in active array coordinates, an shift of
+          example, if the optical center is (1000, 500) in active array coordinates, a shift of
           (0, 5) puts the new optical center at (1000, 505).
 
           The number of shifts must match the number of timestamps in
           android.statistics.oisTimestamps.
+          </details>
+        </entry>
+        <entry name="oisSamples" type="float" visibility="java_public" synthetic="true"
+               container="array" typedef="oisSample" hal_version="3.3">
+          <array>
+            <size>n</size>
+          </array>
+          <description>
+          An array of OIS samples.
+          </description>
+          <details>
+          Each OIS sample contains the timestamp and the amount of shifts in x and y direction,
+          in pixels, of the OIS sample.
+
+          A positive value for a shift in x direction is a shift from left to right in active array
+          coordinate system. For example, if the optical center is (1000, 500) in active array
+          coordinates, a shift of (3, 0) puts the new optical center at (1003, 500).
+
+          A positive value for a shift in y direction is a shift from top to bottom in active array
+          coordinate system. For example, if the optical center is (1000, 500) in active array
+          coordinates, a shift of (0, 5) puts the new optical center at (1000, 505).
           </details>
         </entry>
       </dynamic>
