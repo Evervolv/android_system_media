@@ -26,11 +26,11 @@
 
 // These are declared as macros for compatbility with existing uses.
 // TODO Spell out the words in full.
-#define MICROS_PER_SECOND      1000000
-#define MILLIS_PER_SECOND         1000
-#define NANOS_PER_MICROSECOND     1000
-#define NANOS_PER_MILLISECOND  1000000
-#define NANOS_PER_SECOND    1000000000
+#define MICROS_PER_SECOND      1000000LL
+#define MILLIS_PER_SECOND         1000LL
+#define NANOS_PER_MICROSECOND     1000LL
+#define NANOS_PER_MILLISECOND  1000000LL
+#define NANOS_PER_SECOND    1000000000LL
 
 /**
  * \brief Converts time in ns to a time string, with format similar to logcat.
