@@ -415,6 +415,7 @@ bool profile_read_device_info(alsa_device_profile* profile)
 
     profile->is_valid = true;
 
+    pcm_params_free(alsa_hw_params);
     return true;
 }
 
