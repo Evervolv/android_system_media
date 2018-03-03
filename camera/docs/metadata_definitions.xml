@@ -996,7 +996,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               ignored.
 
               If all regions have 0 weight, then no specific metering area needs to be used by the
-              camera device.
+              camera device. The capture result will either be a zero weight region as well, or
+              the region selected by the camera device as the focus area of interest.
 
               If the metering region is outside the used android.scaler.cropRegion returned in
               capture result metadata, the camera device will ignore the sections outside the crop
