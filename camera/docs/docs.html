@@ -3077,7 +3077,8 @@ camera device will add the weights in the overlap region.<wbr/></p>
 is used,<wbr/> all non-zero weights will have the same effect.<wbr/> A region with 0 weight is
 ignored.<wbr/></p>
 <p>If all regions have 0 weight,<wbr/> then no specific metering area needs to be used by the
-camera device.<wbr/></p>
+camera device.<wbr/> The capture result will either be a zero weight region as well,<wbr/> or
+the region selected by the camera device as the focus area of interest.<wbr/></p>
 <p>If the metering region is outside the used <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> returned in
 capture result metadata,<wbr/> the camera device will ignore the sections outside the crop
 region and output only the intersection rectangle as the metering region in the result
@@ -7282,7 +7283,8 @@ camera device will add the weights in the overlap region.<wbr/></p>
 is used,<wbr/> all non-zero weights will have the same effect.<wbr/> A region with 0 weight is
 ignored.<wbr/></p>
 <p>If all regions have 0 weight,<wbr/> then no specific metering area needs to be used by the
-camera device.<wbr/></p>
+camera device.<wbr/> The capture result will either be a zero weight region as well,<wbr/> or
+the region selected by the camera device as the focus area of interest.<wbr/></p>
 <p>If the metering region is outside the used <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> returned in
 capture result metadata,<wbr/> the camera device will ignore the sections outside the crop
 region and output only the intersection rectangle as the metering region in the result
