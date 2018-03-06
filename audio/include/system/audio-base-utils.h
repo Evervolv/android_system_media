@@ -39,8 +39,8 @@ enum {
     AUDIO_SOURCE_MAX          = AUDIO_SOURCE_UNPROCESSED,
     AUDIO_SOURCE_CNT          = AUDIO_SOURCE_MAX + 1,
 
-    AUDIO_MODE_CNT            = AUDIO_MODE_IN_COMMUNICATION,
-    AUDIO_MODE_MAX            = AUDIO_MODE_CNT + 1,
+    AUDIO_MODE_MAX            = AUDIO_MODE_IN_COMMUNICATION,
+    AUDIO_MODE_CNT            = AUDIO_MODE_MAX + 1,
 
     /** For retrocompatibility AUDIO_MODE_* and AUDIO_STREAM_* must be signed. */
     AUDIO_DETAIL_NEGATIVE_VALUE = -1,
@@ -165,6 +165,7 @@ enum {
                                 AUDIO_DEVICE_IN_USB_HEADSET,
 
     AUDIO_USAGE_MAX           = AUDIO_USAGE_ASSISTANT,
+    AUDIO_USAGE_CNT           = AUDIO_USAGE_ASSISTANT + 1,
 
     AUDIO_PORT_CONFIG_ALL     = AUDIO_PORT_CONFIG_SAMPLE_RATE |
                                 AUDIO_PORT_CONFIG_CHANNEL_MASK |
