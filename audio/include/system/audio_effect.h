@@ -60,6 +60,12 @@ typedef struct effect_descriptor_s {
     char    implementor[EFFECT_STRING_LEN_MAX];    // human readable effect implementor name
 } effect_descriptor_t;
 
+#define EFFECT_CONFIG_ALL (EFFECT_CONFIG_BUFFER | \
+                           EFFECT_CONFIG_SMP_RATE | \
+                           EFFECT_CONFIG_CHANNELS | \
+                           EFFECT_CONFIG_FORMAT | \
+                           EFFECT_CONFIG_ACC_MODE)
+
 /////////////////////////////////////////////////
 //      Effect control interface
 /////////////////////////////////////////////////
