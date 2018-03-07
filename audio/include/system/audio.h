@@ -841,6 +841,8 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_AAC_ADTS:
     case AUDIO_FORMAT_HE_AAC_V1:
     case AUDIO_FORMAT_HE_AAC_V2:
+    case AUDIO_FORMAT_AAC_ELD:
+    case AUDIO_FORMAT_AAC_XHE:
     case AUDIO_FORMAT_VORBIS:
     case AUDIO_FORMAT_OPUS:
     case AUDIO_FORMAT_AC3:
