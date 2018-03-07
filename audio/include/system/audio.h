@@ -818,6 +818,28 @@ static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t cha
             AUDIO_CHANNEL_REPRESENTATION_POSITION, bits);
 }
 
+static inline audio_channel_mask_t audio_channel_mask_in_to_out(audio_channel_mask_t in)
+{
+    switch (in) {
+    case AUDIO_CHANNEL_IN_MONO:
+        return AUDIO_CHANNEL_OUT_MONO;
+    case AUDIO_CHANNEL_IN_STEREO:
+        return AUDIO_CHANNEL_OUT_STEREO;
+    case AUDIO_CHANNEL_IN_5POINT1:
+        return AUDIO_CHANNEL_OUT_5POINT1;
+    case AUDIO_CHANNEL_IN_3POINT1POINT2:
+        return AUDIO_CHANNEL_OUT_3POINT1POINT2;
+    case AUDIO_CHANNEL_IN_3POINT0POINT2:
+        return AUDIO_CHANNEL_OUT_3POINT0POINT2;
+    case AUDIO_CHANNEL_IN_2POINT1POINT2:
+        return AUDIO_CHANNEL_OUT_2POINT1POINT2;
+    case AUDIO_CHANNEL_IN_2POINT0POINT2:
+        return AUDIO_CHANNEL_OUT_2POINT0POINT2;
+    default:
+        return AUDIO_CHANNEL_INVALID;
+    }
+}
+
 static inline bool audio_is_valid_format(audio_format_t format)
 {
     switch (format & AUDIO_FORMAT_MAIN_MASK) {
@@ -1164,10 +1186,5 @@ __END_DECLS
 #define AUDIO_OFFLOAD_CODEC_DOWN_SAMPLING  "music_offload_down_sampling"
 #define AUDIO_OFFLOAD_CODEC_DELAY_SAMPLES  "delay_samples"
 #define AUDIO_OFFLOAD_CODEC_PADDING_SAMPLES  "padding_samples"
-
-// FIXME: a temporary declaration for the incall music flag, will be removed when
-// declared in types.hal for audio HAL V4.0 and auto imported to audio-base.h
-#define AUDIO_OUTPUT_FLAG_INCALL_MUSIC 0x10000
-
 
 #endif  // ANDROID_AUDIO_CORE_H
