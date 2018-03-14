@@ -133,6 +133,9 @@
             <element name="description" type="string" maxOccurs="1"
                 minOccurs="0">
             </element>
+            <element name="deprecation_description" type="string" maxOccurs="1"
+                     minOccurs="0">
+            </element>
             <element name="units" type="string" maxOccurs="1"
                 minOccurs="0">
             </element>

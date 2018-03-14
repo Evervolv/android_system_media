@@ -224,6 +224,7 @@ typedef enum camera_metadata_tag {
     ANDROID_LENS_INTRINSIC_CALIBRATION,               // float[]      | public       | HIDL v3.2
     ANDROID_LENS_RADIAL_DISTORTION,                   // float[]      | public       | HIDL v3.2
     ANDROID_LENS_POSE_REFERENCE,                      // enum         | public       | HIDL v3.3
+    ANDROID_LENS_DISTORTION,                          // float[]      | public       | HIDL v3.3
     ANDROID_LENS_END,
 
     ANDROID_LENS_INFO_AVAILABLE_APERTURES =           // float[]      | public       | HIDL v3.2

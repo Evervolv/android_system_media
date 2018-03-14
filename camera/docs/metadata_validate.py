@@ -281,6 +281,20 @@ def validate_entries(soup):
                                   ))
         success = False
 
+    deprecated = entry.attrs.get('deprecated')
+    if deprecated and deprecated == 'true':
+      if entry.deprecation_description is None:
+        validate_error(("Entry '%s' in kind '%s' is deprecated, but missing deprecation description") \
+                       % (fully_qualified_name(entry), find_kind(entry),
+                       ))
+        success = False
+    else:
+      if entry.deprecation_description is not None:
+        validate_error(("Entry '%s' in kind '%s' has deprecation description, but is not deprecated") \
+                       % (fully_qualified_name(entry), find_kind(entry),
+                       ))
+        success = False
+
   return success
 
 def validate_xml(xml):
