@@ -58,6 +58,8 @@ const char *camera_metadata_section_names[ANDROID_SECTION_COUNT] = {
     [ANDROID_REPROCESS]            = "android.reprocess",
     [ANDROID_DEPTH]                = "android.depth",
     [ANDROID_LOGICAL_MULTI_CAMERA] = "android.logicalMultiCamera",
+    [ANDROID_DISTORTION_CORRECTION]
+                                    = "android.distortionCorrection",
 };
 
 unsigned int camera_metadata_section_bounds[ANDROID_SECTION_COUNT][2] = {
@@ -115,6 +117,9 @@ unsigned int camera_metadata_section_bounds[ANDROID_SECTION_COUNT][2] = {
                                        ANDROID_DEPTH_END },
     [ANDROID_LOGICAL_MULTI_CAMERA] = { ANDROID_LOGICAL_MULTI_CAMERA_START,
                                        ANDROID_LOGICAL_MULTI_CAMERA_END },
+    [ANDROID_DISTORTION_CORRECTION]
+                                    = { ANDROID_DISTORTION_CORRECTION_START,
+                                       ANDROID_DISTORTION_CORRECTION_END },
 };
 
 static tag_info_t android_color_correction[ANDROID_COLOR_CORRECTION_END -
@@ -709,6 +714,14 @@ static tag_info_t android_logical_multi_camera[ANDROID_LOGICAL_MULTI_CAMERA_END 
     { "sensorSyncType",                TYPE_BYTE   },
 };
 
+static tag_info_t android_distortion_correction[ANDROID_DISTORTION_CORRECTION_END -
+        ANDROID_DISTORTION_CORRECTION_START] = {
+    [ ANDROID_DISTORTION_CORRECTION_MODE - ANDROID_DISTORTION_CORRECTION_START ] =
+    { "mode",                          TYPE_BYTE   },
+    [ ANDROID_DISTORTION_CORRECTION_AVAILABLE_MODES - ANDROID_DISTORTION_CORRECTION_START ] =
+    { "availableModes",                TYPE_BYTE   },
+};
+
 
 tag_info_t *tag_info[ANDROID_SECTION_COUNT] = {
     android_color_correction,
@@ -738,6 +751,7 @@ tag_info_t *tag_info[ANDROID_SECTION_COUNT] = {
     android_reprocess,
     android_depth,
     android_logical_multi_camera,
+    android_distortion_correction,
 };
 
 int camera_metadata_enum_snprint(uint32_t tag,
@@ -2755,6 +2769,29 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+
+        case ANDROID_DISTORTION_CORRECTION_MODE: {
+            switch (value) {
+                case ANDROID_DISTORTION_CORRECTION_MODE_OFF:
+                    msg = "OFF";
+                    ret = 0;
+                    break;
+                case ANDROID_DISTORTION_CORRECTION_MODE_FAST:
+                    msg = "FAST";
+                    ret = 0;
+                    break;
+                case ANDROID_DISTORTION_CORRECTION_MODE_HIGH_QUALITY:
+                    msg = "HIGH_QUALITY";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_DISTORTION_CORRECTION_AVAILABLE_MODES: {
             break;
         }
 
