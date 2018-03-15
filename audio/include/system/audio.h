@@ -599,6 +599,11 @@ static inline bool audio_is_bluetooth_sco_device(audio_devices_t device)
     return false;
 }
 
+static inline bool audio_is_hearing_aid_out_device(audio_devices_t device)
+{
+    return device == AUDIO_DEVICE_OUT_HEARING_AID;
+}
+
 static inline bool audio_is_usb_out_device(audio_devices_t device)
 {
     return ((popcount(device) == 1) && (device & AUDIO_DEVICE_OUT_ALL_USB));
