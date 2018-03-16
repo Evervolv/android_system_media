@@ -65,8 +65,8 @@ enum {
                                 AUDIO_CHANNEL_OUT_TOP_BACK_LEFT |
                                 AUDIO_CHANNEL_OUT_TOP_BACK_CENTER |
                                 AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT |
-                                AUDIO_CHANNEL_OUT_TOP_CENTER_LEFT |
-                                AUDIO_CHANNEL_OUT_TOP_CENTER_RIGHT,
+                                AUDIO_CHANNEL_OUT_TOP_SIDE_LEFT |
+                                AUDIO_CHANNEL_OUT_TOP_SIDE_RIGHT,
 
     AUDIO_CHANNEL_IN_ALL      = AUDIO_CHANNEL_IN_LEFT |
                                 AUDIO_CHANNEL_IN_RIGHT |
