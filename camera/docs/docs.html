@@ -2486,8 +2486,8 @@ metering (and continuous focus if active) should be quickly recaculated to accou
 for the external flash.<wbr/> Otherwise,<wbr/> this mode acts like ON.<wbr/></p>
 <p>When the external flash is turned off,<wbr/> AE mode should be changed to one of the
 other available AE modes.<wbr/></p>
-<p>If the camera device supports AE external flash mode,<wbr/> aeState must be
-FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
+<p>If the camera device supports AE external flash mode,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> must
+be FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
 flash.<wbr/></p></span>
                   </li>
                 </ul>
@@ -6385,8 +6385,8 @@ metering (and continuous focus if active) should be quickly recaculated to accou
 for the external flash.<wbr/> Otherwise,<wbr/> this mode acts like ON.<wbr/></p>
 <p>When the external flash is turned off,<wbr/> AE mode should be changed to one of the
 other available AE modes.<wbr/></p>
-<p>If the camera device supports AE external flash mode,<wbr/> aeState must be
-FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
+<p>If the camera device supports AE external flash mode,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> must
+be FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
 flash.<wbr/></p></span>
                   </li>
                 </ul>
@@ -6972,8 +6972,8 @@ be good to use.<wbr/></p>
 </tbody>
 </table>
 <p>If the camera device supports AE external flash mode (ON_<wbr/>EXTERNAL_<wbr/>FLASH is included in
-<a href="#static_android.control.aeAvailableModes">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Modes</a>),<wbr/> aeState must be FLASH_<wbr/>REQUIRED after the camera device
-finishes AE scan and it's too dark without flash.<wbr/></p>
+<a href="#static_android.control.aeAvailableModes">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Modes</a>),<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> must be FLASH_<wbr/>REQUIRED after
+the camera device finishes AE scan and it's too dark without flash.<wbr/></p>
 <p>For the above table,<wbr/> the camera device may skip reporting any state changes that happen
 without application intervention (i.<wbr/>e.<wbr/> mode switch,<wbr/> trigger,<wbr/> locking).<wbr/> Any state that
 can be skipped in that manner is called a transient state.<wbr/></p>
