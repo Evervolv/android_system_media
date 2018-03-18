@@ -644,8 +644,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 When the external flash is turned off, AE mode should be changed to one of the
                 other available AE modes.
 
-                If the camera device supports AE external flash mode, aeState must be
-                FLASH_REQUIRED after the camera device finishes AE scan and it's too dark without
+                If the camera device supports AE external flash mode, android.control.aeState must
+                be FLASH_REQUIRED after the camera device finishes AE scan and it's too dark without
                 flash.
               </notes>
             </value>
@@ -2370,8 +2370,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Any state (excluding LOCKED) | android.control.aePrecaptureTrigger is CANCEL| INACTIVE       | Currently active precapture metering sequence is canceled
 
           If the camera device supports AE external flash mode (ON_EXTERNAL_FLASH is included in
-          android.control.aeAvailableModes), aeState must be FLASH_REQUIRED after the camera device
-          finishes AE scan and it's too dark without flash.
+          android.control.aeAvailableModes), android.control.aeState must be FLASH_REQUIRED after
+          the camera device finishes AE scan and it's too dark without flash.
 
           For the above table, the camera device may skip reporting any state changes that happen
           without application intervention (i.e. mode switch, trigger, locking). Any state that
