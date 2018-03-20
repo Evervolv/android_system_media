@@ -325,6 +325,8 @@ static tag_info_t android_lens[ANDROID_LENS_END -
     { "radialDistortion",              TYPE_FLOAT  },
     [ ANDROID_LENS_POSE_REFERENCE - ANDROID_LENS_START ] =
     { "poseReference",                 TYPE_BYTE   },
+    [ ANDROID_LENS_DISTORTION - ANDROID_LENS_START ] =
+    { "distortion",                    TYPE_FLOAT  },
 };
 
 static tag_info_t android_lens_info[ANDROID_LENS_INFO_END -
@@ -1691,6 +1693,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_LENS_DISTORTION: {
             break;
         }
 

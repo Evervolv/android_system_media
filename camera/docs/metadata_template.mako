@@ -180,6 +180,10 @@
                 <description>${prop.description | x}</description>
               % endif
 
+              % if prop.deprecation_description is not None:
+                <deprecation_description>${prop.deprecation_description | x}</deprecation_description>
+              % endif
+
               % if prop.units is not None:
                 <units>${prop.units | x}</units>
               % endif
