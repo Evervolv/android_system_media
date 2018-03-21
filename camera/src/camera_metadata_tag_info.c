@@ -1926,6 +1926,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "LOGICAL_MULTI_CAMERA";
                     ret = 0;
                     break;
+                case ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MONOCHROME:
+                    msg = "MONOCHROME";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
