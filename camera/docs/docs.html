@@ -517,9 +517,12 @@
             <li
             ><a href="#static_android.lens.intrinsicCalibration">android.lens.intrinsicCalibration</a></li>
             <li
+                class="toc_deprecated"
             ><a href="#static_android.lens.radialDistortion">android.lens.radialDistortion</a></li>
             <li
             ><a href="#static_android.lens.poseReference">android.lens.poseReference</a></li>
+            <li
+            ><a href="#static_android.lens.distortion">android.lens.distortion</a></li>
           </ul>
         </li>
         <li>
@@ -546,7 +549,10 @@
             <li
             ><a href="#dynamic_android.lens.intrinsicCalibration">android.lens.intrinsicCalibration</a></li>
             <li
+                class="toc_deprecated"
             ><a href="#dynamic_android.lens.radialDistortion">android.lens.radialDistortion</a></li>
+            <li
+            ><a href="#dynamic_android.lens.distortion">android.lens.distortion</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -13531,7 +13537,7 @@ position will be <code>(0,<wbr/> 0,<wbr/> 0)</code>; a camera device with a lens
 from the main sensor along the +X axis (to the right from the user's perspective) will
 report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
 <p>To transform a pixel coordinates between two cameras facing the same direction,<wbr/> first
-the source camera <a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a> must be corrected for.<wbr/>  Then the source
+the source camera <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> must be corrected for.<wbr/>  Then the source
 camera <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> needs to be applied,<wbr/> followed by the
 <a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> of the source camera,<wbr/> the translation of the source camera
 relative to the destination camera,<wbr/> the <a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> of the destination
@@ -13640,7 +13646,7 @@ point,<wbr/> <code>z_<wbr/>s = 1</code>,<wbr/> and <code>w_<wbr/>s</code> is a m
 where <code>(0,<wbr/>0)</code> is the top-left of the
 preCorrectionActiveArraySize rectangle.<wbr/> Once the pose and
 intrinsic calibration transforms have been applied to a
-world point,<wbr/> then the <a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a>
+world point,<wbr/> then the <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a>
 transform needs to be applied,<wbr/> and the result adjusted to
 be in the <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> coordinate
 system (where <code>(0,<wbr/> 0)</code> is the top-left of the
@@ -13657,6 +13663,7 @@ output buffers.<wbr/></p>
                 
           <tr class="entry" id="static_android.lens.radialDistortion">
             <td class="entry_name
+                entry_name_deprecated
              " rowspan="3">
               android.<wbr/>lens.<wbr/>radial<wbr/>Distortion
             </td>
@@ -13671,6 +13678,7 @@ output buffers.<wbr/></p>
 
 
 
+              <span class="entry_type_deprecated">[deprecated] </span>
 
 
 
@@ -13688,6 +13696,7 @@ radial and tangential lens distortion.<wbr/></p>
             </td>
 
             <td class="entry_range">
+              <p><span class="entry_range_deprecated">Deprecated</span>. Do not use.</p>
             </td>
 
             <td class="entry_hal_version">
@@ -13795,6 +13804,91 @@ primary gyroscope of this Android device.<wbr/></p></span>
             <td class="entry_details" colspan="6">
               <p>Different calibration methods and use cases can produce better or worse results
 depending on the selected coordinate origin.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.lens.distortion">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>lens.<wbr/>distortion
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  5
+                </span>
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The correction coefficients to correct for this camera device's
+radial and tangential lens distortion.<wbr/></p>
+<p>Replaces the deprecated <a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a> field,<wbr/> which was
+inconsistently defined.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              
+            Unitless coefficients.<wbr/>
+          
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_DEPTH">DEPTH</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Three radial distortion coefficients <code>[kappa_<wbr/>1,<wbr/> kappa_<wbr/>2,<wbr/>
+kappa_<wbr/>3]</code> and two tangential distortion coefficients
+<code>[kappa_<wbr/>4,<wbr/> kappa_<wbr/>5]</code> that can be used to correct the
+lens's geometric distortion with the mapping equations:</p>
+<pre><code> x_<wbr/>c = x_<wbr/>i * ( 1 + kappa_<wbr/>1 * r^2 + kappa_<wbr/>2 * r^4 + kappa_<wbr/>3 * r^6 ) +
+       kappa_<wbr/>4 * (2 * x_<wbr/>i * y_<wbr/>i) + kappa_<wbr/>5 * ( r^2 + 2 * x_<wbr/>i^2 )
+ y_<wbr/>c = y_<wbr/>i * ( 1 + kappa_<wbr/>1 * r^2 + kappa_<wbr/>2 * r^4 + kappa_<wbr/>3 * r^6 ) +
+       kappa_<wbr/>5 * (2 * x_<wbr/>i * y_<wbr/>i) + kappa_<wbr/>4 * ( r^2 + 2 * y_<wbr/>i^2 )
+</code></pre>
+<p>Here,<wbr/> <code>[x_<wbr/>c,<wbr/> y_<wbr/>c]</code> are the coordinates to sample in the
+input image that correspond to the pixel values in the
+corrected image at the coordinate <code>[x_<wbr/>i,<wbr/> y_<wbr/>i]</code>:</p>
+<pre><code> correctedImage(x_<wbr/>i,<wbr/> y_<wbr/>i) = sample_<wbr/>at(x_<wbr/>c,<wbr/> y_<wbr/>c,<wbr/> inputImage)
+</code></pre>
+<p>The pixel coordinates are defined in a coordinate system
+related to the <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a>
+calibration fields; see that entry for details of the mapping stages.<wbr/>
+Both <code>[x_<wbr/>i,<wbr/> y_<wbr/>i]</code> and <code>[x_<wbr/>c,<wbr/> y_<wbr/>c]</code>
+have <code>(0,<wbr/>0)</code> at the lens optical center <code>[c_<wbr/>x,<wbr/> c_<wbr/>y]</code>,<wbr/> and
+the range of the coordinates depends on the focal length
+terms of the intrinsic calibration.<wbr/></p>
+<p>Finally,<wbr/> <code>r</code> represents the radial distance from the
+optical center,<wbr/> <code>r^2 = x_<wbr/>i^2 + y_<wbr/>i^2</code>.<wbr/></p>
+<p>The distortion model used is the Brown-Conrady model.<wbr/></p>
             </td>
           </tr>
 
@@ -14460,7 +14554,7 @@ position will be <code>(0,<wbr/> 0,<wbr/> 0)</code>; a camera device with a lens
 from the main sensor along the +X axis (to the right from the user's perspective) will
 report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
 <p>To transform a pixel coordinates between two cameras facing the same direction,<wbr/> first
-the source camera <a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a> must be corrected for.<wbr/>  Then the source
+the source camera <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> must be corrected for.<wbr/>  Then the source
 camera <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> needs to be applied,<wbr/> followed by the
 <a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> of the source camera,<wbr/> the translation of the source camera
 relative to the destination camera,<wbr/> the <a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> of the destination
@@ -14569,7 +14663,7 @@ point,<wbr/> <code>z_<wbr/>s = 1</code>,<wbr/> and <code>w_<wbr/>s</code> is a m
 where <code>(0,<wbr/>0)</code> is the top-left of the
 preCorrectionActiveArraySize rectangle.<wbr/> Once the pose and
 intrinsic calibration transforms have been applied to a
-world point,<wbr/> then the <a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a>
+world point,<wbr/> then the <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a>
 transform needs to be applied,<wbr/> and the result adjusted to
 be in the <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> coordinate
 system (where <code>(0,<wbr/> 0)</code> is the top-left of the
@@ -14586,6 +14680,7 @@ output buffers.<wbr/></p>
                 
           <tr class="entry" id="dynamic_android.lens.radialDistortion">
             <td class="entry_name
+                entry_name_deprecated
              " rowspan="3">
               android.<wbr/>lens.<wbr/>radial<wbr/>Distortion
             </td>
@@ -14600,6 +14695,7 @@ output buffers.<wbr/></p>
 
 
 
+              <span class="entry_type_deprecated">[deprecated] </span>
 
 
 
@@ -14617,6 +14713,7 @@ radial and tangential lens distortion.<wbr/></p>
             </td>
 
             <td class="entry_range">
+              <p><span class="entry_range_deprecated">Deprecated</span>. Do not use.</p>
             </td>
 
             <td class="entry_hal_version">
@@ -14660,6 +14757,91 @@ for both dimensions is <code>-1 &lt;= x &lt;= 1</code>.<wbr/></p>
 <p>Finally,<wbr/> <code>r</code> represents the radial distance from the
 optical center,<wbr/> <code>r^2 = x_<wbr/>i^2 + y_<wbr/>i^2</code>,<wbr/> and its magnitude
 is therefore no larger than <code>|<wbr/>r|<wbr/> &lt;= sqrt(2)</code>.<wbr/></p>
+<p>The distortion model used is the Brown-Conrady model.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.lens.distortion">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>lens.<wbr/>distortion
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  5
+                </span>
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The correction coefficients to correct for this camera device's
+radial and tangential lens distortion.<wbr/></p>
+<p>Replaces the deprecated <a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a> field,<wbr/> which was
+inconsistently defined.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              
+            Unitless coefficients.<wbr/>
+          
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_DEPTH">DEPTH</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Three radial distortion coefficients <code>[kappa_<wbr/>1,<wbr/> kappa_<wbr/>2,<wbr/>
+kappa_<wbr/>3]</code> and two tangential distortion coefficients
+<code>[kappa_<wbr/>4,<wbr/> kappa_<wbr/>5]</code> that can be used to correct the
+lens's geometric distortion with the mapping equations:</p>
+<pre><code> x_<wbr/>c = x_<wbr/>i * ( 1 + kappa_<wbr/>1 * r^2 + kappa_<wbr/>2 * r^4 + kappa_<wbr/>3 * r^6 ) +
+       kappa_<wbr/>4 * (2 * x_<wbr/>i * y_<wbr/>i) + kappa_<wbr/>5 * ( r^2 + 2 * x_<wbr/>i^2 )
+ y_<wbr/>c = y_<wbr/>i * ( 1 + kappa_<wbr/>1 * r^2 + kappa_<wbr/>2 * r^4 + kappa_<wbr/>3 * r^6 ) +
+       kappa_<wbr/>5 * (2 * x_<wbr/>i * y_<wbr/>i) + kappa_<wbr/>4 * ( r^2 + 2 * y_<wbr/>i^2 )
+</code></pre>
+<p>Here,<wbr/> <code>[x_<wbr/>c,<wbr/> y_<wbr/>c]</code> are the coordinates to sample in the
+input image that correspond to the pixel values in the
+corrected image at the coordinate <code>[x_<wbr/>i,<wbr/> y_<wbr/>i]</code>:</p>
+<pre><code> correctedImage(x_<wbr/>i,<wbr/> y_<wbr/>i) = sample_<wbr/>at(x_<wbr/>c,<wbr/> y_<wbr/>c,<wbr/> inputImage)
+</code></pre>
+<p>The pixel coordinates are defined in a coordinate system
+related to the <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a>
+calibration fields; see that entry for details of the mapping stages.<wbr/>
+Both <code>[x_<wbr/>i,<wbr/> y_<wbr/>i]</code> and <code>[x_<wbr/>c,<wbr/> y_<wbr/>c]</code>
+have <code>(0,<wbr/>0)</code> at the lens optical center <code>[c_<wbr/>x,<wbr/> c_<wbr/>y]</code>,<wbr/> and
+the range of the coordinates depends on the focal length
+terms of the intrinsic calibration.<wbr/></p>
+<p>Finally,<wbr/> <code>r</code> represents the radial distance from the
+optical center,<wbr/> <code>r^2 = x_<wbr/>i^2 + y_<wbr/>i^2</code>.<wbr/></p>
 <p>The distortion model used is the Brown-Conrady model.<wbr/></p>
             </td>
           </tr>
@@ -16777,7 +16959,7 @@ following:</p>
 <li><a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a></li>
 <li><a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a></li>
 <li><a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a></li>
-<li><a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a></li>
+<li><a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a></li>
 </ul>
 </li>
 <li>The <a href="#static_android.depth.depthIsExclusive">android.<wbr/>depth.<wbr/>depth<wbr/>Is<wbr/>Exclusive</a> entry is listed by this device.<wbr/></li>
@@ -16889,7 +17071,7 @@ also exposed to the application.<wbr/></p>
 <li><a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a></li>
 <li><a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a></li>
 <li><a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a></li>
-<li><a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a></li>
+<li><a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a></li>
 </ul>
 </li>
 <li>The SENSOR_<wbr/>INFO_<wbr/>TIMESTAMP_<wbr/>SOURCE of the logical device and physical devices must be
@@ -20894,7 +21076,7 @@ relative to the top,<wbr/>left of post-processed YUV output buffer with dimensio
 <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
 <p>The currently supported fields that correct for geometric distortion are:</p>
 <ol>
-<li><a href="#static_android.lens.radialDistortion">android.<wbr/>lens.<wbr/>radial<wbr/>Distortion</a>.<wbr/></li>
+<li><a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a>.<wbr/></li>
 </ol>
 <p>If all of the geometric distortion fields are no-ops,<wbr/> this rectangle will be the same
 as the post-distortion-corrected rectangle given in
@@ -24131,7 +24313,7 @@ result metadata.<wbr/></p>
             </td>
 
             <td class="entry_range">
-              <p>android.<wbr/>Statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes</p>
+              <p><a href="#static_android.statistics.info.availableOisDataModes">android.<wbr/>statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes</a></p>
             </td>
 
             <td class="entry_hal_version">
@@ -25995,7 +26177,7 @@ result metadata.<wbr/></p>
             </td>
 
             <td class="entry_range">
-              <p>android.<wbr/>Statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes</p>
+              <p><a href="#static_android.statistics.info.availableOisDataModes">android.<wbr/>statistics.<wbr/>info.<wbr/>available<wbr/>Ois<wbr/>Data<wbr/>Modes</a></p>
             </td>
 
             <td class="entry_hal_version">
@@ -29781,6 +29963,7 @@ onCaptureStarted callback.<wbr/></p>
           <li><a href="#static_android.lens.poseTranslation">android.lens.poseTranslation</a> (static)</li>
           <li><a href="#static_android.lens.intrinsicCalibration">android.lens.intrinsicCalibration</a> (static)</li>
           <li><a href="#static_android.lens.radialDistortion">android.lens.radialDistortion</a> (static)</li>
+          <li><a href="#static_android.lens.distortion">android.lens.distortion</a> (static)</li>
           <li><a href="#static_android.depth.maxDepthSamples">android.depth.maxDepthSamples</a> (static)</li>
           <li><a href="#static_android.depth.availableDepthStreamConfigurations">android.depth.availableDepthStreamConfigurations</a> (static)</li>
           <li><a href="#static_android.depth.availableDepthMinFrameDurations">android.depth.availableDepthMinFrameDurations</a> (static)</li>

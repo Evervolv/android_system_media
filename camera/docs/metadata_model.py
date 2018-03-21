@@ -1132,6 +1132,8 @@ class Entry(Node):
     tuple_values: A sequence of strings describing the tuple values,
                   None if container is not 'tuple'.
     description: A string description, or None.
+    deprecation_description: A string describing the reason for deprecation. Must be present
+                 if deprecated is true, otherwise may be None.
     range: A string range, or None.
     units: A string units, or None.
     tags: A sequence of Tag nodes associated with this Entry.
@@ -1170,6 +1172,10 @@ class Entry(Node):
       enum_notes: A dictionary of value->notes strings.
       enum_ids: A dictionary of value->id strings.
       enum_hal_versions: A dictionary of value->hal version strings
+
+    Args (if the 'deprecated' attribute is true):
+      deprecation_description: A string explaining the deprecation, to be added
+                               to the Java-layer @deprecated tag
 
     Args (optional):
       description: A string with a description of the entry.
@@ -1245,6 +1251,10 @@ class Entry(Node):
   @property
   def deprecated(self):
     return self._deprecated
+
+  @property
+  def deprecation_description(self):
+    return self._deprecation_description
 
   # TODO: optional should just return hwlevel is None
   @property
@@ -1399,6 +1409,8 @@ class Entry(Node):
     self._synthetic = kwargs.get('synthetic', False)
     self._hwlevel = kwargs.get('hwlevel')
     self._deprecated = kwargs.get('deprecated', False)
+    self._deprecation_description = kwargs.get('deprecation_description')
+
     self._optional = kwargs.get('optional')
     self._ndk_visible = kwargs.get('ndk_visible')
 
@@ -1585,7 +1597,8 @@ class MergedEntry(Entry):
       entry: An Entry or Clone instance
     """
     props_distinct = ['description', 'units', 'range', 'details',
-                      'hal_details', 'ndk_details', 'tags', 'kind']
+                      'hal_details', 'ndk_details', 'tags', 'kind',
+                      'deprecation_description']
 
     for p in props_distinct:
       p = '_' + p
