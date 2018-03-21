@@ -818,7 +818,7 @@ def javadoc(metadata, indent = 4):
     "    * @see CaptureRequest#CONTROL_MODE\n"
   """
   def javadoc_formatter(text):
-    comment_prefix = " " * indent + " * ";
+    comment_prefix = " " * indent + " * "
 
     # render with markdown => HTML
     javatext = md(text, JAVADOC_IMAGE_SRC_METADATA)
