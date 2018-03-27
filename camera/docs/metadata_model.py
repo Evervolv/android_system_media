@@ -416,7 +416,9 @@ class Metadata(Node):
       target_kind = p.target_kind
       target_entry = self._entry_map[target_kind].get(p.name)
       p._entry = target_entry
-
+      if (p.hal_major_version == 0):
+        p._hal_major_version = target_entry._hal_major_version
+        p._hal_minor_version = target_entry._hal_minor_version
       # should not throw if we pass validation
       # but can happen when importing obsolete CSV entries
       if target_entry is None:
@@ -1365,8 +1367,12 @@ class Entry(Node):
 
     hal_version = kwargs.get('hal_version')
     if hal_version is None:
-      self._hal_major_version = 3
-      self._hal_minor_version = 2
+      if self.is_clone():
+        self._hal_major_version = 0
+        self._hal_minor_version = 0
+      else:
+        self._hal_major_version = 3
+        self._hal_minor_version = 2
     else:
       self._hal_major_version = int(hal_version.partition('.')[0])
       self._hal_minor_version = int(hal_version.partition('.')[2])
