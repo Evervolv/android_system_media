@@ -155,6 +155,7 @@ message CameraDeviceInfo {
     optional int32 android_reprocess_maxCaptureStall = 1638400;
     optional bool android_depth_depthIsExclusive = 1703936;
     optional int32 android_logicalMultiCamera_sensorSyncType = 1769472;
+    repeated int32 android_distortionCorrection_availableModes = 1835008;
     // End of codegen fields
   }
 

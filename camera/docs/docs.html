@@ -1185,6 +1185,32 @@
         </li>
       </ul> <!-- toc_section -->
     </li>
+    <li>
+      <span class="toc_section_header"><a href="#section_distortionCorrection">distortionCorrection</a></span>
+      <ul class="toc_section">
+        <li>
+          <span class="toc_kind_header">controls</span>
+          <ul class="toc_section">
+            <li
+            ><a href="#controls_android.distortionCorrection.mode">android.distortionCorrection.mode</a></li>
+          </ul>
+        </li>
+        <li>
+          <span class="toc_kind_header">static</span>
+          <ul class="toc_section">
+            <li
+            ><a href="#static_android.distortionCorrection.availableModes">android.distortionCorrection.availableModes</a></li>
+          </ul>
+        </li>
+        <li>
+          <span class="toc_kind_header">dynamic</span>
+          <ul class="toc_section">
+            <li
+            ><a href="#dynamic_android.distortionCorrection.mode">android.distortionCorrection.mode</a></li>
+          </ul>
+        </li>
+      </ul> <!-- toc_section -->
+    </li>
   </ul>
 
 
@@ -29772,6 +29798,339 @@ onCaptureStarted callback.<wbr/></p>
       </tbody>
 
   <!-- end of section -->
+  <tr><td colspan="7" id="section_distortionCorrection" class="section">distortionCorrection</td></tr>
+
+
+      <tr><td colspan="7" class="kind">controls</td></tr>
+
+      <thead class="entries_header">
+        <tr>
+          <th class="th_name">Property Name</th>
+          <th class="th_type">Type</th>
+          <th class="th_description">Description</th>
+          <th class="th_units">Units</th>
+          <th class="th_range">Range</th>
+          <th class="th_hal_version">Initial HIDL HAL version</th>
+          <th class="th_tags">Tags</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        
+
+        
+
+        
+
+        
+
+                
+          <tr class="entry" id="controls_android.distortionCorrection.mode">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>distortion<wbr/>Correction.<wbr/>mode
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OFF (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>No distortion correction is applied.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">FAST (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>Lens distortion correction is applied without reducing frame rate
+relative to sensor output.<wbr/> It may be the same as OFF if distortion correction would
+reduce frame rate relative to sensor.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">HIGH_QUALITY (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>High-quality distortion correction is applied,<wbr/> at the cost of
+possibly reduced frame rate relative to sensor output.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Mode of operation for the lens distortion correction block.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p><a href="#static_android.distortionCorrection.availableModes">android.<wbr/>distortion<wbr/>Correction.<wbr/>available<wbr/>Modes</a></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The lens distortion correction block attempts to improve image quality by fixing
+radial,<wbr/> tangential,<wbr/> or other geometric aberrations in the camera device's optics.<wbr/>  If
+available,<wbr/> the <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> field documents the lens's distortion parameters.<wbr/></p>
+<p>OFF means no distortion correction is done.<wbr/></p>
+<p>FAST/<wbr/>HIGH_<wbr/>QUALITY both mean camera device determined distortion correction will be
+applied.<wbr/> HIGH_<wbr/>QUALITY mode indicates that the camera device will use the highest-quality
+correction algorithms,<wbr/> even if it slows down capture rate.<wbr/> FAST means the camera device
+will not slow down capture rate when applying correction.<wbr/> FAST may be the same as OFF if
+any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
+similar amount of enhancement applied.<wbr/></p>
+<p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
+applied to any RAW output.<wbr/>  Metadata coordinates such as face rectangles or metering
+regions are also not affected by correction.<wbr/></p>
+<p>Applications enabling distortion correction need to pay extra attention when converting
+image coordinates between corrected output buffers and the sensor array.<wbr/> For example,<wbr/> if
+the app supports tap-to-focus and enables correction,<wbr/> it then has to apply the distortion
+model described in <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> to the image buffer tap coordinates to properly
+calculate the tap position on the sensor active array to be used with
+<a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a>.<wbr/> The same applies in reverse to detected face rectangles if
+they need to be drawn on top of the corrected output buffers.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+        
+
+      <!-- end of kind -->
+      </tbody>
+      <tr><td colspan="7" class="kind">static</td></tr>
+
+      <thead class="entries_header">
+        <tr>
+          <th class="th_name">Property Name</th>
+          <th class="th_type">Type</th>
+          <th class="th_description">Description</th>
+          <th class="th_units">Units</th>
+          <th class="th_range">Range</th>
+          <th class="th_hal_version">Initial HIDL HAL version</th>
+          <th class="th_tags">Tags</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        
+
+        
+
+        
+
+        
+
+                
+          <tr class="entry" id="static_android.distortionCorrection.availableModes">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>distortion<wbr/>Correction.<wbr/>available<wbr/>Modes
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">byte</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [public as enumList]</span>
+
+
+
+
+                <div class="entry_type_notes">list of enums</div>
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>List of distortion correction modes for <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> that are
+supported by this camera device.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p>Any value listed in <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_V1">V1</a></li>
+                  <li><a href="#tag_REPROC">REPROC</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>No device is required to support this API; such devices will always list only 'OFF'.<wbr/>
+All devices that support this API will list both FAST and HIGH_<wbr/>QUALITY.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>HAL must support both FAST and HIGH_<wbr/>QUALITY if distortion correction is available
+on the camera device,<wbr/> but the underlying implementation can be the same for both modes.<wbr/>
+That is,<wbr/> if the highest quality implementation on the camera device does not slow down
+capture rate,<wbr/> then FAST and HIGH_<wbr/>QUALITY will generate the same output.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+        
+
+      <!-- end of kind -->
+      </tbody>
+      <tr><td colspan="7" class="kind">dynamic</td></tr>
+
+      <thead class="entries_header">
+        <tr>
+          <th class="th_name">Property Name</th>
+          <th class="th_type">Type</th>
+          <th class="th_description">Description</th>
+          <th class="th_units">Units</th>
+          <th class="th_range">Range</th>
+          <th class="th_hal_version">Initial HIDL HAL version</th>
+          <th class="th_tags">Tags</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        
+
+        
+
+        
+
+        
+
+                
+          <tr class="entry" id="dynamic_android.distortionCorrection.mode">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>distortion<wbr/>Correction.<wbr/>mode
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OFF (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>No distortion correction is applied.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">FAST (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>Lens distortion correction is applied without reducing frame rate
+relative to sensor output.<wbr/> It may be the same as OFF if distortion correction would
+reduce frame rate relative to sensor.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">HIGH_QUALITY (v3.3)</span>
+                    <span class="entry_type_enum_notes"><p>High-quality distortion correction is applied,<wbr/> at the cost of
+possibly reduced frame rate relative to sensor output.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Mode of operation for the lens distortion correction block.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p><a href="#static_android.distortionCorrection.availableModes">android.<wbr/>distortion<wbr/>Correction.<wbr/>available<wbr/>Modes</a></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>3</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The lens distortion correction block attempts to improve image quality by fixing
+radial,<wbr/> tangential,<wbr/> or other geometric aberrations in the camera device's optics.<wbr/>  If
+available,<wbr/> the <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> field documents the lens's distortion parameters.<wbr/></p>
+<p>OFF means no distortion correction is done.<wbr/></p>
+<p>FAST/<wbr/>HIGH_<wbr/>QUALITY both mean camera device determined distortion correction will be
+applied.<wbr/> HIGH_<wbr/>QUALITY mode indicates that the camera device will use the highest-quality
+correction algorithms,<wbr/> even if it slows down capture rate.<wbr/> FAST means the camera device
+will not slow down capture rate when applying correction.<wbr/> FAST may be the same as OFF if
+any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
+similar amount of enhancement applied.<wbr/></p>
+<p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
+applied to any RAW output.<wbr/>  Metadata coordinates such as face rectangles or metering
+regions are also not affected by correction.<wbr/></p>
+<p>Applications enabling distortion correction need to pay extra attention when converting
+image coordinates between corrected output buffers and the sensor array.<wbr/> For example,<wbr/> if
+the app supports tap-to-focus and enables correction,<wbr/> it then has to apply the distortion
+model described in <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> to the image buffer tap coordinates to properly
+calculate the tap position on the sensor active array to be used with
+<a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a>.<wbr/> The same applies in reverse to detected face rectangles if
+they need to be drawn on top of the corrected output buffers.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+        
+
+      <!-- end of kind -->
+      </tbody>
+
+  <!-- end of section -->
 <!-- </namespace> -->
   </table>
 
@@ -29894,6 +30253,7 @@ onCaptureStarted callback.<wbr/></p>
           <li><a href="#dynamic_android.statistics.hotPixelMap">android.statistics.hotPixelMap</a> (dynamic)</li>
           <li><a href="#dynamic_android.sync.frameNumber">android.sync.frameNumber</a> (dynamic)</li>
           <li><a href="#static_android.sync.maxLatency">android.sync.maxLatency</a> (static)</li>
+          <li><a href="#static_android.distortionCorrection.availableModes">android.distortionCorrection.availableModes</a> (static)</li>
           <li><a href="#dynamic_android.edge.mode">android.edge.mode</a> (dynamic)</li>
           <li><a href="#dynamic_android.hotPixel.mode">android.hotPixel.mode</a> (dynamic)</li>
           <li><a href="#dynamic_android.lens.aperture">android.lens.aperture</a> (dynamic)</li>
@@ -29982,6 +30342,7 @@ onCaptureStarted callback.<wbr/></p>
           <li><a href="#static_android.scaler.availableInputOutputFormatsMap">android.scaler.availableInputOutputFormatsMap</a> (static)</li>
           <li><a href="#controls_android.reprocess.effectiveExposureFactor">android.reprocess.effectiveExposureFactor</a> (controls)</li>
           <li><a href="#static_android.reprocess.maxCaptureStall">android.reprocess.maxCaptureStall</a> (static)</li>
+          <li><a href="#static_android.distortionCorrection.availableModes">android.distortionCorrection.availableModes</a> (static)</li>
           <li><a href="#dynamic_android.edge.mode">android.edge.mode</a> (dynamic)</li>
           <li><a href="#dynamic_android.noiseReduction.mode">android.noiseReduction.mode</a> (dynamic)</li>
         </ul>

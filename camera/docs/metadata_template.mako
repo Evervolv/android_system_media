@@ -69,7 +69,11 @@
 
         <%def name="insert_entry(prop)">
         % if prop.is_clone():
-            <clone entry="${prop.name}" kind="${prop.target_kind}">
+            <clone entry="${prop.name}" kind="${prop.target_kind}"
+          % if ('hal_version' in prop._property_keys):
+                hal_version="${prop.hal_major_version}.${prop.hal_minor_version}"
+          % endif
+            >
 
               % if prop.details is not None:
                 <details>${prop.details}</details>

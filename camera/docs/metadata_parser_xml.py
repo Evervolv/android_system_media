@@ -156,6 +156,8 @@ class MetadataParserXml:
           # no type_notes since its the same
         }
         d2 = {}
+        if 'hal_version' in entry.attrs:
+          d2['hal_version'] = entry['hal_version']
 
         insert = self.metadata.insert_clone
 
