@@ -42,6 +42,7 @@ import android.hardware.camera.metadata@${hal_major_version()}.${i};
 
 % endif
 <%    gotSections = False %>\
+<%    gotFirstNewSection = False %>\
 % for idx, section in enumerate(find_all_sections_added_in_hal(metadata, hal_major_version(), hal_minor_version())):
   % if idx == 0:
 <%    gotSections = True %>\
@@ -51,9 +52,10 @@ import android.hardware.camera.metadata@${hal_major_version()}.${i};
  */
 enum CameraMetadataSection : ${'uint32_t' if first_hal_minor_version(hal_major_version()) == hal_minor_version() else '@%d.%d::CameraMetadataSection' % (hal_major_version(), hal_minor_version()-1)} {
   % endif
-  % if first_hal_minor_version(hal_major_version()) != hal_minor_version():
+  % if first_hal_minor_version(hal_major_version()) != hal_minor_version() and not gotFirstNewSection:
     ${path_name(section) | csym} =
         android.hardware.camera.metadata@${hal_major_version()}.${hal_minor_version()-1}::CameraMetadataSection:ANDROID_SECTION_COUNT,
+<% gotFirstNewSection = True %>\
   % else:
     ${path_name(section) | csym},
   % endif
