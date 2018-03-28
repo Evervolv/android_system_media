@@ -17123,6 +17123,12 @@ mandatory stream combinations required for their device levels.<wbr/></p>
 not slow down the frame rate of the capture,<wbr/> as long as the minimum frame duration
 of the physical and logical streams are the same.<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">MONOCHROME (v3.3)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>The camera device is a monochrome camera that doesn't contain a color filter array,<wbr/>
+and the pixel values on U and Y planes are all 128.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -17210,6 +17216,28 @@ DEPTH).<wbr/></p>
 <p>For a camera device with LOGICAL_<wbr/>MULTI_<wbr/>CAMERA capability,<wbr/> it should operate in the
 same way as a physical camera device based on its hardware level and capabilities.<wbr/>
 It's recommended that its feature set is superset of that of individual physical cameras.<wbr/></p>
+<p>For MONOCHROME,<wbr/> the camera device must also advertise BACKWARD_<wbr/>COMPATIBLE capability,<wbr/> and
+it is exclusive of both RAW and MANUAL_<wbr/>POST_<wbr/>PROCESSING capabilities:</p>
+<ul>
+<li>
+<p>To maintain backward compatibility,<wbr/> the camera device must support all
+BACKWARD_<wbr/>COMPATIBLE required keys.<wbr/> The <a href="#static_android.control.awbAvailableModes">android.<wbr/>control.<wbr/>awb<wbr/>Available<wbr/>Modes</a> key only contains
+AUTO,<wbr/> and <a href="#dynamic_android.control.awbState">android.<wbr/>control.<wbr/>awb<wbr/>State</a> are either CONVERGED or LOCKED depending on
+<a href="#controls_android.control.awbLock">android.<wbr/>control.<wbr/>awb<wbr/>Lock</a>.<wbr/></p>
+</li>
+<li>
+<p>A monochrome device doesn't need to advertise DNG related optional metadata tags.<wbr/></p>
+</li>
+<li>
+<p><a href="#controls_android.colorCorrection.mode">android.<wbr/>color<wbr/>Correction.<wbr/>mode</a>,<wbr/> <a href="#controls_android.colorCorrection.transform">android.<wbr/>color<wbr/>Correction.<wbr/>transform</a>,<wbr/> and
+<a href="#controls_android.colorCorrection.gains">android.<wbr/>color<wbr/>Correction.<wbr/>gains</a> are not applicable.<wbr/> So the camera device cannot
+be a FULL device.<wbr/> However,<wbr/> the HAL can still advertise other individual capabilites.<wbr/></p>
+</li>
+<li>
+<p>If the device supports tonemap control,<wbr/> only <a href="#controls_android.tonemap.curveRed">android.<wbr/>tonemap.<wbr/>curve<wbr/>Red</a> is used.<wbr/>
+CurveGreen and curveBlue are no-ops.<wbr/></p>
+</li>
+</ul>
             </td>
           </tr>
 
@@ -26664,6 +26692,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
+are ignored.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>
@@ -26769,6 +26799,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
+are ignored.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>
@@ -27416,6 +27448,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
+are ignored.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>
@@ -27521,6 +27555,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
+are ignored.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>

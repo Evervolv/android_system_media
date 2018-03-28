@@ -778,6 +778,7 @@ typedef enum camera_metadata_enum_android_request_available_capabilities {
                                                                      , // HIDL v3.2
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MOTION_TRACKING          , // HIDL v3.3
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA     , // HIDL v3.3
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MONOCHROME               , // HIDL v3.3
 } camera_metadata_enum_android_request_available_capabilities_t;
 
 
