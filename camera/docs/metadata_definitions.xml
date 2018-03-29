@@ -5245,6 +5245,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               of the physical and logical streams are the same.
               </notes>
             </value>
+            <value optional="true" hal_version="3.3" >MONOCHROME
+              <notes>
+              The camera device is a monochrome camera that doesn't contain a color filter array,
+              and the pixel values on U and Y planes are all 128.
+              </notes>
+            </value>
 
           </enum>
           <description>List of capabilities that this camera device
@@ -5315,6 +5321,23 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           For a camera device with LOGICAL_MULTI_CAMERA capability, it should operate in the
           same way as a physical camera device based on its hardware level and capabilities.
           It's recommended that its feature set is superset of that of individual physical cameras.
+
+          For MONOCHROME, the camera device must also advertise BACKWARD_COMPATIBLE capability, and
+          it is exclusive of both RAW and MANUAL_POST_PROCESSING capabilities:
+
+          * To maintain backward compatibility, the camera device must support all
+          BACKWARD_COMPATIBLE required keys. The android.control.awbAvailableModes key only contains
+          AUTO, and android.control.awbState are either CONVERGED or LOCKED depending on
+          android.control.awbLock.
+
+          * A monochrome device doesn't need to advertise DNG related optional metadata tags.
+
+          * android.colorCorrection.mode, android.colorCorrection.transform, and
+          android.colorCorrection.gains are not applicable. So the camera device cannot
+          be a FULL device. However, the HAL can still advertise other individual capabilites.
+
+          * If the device supports tonemap control, only android.tonemap.curveRed is used.
+          CurveGreen and curveBlue are no-ops.
           </hal_details>
         </entry>
         <entry name="availableRequestKeys" type="int32" visibility="ndk_public"
@@ -8578,6 +8601,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           always provide a curve with number of points equivalent to
           android.tonemap.maxCurvePoints).
 
+          For devices with MONOCHROME capability, only red channel is used. Green and blue channels
+          are ignored.
+
           A few examples, and their corresponding graphical mappings; these
           only specify the red channel and the precision is limited to 4
           digits, for conciseness.
@@ -8647,6 +8673,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           of points can be less than max (that is, the request doesn't have to
           always provide a curve with number of points equivalent to
           android.tonemap.maxCurvePoints).
+
+          For devices with MONOCHROME capability, only red channel is used. Green and blue channels
+          are ignored.
 
           A few examples, and their corresponding graphical mappings; these
           only specify the red channel and the precision is limited to 4
