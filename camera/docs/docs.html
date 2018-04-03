@@ -11468,8 +11468,8 @@ rotate the image data to match this orientation.<wbr/> When the image data is ro
 the thumbnail data will also be rotated.<wbr/></p>
 <p>Note that this orientation is relative to the orientation of the camera sensor,<wbr/> given
 by <a href="#static_android.sensor.orientation">android.<wbr/>sensor.<wbr/>orientation</a>.<wbr/></p>
-<p>To translate from the device orientation given by the Android sensor APIs,<wbr/> the following
-sample code may be used:</p>
+<p>To translate from the device orientation given by the Android sensor APIs for camera
+sensors which are not EXTERNAL,<wbr/> the following sample code may be used:</p>
 <pre><code>private int getJpegOrientation(CameraCharacteristics c,<wbr/> int deviceOrientation) {
     if (deviceOrientation == android.<wbr/>view.<wbr/>Orientation<wbr/>Event<wbr/>Listener.<wbr/>ORIENTATION_<wbr/>UNKNOWN) return 0;
     int sensorOrientation = c.<wbr/>get(Camera<wbr/>Characteristics.<wbr/>SENSOR_<wbr/>ORIENTATION);
@@ -11488,6 +11488,8 @@ sample code may be used:</p>
     return jpegOrientation;
 }
 </code></pre>
+<p>For EXTERNAL cameras the sensor orientation will always be set to 0 and the facing will
+also be set to EXTERNAL.<wbr/> The above code is not relevant in such case.<wbr/></p>
             </td>
           </tr>
 
@@ -12122,8 +12124,8 @@ rotate the image data to match this orientation.<wbr/> When the image data is ro
 the thumbnail data will also be rotated.<wbr/></p>
 <p>Note that this orientation is relative to the orientation of the camera sensor,<wbr/> given
 by <a href="#static_android.sensor.orientation">android.<wbr/>sensor.<wbr/>orientation</a>.<wbr/></p>
-<p>To translate from the device orientation given by the Android sensor APIs,<wbr/> the following
-sample code may be used:</p>
+<p>To translate from the device orientation given by the Android sensor APIs for camera
+sensors which are not EXTERNAL,<wbr/> the following sample code may be used:</p>
 <pre><code>private int getJpegOrientation(CameraCharacteristics c,<wbr/> int deviceOrientation) {
     if (deviceOrientation == android.<wbr/>view.<wbr/>Orientation<wbr/>Event<wbr/>Listener.<wbr/>ORIENTATION_<wbr/>UNKNOWN) return 0;
     int sensorOrientation = c.<wbr/>get(Camera<wbr/>Characteristics.<wbr/>SENSOR_<wbr/>ORIENTATION);
@@ -12142,6 +12144,8 @@ sample code may be used:</p>
     return jpegOrientation;
 }
 </code></pre>
+<p>For EXTERNAL cameras the sensor orientation will always be set to 0 and the facing will
+also be set to EXTERNAL.<wbr/> The above code is not relevant in such case.<wbr/></p>
             </td>
           </tr>
 
