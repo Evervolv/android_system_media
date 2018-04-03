@@ -3337,8 +3337,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Note that this orientation is relative to the orientation of the camera sensor, given
           by android.sensor.orientation.
 
-          To translate from the device orientation given by the Android sensor APIs, the following
-          sample code may be used:
+          To translate from the device orientation given by the Android sensor APIs for camera
+          sensors which are not EXTERNAL, the following sample code may be used:
 
               private int getJpegOrientation(CameraCharacteristics c, int deviceOrientation) {
                   if (deviceOrientation == android.view.OrientationEventListener.ORIENTATION_UNKNOWN) return 0;
@@ -3357,6 +3357,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
                   return jpegOrientation;
               }
+
+          For EXTERNAL cameras the sensor orientation will always be set to 0 and the facing will
+          also be set to EXTERNAL. The above code is not relevant in such case.
           </details>
           <tag id="BC" />
         </entry>
