@@ -5251,7 +5251,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value optional="true" hal_version="3.3" >MONOCHROME
               <notes>
               The camera device is a monochrome camera that doesn't contain a color filter array,
-              and the pixel values on U and Y planes are all 128.
+              and the pixel values on U and V planes are all 128.
               </notes>
             </value>
 
