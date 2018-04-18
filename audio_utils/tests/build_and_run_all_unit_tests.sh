@@ -31,6 +31,10 @@ echo "testing channels"
 adb push $OUT/data/nativetest/channels_tests/channels_tests /system/bin
 adb shell /system/bin/channels_tests
 
+echo "string test"
+adb push $OUT/data/nativetest/string_tests/string_tests /system/bin
+adb shell /system/bin/string_tests
+
 echo "benchmarking primitives"
 adb push $OUT/system/bin/primitives_benchmark /system/bin
 adb shell /system/bin/primitives_benchmark
