@@ -1086,7 +1086,7 @@ typedef enum {
 /* the maximum length for the microphone id */
 #define AUDIO_MICROPHONE_ID_MAX_LEN 32
 /* max number of frequency responses in a frequency response table */
-#define AUDIO_MICROPHONE_MAX_FREQUENCY_RESPONSES 32
+#define AUDIO_MICROPHONE_MAX_FREQUENCY_RESPONSES 256
 /* max number of microphone */
 #define AUDIO_MICROPHONE_MAX_COUNT 32
 /* the value of unknown spl */
