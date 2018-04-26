@@ -138,14 +138,15 @@ void memcpy_to_p24_from_i16(uint8_t *dst, const int16_t *src, size_t count)
     src += count;
     for (; count > 0; --count) {
         dst -= 3;
+        const int16_t sample = *--src;
 #if HAVE_BIG_ENDIAN
-        dst[0] = *--src >> 8;
-        dst[1] = *src;
+        dst[0] = sample >> 8;
+        dst[1] = sample;
         dst[2] = 0;
 #else
         dst[0] = 0;
-        dst[1] = *--src;
-        dst[2] = *src >> 8;
+        dst[1] = sample;
+        dst[2] = sample >> 8;
 #endif
     }
 }
