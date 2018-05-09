@@ -26,7 +26,7 @@
 #include <audio_utils/fifo.h>
 #include <audio_utils/futex.h>
 #include <audio_utils/roundup.h>
-#include <cutils/log.h>
+#include <log/log.h>
 #include <utils/Errors.h>
 
 audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount,
