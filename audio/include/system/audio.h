@@ -859,6 +859,28 @@ static inline audio_channel_mask_t audio_channel_mask_in_to_out(audio_channel_ma
     }
 }
 
+static inline audio_channel_mask_t audio_channel_mask_out_to_in(audio_channel_mask_t out)
+{
+    switch (out) {
+    case AUDIO_CHANNEL_OUT_MONO:
+        return AUDIO_CHANNEL_IN_MONO;
+    case AUDIO_CHANNEL_OUT_STEREO:
+        return AUDIO_CHANNEL_IN_STEREO;
+    case AUDIO_CHANNEL_OUT_5POINT1:
+        return AUDIO_CHANNEL_IN_5POINT1;
+    case AUDIO_CHANNEL_OUT_3POINT1POINT2:
+        return AUDIO_CHANNEL_IN_3POINT1POINT2;
+    case AUDIO_CHANNEL_OUT_3POINT0POINT2:
+        return AUDIO_CHANNEL_IN_3POINT0POINT2;
+    case AUDIO_CHANNEL_OUT_2POINT1POINT2:
+        return AUDIO_CHANNEL_IN_2POINT1POINT2;
+    case AUDIO_CHANNEL_OUT_2POINT0POINT2:
+        return AUDIO_CHANNEL_IN_2POINT0POINT2;
+    default:
+        return AUDIO_CHANNEL_INVALID;
+    }
+}
+
 static inline bool audio_is_valid_format(audio_format_t format)
 {
     switch (format & AUDIO_FORMAT_MAIN_MASK) {
