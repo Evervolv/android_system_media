@@ -188,7 +188,7 @@ camera_metadata_t *allocate_copy_camera_metadata_checked(
         return NULL;
     }
 
-    void *buffer = malloc(src_size);
+    void *buffer = calloc(1, src_size);
     memcpy(buffer, src, src_size);
 
     camera_metadata_t *metadata = (camera_metadata_t*) buffer;
@@ -205,7 +205,7 @@ camera_metadata_t *allocate_camera_metadata(size_t entry_capacity,
 
     size_t memory_needed = calculate_camera_metadata_size(entry_capacity,
                                                           data_capacity);
-    void *buffer = malloc(memory_needed);
+    void *buffer = calloc(1, memory_needed);
     return place_camera_metadata(buffer, memory_needed,
                                  entry_capacity,
                                  data_capacity);
