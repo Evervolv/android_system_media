@@ -1209,6 +1209,11 @@ __END_DECLS
 
 #define AUDIO_PARAMETER_VALUE_LIST_SEPARATOR "|"
 
+/* Reconfigure offloaded A2DP codec */
+#define AUDIO_PARAMETER_RECONFIG_A2DP "reconfigA2dp"
+/* Query if HwModule supports reconfiguration of offloaded A2DP codec */
+#define AUDIO_PARAMETER_A2DP_RECONFIG_SUPPORTED "isReconfigA2dpSupported"
+
 /**
  * audio codec parameters
  */
