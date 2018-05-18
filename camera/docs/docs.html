@@ -17576,7 +17576,12 @@ An example usage scenario could look like this:</p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>Vendor tags can be listed here.<wbr/> Vendor tag metadata should also
+              <p>If <a href="#controls_android.control.aeTargetFpsRange">android.<wbr/>control.<wbr/>ae<wbr/>Target<wbr/>Fps<wbr/>Range</a> is part of the session parameters and constrained high
+speed mode is enabled,<wbr/> then only modifications of the maximum framerate value will be
+monitored by the framework and can trigger camera re-configuration.<wbr/> For more information
+about framerate ranges during constrained high speed sessions see
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createConstrainedHighSpeedCaptureSession">CameraDevice#createConstrainedHighSpeedCaptureSession</a>.<wbr/>
+Vendor tags can be listed here.<wbr/> Vendor tag metadata should also
 use the extensions C api (refer to
 android.<wbr/>hardware.<wbr/>camera.<wbr/>device.<wbr/>V3_<wbr/>4.<wbr/>Stream<wbr/>Configuration.<wbr/>session<wbr/>Params for more details).<wbr/></p>
 <p>Setting/<wbr/>getting vendor tags will be checked against the metadata
