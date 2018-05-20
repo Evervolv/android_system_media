@@ -5497,6 +5497,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           </details>
           <hal_details>
+          If android.control.aeTargetFpsRange is part of the session parameters and constrained high
+          speed mode is enabled, then only modifications of the maximum framerate value will be
+          monitored by the framework and can trigger camera re-configuration. For more information
+          about framerate ranges during constrained high speed sessions see
+          {@link android.hardware.camera2.CameraDevice#createConstrainedHighSpeedCaptureSession}.
           Vendor tags can be listed here. Vendor tag metadata should also
           use the extensions C api (refer to
           android.hardware.camera.device.V3_4.StreamConfiguration.sessionParams for more details).
