@@ -5210,6 +5210,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               The camera device is a logical camera backed by two or more physical cameras that are
               also exposed to the application.
 
+              Camera application shouldn't assume that there are at most 1 rear camera and 1 front
+              camera in the system. For an application that switches between front and back cameras,
+              the recommendation is to switch between the first rear camera and the first front
+              camera in the list of supported camera devices.
+
               This capability requires the camera device to support the following:
 
               * This camera device must list the following static metadata entries in {@link
@@ -5324,6 +5329,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           For a camera device with LOGICAL_MULTI_CAMERA capability, it should operate in the
           same way as a physical camera device based on its hardware level and capabilities.
           It's recommended that its feature set is superset of that of individual physical cameras.
+
+          * In camera1 API, to maintain application compatibility, for each {logical_camera_id,
+          physical_camera_1_id, physical_camera_2_id, ...} combination, where logical_camera_id
+          is composed of physical_camera_N_id, camera framework will only advertise one camera id
+          (within the combination) that is frontmost in the HAL published camera id list.
+
+          * Camera HAL is strongly recommended to advertise camera devices with best feature,
+          power, performance, and latency tradeoffs at the front of the camera id list.
 
           For MONOCHROME, the camera device must also advertise BACKWARD_COMPATIBLE capability, and
           it is exclusive of both RAW and MANUAL_POST_PROCESSING capabilities:
