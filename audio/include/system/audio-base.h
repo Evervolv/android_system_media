@@ -436,6 +436,9 @@ enum {
     AUDIO_PORT_CONFIG_CHANNEL_MASK = 0x2u,
     AUDIO_PORT_CONFIG_FORMAT       = 0x4u,
     AUDIO_PORT_CONFIG_GAIN         = 0x8u,
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_PORT_CONFIG_FLAGS        = 0x10u,  // Absent from AudioPortConfigMask, framework only.
+#endif
 };
 
 typedef enum {

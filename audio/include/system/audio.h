@@ -384,6 +384,13 @@ typedef int audio_port_handle_t;
 /* the maximum length for the human-readable device name */
 #define AUDIO_PORT_MAX_NAME_LEN 128
 
+/* a union to store port configuration flags. Declared as a type so can be reused
+   in framework code */
+union audio_io_flags {
+    audio_input_flags_t  input;
+    audio_output_flags_t output;
+};
+
 /* maximum audio device address length */
 #define AUDIO_DEVICE_MAX_ADDRESS_LEN 32
 
@@ -424,6 +431,9 @@ struct audio_port_config {
     audio_channel_mask_t     channel_mask; /* channel mask if applicable */
     audio_format_t           format;       /* format if applicable */
     struct audio_gain_config gain;         /* gain to apply if applicable */
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    union audio_io_flags     flags;        /* framework only: HW_AV_SYNC, DIRECT, ... */
+#endif
     union {
         struct audio_port_config_device_ext  device;  /* device specific info */
         struct audio_port_config_mix_ext     mix;     /* mix specific info */
