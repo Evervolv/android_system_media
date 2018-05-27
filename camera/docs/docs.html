@@ -17088,6 +17088,10 @@ results for use cases such as image stabilization or augmented reality.<wbr/></p
                     <span class="entry_type_enum_optional">[optional]</span>
                     <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras that are
 also exposed to the application.<wbr/></p>
+<p>Camera application shouldn't assume that there are at most 1 rear camera and 1 front
+camera in the system.<wbr/> For an application that switches between front and back cameras,<wbr/>
+the recommendation is to switch between the first rear camera and the first front
+camera in the list of supported camera devices.<wbr/></p>
 <p>This capability requires the camera device to support the following:</p>
 <ul>
 <li>This camera device must list the following static metadata entries in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>:<ul>
@@ -17220,6 +17224,18 @@ DEPTH).<wbr/></p>
 <p>For a camera device with LOGICAL_<wbr/>MULTI_<wbr/>CAMERA capability,<wbr/> it should operate in the
 same way as a physical camera device based on its hardware level and capabilities.<wbr/>
 It's recommended that its feature set is superset of that of individual physical cameras.<wbr/></p>
+<ul>
+<li>
+<p>In camera1 API,<wbr/> to maintain application compatibility,<wbr/> for each {logical_<wbr/>camera_<wbr/>id,<wbr/>
+physical_<wbr/>camera_<wbr/>1_<wbr/>id,<wbr/> physical_<wbr/>camera_<wbr/>2_<wbr/>id,<wbr/> ...<wbr/>} combination,<wbr/> where logical_<wbr/>camera_<wbr/>id
+is composed of physical_<wbr/>camera_<wbr/>N_<wbr/>id,<wbr/> camera framework will only advertise one camera id
+(within the combination) that is frontmost in the HAL published camera id list.<wbr/></p>
+</li>
+<li>
+<p>Camera HAL is strongly recommended to advertise camera devices with best feature,<wbr/>
+power,<wbr/> performance,<wbr/> and latency tradeoffs at the front of the camera id list.<wbr/></p>
+</li>
+</ul>
 <p>For MONOCHROME,<wbr/> the camera device must also advertise BACKWARD_<wbr/>COMPATIBLE capability,<wbr/> and
 it is exclusive of both RAW and MANUAL_<wbr/>POST_<wbr/>PROCESSING capabilities:</p>
 <ul>
