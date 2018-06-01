@@ -1052,6 +1052,26 @@ static inline bool audio_device_is_digital(audio_devices_t device) {
     }
 }
 
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+
+static inline bool audio_patch_has_hw_av_sync(const struct audio_patch *patch) {
+    for (unsigned int i = 0; i < patch->num_sources; ++i) {
+        if ((patch->sources[i].config_mask & AUDIO_PORT_CONFIG_FLAGS) &&
+                (patch->sources[i].flags.output & AUDIO_OUTPUT_FLAG_HW_AV_SYNC)) {
+            return true;
+        }
+    }
+    for (unsigned int i = 0; i < patch->num_sinks; ++i) {
+        if ((patch->sinks[i].config_mask & AUDIO_PORT_CONFIG_FLAGS) &&
+                (patch->sinks[i].flags.input & AUDIO_INPUT_FLAG_HW_AV_SYNC)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+#endif
+
 // Unique effect ID (can be generated from the following site:
 //  http://www.itu.int/ITU-T/asn1/uuid.html)
 // This struct is used for effects identification and in soundtrigger.
