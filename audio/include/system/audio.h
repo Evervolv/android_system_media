@@ -1054,18 +1054,45 @@ static inline bool audio_device_is_digital(audio_devices_t device) {
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
 
+static inline bool audio_port_config_has_hw_av_sync(const struct audio_port_config *port_cfg) {
+    if (!(port_cfg->config_mask & AUDIO_PORT_CONFIG_FLAGS)) {
+        return false;
+    }
+    bool input_direction;
+    switch (port_cfg->type) {
+        case AUDIO_PORT_TYPE_DEVICE:
+            switch (port_cfg->role) {
+                case AUDIO_PORT_ROLE_SOURCE:
+                    input_direction = true; break;
+                case AUDIO_PORT_ROLE_SINK:
+                    input_direction = false; break;
+                default:
+                    return false;
+            }
+            break;
+        case AUDIO_PORT_TYPE_MIX:
+            switch (port_cfg->role) {
+                case AUDIO_PORT_ROLE_SOURCE:
+                    input_direction = false; break;
+                case AUDIO_PORT_ROLE_SINK:
+                    input_direction = true; break;
+                default:
+                    return false;
+            }
+            break;
+        default:
+            return false;
+    }
+    return input_direction ? port_cfg->flags.input & AUDIO_INPUT_FLAG_HW_AV_SYNC
+            : port_cfg->flags.output & AUDIO_OUTPUT_FLAG_HW_AV_SYNC;
+}
+
 static inline bool audio_patch_has_hw_av_sync(const struct audio_patch *patch) {
     for (unsigned int i = 0; i < patch->num_sources; ++i) {
-        if ((patch->sources[i].config_mask & AUDIO_PORT_CONFIG_FLAGS) &&
-                (patch->sources[i].flags.output & AUDIO_OUTPUT_FLAG_HW_AV_SYNC)) {
-            return true;
-        }
+        if (audio_port_config_has_hw_av_sync(&patch->sources[i])) return true;
     }
     for (unsigned int i = 0; i < patch->num_sinks; ++i) {
-        if ((patch->sinks[i].config_mask & AUDIO_PORT_CONFIG_FLAGS) &&
-                (patch->sinks[i].flags.input & AUDIO_INPUT_FLAG_HW_AV_SYNC)) {
-            return true;
-        }
+        if (audio_port_config_has_hw_av_sync(&patch->sinks[i])) return true;
     }
     return false;
 }
