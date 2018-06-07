@@ -5639,7 +5639,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             android.sensor.info.activeArraySize to the sensor cropped pixel area size in this way:
                 1. Translate the requested cropRegion w.r.t., the left top corner of the sensor
                 cropped pixel area by (tx, ty),
-                where `tx = sensorCrop.top * (sensorCrop.height / activeArraySize.height)`
+                where `ty = sensorCrop.top * (sensorCrop.height / activeArraySize.height)`
                 and `tx = sensorCrop.left * (sensorCrop.width / activeArraySize.width)`. The
                 (sensorCrop.top, sensorCrop.left) is the coordinate based off the
                 android.sensor.info.activeArraySize.
