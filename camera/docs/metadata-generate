@@ -36,6 +36,7 @@ fi
 thisdir=$(cd "$(dirname "$0")"; pwd)
 fwkdir="$ANDROID_BUILD_TOP/frameworks/base/core/java/android/hardware/camera2/"
 fwkdir_html="$ANDROID_BUILD_TOP/frameworks/base/docs/html/reference"
+ndkdir_html="$ANDROID_BUILD_TOP/frameworks/native/docs"
 hidldir="$ANDROID_BUILD_TOP/hardware/interfaces/camera/metadata"
 ctsdir="$ANDROID_BUILD_TOP/cts/tests/camera/src/android/hardware/camera2/cts"
 outdir="$ANDROID_PRODUCT_OUT/obj/ETC/system-media-camera-docs_intermediates"
@@ -183,6 +184,7 @@ function copy_directory() {
         echo "ERROR: Failed to copy $(relpath "$src") to $(relpath "$dst")" >& 2
     else
         echo "OK: Copied $(relpath "$src") to $(relpath "$dst")"
+        out_files+=$'\n'" $dst"
     fi
 
     return $retval
@@ -237,6 +239,9 @@ gen_file camera_device_info.mako ./camera_device_info.proto || exit 1
 
 # Copy ./images directory into javadoc directory
 copy_directory "images" "$fwkdir_html" || exit 1
+
+# Copy ./images directory into ndk doc directory
+copy_directory "images" "$ndkdir_html" || exit 1
 
 echo ""
 echo "===================================================="
