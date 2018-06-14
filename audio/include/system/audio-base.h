@@ -380,6 +380,10 @@ typedef enum {
     AUDIO_INPUT_FLAG_MMAP_NOIRQ = 0x10,
     AUDIO_INPUT_FLAG_VOIP_TX    = 0x20,
     AUDIO_INPUT_FLAG_HW_AV_SYNC = 0x40,
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS  // TODO: Expose at HAL interface, remove FRAMEWORK_FLAGS mask
+    AUDIO_INPUT_FLAG_DIRECT     = 0x80,
+    AUDIO_INPUT_FRAMEWORK_FLAGS = AUDIO_INPUT_FLAG_DIRECT,
+#endif
 } audio_input_flags_t;
 
 typedef enum {
