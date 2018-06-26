@@ -59,13 +59,29 @@ public:
         }
         if (mDiscontinuity || mSampleRate != sampleRate) {
             mDiscontinuity = false;
+            // ALOGD("disc:%d frames:%lld timeNs:%lld",
+            //         mDiscontinuity, (long long)frames, (long long)timeNs);
             copyTo(mFirstTimestamp, {frames, timeNs});
             copyTo(mLastTimestamp, mFirstTimestamp);
             mSampleRate = sampleRate;
         } else {
             assert(sampleRate != 0);
             const FrameTime timestamp{frames, timeNs};
-            mJitterMs.add(computeJitterMs(timestamp, mLastTimestamp, sampleRate));
+            if (mCold && (timestamp.second == mLastTimestamp.second
+                    || computeRatio(timestamp, mLastTimestamp, sampleRate)
+                            < kMinimumSpeedToStartVerification)) {
+                // cold is when the timestamp may take some time to start advancing at normal rate.
+                ++mColds;
+                copyTo(mFirstTimestamp, timestamp);
+                // ALOGD("colds:%lld frames:%lld timeNs:%lld",
+                //         (long long)mColds, (long long)frames, (long long)timeNs);
+            } else {
+                mCold = false;
+                const double jitterMs = computeJitterMs(timestamp, mLastTimestamp, sampleRate);
+                mJitterMs.add(jitterMs);
+                // ALOGD("frames:%lld  timeNs:%lld jitterMs:%lf",
+                //         (long long)frames, (long long)timeNs, jitterMs);
+            }
             copyTo(mLastTimestamp, timestamp);
         }
         ++mTimestamps;
@@ -81,6 +97,7 @@ public:
     constexpr void discontinuity() {
         if (!mDiscontinuity) {
             mDiscontinuity = true;
+            mCold = true;
             ++mDiscontinuities;
         }
     }
@@ -103,6 +120,7 @@ public:
 
         ss << "n=" << mTimestamps;          // number of timestamps added with valid times.
         ss << " disc=" << mDiscontinuities; // discontinuities encountered (dups ignored).
+        ss << " cold=" << mColds;           // timestamps not progressing after discontinuity.
         ss << " nRdy=" << mNotReady;        // timestamps not ready (time negative).
         ss << " err=" << mErrors;           // errors encountered.
         if (mSampleRate != 0) {             // ratio of time-by-frames / time
@@ -117,6 +135,7 @@ public:
     constexpr int64_t getN() const { return mTimestamps; }
     constexpr int64_t getDiscontinuities() const { return mDiscontinuities; }
     constexpr int64_t getNotReady() const { return mNotReady; }
+    constexpr int64_t getColds() const { return mColds; }
     constexpr int64_t getErrors() const { return mErrors; }
     constexpr const Statistics<double> & getJitterMs() const { return mJitterMs; }
 
@@ -132,14 +151,18 @@ private:
     int64_t mTimestamps = 0;
     int64_t mDiscontinuities = 0;
     int64_t mNotReady = 0;
+    int64_t mColds = 0;
     int64_t mErrors = 0;
     Statistics<double> mJitterMs{0.999}; // weight more recent history higher.
 
     // timestamp anchor info
     bool mDiscontinuity = true;
+    bool mCold = true;
     FrameTime mFirstTimestamp;
     FrameTime mLastTimestamp;
     uint32_t mSampleRate = 0;
+
+    static constexpr double kMinimumSpeedToStartVerification = 0.1;
 
     // TODO: remove when std::pair has a constexpr copy operator.
     static void constexpr copyTo(FrameTime& to, const FrameTime &from) {

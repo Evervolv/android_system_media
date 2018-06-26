@@ -76,4 +76,5 @@ TEST(TimestampVerifier, sanity)
     EXPECT_EQ(48000 * (8 - 1), last.first);
     EXPECT_EQ((int64_t)1e9 * (8 - 1), last.second);
     EXPECT_EQ((uint32_t)48000, tv3.getSampleRate());
+    EXPECT_EQ(0, tv3.getColds());
 }
