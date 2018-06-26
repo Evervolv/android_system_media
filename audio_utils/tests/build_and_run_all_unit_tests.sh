@@ -39,6 +39,10 @@ echo "format tests"
 adb push $OUT/data/nativetest/format_tests/format_tests /system/bin
 adb shell /system/bin/format_tests
 
+echo "statistics tests"
+adb push $OUT/data/nativetest/statistics_tests/statistics_tests /system/bin
+adb shell /system/bin/statistics_tests
+
 echo "benchmarking primitives"
 adb push $OUT/system/bin/primitives_benchmark /system/bin
 adb shell /system/bin/primitives_benchmark
