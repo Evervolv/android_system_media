@@ -260,3 +260,17 @@ cc_test {
         "-Wextra",
     ],
 }
+
+cc_test {
+    name: "timestampverifier_tests",
+    host_supported: false,
+
+    shared_libs: ["libaudioutils"],
+    srcs: ["timestampverifier_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+

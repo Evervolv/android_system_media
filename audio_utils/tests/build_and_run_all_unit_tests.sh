@@ -43,6 +43,10 @@ echo "statistics tests"
 adb push $OUT/data/nativetest/statistics_tests/statistics_tests /system/bin
 adb shell /system/bin/statistics_tests
 
+echo "timestampverifier tests"
+adb push $OUT/data/nativetest/timestampverifier_tests/timestampverifier_tests /system/bin
+adb shell /system/bin/timestampverifier_tests
+
 echo "benchmarking primitives"
 adb push $OUT/system/bin/primitives_benchmark /system/bin
 adb shell /system/bin/primitives_benchmark
