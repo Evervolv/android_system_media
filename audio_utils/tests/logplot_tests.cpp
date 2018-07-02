@@ -17,18 +17,17 @@
 #include <iostream>
 #include <vector>
 
-// FIXME couldn't get <audio_utils/LogPlot.h> to work yet.
-#include "LogPlot.h"
+#include <audio_utils/LogPlot.h>
 
 // TODO Make more rigorous unit tests.
-int main(int argc, char **argv)
+int main()
 {
     static const float data[] = {-61.4, -61.7, -56.2, -54.5, -47.7, -51.1, -49.7, -47.2,
         -47.8, -42.3, -38.9, -40.5, -39.4, -33.9, -26.3, -20.9};
     size_t data_size = sizeof(data) / sizeof(*data);
     std::vector<std::pair<float, bool>> vdata;
-    for (int i = 0; i < data_size; i++) {
-        vdata.push_back(std::make_pair(data[i], (i + 1) % 10 == 0));
+    for (size_t i = 0; i < data_size; i++) {
+        vdata.emplace_back(data[i], (i + 1) % 10 == 0);
     }
 
     std::string graphstr = audio_utils_log_plot(vdata.begin(), vdata.end());
