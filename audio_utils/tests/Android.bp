@@ -296,3 +296,18 @@ cc_test {
         },
     }
 }
+
+cc_binary {
+    name: "statistics_benchmark",
+    host_supported: false,
+
+    srcs: ["statistics_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+    static_libs: [
+        "libgoogle-benchmark",
+        "libaudioutils",
+    ],
+}

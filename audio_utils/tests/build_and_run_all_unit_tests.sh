@@ -51,6 +51,10 @@ echo "logplot tests"
 adb push $OUT/data/nativetest/logplot_tests/logplot_tests /system/bin
 adb shell /system/bin/logplot_tests
 
+echo "benchmarking_statistics"
+adb push $OUT/system/bin/statistics_benchmark /system/bin
+adb shell /system/bin/statistics_benchmark
+
 echo "benchmarking primitives"
 adb push $OUT/system/bin/primitives_benchmark /system/bin
 adb shell /system/bin/primitives_benchmark

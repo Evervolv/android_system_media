@@ -48,6 +48,17 @@ namespace android {
  * The Statistics class is safe to call from a SCHED_FIFO thread with the exception of
  * the toString() method, which uses std::stringstream to format data for printing.
  *
+ * Long term data accumulation:
+ * If the alpha weight is 1 (or not specified) then statistics objects with float
+ * summation types (D, S) should NOT add more than the mantissa-bits elements
+ * without reset to prevent variance increases due to weight precision underflow.
+ * This is 1 << 23 elements for float and 1 << 52 elements for double.
+ *
+ * Setting alpha less than 1 avoids this underflow problem.
+ * Alpha < 1 - (epsilon * 32), where epsilon is std::numeric_limits<D>::epsilon()
+ * is recommended for continuously running statistics (alpha <= 0.999996
+ * for float summation precision).
+ *
  * TODO:
  * 1) Allow changing the alpha weight on the fly.
  * 2) Alternative versions of Kahan/Neumaier sum that better preserve precision.
