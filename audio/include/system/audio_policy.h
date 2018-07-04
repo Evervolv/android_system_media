@@ -94,19 +94,6 @@ typedef enum {
 } audio_policy_tone_t;
 
 
-static inline bool audio_is_low_visibility(audio_stream_type_t stream)
-{
-    switch (stream) {
-    case AUDIO_STREAM_SYSTEM:
-    case AUDIO_STREAM_NOTIFICATION:
-    case AUDIO_STREAM_RING:
-        return true;
-    default:
-        return false;
-    }
-}
-
-
 __END_DECLS
 
 #endif  // ANDROID_AUDIO_POLICY_CORE_H
