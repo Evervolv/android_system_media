@@ -236,11 +236,11 @@ public:
         return sqrt(getPopVariance());
     }
 
-    constexpr D getMin() const {
+    constexpr T getMin() const {
         return mMin;
     }
 
-    constexpr D getMax() const {
+    constexpr T getMax() const {
         return mMax;
     }
 
@@ -386,11 +386,11 @@ public:
         return sqrt(getPopVariance());
     }
 
-    D getMin() const {
+    T getMin() const {
         return mMin;
     }
 
-    D getMax() const {
+    T getMax() const {
         return mMax;
     }
 
