@@ -17,6 +17,7 @@
 #ifndef ANDROID_AUDIO_UTILS_TIMESTAMP_VERIFIER_H
 #define ANDROID_AUDIO_UTILS_TIMESTAMP_VERIFIER_H
 
+#include <audio_utils/clock.h>
 #include <audio_utils/Statistics.h>
 
 namespace android {
@@ -58,9 +59,24 @@ public:
            return;
         }
         if (mDiscontinuity || mSampleRate != sampleRate) {
-            mDiscontinuity = false;
             // ALOGD("disc:%d frames:%lld timeNs:%lld",
             //         mDiscontinuity, (long long)frames, (long long)timeNs);
+            switch (mDiscontinuityMode) {
+            case DISCONTINUITY_MODE_CONTINUOUS:
+                break;
+            case DISCONTINUITY_MODE_ZERO:
+                // frame position reset to 0 on discontinuity - detect this.
+                if (mLastTimestamp.first
+                        > kDiscontinuityZeroStartThresholdMs * sampleRate / MILLIS_PER_SECOND
+                        && frames >= mLastTimestamp.first) {
+                    return;
+                }
+                break;
+            default:
+                assert(false); // never here.
+                break;
+            }
+            mDiscontinuity = false;
             copyTo(mFirstTimestamp, {frames, timeNs});
             copyTo(mLastTimestamp, mFirstTimestamp);
             mSampleRate = sampleRate;
@@ -96,6 +112,7 @@ public:
      */
     constexpr void discontinuity() {
         if (!mDiscontinuity) {
+            // ALOGD("discontinuity");
             mDiscontinuity = true;
             mCold = true;
             ++mDiscontinuities;
@@ -109,6 +126,22 @@ public:
      */
     constexpr void error() {
         ++mErrors;
+    }
+
+    // How a discontinuity affects frame position.
+    enum DiscontinuityMode : int32_t {
+        DISCONTINUITY_MODE_CONTINUOUS, // frame position is unaffected.
+        DISCONTINUITY_MODE_ZERO,       // frame position resets to zero.
+    };
+
+    constexpr void setDiscontinuityMode(DiscontinuityMode mode) {
+        assert(mode == DISCONTINUITY_MODE_CONTINUOUS
+                || mode == DISCONTINUITY_MODE_ZERO);
+        mDiscontinuityMode = mode;
+    }
+
+    constexpr DiscontinuityMode getDiscontinuityMode() const {
+        return mDiscontinuityMode;
     }
 
     /** returns a string with relevant statistics.
@@ -162,7 +195,12 @@ private:
     FrameTime mLastTimestamp;
     uint32_t mSampleRate = 0;
 
+    // configuration
+    DiscontinuityMode mDiscontinuityMode = DISCONTINUITY_MODE_CONTINUOUS;
+
     static constexpr double kMinimumSpeedToStartVerification = 0.1;
+     // Number of ms so small that initial jitter is OK for DISCONTINUITY_MODE_ZERO.
+    static constexpr int64_t kDiscontinuityZeroStartThresholdMs = 5;
 
     // TODO: remove when std::pair has a constexpr copy operator.
     static void constexpr copyTo(FrameTime& to, const FrameTime &from) {
