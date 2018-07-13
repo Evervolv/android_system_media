@@ -1281,6 +1281,7 @@ __END_DECLS
 #define AUDIO_HARDWARE_MODULE_ID_CODEC_OFFLOAD "codec_offload"
 #define AUDIO_HARDWARE_MODULE_ID_STUB "stub"
 #define AUDIO_HARDWARE_MODULE_ID_HEARING_AID "hearing_aid"
+#define AUDIO_HARDWARE_MODULE_ID_MSD "msd"
 
 /**
  * Multi-Stream Decoder (MSD) HAL service name. MSD HAL is used to mix
