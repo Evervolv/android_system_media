@@ -21,10 +21,12 @@
 #include <cmath>
 #include <iomanip>      // setw
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 
 // TODO Make a class called LogPlot and put this functionality in it.
+// Actually maybe this file can be called AsciiPlot or something...
 /**
  * \brief Creates a std::string graph representation of equally-spaced time-series data points.
  *
@@ -106,6 +108,101 @@ std::string audio_utils_log_plot(RandomAccessIterator first, RandomAccessIterato
     }
     ss << std::setw(12) << "|";
     ss << std::string(std::min(size - (size_t)1, (size_t)WIDTH_MAX), '_') << "\n\n";
+
+    return ss.str();
+}
+
+// determines how many character spaces an integer takes up.
+inline int widthOf(int x) {
+    int width = 0;
+    if (x < 0) {
+        ++width;
+        x = x == INT_MIN ? INT_MAX : -x;
+    }
+    // assert (x >= 0)
+    do {
+        ++width;
+        x /= 10;
+    } while (x > 0);
+    return width;
+}
+
+// computes the column width required for a specific histogram value
+inline int numberWidth(double number, int leftPadding) {
+    // Added values account for whitespaces needed around numbers, and for the
+    // dot and decimal digit not accounted for by widthOf
+    return std::max(std::max(widthOf(static_cast<int>(number)) + 3, 2), leftPadding + 1);
+}
+
+// TODO Make this templated and add comments.
+inline std::string audio_utils_plot_histogram(const std::map<double, int> &buckets,
+        const char *title = "", const char *label = "", int maxHeight = 10)
+{
+    if (buckets.empty()) {
+        return "";
+    }
+
+    auto it = buckets.begin();
+    double maxDelta = it->first;
+    int maxCount = it->second;
+    // Compute maximum values
+    while (++it != buckets.end()) {
+        if (it->first > maxDelta) {
+            maxDelta = it->first;
+        }
+        if (it->second > maxCount) {
+            maxCount = it->second;
+        }
+    }
+    int height = log2(maxCount) + 1; // maxCount > 0, safe to call log2
+    const int leftPadding = widthOf(1 << height);
+    const int bucketWidth = numberWidth(maxDelta, leftPadding);
+    int scalingFactor = 1;
+    // scale data if it exceeds maximum height
+    if (height > maxHeight) {
+        scalingFactor = (height + maxHeight) / maxHeight;
+        height /= scalingFactor;
+    }
+    std::stringstream ss;
+    ss << title << "\n " << std::setw(leftPadding) << " ";
+    // write histogram label line with bucket values
+    for (auto const &x : buckets) {
+        const int colWidth = numberWidth(x.first, leftPadding);
+        ss << std::setw(colWidth) << x.second;
+    }
+    // write histogram ascii art
+    // underscores and spaces length corresponds to maximum width of histogram
+    constexpr int kLen = 200;
+    static const std::string underscores(kLen, '_');
+    static const std::string spaces(kLen, ' ');
+    auto getTail = [](const size_t n, const std::string &s) {
+        return s.c_str() + s.size() - std::min(n, s.size());
+    };
+
+    ss << "\n ";
+    for (int row = height * scalingFactor; row >= 0; row -= scalingFactor) {
+        // TODO explain how value is derived from log2 and why it doesn't overflow.
+        const int value = 1 << row;
+        ss << getTail(leftPadding, spaces);
+        for (auto const &x : buckets) {
+            const int colWidth = numberWidth(x.first, leftPadding);
+            ss << getTail(colWidth - 1, spaces) <<
+                (x.second < value ? " " : "|");
+        }
+        ss << "\n ";
+    }
+    // print x-axis
+    const int columns = static_cast<int>(buckets.size());
+    ss << std::setw(leftPadding) << " "
+        << getTail((columns + 1) * bucketWidth, underscores) << "\n ";
+
+    // write footer with bucket labels
+    ss << std::setw(leftPadding) << " ";
+    for (auto const &x : buckets) {
+        const int colWidth = numberWidth(x.first, leftPadding);
+        ss << std::setw(colWidth) << std::fixed << std::setprecision(1) << x.first;
+    }
+    ss << getTail(bucketWidth, spaces) << label << "\n";
 
     return ss.str();
 }
