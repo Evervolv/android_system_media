@@ -28490,12 +28490,26 @@ numerical value as well.<wbr/> To check if a given device is at least at a given
 the following code snippet can be used:</p>
 <pre><code>//<wbr/> Returns true if the device supports the required hardware level,<wbr/> or better.<wbr/>
 boolean isHardwareLevelSupported(CameraCharacteristics c,<wbr/> int requiredLevel) {
+    final int[] sortedHwLevels = {
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>LEGACY,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>EXTERNAL,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>LIMITED,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>FULL,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>3
+    };
     int deviceLevel = c.<wbr/>get(Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL);
-    if (deviceLevel == Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>LEGACY) {
-        return requiredLevel == deviceLevel;
+    if (requiredLevel == deviceLevel) {
+        return true;
     }
-    //<wbr/> deviceLevel is not LEGACY,<wbr/> can use numerical sort
-    return requiredLevel &lt;= deviceLevel;
+
+    for (int sortedlevel : sortedHwLevels) {
+        if (sortedlevel == requiredLevel) {
+            return true;
+        } else if (sortedlevel == deviceLevel) {
+            return false;
+        }
+    }
+    return false; //<wbr/> Should never reach here
 }
 </code></pre>
 <p>At a high level,<wbr/> the levels are:</p>
@@ -28509,6 +28523,8 @@ boolean isHardwareLevelSupported(CameraCharacteristics c,<wbr/> int requiredLeve
   post-processing settings,<wbr/> and image capture at a high rate.<wbr/></li>
 <li><code>LEVEL_<wbr/>3</code> devices additionally support YUV reprocessing and RAW image capture,<wbr/> along
   with additional output stream configurations.<wbr/></li>
+<li><code>EXTERNAL</code> devices are similar to <code>LIMITED</code> devices with exceptions like some sensor or
+  lens information not reorted or less stable framerates.<wbr/></li>
 </ul>
 <p>See the individual level enums for full descriptions of the supported capabilities.<wbr/>  The
 <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a> entry describes the device's capabilities at a
