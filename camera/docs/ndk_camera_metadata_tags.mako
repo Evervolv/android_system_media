@@ -41,6 +41,7 @@
 
 __BEGIN_DECLS
 
+#if __ANDROID_API__ >= 24
 <%!
   from metadata_helpers import csym
   def annotated_type(entry):
@@ -194,6 +195,7 @@ ${val.ndk_notes | ndkdoc(metadata)}\
   % endfor
 
 % endfor
+#endif /* __ANDROID_API__ >= 24 */
 
 __END_DECLS
 
