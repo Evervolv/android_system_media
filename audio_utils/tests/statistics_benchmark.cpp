@@ -70,7 +70,7 @@ static constexpr int alpha_equals_one_alphalimit = 0;
 
 // benchmark running float
 static void BM_MeanVariance_float_float_float(benchmark::State &state) {
-    BM_MeanVariance<android::Statistics<float, float, float>>(state,
+    BM_MeanVariance<android::audio_utils::Statistics<float, float, float>>(state,
         float_iterlimit, alpha_equals_one_alphalimit);
 }
 
@@ -78,7 +78,7 @@ BENCHMARK(BM_MeanVariance_float_float_float);
 
 // benchmark reference float
 static void BM_RefMeanVariance_float_float(benchmark::State &state) {
-    BM_MeanVariance<android::ReferenceStatistics<float, float>>(state,
+    BM_MeanVariance<android::audio_utils::ReferenceStatistics<float, float>>(state,
         float_iterlimit, alpha_equals_one_alphalimit);
 }
 
@@ -86,7 +86,7 @@ BENCHMARK(BM_RefMeanVariance_float_float);
 
 // benchmark running double
 static auto BM_MeanVariance_float_double_double(benchmark::State &state) {
-    BM_MeanVariance<android::Statistics<float, double, double>>(state,
+    BM_MeanVariance<android::audio_utils::Statistics<float, double, double>>(state,
         float_iterlimit, alpha_equals_one_alphalimit);
 }
 
@@ -94,7 +94,7 @@ BENCHMARK(BM_MeanVariance_float_double_double);
 
 // benchmark reference double
 static auto BM_RefMeanVariance_float_double(benchmark::State &state) {
-    BM_MeanVariance<android::ReferenceStatistics<float, double>>(state,
+    BM_MeanVariance<android::audio_utils::ReferenceStatistics<float, double>>(state,
         float_iterlimit, alpha_equals_one_alphalimit);
 }
 
@@ -102,16 +102,18 @@ BENCHMARK(BM_RefMeanVariance_float_double);
 
 // benchmark running float + kahan
 static auto BM_MeanVariance_float_float_Kahan(benchmark::State &state) {
-    BM_MeanVariance<android::Statistics<float, float, android::KahanSum<float>>>(state,
-        float_iterlimit, alpha_equals_one_alphalimit);
+    BM_MeanVariance<android::audio_utils::Statistics<float, float,
+        android::audio_utils::KahanSum<float>>>(state,
+            float_iterlimit, alpha_equals_one_alphalimit);
 }
 
 BENCHMARK(BM_MeanVariance_float_float_Kahan);
 
 // benchmark running float + Neumaier
 static auto BM_MeanVariance_float_float_Neumaier(benchmark::State &state) {
-    BM_MeanVariance<android::Statistics<float, float, android::NeumaierSum<float>>>(state,
-        float_iterlimit, alpha_equals_one_alphalimit);
+    BM_MeanVariance<android::audio_utils::Statistics<float, float,
+        android::audio_utils::NeumaierSum<float>>>(state,
+            float_iterlimit, alpha_equals_one_alphalimit);
 }
 
 BENCHMARK(BM_MeanVariance_float_float_Neumaier);
@@ -129,7 +131,7 @@ static constexpr int alpha_safe_upperbound_iterlimit = 32;
 
 // benchmark running float at alpha
 static auto BM_MeanVariance_float_float_float_alpha(benchmark::State &state) {
-    BM_MeanVariance<android::Statistics<float, float, float>>(state,
+    BM_MeanVariance<android::audio_utils::Statistics<float, float, float>>(state,
         float_overflow_iterlimit, alpha_safe_upperbound_iterlimit);
 }
 
@@ -137,7 +139,7 @@ BENCHMARK(BM_MeanVariance_float_float_float_alpha);
 
 // benchmark running double
 static auto BM_MeanVariance_float_double_double_alpha(benchmark::State &state) {
-    BM_MeanVariance<android::Statistics<float, double, double>>(state,
+    BM_MeanVariance<android::audio_utils::Statistics<float, double, double>>(state,
         float_overflow_iterlimit, alpha_safe_upperbound_iterlimit);
 }
 

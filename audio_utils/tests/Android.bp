@@ -275,6 +275,19 @@ cc_test {
 }
 
 cc_test {
+    name: "variadic_tests",
+    host_supported: false,
+
+    shared_libs: ["libaudioutils"],
+    srcs: ["variadic_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+cc_test {
     name: "logplot_tests",
     host_supported: true,
 

@@ -47,6 +47,10 @@ echo "timestampverifier tests"
 adb push $OUT/data/nativetest/timestampverifier_tests/timestampverifier_tests /system/bin
 adb shell /system/bin/timestampverifier_tests
 
+echo "variadic tests"
+adb push $OUT/data/nativetest/variadic_tests/variadic_tests /system/bin
+adb shell /system/bin/variadic_tests
+
 echo "logplot tests"
 adb push $OUT/data/nativetest/logplot_tests/logplot_tests /system/bin
 adb shell /system/bin/logplot_tests

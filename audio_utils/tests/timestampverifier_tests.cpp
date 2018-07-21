@@ -47,7 +47,7 @@ static constexpr auto makeVerifier(
 TEST(TimestampVerifier, sanity)
 {
     constexpr android::TimestampVerifier<int64_t, int64_t> tv;
-    constexpr android::Statistics<double> s = tv.getJitterMs();
+    constexpr android::audio_utils::Statistics<double> s = tv.getJitterMs();
 
     EXPECT_EQ(std::numeric_limits<double>::infinity(), s.getMin());
     EXPECT_EQ(-std::numeric_limits<double>::infinity(), s.getMax());

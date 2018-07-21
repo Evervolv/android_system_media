@@ -170,7 +170,9 @@ public:
     constexpr int64_t getNotReady() const { return mNotReady; }
     constexpr int64_t getColds() const { return mColds; }
     constexpr int64_t getErrors() const { return mErrors; }
-    constexpr const Statistics<double> & getJitterMs() const { return mJitterMs; }
+    constexpr const audio_utils::Statistics<double> & getJitterMs() const {
+        return mJitterMs;
+    }
 
     // timestamp anchor info
     using FrameTime = std::pair<F, T>;
@@ -186,7 +188,7 @@ private:
     int64_t mNotReady = 0;
     int64_t mColds = 0;
     int64_t mErrors = 0;
-    Statistics<double> mJitterMs{0.999}; // weight more recent history higher.
+    audio_utils::Statistics<double> mJitterMs{0.999}; // weight recent history higher.
 
     // timestamp anchor info
     bool mDiscontinuity = true;
