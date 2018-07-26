@@ -48,7 +48,7 @@ namespace android {
  * The Statistics class is safe to call from a SCHED_FIFO thread with the exception of
  * the toString() method, which uses std::stringstream to format data for printing.
  *
- * Long term data accumulation:
+ * Long term data accumulation and constant alpha:
  * If the alpha weight is 1 (or not specified) then statistics objects with float
  * summation types (D, S) should NOT add more than the mantissa-bits elements
  * without reset to prevent variance increases due to weight precision underflow.
@@ -59,10 +59,15 @@ namespace android {
  * is recommended for continuously running statistics (alpha <= 0.999996
  * for float summation precision).
  *
+ * Alpha may also change on-the-fly, based on the reliability of
+ * new information.  In that case, alpha may be set temporarily greater
+ * than 1.
+ *
+ * https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Reliability_weights_2
+ *
  * TODO:
- * 1) Allow changing the alpha weight on the fly.
- * 2) Alternative versions of Kahan/Neumaier sum that better preserve precision.
- * 3) Add binary math ops to corrected sum classes for better precision in lieu of long double.
+ * 1) Alternative versions of Kahan/Neumaier sum that better preserve precision.
+ * 2) Add binary math ops to corrected sum classes for better precision in lieu of long double.
  */
 
 /**
@@ -167,6 +172,10 @@ public:
         }
     }
 
+    constexpr void setAlpha(D alpha) {
+        mAlpha = alpha;
+    }
+
     constexpr void add(const T &value) {
         // Note: fastest implementation uses fmin fminf but would not be constexpr
 
@@ -182,6 +191,7 @@ public:
             Note delta * (value - mMean) should be non-negative.
         */
         mWeight = D(1.) + mAlpha * mWeight;
+        mWeight2 = D(1.) + mAlpha * mAlpha * mWeight2;
         mMean += delta / mWeight;
         mM2 = mAlpha * mM2 + delta * (value - mMean);
 
@@ -209,6 +219,7 @@ public:
         mMax = StatisticsConstants<T>::mNegativeInfinity;
         mN = 0;
         mWeight = {};
+        mWeight2 = {};
         mMean = {};
         mM2 = {};
     }
@@ -272,12 +283,13 @@ public:
     }
 
 private:
-    const D mAlpha;
+    D mAlpha;
     T mMin{StatisticsConstants<T>::mPositiveInfinity};
     T mMax{StatisticsConstants<T>::mNegativeInfinity};
 
     int64_t mN = 0;  // running count of samples.
     D mWeight{};     // sum of weights.
+    D mWeight2{};    // sum of weights squared.
     S mMean{};       // running mean.
     D mM2{};         // running unnormalized variance.
 
@@ -287,7 +299,11 @@ private:
     //
     // TODO: consider exposing the correction factor.
     constexpr D getSampleWeight() const {
-        return (mWeight - D(1.)) * D(2.) / (D(1.) + mAlpha);
+        // if mAlpha is constant then the mWeight2 member variable is not
+        // needed, one can use instead:
+        // return (mWeight - D(1.)) * D(2.) / (D(1.) + mAlpha);
+
+        return mWeight - mWeight2 / mWeight;
     }
 };
 
@@ -307,6 +323,10 @@ public:
         : mAlpha(alpha)
     { }
 
+    constexpr void setAlpha(D alpha) {
+        mAlpha = alpha;
+    }
+
     // For independent testing, have intentionally slightly different behavior
     // of min and max than Statistics with respect to Nan.
     constexpr void add(const T &value) {
@@ -320,6 +340,7 @@ public:
         }
 
         mData.push_front(value);
+        mAlphaList.push_front(mAlpha);
     }
 
     int64_t getN() const {
@@ -330,6 +351,7 @@ public:
         mMin = {};
         mMax = {};
         mData.clear();
+        mAlphaList.clear();
     }
 
     D getWeight() const {
@@ -337,7 +359,7 @@ public:
         D alpha_i(1.);
         for (size_t i = 0; i < mData.size(); ++i) {
             weight += alpha_i;
-            alpha_i *= mAlpha;
+            alpha_i *= mAlphaList[i];
         }
         return weight;
     }
@@ -345,10 +367,9 @@ public:
     D getWeight2() const {
         D weight2{};
         D alpha2_i(1.);
-        const D a2 = mAlpha * mAlpha;
         for (size_t i = 0; i < mData.size(); ++i) {
             weight2 += alpha2_i;
-            alpha2_i *= a2;
+            alpha2_i *= mAlphaList[i] * mAlphaList[i];
         }
         return weight2;
     }
@@ -356,37 +377,21 @@ public:
     D getMean() const {
         D wsum{};
         D alpha_i(1.);
-        for (const auto &data : mData) {
-            wsum += alpha_i * data;
-            alpha_i *= mAlpha;
+        for (size_t i = 0; i < mData.size(); ++i) {
+            wsum += alpha_i * mData[i];
+            alpha_i *= mAlphaList[i];
         }
         return wsum / getWeight();
     }
 
     // Should always return a positive value.
     D getVariance() const {
-        const D mean = getMean();
-        D wsum{};
-        D alpha_i(1.);
-        for (const auto &data : mData) {
-            D diff = data - mean;
-            wsum += alpha_i * diff * diff;
-            alpha_i *= mAlpha;
-        }
-        return wsum / (getWeight() - getWeight2() / getWeight());
+        return getUnweightedVariance() / (getWeight() - getWeight2() / getWeight());
     }
 
     // Should always return a positive value.
     D getPopVariance() const {
-        const D mean = getMean();
-        D wsum{};
-        D alpha_i(1.);
-        for (const auto &data : mData) {
-            D diff = data - mean;
-            wsum += alpha_i * diff * diff;
-            alpha_i *= mAlpha;
-        }
-        return wsum / getWeight();
+        return getUnweightedVariance() / getWeight();
     }
 
     D getStdDev() const {
@@ -422,11 +427,24 @@ public:
     }
 
 private:
-    const D mAlpha;
     T mMin{};
     T mMax{};
 
-    std::deque<T> mData; // store all the data for exact summation, mData[0] most recent.
+    D mAlpha;                 // current alpha value
+    std::deque<T> mData;      // store all the data for exact summation, mData[0] most recent.
+    std::deque<D> mAlphaList; // alpha value for the data added.
+
+    D getUnweightedVariance() const {
+        const D mean = getMean();
+        D wsum{};
+        D alpha_i(1.);
+        for (size_t i = 0; i < mData.size(); ++i) {
+            const D diff = mData[i] - mean;
+            wsum += alpha_i * diff * diff;
+            alpha_i *= mAlphaList[i];
+        }
+        return wsum;
+    }
 };
 
 //

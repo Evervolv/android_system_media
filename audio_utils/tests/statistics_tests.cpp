@@ -16,12 +16,23 @@
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "audio_utils_statistics_tests"
-
+#include <random>
 #include <stdio.h>
 
 #include <audio_utils/Statistics.h>
 #include <gtest/gtest.h>
 
+
+// create uniform distribution
+template <typename T>
+static void initUniform(std::vector<T> &data, T rangeMin, T rangeMax) {
+    const size_t count = data.capacity();
+    std::minstd_rand gen(count);
+    std::uniform_real_distribution<T> dis(rangeMin, rangeMax);
+    for (auto &datum : data) {
+        datum = dis(gen);
+    }
+}
 
 // Used to create compile-time reference constants for variance testing.
 template <typename T>
@@ -287,6 +298,31 @@ TEST(StatisticsTest, stat_reference)
     verify(stat, rstat);
 }
 
+TEST(StatisticsTest, stat_variable_alpha)
+{
+    constexpr size_t TEST_SIZE = 1 << 20;
+    std::vector<double> data(TEST_SIZE);
+    std::vector<double> alpha(TEST_SIZE);
+
+    initUniform(data, -1., 1.);
+    initUniform(alpha, .95, .99);
+
+    android::ReferenceStatistics<double> rstat;
+    android::Statistics<double> stat;
+
+    for (size_t i = 0; i < TEST_SIZE; ++i) {
+        rstat.setAlpha(alpha[i]);
+        rstat.add(data[i]);
+
+        stat.setAlpha(alpha[i]);
+        stat.add(data[i]);
+    }
+
+    printf("statistics: %s\n", stat.toString().c_str());
+    printf("ref statistics: %s\n", rstat.toString().c_str());
+    verify(stat, rstat);
+}
+
 TEST_P(StatisticsTest, stat_simple_char)
 {
     const char *param = GetParam();
@@ -301,6 +337,7 @@ TEST_P(StatisticsTest, stat_simple_char)
     }
 
     printf("statistics for %s: %s\n", param, stat.toString().c_str());
+    printf("ref statistics for %s: %s\n", param, rstat.toString().c_str());
     // verify that the statistics are the same
     verify(stat, rstat);
 }
