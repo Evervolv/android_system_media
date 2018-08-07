@@ -47,6 +47,14 @@ static constexpr auto makeVerifier(
 TEST(TimestampVerifier, sanity)
 {
     constexpr android::TimestampVerifier<int64_t, int64_t> tv;
+
+    // The timestamp verifier must be embeddable in a memcpy structure just like pod.
+    // We use is_trivially_copyable and is_trivially_destructible for this test.
+    static_assert(std::is_trivially_copyable<decltype(tv)>::value,
+        "TimestampVerifier must be trivially copyable");
+    static_assert(std::is_trivially_destructible<decltype(tv)>::value,
+        "TimestampVerifier must be trivially destructible");
+
     constexpr android::audio_utils::Statistics<double> s = tv.getJitterMs();
 
     EXPECT_EQ(std::numeric_limits<double>::infinity(), s.getMin());
@@ -58,6 +66,14 @@ TEST(TimestampVerifier, sanity)
     EXPECT_EQ(0., tv2.getJitterMs().getMax());
     EXPECT_EQ(0., tv2.getJitterMs().getMin());
     EXPECT_EQ(0., tv2.getJitterMs().getMean());
+    EXPECT_EQ(1, tv2.getJitterMs().getN());
+
+    // We should get a perfect straight line estimate as there is no noise.
+    double a, b, r2;
+    tv2.estimateSampleRate(a, b, r2);
+    EXPECT_EQ(0., a);
+    EXPECT_EQ(48000., b);
+    EXPECT_NEAR(1., r2, std::numeric_limits<double>::epsilon());
 
     constexpr android::TimestampVerifier<int64_t, int64_t> tv3 =
             makeVerifier(8 /* N */, 48000 /* sampleRate */, 10 /* errors */, 10 /* disc */);
@@ -71,10 +87,15 @@ TEST(TimestampVerifier, sanity)
     constexpr auto first = tv3.getFirstTimestamp();
     constexpr auto last = tv3.getLastTimestamp();
 
-    EXPECT_EQ(0, first.first);
-    EXPECT_EQ(0, first.second);
-    EXPECT_EQ(48000 * (8 - 1), last.first);
-    EXPECT_EQ((int64_t)1e9 * (8 - 1), last.second);
+    EXPECT_EQ(0, first.mFrames);
+    EXPECT_EQ(0, first.mTimeNs);
+    EXPECT_EQ(48000 * (8 - 1), last.mFrames);
+    EXPECT_EQ((int64_t)1e9 * (8 - 1), last.mTimeNs);
     EXPECT_EQ((uint32_t)48000, tv3.getSampleRate());
     EXPECT_EQ(0, tv3.getColds());
+
+    tv3.estimateSampleRate(a, b, r2);
+    EXPECT_EQ(0., a);
+    EXPECT_EQ(48000., b);
+    EXPECT_NEAR(1., r2, std::numeric_limits<double>::epsilon());
 }

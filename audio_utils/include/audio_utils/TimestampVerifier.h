@@ -33,7 +33,13 @@ namespace android {
 template <typename F /* frame count */, typename T /* time units */>
 class TimestampVerifier {
 public:
-    constexpr TimestampVerifier() = default;
+    explicit constexpr TimestampVerifier(
+            double alphaJitter = kDefaultAlphaJitter,
+            double alphaEstimator = kDefaultAlphaEstimator)
+        : mJitterMs{alphaJitter}
+        , mTimestampEstimator{alphaEstimator}
+        , mCorrectedJitterMs{alphaJitter}
+    { }
 
     // construct from static arrays.
     template <size_t N>
@@ -66,9 +72,9 @@ public:
                 break;
             case DISCONTINUITY_MODE_ZERO:
                 // frame position reset to 0 on discontinuity - detect this.
-                if (mLastTimestamp.first
+                if (mLastTimestamp.mFrames
                         > kDiscontinuityZeroStartThresholdMs * sampleRate / MILLIS_PER_SECOND
-                        && frames >= mLastTimestamp.first) {
+                        && frames >= mLastTimestamp.mFrames) {
                     return;
                 }
                 break;
@@ -77,28 +83,69 @@ public:
                 break;
             }
             mDiscontinuity = false;
-            copyTo(mFirstTimestamp, {frames, timeNs});
-            copyTo(mLastTimestamp, mFirstTimestamp);
+            mFirstTimestamp = {frames, timeNs};
+            mLastTimestamp = mFirstTimestamp;
             mSampleRate = sampleRate;
         } else {
             assert(sampleRate != 0);
             const FrameTime timestamp{frames, timeNs};
-            if (mCold && (timestamp.second == mLastTimestamp.second
+            if (mCold && (timestamp.mTimeNs == mLastTimestamp.mTimeNs
                     || computeRatio(timestamp, mLastTimestamp, sampleRate)
                             < kMinimumSpeedToStartVerification)) {
                 // cold is when the timestamp may take some time to start advancing at normal rate.
                 ++mColds;
-                copyTo(mFirstTimestamp, timestamp);
+                mFirstTimestamp = timestamp;
                 // ALOGD("colds:%lld frames:%lld timeNs:%lld",
                 //         (long long)mColds, (long long)frames, (long long)timeNs);
             } else {
-                mCold = false;
                 const double jitterMs = computeJitterMs(timestamp, mLastTimestamp, sampleRate);
                 mJitterMs.add(jitterMs);
                 // ALOGD("frames:%lld  timeNs:%lld jitterMs:%lf",
                 //         (long long)frames, (long long)timeNs, jitterMs);
+
+                // Handle timestamp estimation
+                if (mCold) {
+                    mCold = false;
+                    mTimestampEstimator.reset();
+                    mTimestampEstimator.add(
+                        {(double)mFirstTimestamp.mTimeNs * 1e-9, (double)mFirstTimestamp.mFrames});
+                    mFirstCorrectedTimestamp = mFirstTimestamp;
+                    mLastCorrectedTimestamp = mFirstCorrectedTimestamp;
+                }
+                mTimestampEstimator.add({(double)timeNs * 1e-9, (double)frames});
+
+                // Find the corrected timestamp, a posteriori estimate.
+                FrameTime correctedTimestamp = timestamp;
+
+                // The estimator is valid after 2 timestamps; we choose correlation
+                // of kEstimatorR2Lock to signal locked.
+                if (mTimestampEstimator.getN() > 2
+                        && mTimestampEstimator.getR2() >= kEstimatorR2Lock) {
+#if 1
+                    // We choose frame correction over time correction.
+                    // TODO: analyze preference.
+
+                    // figure out frames based on time.
+                    const F newFrames = mTimestampEstimator.getYFromX((double)timeNs * 1e-9);
+                    // prevent retrograde correction.
+                    correctedTimestamp.mFrames = std::max(
+                            newFrames, mLastCorrectedTimestamp.mFrames);
+#else
+                    // figure out time based on frames
+                    const T newTimeNs = mTimestampEstimator.getXFromY((double)frames) * 1e9;
+                    // prevent retrograde correction.
+                    correctedTimestamp.mTimeNs = std::max(
+                            newTimeNs, mLastCorrectedTimestamp.mTimeNs);
+#endif
+                }
+
+                // Compute the jitter if the corrected timestamp is used.
+                const double correctedJitterMs = computeJitterMs(
+                        correctedTimestamp, mLastCorrectedTimestamp, sampleRate);
+                mCorrectedJitterMs.add(correctedJitterMs);
+                mLastCorrectedTimestamp = correctedTimestamp;
             }
-            copyTo(mLastTimestamp, timestamp);
+            mLastTimestamp = timestamp;
         }
         ++mTimestamps;
     }
@@ -161,6 +208,14 @@ public:
                     mLastTimestamp, mFirstTimestamp, mSampleRate);
         }
         ss << " jitterMs(" << mJitterMs.toString() << ")";  // timestamp jitter statistics.
+
+        double a, b, r2; // sample rate is the slope b.
+        estimateSampleRate(a, b, r2);
+
+        // r2 is correlation coefficient (where 1 is best and 0 is worst),
+        // so for better printed resolution, we print from 1 - r2.
+        ss << " localSR(" << b << ", " << (1. - r2) << ")";
+        ss << " correctedJitterMs(" << mCorrectedJitterMs.toString() << ")";
         return ss.str();
     }
 
@@ -173,14 +228,25 @@ public:
     constexpr const audio_utils::Statistics<double> & getJitterMs() const {
         return mJitterMs;
     }
+    // estimate local sample rate (dframes / dtime) which is the slope b from:
+    // y = a + bx
+    constexpr void estimateSampleRate(double &a, double &b, double &r2) const {
+        mTimestampEstimator.computeYLine(a, b, r2);
+    }
 
     // timestamp anchor info
-    using FrameTime = std::pair<F, T>;
+    using FrameTime = struct { F mFrames; T mTimeNs; }; // a "constexpr" pair
     constexpr FrameTime getFirstTimestamp() const { return mFirstTimestamp; }
     constexpr FrameTime getLastTimestamp() const { return mLastTimestamp; }
     constexpr uint32_t getSampleRate() const { return mSampleRate; }
 
+    constexpr FrameTime getLastCorrectedTimestamp() const { return mLastCorrectedTimestamp; }
 private:
+    // our statistics have exponentially weighted history.
+    // the defaults are here.
+    static constexpr double kDefaultAlphaJitter = 0.999;
+    static constexpr double kDefaultAlphaEstimator = 0.99;
+    static constexpr double kEstimatorR2Lock = 0.95;
 
     // general counters
     int64_t mTimestamps = 0;
@@ -188,14 +254,20 @@ private:
     int64_t mNotReady = 0;
     int64_t mColds = 0;
     int64_t mErrors = 0;
-    audio_utils::Statistics<double> mJitterMs{0.999}; // weight recent history higher.
+    audio_utils::Statistics<double> mJitterMs{kDefaultAlphaJitter};
 
     // timestamp anchor info
     bool mDiscontinuity = true;
     bool mCold = true;
-    FrameTime mFirstTimestamp;
-    FrameTime mLastTimestamp;
+    FrameTime mFirstTimestamp{};
+    FrameTime mLastTimestamp{};
     uint32_t mSampleRate = 0;
+
+    // timestamp estimation and correction
+    audio_utils::LinearLeastSquaresFit<double> mTimestampEstimator{kDefaultAlphaEstimator};
+    FrameTime mFirstCorrectedTimestamp{};
+    FrameTime mLastCorrectedTimestamp{};
+    audio_utils::Statistics<double> mCorrectedJitterMs{kDefaultAlphaJitter};
 
     // configuration
     DiscontinuityMode mDiscontinuityMode = DISCONTINUITY_MODE_CONTINUOUS;
@@ -204,19 +276,13 @@ private:
      // Number of ms so small that initial jitter is OK for DISCONTINUITY_MODE_ZERO.
     static constexpr int64_t kDiscontinuityZeroStartThresholdMs = 5;
 
-    // TODO: remove when std::pair has a constexpr copy operator.
-    static void constexpr copyTo(FrameTime& to, const FrameTime &from) {
-       to.first = from.first;
-       to.second = from.second;
-    }
-
     // sub returns the signed type of the difference between left and right.
     // This is only important if F or T are unsigned int types.
     __attribute__((no_sanitize("integer")))
     static constexpr auto sub(const FrameTime &left, const FrameTime &right) {
         return std::make_pair<
                 typename std::make_signed<F>::type, typename std::make_signed<T>::type>(
-                        left.first - right.first, left.second - right.second);
+                        left.mFrames - right.mFrames, left.mTimeNs - right.mTimeNs);
     }
 
     // Inf+-, NaN is possible only if sampleRate is 0 (should not happen)
