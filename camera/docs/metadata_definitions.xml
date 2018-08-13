@@ -686,9 +686,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <size>area_count</size>
           </array>
           <description>List of metering areas to use for auto-exposure adjustment.</description>
-          <units>Pixel coordinates within android.sensor.info.activeArraySize</units>
+          <units>Pixel coordinates within android.sensor.info.activeArraySize or
+            android.sensor.info.preCorrectionActiveArraySize depending on
+            distortion correction capability and mode</units>
           <range>Coordinates must be between `[(0,0), (width, height))` of
-          android.sensor.info.activeArraySize</range>
+            android.sensor.info.activeArraySize or android.sensor.info.preCorrectionActiveArraySize
+            depending on distortion correction capability and mode</range>
           <details>
               Not available if android.control.maxRegionsAe is 0.
               Otherwise will always be present.
@@ -696,11 +699,27 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               The maximum number of regions supported by the device is determined by the value
               of android.control.maxRegionsAe.
 
-              The coordinate system is based on the active pixel array,
-              with (0,0) being the top-left pixel in the active pixel array, and
+              For devices not supporting android.distortionCorrection.mode control, the coordinate
+              system always follows that of android.sensor.info.activeArraySize, with (0,0) being
+              the top-left pixel in the active pixel array, and
               (android.sensor.info.activeArraySize.width - 1,
-              android.sensor.info.activeArraySize.height - 1) being the
-              bottom-right pixel in the active pixel array.
+              android.sensor.info.activeArraySize.height - 1) being the bottom-right pixel in the
+              active pixel array.
+
+              For devices supporting android.distortionCorrection.mode control, the coordinate
+              system depends on the mode being set.
+              When the distortion correction mode is OFF, the coordinate system follows
+              android.sensor.info.preCorrectionActiveArraySize, with
+              `(0, 0)` being the top-left pixel of the pre-correction active array, and
+              (android.sensor.info.preCorrectionActiveArraySize.width - 1,
+              android.sensor.info.preCorrectionActiveArraySize.height - 1) being the bottom-right
+              pixel in the pre-correction active pixel array.
+              When the distortion correction mode is not OFF, the coordinate system follows
+              android.sensor.info.activeArraySize, with
+              `(0, 0)` being the top-left pixel of the active array, and
+              (android.sensor.info.activeArraySize.width - 1,
+              android.sensor.info.activeArraySize.height - 1) being the bottom-right pixel in the
+              active pixel array.
 
               The weight must be within `[0, 1000]`, and represents a weight
               for every pixel in the area. This means that a large metering area
@@ -734,6 +753,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               (xmin, ymin, xmax, ymax, weight).
               The rectangle is defined to be inclusive on xmin and ymin, but
               exclusive on xmax and ymax.
+              HAL must always report metering regions in the coordinate system of pre-correction
+              active array.
           </hal_details>
           <tag id="BC" />
         </entry>
@@ -969,9 +990,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <size>area_count</size>
           </array>
           <description>List of metering areas to use for auto-focus.</description>
-          <units>Pixel coordinates within android.sensor.info.activeArraySize</units>
+          <units>Pixel coordinates within android.sensor.info.activeArraySize or
+            android.sensor.info.preCorrectionActiveArraySize depending on
+            distortion correction capability and mode</units>
           <range>Coordinates must be between `[(0,0), (width, height))` of
-          android.sensor.info.activeArraySize</range>
+            android.sensor.info.activeArraySize or android.sensor.info.preCorrectionActiveArraySize
+            depending on distortion correction capability and mode</range>
           <details>
               Not available if android.control.maxRegionsAf is 0.
               Otherwise will always be present.
@@ -979,11 +1003,28 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               The maximum number of focus areas supported by the device is determined by the value
               of android.control.maxRegionsAf.
 
-              The coordinate system is based on the active pixel array,
-              with (0,0) being the top-left pixel in the active pixel array, and
+
+              For devices not supporting android.distortionCorrection.mode control, the coordinate
+              system always follows that of android.sensor.info.activeArraySize, with (0,0) being
+              the top-left pixel in the active pixel array, and
               (android.sensor.info.activeArraySize.width - 1,
-              android.sensor.info.activeArraySize.height - 1) being the
-              bottom-right pixel in the active pixel array.
+              android.sensor.info.activeArraySize.height - 1) being the bottom-right pixel in the
+              active pixel array.
+
+              For devices supporting android.distortionCorrection.mode control, the coordinate
+              system depends on the mode being set.
+              When the distortion correction mode is OFF, the coordinate system follows
+              android.sensor.info.preCorrectionActiveArraySize, with
+              `(0, 0)` being the top-left pixel of the pre-correction active array, and
+              (android.sensor.info.preCorrectionActiveArraySize.width - 1,
+              android.sensor.info.preCorrectionActiveArraySize.height - 1) being the bottom-right
+              pixel in the pre-correction active pixel array.
+              When the distortion correction mode is not OFF, the coordinate system follows
+              android.sensor.info.activeArraySize, with
+              `(0, 0)` being the top-left pixel of the active array, and
+              (android.sensor.info.activeArraySize.width - 1,
+              android.sensor.info.activeArraySize.height - 1) being the bottom-right pixel in the
+              active pixel array.
 
               The weight must be within `[0, 1000]`, and represents a weight
               for every pixel in the area. This means that a large metering area
@@ -1018,6 +1059,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               (xmin, ymin, xmax, ymax, weight).
               The rectangle is defined to be inclusive on xmin and ymin, but
               exclusive on xmax and ymax.
+              HAL must always report metering regions in the coordinate system of pre-correction
+              active array.
           </hal_details>
           <tag id="BC" />
         </entry>
@@ -1279,9 +1322,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </array>
           <description>List of metering areas to use for auto-white-balance illuminant
           estimation.</description>
-          <units>Pixel coordinates within android.sensor.info.activeArraySize</units>
+          <units>Pixel coordinates within android.sensor.info.activeArraySize or
+            android.sensor.info.preCorrectionActiveArraySize depending on
+            distortion correction capability and mode</units>
           <range>Coordinates must be between `[(0,0), (width, height))` of
-          android.sensor.info.activeArraySize</range>
+            android.sensor.info.activeArraySize or android.sensor.info.preCorrectionActiveArraySize
+            depending on distortion correction capability and mode</range>
           <details>
               Not available if android.control.maxRegionsAwb is 0.
               Otherwise will always be present.
@@ -1289,11 +1335,27 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               The maximum number of regions supported by the device is determined by the value
               of android.control.maxRegionsAwb.
 
-              The coordinate system is based on the active pixel array,
-              with (0,0) being the top-left pixel in the active pixel array, and
+              For devices not supporting android.distortionCorrection.mode control, the coordinate
+              system always follows that of android.sensor.info.activeArraySize, with (0,0) being
+              the top-left pixel in the active pixel array, and
               (android.sensor.info.activeArraySize.width - 1,
-              android.sensor.info.activeArraySize.height - 1) being the
-              bottom-right pixel in the active pixel array.
+              android.sensor.info.activeArraySize.height - 1) being the bottom-right pixel in the
+              active pixel array.
+
+              For devices supporting android.distortionCorrection.mode control, the coordinate
+              system depends on the mode being set.
+              When the distortion correction mode is OFF, the coordinate system follows
+              android.sensor.info.preCorrectionActiveArraySize, with
+              `(0, 0)` being the top-left pixel of the pre-correction active array, and
+              (android.sensor.info.preCorrectionActiveArraySize.width - 1,
+              android.sensor.info.preCorrectionActiveArraySize.height - 1) being the bottom-right
+              pixel in the pre-correction active pixel array.
+              When the distortion correction mode is not OFF, the coordinate system follows
+              android.sensor.info.activeArraySize, with
+              `(0, 0)` being the top-left pixel of the active array, and
+              (android.sensor.info.activeArraySize.width - 1,
+              android.sensor.info.activeArraySize.height - 1) being the bottom-right pixel in the
+              active pixel array.
 
               The weight must range from 0 to 1000, and represents a weight
               for every pixel in the area. This means that a large metering area
@@ -1327,6 +1389,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               (xmin, ymin, xmax, ymax, weight).
               The rectangle is defined to be inclusive on xmin and ymin, but
               exclusive on xmax and ymax.
+              HAL must always report metering regions in the coordinate system of pre-correction
+              active array.
           </hal_details>
           <tag id="BC" />
         </entry>
@@ -3410,9 +3474,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </details>
           <hal_details>
           The HAL must not squeeze or stretch the downscaled primary image to generate thumbnail.
-          The cropping must be done on the primary jpeg image rather than the sensor active array.
-          The stream cropping rule specified by "S5. Cropping" in camera3.h doesn't apply to the
-          thumbnail image cropping.
+          The cropping must be done on the primary jpeg image rather than the sensor pre-correction
+          active array. The stream cropping rule specified by "S5. Cropping" in camera3.h doesn't
+          apply to the thumbnail image cropping.
           </hal_details>
           <tag id="BC" />
         </entry>
@@ -5577,13 +5641,24 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </array>
           <description>The desired region of the sensor to read out for this capture.</description>
           <units>Pixel coordinates relative to
-          android.sensor.info.activeArraySize</units>
+          android.sensor.info.activeArraySize or
+          android.sensor.info.preCorrectionActiveArraySize depending on distortion correction
+          capability and mode</units>
           <details>
             This control can be used to implement digital zoom.
 
-            The crop region coordinate system is based off
-            android.sensor.info.activeArraySize, with `(0, 0)` being the
-            top-left corner of the sensor active array.
+            For devices not supporting android.distortionCorrection.mode control, the coordinate
+            system always follows that of android.sensor.info.activeArraySize, with `(0, 0)` being
+            the top-left pixel of the active array.
+
+            For devices supporting android.distortionCorrection.mode control, the coordinate
+            system depends on the mode being set.
+            When the distortion correction mode is OFF, the coordinate system follows
+            android.sensor.info.preCorrectionActiveArraySize, with
+            `(0, 0)` being the top-left pixel of the pre-correction active array.
+            When the distortion correction mode is not OFF, the coordinate system follows
+            android.sensor.info.activeArraySize, with
+            `(0, 0)` being the top-left pixel of the active array.
 
             Output streams use this rectangle to produce their output,
             cropping to a smaller region if necessary to maintain the
@@ -5608,10 +5683,17 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             streams will match exactly. These additional crops will
             be centered within the crop region.
 
-            The width and height of the crop region cannot
-            be set to be smaller than
+            If the coordinate system is android.sensor.info.activeArraysSize, the width and height
+            of the crop region cannot be set to be smaller than
             `floor( activeArraySize.width / android.scaler.availableMaxDigitalZoom )` and
             `floor( activeArraySize.height / android.scaler.availableMaxDigitalZoom )`, respectively.
+
+            If the coordinate system is android.sensor.info.preCorrectionActiveArraySize, the width
+            and height of the crop region cannot be set to be smaller than
+            `floor( preCorrectionActiveArraySize.width / android.scaler.availableMaxDigitalZoom )`
+            and
+            `floor( preCorrectionActiveArraySize.height / android.scaler.availableMaxDigitalZoom )`,
+            respectively.
 
             The camera device may adjust the crop region to account
             for rounding and other hardware requirements; the final
@@ -5632,30 +5714,31 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             possible.
 
             For a set of output streams configured, if the sensor output is cropped to a smaller
-            size than active array size, the HAL need follow below cropping rules:
+            size than pre-correction active array size, the HAL need follow below cropping rules:
 
-            * The HAL need handle the cropRegion as if the sensor crop size is the effective active
-            array size.More specifically, the HAL must transform the request cropRegion from
-            android.sensor.info.activeArraySize to the sensor cropped pixel area size in this way:
+            * The HAL need handle the cropRegion as if the sensor crop size is the effective
+            pre-correction active array size. More specifically, the HAL must transform the request
+            cropRegion from android.sensor.info.preCorrectionActiveArraySize to the sensor cropped
+            pixel area size in this way:
                 1. Translate the requested cropRegion w.r.t., the left top corner of the sensor
                 cropped pixel area by (tx, ty),
-                where `ty = sensorCrop.top * (sensorCrop.height / activeArraySize.height)`
-                and `tx = sensorCrop.left * (sensorCrop.width / activeArraySize.width)`. The
-                (sensorCrop.top, sensorCrop.left) is the coordinate based off the
+                where `ty = sensorCrop.top * (sensorCrop.height / preCorrectionActiveArraySize.height)`
+                and `tx = sensorCrop.left * (sensorCrop.width / preCorrectionActiveArraySize.width)`.
+                The (sensorCrop.top, sensorCrop.left) is the coordinate based off the
                 android.sensor.info.activeArraySize.
                 2. Scale the width and height of requested cropRegion with scaling factor of
-                sensorCrop.width/activeArraySize.width and sensorCrop.height/activeArraySize.height
+                sensorCrop.width/preCorrectionActiveArraySize.width and sensorCrop.height/preCorrectionActiveArraySize.height
                 respectively.
             Once this new cropRegion is calculated, the HAL must use this region to crop the image
-            with regard to the sensor crop size (effective active array size). The HAL still need
-            follow the general cropping rule for this new cropRegion and effective active
-            array size.
+            with regard to the sensor crop size (effective pre-correction active array size). The
+            HAL still need follow the general cropping rule for this new cropRegion and effective
+            pre-correction active array size.
 
-            * The HAL must report the cropRegion with regard to android.sensor.info.activeArraySize.
-            The HAL need convert the new cropRegion generated above w.r.t., full active array size.
-            The reported cropRegion may be slightly different with the requested cropRegion since
-            the HAL may adjust the crop region to account for rounding, conversion error, or other
-            hardware limitations.
+            * The HAL must report the cropRegion with regard to android.sensor.info.preCorrectionActiveArraySize.
+            The HAL need convert the new cropRegion generated above w.r.t., full pre-correction
+            active array size. The reported cropRegion may be slightly different with the requested
+            cropRegion since the HAL may adjust the crop region to account for rounding, conversion
+            error, or other hardware limitations.
 
             HAL2.x uses only (x, y, width)
           </hal_details>
@@ -6517,8 +6600,21 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             this field, with `(0, 0)` being the top-left of this rectangle.
 
             The active array may be smaller than the full pixel array, since the full array may
-            include black calibration pixels or other inactive regions, and geometric correction
-            resulting in scaling or cropping may have been applied.
+            include black calibration pixels or other inactive regions.
+
+            For devices that do not support android.distortionCorrection.mode control, the active
+            array must be the same as android.sensor.info.preCorrectionActiveArraySize.
+
+            For devices that support android.distortionCorrection.mode control, the active array must
+            be enclosed by android.sensor.info.preCorrectionActiveArraySize. The difference between
+            pre-correction active array and active array accounts for scaling or cropping caused
+            by lens geometric distortion correction.
+
+            In general, application should always refer to active array size for controls like
+            metering regions or crop region. Two exceptions are when the application is dealing with
+            RAW image buffers (RAW_SENSOR, RAW10, RAW12 etc), or when application explicitly set
+            android.distortionCorrection.mode to OFF. In these cases, application should refer
+            to android.sensor.info.preCorrectionActiveArraySize.
             </details>
             <ndk_details>
             The data representation is `int[4]`, which maps to `(left, top, width, height)`.
@@ -6810,9 +6906,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
             1. android.lens.distortion.
 
-            If all of the geometric distortion fields are no-ops, this rectangle will be the same
-            as the post-distortion-corrected rectangle given in
-            android.sensor.info.activeArraySize.
+            If the camera device doesn't support geometric distortion correction, or all of the
+            geometric distortion fields are no-ops, this rectangle will be the same as the
+            post-distortion-corrected rectangle given in android.sensor.info.activeArraySize.
 
             This rectangle is defined relative to the full pixel array; (0,0) is the top-left of
             the full pixel array, and the size of the full pixel array is given by
@@ -8063,10 +8159,24 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>List of landmarks for detected
           faces.</description>
           <details>
-            The coordinate system is that of android.sensor.info.activeArraySize, with
+            For devices not supporting android.distortionCorrection.mode control, the coordinate
+            system always follows that of android.sensor.info.activeArraySize, with `(0, 0)` being
+            the top-left pixel of the active array.
+
+            For devices supporting android.distortionCorrection.mode control, the coordinate
+            system depends on the mode being set.
+            When the distortion correction mode is OFF, the coordinate system follows
+            android.sensor.info.preCorrectionActiveArraySize, with
+            `(0, 0)` being the top-left pixel of the pre-correction active array.
+            When the distortion correction mode is not OFF, the coordinate system follows
+            android.sensor.info.activeArraySize, with
             `(0, 0)` being the top-left pixel of the active array.
 
             Only available if android.statistics.faceDetectMode == FULL</details>
+          <hal_details>
+            HAL must always report face landmarks in the coordinate system of pre-correction
+            active array.
+          </hal_details>
           <tag id="BC" />
         </entry>
         <entry name="faceRectangles" type="int32" visibility="ndk_public"
@@ -8079,13 +8189,27 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>List of the bounding rectangles for detected
           faces.</description>
           <details>
-            The coordinate system is that of android.sensor.info.activeArraySize, with
+            For devices not supporting android.distortionCorrection.mode control, the coordinate
+            system always follows that of android.sensor.info.activeArraySize, with `(0, 0)` being
+            the top-left pixel of the active array.
+
+            For devices supporting android.distortionCorrection.mode control, the coordinate
+            system depends on the mode being set.
+            When the distortion correction mode is OFF, the coordinate system follows
+            android.sensor.info.preCorrectionActiveArraySize, with
+            `(0, 0)` being the top-left pixel of the pre-correction active array.
+            When the distortion correction mode is not OFF, the coordinate system follows
+            android.sensor.info.activeArraySize, with
             `(0, 0)` being the top-left pixel of the active array.
 
             Only available if android.statistics.faceDetectMode != OFF</details>
           <ndk_details>
-            The data representation is `int[4]`, which maps to `(left, top, width, height)`.
+            The data representation is `int[4]`, which maps to `(left, top, right, bottom)`.
           </ndk_details>
+          <hal_details>
+            HAL must always report face rectangles in the coordinate system of pre-correction
+            active array.
+          </hal_details>
           <tag id="BC" />
         </entry>
         <entry name="faceScores" type="byte" visibility="ndk_public"
@@ -9110,12 +9234,26 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
               // Returns true if the device supports the required hardware level, or better.
               boolean isHardwareLevelSupported(CameraCharacteristics c, int requiredLevel) {
+                  final int[] sortedHwLevels = {
+                      CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
+                      CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL,
+                      CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+                      CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL,
+                      CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3
+                  };
                   int deviceLevel = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-                  if (deviceLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-                      return requiredLevel == deviceLevel;
+                  if (requiredLevel == deviceLevel) {
+                      return true;
                   }
-                  // deviceLevel is not LEGACY, can use numerical sort
-                  return requiredLevel &lt;= deviceLevel;
+
+                  for (int sortedlevel : sortedHwLevels) {
+                      if (sortedlevel == requiredLevel) {
+                          return true;
+                      } else if (sortedlevel == deviceLevel) {
+                          return false;
+                      }
+                  }
+                  return false; // Should never reach here
               }
 
           At a high level, the levels are:
@@ -9129,6 +9267,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             post-processing settings, and image capture at a high rate.
           * `LEVEL_3` devices additionally support YUV reprocessing and RAW image capture, along
             with additional output stream configurations.
+          * `EXTERNAL` devices are similar to `LIMITED` devices with exceptions like some sensor or
+            lens information not reorted or less stable framerates.
 
           See the individual level enums for full descriptions of the supported capabilities.  The
           android.request.availableCapabilities entry describes the device's capabilities at a
@@ -9740,16 +9880,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           similar amount of enhancement applied.
 
           The correction only applies to processed outputs such as YUV, JPEG, or DEPTH16; it is not
-          applied to any RAW output.  Metadata coordinates such as face rectangles or metering
+          applied to any RAW output. Metadata coordinates such as face rectangles or metering
           regions are also not affected by correction.
 
-          Applications enabling distortion correction need to pay extra attention when converting
-          image coordinates between corrected output buffers and the sensor array. For example, if
-          the app supports tap-to-focus and enables correction, it then has to apply the distortion
-          model described in android.lens.distortion to the image buffer tap coordinates to properly
-          calculate the tap position on the sensor active array to be used with
-          android.control.afRegions. The same applies in reverse to detected face rectangles if
-          they need to be drawn on top of the corrected output buffers.
+          This control will be on by default on devices that support this control. Applications
+          disabling distortion correction need to pay extra attention with the coordinate system of
+          metering regions, crop region, and face rectangles. When distortion correction is OFF,
+          metadata coordinates follow the coordinate system of
+          android.sensor.info.preCorrectionActiveArraySize. When distortion is not OFF, metadata
+          coordinates follow the coordinate system of android.sensor.info.activeArraySize.
           </details>
         </entry>
       </controls>
