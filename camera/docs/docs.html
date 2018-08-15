@@ -671,6 +671,8 @@
             ><a href="#static_android.request.availableSessionKeys">android.request.availableSessionKeys</a></li>
             <li
             ><a href="#static_android.request.availablePhysicalCameraRequestKeys">android.request.availablePhysicalCameraRequestKeys</a></li>
+            <li
+            ><a href="#static_android.request.characteristicKeysNeedingPermission">android.request.characteristicKeysNeedingPermission</a></li>
           </ul>
         </li>
         <li>
@@ -17832,6 +17834,74 @@ with any other controls that can have impact on the dual-camera sync.<wbr/></p>
 <p>The public camera2 API will always make the vendor tags visible
 via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailablePhysicalCameraRequestKeys">CameraCharacteristics#getAvailablePhysicalCameraRequestKeys</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.request.characteristicKeysNeedingPermission">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>request.<wbr/>characteristic<wbr/>Keys<wbr/>Needing<wbr/>Permission
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [hidden]</span>
+
+
+              <span class="entry_type_hwlevel">[legacy] </span>
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>A list of camera characteristics keys that are only available
+in case the camera client has camera permission.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The entry contains a subset of
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getKeys">CameraCharacteristics#getKeys</a> that require camera clients
+to acquire the <a href="https://developer.android.com/reference/android/Manifest/permission.html#CAMERA">permission#CAMERA</a> permission before calling
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>.<wbr/> If the
+permission is not held by the camera client,<wbr/> then the values of the repsective properties
+will not be present in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Do not set this property directly,<wbr/> camera service will overwrite any previous values.<wbr/></p>
             </td>
           </tr>
 
