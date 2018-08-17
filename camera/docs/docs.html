@@ -17238,11 +17238,11 @@ the recommendation is to switch between the first rear camera and the first fron
 camera in the list of supported camera devices.<wbr/></p>
 <p>This capability requires the camera device to support the following:</p>
 <ul>
-<li>This camera device must list the following static metadata entries in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>:<ul>
-<li><a href="#static_android.logicalMultiCamera.physicalIds">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>physical<wbr/>Ids</a></li>
-<li><a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a></li>
-</ul>
-</li>
+<li>The IDs of underlying physical cameras are returned via
+  <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getPhysicalCameraIds">CameraCharacteristics#getPhysicalCameraIds</a>.<wbr/></li>
+<li>This camera device must list static metadata
+  <a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a> in
+  <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>.<wbr/></li>
 <li>The underlying physical cameras' static metadata must list the following entries,<wbr/>
   so that the application can correlate pixels from the physical streams:<ul>
 <li><a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a></li>

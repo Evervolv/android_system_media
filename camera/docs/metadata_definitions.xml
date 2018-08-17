@@ -5295,10 +5295,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
               This capability requires the camera device to support the following:
 
-              * This camera device must list the following static metadata entries in {@link
-                android.hardware.camera2.CameraCharacteristics}:
-                  - android.logicalMultiCamera.physicalIds
-                  - android.logicalMultiCamera.sensorSyncType
+              * The IDs of underlying physical cameras are returned via
+                {@link android.hardware.camera2.CameraCharacteristics#getPhysicalCameraIds}.
+              * This camera device must list static metadata
+                android.logicalMultiCamera.sensorSyncType in
+                {@link android.hardware.camera2.CameraCharacteristics}.
               * The underlying physical cameras' static metadata must list the following entries,
                 so that the application can correlate pixels from the physical streams:
                   - android.lens.poseReference
