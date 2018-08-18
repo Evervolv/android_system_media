@@ -511,6 +511,29 @@ typedef uint32_t audio_hw_sync_t;
 /* an invalid HW synchronization source indicating an error */
 #define AUDIO_HW_SYNC_INVALID 0
 
+/** @TODO export from .hal */
+typedef enum {
+    NONE    = 0x0,
+    /**
+     * Only set this flag if applications can access the audio buffer memory
+     * shared with the backend (usually DSP) _without_ security issue.
+     *
+     * Setting this flag also implies that Binder will allow passing the shared memory FD
+     * to applications.
+     *
+     * That usually implies that the kernel will prevent any access to the
+     * memory surrounding the audio buffer as it could lead to a security breach.
+     *
+     * For example, a "/dev/snd/" file descriptor generally is not shareable,
+     * but an "anon_inode:dmabuffer" file descriptor is shareable.
+     * See also Linux kernel's dma_buf.
+     *
+     * This flag is required to support AAudio exclusive mode:
+     * See: https://source.android.com/devices/audio/aaudio
+     */
+    AUDIO_MMAP_APPLICATION_SHAREABLE    = 0x1,
+} audio_mmap_buffer_flag;
+
 /**
  * Mmap buffer descriptor returned by audio_stream->create_mmap_buffer().
  * note\ Used by streams opened in mmap mode.
@@ -521,6 +544,7 @@ struct audio_mmap_buffer_info {
     int32_t shared_memory_fd;       /**< FD for mmap memory buffer */
     int32_t buffer_size_frames;     /**< total buffer size in frames */
     int32_t burst_size_frames;      /**< transfer size granularity in frames */
+    audio_mmap_buffer_flag flags;   /**< Attributes describing the buffer. */
 };
 
 /**
