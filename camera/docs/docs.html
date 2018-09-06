@@ -17230,8 +17230,14 @@ results for use cases such as image stabilization or augmented reality.<wbr/></p
                   <li>
                     <span class="entry_type_enum_name">LOGICAL_MULTI_CAMERA (v3.3)</span>
                     <span class="entry_type_enum_optional">[optional]</span>
-                    <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras that are
-also exposed to the application.<wbr/></p>
+                    <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras.<wbr/> In
+API level 28,<wbr/> the physical cameras must also be exposed to the application via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> Starting from API
+level 29,<wbr/> some or all physical cameras may not be independently exposed to the
+application,<wbr/> in which case the physical camera IDs will not be available in
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> But the application
+can still query the physical cameras' characteristics by calling
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>.<wbr/></p>
 <p>Camera application shouldn't assume that there are at most 1 rear camera and 1 front
 camera in the system.<wbr/> For an application that switches between front and back cameras,<wbr/>
 the recommendation is to switch between the first rear camera and the first front
