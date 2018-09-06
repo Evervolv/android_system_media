@@ -13685,7 +13685,9 @@ coordinate system,<wbr/> but not the origin.<wbr/></p>
 <p>If this device is the largest or only camera device with a given facing,<wbr/> then this
 position will be <code>(0,<wbr/> 0,<wbr/> 0)</code>; a camera device with a lens optical center located 3 cm
 from the main sensor along the +X axis (to the right from the user's perspective) will
-report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
+report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/>  Note that this means that,<wbr/> for many computer vision
+applications,<wbr/> the position needs to be negated to convert it to a translation from the
+camera to the origin.<wbr/></p>
 <p>To transform a pixel coordinates between two cameras facing the same direction,<wbr/> first
 the source camera <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> must be corrected for.<wbr/>  Then the source
 camera <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> needs to be applied,<wbr/> followed by the
@@ -13697,7 +13699,8 @@ coordinates.<wbr/></p>
 <p>To compare this against a real image from the destination camera,<wbr/> the destination camera
 image then needs to be corrected for radial distortion before comparison or sampling.<wbr/></p>
 <p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is GYROSCOPE,<wbr/> then this position is relative to
-the center of the primary gyroscope on the device.<wbr/></p>
+the center of the primary gyroscope on the device.<wbr/> The axis definitions are the same as
+with PRIMARY_<wbr/>CAMERA.<wbr/></p>
             </td>
           </tr>
 
@@ -13775,13 +13778,15 @@ being aligned with the lens plane.<wbr/></p>
 </code></pre>
 <p>which can then be combined with the camera pose rotation
 <code>R</code> and translation <code>t</code> (<a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> and
-<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respective) to calculate the
+<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respectively) to calculate the
 complete transform from world coordinates to pixel
 coordinates:</p>
-<pre><code>P = [ K 0   * [ R t
-     0 1 ]     0 1 ]
+<pre><code>P = [ K 0   * [ R -Rt
+     0 1 ]      0 1 ]
 </code></pre>
-<p>and with <code>p_<wbr/>w</code> being a point in the world coordinate system
+<p>(Note the negation of poseTranslation when mapping from camera
+to world coordinates,<wbr/> and multiplication by the rotation).<wbr/></p>
+<p>With <code>p_<wbr/>w</code> being a point in the world coordinate system
 and <code>p_<wbr/>s</code> being a point in the camera active pixel array
 coordinate system,<wbr/> and with the mapping including the
 homogeneous division by z:</p>
@@ -13803,6 +13808,13 @@ system (where <code>(0,<wbr/> 0)</code> is the top-left of the
 activeArraySize rectangle),<wbr/> to determine the final pixel
 coordinate of the world point for processed (non-RAW)
 output buffers.<wbr/></p>
+<p>For camera devices,<wbr/> the center of pixel <code>(x,<wbr/>y)</code> is located at
+coordinate <code>(x + 0.<wbr/>5,<wbr/> y + 0.<wbr/>5)</code>.<wbr/>  So on a device with a
+precorrection active array of size <code>(10,<wbr/>10)</code>,<wbr/> the valid pixel
+indices go from <code>(0,<wbr/>0)-(9,<wbr/>9)</code>,<wbr/> and an perfectly-built camera would
+have an optical center at the exact center of the pixel grid,<wbr/> at
+coordinates <code>(5.<wbr/>0,<wbr/> 5.<wbr/>0)</code>,<wbr/> which is the top-left corner of pixel
+<code>(5,<wbr/>5)</code>.<wbr/></p>
             </td>
           </tr>
 
@@ -14702,7 +14714,9 @@ coordinate system,<wbr/> but not the origin.<wbr/></p>
 <p>If this device is the largest or only camera device with a given facing,<wbr/> then this
 position will be <code>(0,<wbr/> 0,<wbr/> 0)</code>; a camera device with a lens optical center located 3 cm
 from the main sensor along the +X axis (to the right from the user's perspective) will
-report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
+report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/>  Note that this means that,<wbr/> for many computer vision
+applications,<wbr/> the position needs to be negated to convert it to a translation from the
+camera to the origin.<wbr/></p>
 <p>To transform a pixel coordinates between two cameras facing the same direction,<wbr/> first
 the source camera <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> must be corrected for.<wbr/>  Then the source
 camera <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> needs to be applied,<wbr/> followed by the
@@ -14714,7 +14728,8 @@ coordinates.<wbr/></p>
 <p>To compare this against a real image from the destination camera,<wbr/> the destination camera
 image then needs to be corrected for radial distortion before comparison or sampling.<wbr/></p>
 <p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is GYROSCOPE,<wbr/> then this position is relative to
-the center of the primary gyroscope on the device.<wbr/></p>
+the center of the primary gyroscope on the device.<wbr/> The axis definitions are the same as
+with PRIMARY_<wbr/>CAMERA.<wbr/></p>
             </td>
           </tr>
 
@@ -14792,13 +14807,15 @@ being aligned with the lens plane.<wbr/></p>
 </code></pre>
 <p>which can then be combined with the camera pose rotation
 <code>R</code> and translation <code>t</code> (<a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> and
-<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respective) to calculate the
+<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respectively) to calculate the
 complete transform from world coordinates to pixel
 coordinates:</p>
-<pre><code>P = [ K 0   * [ R t
-     0 1 ]     0 1 ]
+<pre><code>P = [ K 0   * [ R -Rt
+     0 1 ]      0 1 ]
 </code></pre>
-<p>and with <code>p_<wbr/>w</code> being a point in the world coordinate system
+<p>(Note the negation of poseTranslation when mapping from camera
+to world coordinates,<wbr/> and multiplication by the rotation).<wbr/></p>
+<p>With <code>p_<wbr/>w</code> being a point in the world coordinate system
 and <code>p_<wbr/>s</code> being a point in the camera active pixel array
 coordinate system,<wbr/> and with the mapping including the
 homogeneous division by z:</p>
@@ -14820,6 +14837,13 @@ system (where <code>(0,<wbr/> 0)</code> is the top-left of the
 activeArraySize rectangle),<wbr/> to determine the final pixel
 coordinate of the world point for processed (non-RAW)
 output buffers.<wbr/></p>
+<p>For camera devices,<wbr/> the center of pixel <code>(x,<wbr/>y)</code> is located at
+coordinate <code>(x + 0.<wbr/>5,<wbr/> y + 0.<wbr/>5)</code>.<wbr/>  So on a device with a
+precorrection active array of size <code>(10,<wbr/>10)</code>,<wbr/> the valid pixel
+indices go from <code>(0,<wbr/>0)-(9,<wbr/>9)</code>,<wbr/> and an perfectly-built camera would
+have an optical center at the exact center of the pixel grid,<wbr/> at
+coordinates <code>(5.<wbr/>0,<wbr/> 5.<wbr/>0)</code>,<wbr/> which is the top-left corner of pixel
+<code>(5,<wbr/>5)</code>.<wbr/></p>
             </td>
           </tr>
 
@@ -17214,11 +17238,11 @@ the recommendation is to switch between the first rear camera and the first fron
 camera in the list of supported camera devices.<wbr/></p>
 <p>This capability requires the camera device to support the following:</p>
 <ul>
-<li>This camera device must list the following static metadata entries in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>:<ul>
-<li><a href="#static_android.logicalMultiCamera.physicalIds">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>physical<wbr/>Ids</a></li>
-<li><a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a></li>
-</ul>
-</li>
+<li>The IDs of underlying physical cameras are returned via
+  <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getPhysicalCameraIds">CameraCharacteristics#getPhysicalCameraIds</a>.<wbr/></li>
+<li>This camera device must list static metadata
+  <a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a> in
+  <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>.<wbr/></li>
 <li>The underlying physical cameras' static metadata must list the following entries,<wbr/>
   so that the application can correlate pixels from the physical streams:<ul>
 <li><a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a></li>
@@ -18257,7 +18281,7 @@ region.<wbr/> 16:9 streams will further crop vertically
 outputs will crop horizontally (pillarbox),<wbr/> and 16:9
 streams will match exactly.<wbr/> These additional crops will
 be centered within the crop region.<wbr/></p>
-<p>If the coordinate system is android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Arrays<wbr/>Size,<wbr/> the width and height
+<p>If the coordinate system is <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> the width and height
 of the crop region cannot be set to be smaller than
 <code>floor( activeArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code> and
 <code>floor( activeArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/> respectively.<wbr/></p>
@@ -19874,7 +19898,7 @@ region.<wbr/> 16:9 streams will further crop vertically
 outputs will crop horizontally (pillarbox),<wbr/> and 16:9
 streams will match exactly.<wbr/> These additional crops will
 be centered within the crop region.<wbr/></p>
-<p>If the coordinate system is android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Arrays<wbr/>Size,<wbr/> the width and height
+<p>If the coordinate system is <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> the width and height
 of the crop region cannot be set to be smaller than
 <code>floor( activeArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code> and
 <code>floor( activeArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/> respectively.<wbr/></p>
@@ -24522,7 +24546,7 @@ the output result metadata.<wbr/></p>
                 
           <tr class="entry" id="controls_android.statistics.oisDataMode">
             <td class="entry_name
-             " rowspan="1">
+             " rowspan="3">
               android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
             </td>
             <td class="entry_type">
@@ -24548,8 +24572,8 @@ the output result metadata.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>A control for selecting whether OIS position information is included in output
-result metadata.<wbr/></p>
+              <p>A control for selecting whether optical stabilization (OIS) position
+information is included in output result metadata.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -24566,6 +24590,19 @@ result metadata.<wbr/></p>
             <td class="entry_tags">
             </td>
 
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Since optical image stabilization generally involves motion much faster than the duration
+of individualq image exposure,<wbr/> multiple OIS samples can be included for a single capture
+result.<wbr/> For example,<wbr/> if the OIS reporting operates at 200 Hz,<wbr/> a typical camera operating
+at 30fps may have 6-7 OIS samples per capture result.<wbr/> This information can be combined
+with the rolling shutter skew to account for lens motion during image exposure in
+post-processing algorithms.<wbr/></p>
+            </td>
           </tr>
 
 
@@ -26422,7 +26459,7 @@ the output result metadata.<wbr/></p>
                 
           <tr class="entry" id="dynamic_android.statistics.oisDataMode">
             <td class="entry_name
-             " rowspan="1">
+             " rowspan="3">
               android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
             </td>
             <td class="entry_type">
@@ -26448,8 +26485,8 @@ the output result metadata.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>A control for selecting whether OIS position information is included in output
-result metadata.<wbr/></p>
+              <p>A control for selecting whether optical stabilization (OIS) position
+information is included in output result metadata.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -26466,6 +26503,19 @@ result metadata.<wbr/></p>
             <td class="entry_tags">
             </td>
 
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Since optical image stabilization generally involves motion much faster than the duration
+of individualq image exposure,<wbr/> multiple OIS samples can be included for a single capture
+result.<wbr/> For example,<wbr/> if the OIS reporting operates at 200 Hz,<wbr/> a typical camera operating
+at 30fps may have 6-7 OIS samples per capture result.<wbr/> This information can be combined
+with the rolling shutter skew to account for lens motion during image exposure in
+post-processing algorithms.<wbr/></p>
+            </td>
           </tr>
 
 
@@ -26574,11 +26624,15 @@ timebase as and comparable to <a href="#dynamic_android.sensor.timestamp">androi
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>The array contains the amount of shifts in x direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
-A positive value is a shift from left to right in active array coordinate system.<wbr/> For
-example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of
-(3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
+A positive value is a shift from left to right in the pre-correction active array
+coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in pre-correction
+active array coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
 <p>The number of shifts must match the number of timestamps in
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
+<p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+supporting devices).<wbr/> They are always reported in pre-correction active array coordinates,<wbr/>
+since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+is needed.<wbr/></p>
             </td>
           </tr>
 
@@ -26633,11 +26687,15 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>The array contains the amount of shifts in y direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
-A positive value is a shift from top to bottom in active array coordinate system.<wbr/> For
-example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of
-(0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
+A positive value is a shift from top to bottom in pre-correction active array coordinate
+system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a
+shift of (0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
 <p>The number of shifts must match the number of timestamps in
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
+<p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+supporting devices).<wbr/> They are always reported in pre-correction active array coordinates,<wbr/>
+since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+is needed.<wbr/></p>
             </td>
           </tr>
 
@@ -26669,7 +26727,7 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>An array of OIS samples.<wbr/></p>
+              <p>An array of optical stabilization (OIS) position samples.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -26693,12 +26751,18 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
             <td class="entry_details" colspan="6">
               <p>Each OIS sample contains the timestamp and the amount of shifts in x and y direction,<wbr/>
 in pixels,<wbr/> of the OIS sample.<wbr/></p>
-<p>A positive value for a shift in x direction is a shift from left to right in active array
-coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array
-coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
-<p>A positive value for a shift in y direction is a shift from top to bottom in active array
-coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array
-coordinates,<wbr/> a shift of (0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
+<p>A positive value for a shift in x direction is a shift from left to right in the
+pre-correction active array coordinate system.<wbr/> For example,<wbr/> if the optical center is
+(1000,<wbr/> 500) in pre-correction active array coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new
+optical center at (1003,<wbr/> 500).<wbr/></p>
+<p>A positive value for a shift in y direction is a shift from top to bottom in
+pre-correction active array coordinate system.<wbr/> For example,<wbr/> if the optical center is
+(1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of (0,<wbr/> 5) puts the new optical center at
+(1000,<wbr/> 505).<wbr/></p>
+<p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+supporting devices).<wbr/> They are always reported in pre-correction active array coordinates,<wbr/>
+since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+is needed.<wbr/></p>
             </td>
           </tr>
 
@@ -30172,14 +30236,28 @@ will not slow down capture rate when applying correction.<wbr/> FAST may be the 
 any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
 similar amount of enhancement applied.<wbr/></p>
 <p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
-applied to any RAW output.<wbr/> Metadata coordinates such as face rectangles or metering
-regions are also not affected by correction.<wbr/></p>
+applied to any RAW output.<wbr/></p>
 <p>This control will be on by default on devices that support this control.<wbr/> Applications
 disabling distortion correction need to pay extra attention with the coordinate system of
 metering regions,<wbr/> crop region,<wbr/> and face rectangles.<wbr/> When distortion correction is OFF,<wbr/>
 metadata coordinates follow the coordinate system of
 <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/> When distortion is not OFF,<wbr/> metadata
-coordinates follow the coordinate system of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
+coordinates follow the coordinate system of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>  The
+camera device will map these metadata fields to match the corrected image produced by the
+camera device,<wbr/> for both capture requests and results.<wbr/>  However,<wbr/> this mapping is not very
+precise,<wbr/> since rectangles do not generally map to rectangles when corrected.<wbr/>  Only linear
+scaling between the active array and precorrection active array coordinates is
+performed.<wbr/> Applications that require precise correction of metadata need to undo that
+linear scaling,<wbr/> and apply a more complete correction that takes into the account the app's
+own requirements.<wbr/></p>
+<p>The full list of metadata that is affected in this way by distortion correction is:</p>
+<ul>
+<li><a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
+<li><a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a></li>
+<li><a href="#dynamic_android.statistics.faces">android.<wbr/>statistics.<wbr/>faces</a></li>
+</ul>
             </td>
           </tr>
 
@@ -30385,14 +30463,28 @@ will not slow down capture rate when applying correction.<wbr/> FAST may be the 
 any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
 similar amount of enhancement applied.<wbr/></p>
 <p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
-applied to any RAW output.<wbr/> Metadata coordinates such as face rectangles or metering
-regions are also not affected by correction.<wbr/></p>
+applied to any RAW output.<wbr/></p>
 <p>This control will be on by default on devices that support this control.<wbr/> Applications
 disabling distortion correction need to pay extra attention with the coordinate system of
 metering regions,<wbr/> crop region,<wbr/> and face rectangles.<wbr/> When distortion correction is OFF,<wbr/>
 metadata coordinates follow the coordinate system of
 <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/> When distortion is not OFF,<wbr/> metadata
-coordinates follow the coordinate system of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
+coordinates follow the coordinate system of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>  The
+camera device will map these metadata fields to match the corrected image produced by the
+camera device,<wbr/> for both capture requests and results.<wbr/>  However,<wbr/> this mapping is not very
+precise,<wbr/> since rectangles do not generally map to rectangles when corrected.<wbr/>  Only linear
+scaling between the active array and precorrection active array coordinates is
+performed.<wbr/> Applications that require precise correction of metadata need to undo that
+linear scaling,<wbr/> and apply a more complete correction that takes into the account the app's
+own requirements.<wbr/></p>
+<p>The full list of metadata that is affected in this way by distortion correction is:</p>
+<ul>
+<li><a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
+<li><a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a></li>
+<li><a href="#dynamic_android.statistics.faces">android.<wbr/>statistics.<wbr/>faces</a></li>
+</ul>
             </td>
           </tr>
 
