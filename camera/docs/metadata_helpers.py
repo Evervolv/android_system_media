@@ -778,6 +778,8 @@ def generate_extra_javadoc_detail(entry):
         'android.info.supportedHardwareLevel key\n'
     if entry.hwlevel == 'legacy':
       text += "\nThis key is available on all devices."
+    if entry.permission_needed == "true":
+      text += "\n\n<b>Permission {@link android.Manifest.permission#CAMERA} is needed to access this property</b>\n\n"
 
     return text
   return inner
@@ -1378,6 +1380,35 @@ def filter_has_enum_values_added_in_hal_version(entries, hal_major_version, hal_
     An iterable of Entry nodes
   """
   return (e for e in entries if e.has_new_values_added_in_hal_version(hal_major_version, hal_minor_version))
+
+def permission_needed_count(root):
+  """
+  Return the number entries that need camera permission.
+
+  Args:
+    root: a Metadata instance
+
+  Returns:
+    The number of entires that need camera permission.
+
+  """
+  ret = 0
+  for sec in find_all_sections(root):
+      ret += len(list(filter_has_permission_needed(remove_synthetic(find_unique_entries(sec)))))
+
+  return ret
+
+def filter_has_permission_needed(entries):
+  """
+    Filter the given entries by removing those that don't need camera permission.
+
+    Args:
+      entries: An iterable of Entry nodes
+
+    Yields:
+      An iterable of Entry nodes
+  """
+  return (e for e in entries if e.permission_needed == 'true')
 
 def filter_ndk_visible(entries):
   """

@@ -1018,6 +1018,15 @@ int get_local_camera_metadata_tag_type(uint32_t tag,
     return get_local_camera_metadata_tag_type_vendor_id(tag, id);
 }
 
+const int32_t *get_camera_metadata_permission_needed(uint32_t *tag_count) {
+    if (NULL == tag_count) {
+        return NULL;
+    }
+
+    *tag_count = sizeof(tag_permission_needed) / sizeof(tag_permission_needed[0]);
+    return tag_permission_needed;
+}
+
 int set_camera_metadata_vendor_tag_ops(const vendor_tag_query_ops_t* ops) {
     // **DEPRECATED**
     (void) ops;

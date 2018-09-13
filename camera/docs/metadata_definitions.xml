@@ -3764,7 +3764,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <tag id="V1" />
           </entry>
           <entry name="hyperfocalDistance" type="float" visibility="public" optional="true"
-                 hwlevel="limited">
+                 hwlevel="limited" permission_needed="true">
             <description>Hyperfocal distance for this lens.</description>
             <units>See android.lens.info.focusDistanceCalibration for details</units>
             <range>If lens is fixed focus, &amp;gt;= 0. If lens has focuser unit, the value is
@@ -3775,7 +3775,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             </details>
           </entry>
           <entry name="minimumFocusDistance" type="float" visibility="public" optional="true"
-                 hwlevel="limited">
+                 hwlevel="limited" permission_needed="true">
             <description>Shortest distance from frontmost surface
             of the lens that can be brought into sharp focus.</description>
             <units>See android.lens.info.focusDistanceCalibration for details</units>
@@ -3894,7 +3894,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           device screen.</description>
         </entry>
         <entry name="poseRotation" type="float" visibility="public"
-               container="array">
+               container="array" permission_needed="true">
           <array>
             <size>4</size>
           </array>
@@ -3941,7 +3941,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <tag id="DEPTH" />
         </entry>
         <entry name="poseTranslation" type="float" visibility="public"
-               container="array">
+               container="array" permission_needed="true">
           <array>
             <size>3</size>
           </array>
@@ -4066,7 +4066,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
       </dynamic>
       <static>
         <entry name="intrinsicCalibration" type="float" visibility="public"
-               container="array">
+               container="array" permission_needed="true">
           <array>
             <size>5</size>
           </array>
@@ -4145,7 +4145,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <tag id="DEPTH" />
         </entry>
         <entry name="radialDistortion" type="float" visibility="public"
-               deprecated="true" container="array">
+               deprecated="true" container="array" permission_needed="true">
           <array>
             <size>6</size>
           </array>
@@ -4202,7 +4202,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         </clone>
       </dynamic>
       <static>
-        <entry name="poseReference" type="byte" visibility="public" enum="true" hal_version="3.3">
+        <entry name="poseReference" type="byte" visibility="public" enum="true"
+            permission_needed="true" hal_version="3.3" >
           <enum>
             <value>PRIMARY_CAMERA
             <notes>The value of android.lens.poseTranslation is relative to the optical center of
@@ -4226,7 +4227,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </details>
         </entry>
         <entry name="distortion" type="float" visibility="public" container="array"
-               hal_version="3.3">
+               permission_needed="true" hal_version="3.3" >
           <array>
             <size>5</size>
           </array>
@@ -5645,6 +5646,25 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           {@link android.hardware.camera2.CameraCharacteristics#getAvailablePhysicalCameraRequestKeys}.
           </hal_details>
         </entry>
+        <entry name="characteristicKeysNeedingPermission" type="int32" visibility="hidden"
+               container="array" hwlevel="legacy" hal_version="3.4">
+          <array>
+            <size>n</size>
+          </array>
+          <description>A list of camera characteristics keys that are only available
+          in case the camera client has camera permission.</description>
+
+          <details>The entry contains a subset of
+          {@link android.hardware.camera2.CameraCharacteristics#getKeys} that require camera clients
+          to acquire the {@link android.Manifest.permission#CAMERA} permission before calling
+          {@link android.hardware.camera2.CameraManager#getCameraCharacteristics}. If the
+          permission is not held by the camera client, then the values of the repsective properties
+          will not be present in {@link android.hardware.camera2.CameraCharacteristics}.
+          </details>
+          <hal_details>
+          Do not set this property directly, camera service will overwrite any previous values.
+          </hal_details>
+        </entry>
       </static>
     </section>
     <section name="scaler">
@@ -6948,7 +6968,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </entry>
         </namespace>
         <entry name="referenceIlluminant1" type="byte" visibility="public"
-               enum="true">
+               enum="true" permission_needed="true" >
           <enum>
             <value id="1">DAYLIGHT</value>
             <value id="2">FLUORESCENT</value>
@@ -7024,7 +7044,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </hal_details>
           <tag id="RAW" />
         </entry>
-        <entry name="referenceIlluminant2" type="byte" visibility="public">
+        <entry name="referenceIlluminant2" type="byte" visibility="public"
+        permission_needed="true" >
           <description>
           The standard reference illuminant used as the scene light source when
           calculating the android.sensor.colorTransform2,
@@ -7044,7 +7065,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <entry name="calibrationTransform1" type="rational"
         visibility="public" optional="true"
         type_notes="3x3 matrix in row-major-order" container="array"
-        typedef="colorSpaceTransform">
+        typedef="colorSpaceTransform" permission_needed="true" >
           <array>
             <size>3</size>
             <size>3</size>
@@ -7069,7 +7090,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <entry name="calibrationTransform2" type="rational"
         visibility="public" optional="true"
         type_notes="3x3 matrix in row-major-order" container="array"
-        typedef="colorSpaceTransform">
+        typedef="colorSpaceTransform" permission_needed="true" >
           <array>
             <size>3</size>
             <size>3</size>
@@ -7098,7 +7119,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <entry name="colorTransform1" type="rational"
         visibility="public" optional="true"
         type_notes="3x3 matrix in row-major-order" container="array"
-        typedef="colorSpaceTransform">
+        typedef="colorSpaceTransform" permission_needed="true" >
           <array>
             <size>3</size>
             <size>3</size>
@@ -7128,7 +7149,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <entry name="colorTransform2" type="rational"
         visibility="public" optional="true"
         type_notes="3x3 matrix in row-major-order" container="array"
-        typedef="colorSpaceTransform">
+        typedef="colorSpaceTransform" permission_needed="true" >
           <array>
             <size>3</size>
             <size>3</size>
@@ -7161,7 +7182,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <entry name="forwardMatrix1" type="rational"
         visibility="public" optional="true"
         type_notes="3x3 matrix in row-major-order" container="array"
-        typedef="colorSpaceTransform">
+        typedef="colorSpaceTransform" permission_needed="true" >
           <array>
             <size>3</size>
             <size>3</size>
@@ -7189,7 +7210,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <entry name="forwardMatrix2" type="rational"
         visibility="public" optional="true"
         type_notes="3x3 matrix in row-major-order" container="array"
-        typedef="colorSpaceTransform">
+        typedef="colorSpaceTransform" permission_needed="true" >
           <array>
             <size>3</size>
             <size>3</size>
