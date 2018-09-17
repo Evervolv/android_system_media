@@ -411,6 +411,7 @@ typedef enum camera_metadata_tag {
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL =           // enum         | public       | HIDL v3.2
             ANDROID_INFO_START,
     ANDROID_INFO_VERSION,                             // byte         | public       | HIDL v3.3
+    ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION, // enum         | system       | HIDL v3.4
     ANDROID_INFO_END,
 
     ANDROID_BLACK_LEVEL_LOCK =                        // enum         | public       | HIDL v3.2
@@ -954,6 +955,11 @@ typedef enum camera_metadata_enum_android_info_supported_hardware_level {
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_3                         , // HIDL v3.2
     ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL                  , // HIDL v3.3
 } camera_metadata_enum_android_info_supported_hardware_level_t;
+
+// ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION
+typedef enum camera_metadata_enum_android_info_supported_buffer_management_version {
+    ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_HIDL_DEVICE_3_5, // HIDL v3.4
+} camera_metadata_enum_android_info_supported_buffer_management_version_t;
 
 
 // ANDROID_BLACK_LEVEL_LOCK

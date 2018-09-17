@@ -1085,6 +1085,8 @@
             ><a href="#static_android.info.supportedHardwareLevel">android.info.supportedHardwareLevel</a></li>
             <li
             ><a href="#static_android.info.version">android.info.version</a></li>
+            <li
+            ><a href="#static_android.info.supportedBufferManagementVersion">android.info.supportedBufferManagementVersion</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -28765,6 +28767,65 @@ whitespace,<wbr/> i.<wbr/>e.<wbr/> it must match regular expression "[\p{Alnum}\
 It must not exceed 256 characters.<wbr/></p>
             </td>
           </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.info.supportedBufferManagementVersion">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>info.<wbr/>supported<wbr/>Buffer<wbr/>Management<wbr/>Version
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [system]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">HIDL_DEVICE_3_5 (v3.4)</span>
+                    <span class="entry_type_enum_notes"><p>This camera device supports and opts in to the buffer management APIs provided by
+HIDL ICameraDevice version 3.<wbr/>5.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The version of buffer management API this camera device supports and opts into.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When this key is not present,<wbr/> camera framework will interact with this camera device
+without any buffer management HAL API.<wbr/> When this key is present and camera framework
+supports the buffer management API version,<wbr/> camera framework will interact with camera
+HAL using such version of buffer management API.<wbr/></p>
+            </td>
+          </tr>
+
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->

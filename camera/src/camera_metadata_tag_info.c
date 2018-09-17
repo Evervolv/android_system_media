@@ -669,6 +669,9 @@ static tag_info_t android_info[ANDROID_INFO_END -
     { "supportedHardwareLevel",        TYPE_BYTE   },
     [ ANDROID_INFO_VERSION - ANDROID_INFO_START ] =
     { "version",                       TYPE_BYTE   },
+    [ ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION - ANDROID_INFO_START ] =
+    { "supportedBufferManagementVersion",
+                                        TYPE_BYTE   },
 };
 
 static tag_info_t android_black_level[ANDROID_BLACK_LEVEL_END -
@@ -2685,6 +2688,17 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_INFO_VERSION: {
+            break;
+        }
+        case ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION: {
+            switch (value) {
+                case ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_HIDL_DEVICE_3_5:
+                    msg = "HIDL_DEVICE_3_5";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
             break;
         }
 
