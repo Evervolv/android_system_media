@@ -454,6 +454,12 @@ static tag_info_t android_scaler[ANDROID_SCALER_END -
     { "availableStallDurations",       TYPE_INT64  },
     [ ANDROID_SCALER_CROPPING_TYPE - ANDROID_SCALER_START ] =
     { "croppingType",                  TYPE_BYTE   },
+    [ ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS - ANDROID_SCALER_START ] =
+    { "availableRecommendedStreamConfigurations",
+                                        TYPE_INT32  },
+    [ ANDROID_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP - ANDROID_SCALER_START ] =
+    { "availableRecommendedInputOutputFormatsMap",
+                                        TYPE_INT32  },
 };
 
 static tag_info_t android_sensor[ANDROID_SENSOR_END -
@@ -710,6 +716,9 @@ static tag_info_t android_depth[ANDROID_DEPTH_END -
     { "availableDepthStallDurations",  TYPE_INT64  },
     [ ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE - ANDROID_DEPTH_START ] =
     { "depthIsExclusive",              TYPE_BYTE   },
+    [ ANDROID_DEPTH_AVAILABLE_RECOMMENDED_DEPTH_STREAM_CONFIGURATIONS - ANDROID_DEPTH_START ] =
+    { "availableRecommendedDepthStreamConfigurations",
+                                        TYPE_INT32  },
 };
 
 static tag_info_t android_logical_multi_camera[ANDROID_LOGICAL_MULTI_CAMERA_END -
@@ -2077,6 +2086,48 @@ int camera_metadata_enum_snprint(uint32_t tag,
             }
             break;
         }
+        case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS: {
+            switch (value) {
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PREVIEW:
+                    msg = "PREVIEW";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RECORD:
+                    msg = "RECORD";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VIDEO_SNAPSHOT:
+                    msg = "VIDEO_SNAPSHOT";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_SNAPSHOT:
+                    msg = "SNAPSHOT";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_ZSL:
+                    msg = "ZSL";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RAW:
+                    msg = "RAW";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PUBLIC_END:
+                    msg = "PUBLIC_END";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VENDOR_START:
+                    msg = "VENDOR_START";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP: {
+            break;
+        }
 
         case ANDROID_SENSOR_EXPOSURE_TIME: {
             break;
@@ -2793,6 +2844,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_DEPTH_AVAILABLE_RECOMMENDED_DEPTH_STREAM_CONFIGURATIONS: {
             break;
         }
 
