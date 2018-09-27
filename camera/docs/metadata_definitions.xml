@@ -4656,8 +4656,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             {@link android.graphics.ImageFormat#RAW12|AIMAGE_FORMAT_RAW12 RAW12}.
           * Processed (but not-stalling): any non-RAW format without a stall duration.  Typically
             {@link android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888 YUV_420_888},
-            {@link android.graphics.ImageFormat#NV21 NV21}, or {@link
-            android.graphics.ImageFormat#YV12 YV12}.
+            {@link android.graphics.ImageFormat#NV21 NV21}, {@link
+            android.graphics.ImageFormat#YV12 YV12}, or {@link
+            android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8 Y8} .
           </details>
           <tag id="BC" />
         </entry>
@@ -4717,6 +4718,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * {@link android.graphics.ImageFormat#YV12 YV12}
           * Implementation-defined formats, i.e. {@link
             android.hardware.camera2.params.StreamConfigurationMap#isOutputSupportedFor(Class)}
+          * {@link android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8 Y8}
 
           For full guarantees, query {@link
           android.hardware.camera2.params.StreamConfigurationMap#getOutputStallDuration} with a
@@ -5017,6 +5019,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               * {@link android.graphics.ImageFormat#PRIVATE} will be reprocessable into both
                 {@link android.graphics.ImageFormat#YUV_420_888} and
                 {@link android.graphics.ImageFormat#JPEG} formats.
+              * For a MONOCHROME camera supporting Y8 format, {@link
+                android.graphics.ImageFormat#PRIVATE} will be reprocessable into
+                {@link android.graphics.ImageFormat#Y8}.
               * The maximum available resolution for PRIVATE streams
                 (both input/output) will match the maximum available
                 resolution of JPEG streams.
@@ -5078,7 +5083,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
               If the device supports the {@link
               android.graphics.ImageFormat#RAW10|AIMAGE_FORMAT_RAW10}, {@link
-              android.graphics.ImageFormat#RAW12|AIMAGE_FORMAT_RAW12}, then those can also be
+              android.graphics.ImageFormat#RAW12|AIMAGE_FORMAT_RAW12}, {@link
+              android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8}, then those can also be
               captured at the same rate as the maximum-size YUV_420_888 resolution is.
 
               If the device supports the PRIVATE_REPROCESSING capability, then the same guarantees
@@ -5106,7 +5112,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
               If the device supports the {@link
               android.graphics.ImageFormat#RAW10|AIMAGE_FORMAT_RAW10}, {@link
-              android.graphics.ImageFormat#RAW12|AIMAGE_FORMAT_RAW12}, then those can also be
+              android.graphics.ImageFormat#RAW12|AIMAGE_FORMAT_RAW12}, {@link
+              android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8}, then those can also be
               captured at the same rate as the maximum-size YUV_420_888 resolution is.
 
               In addition, the android.sync.maxLatency field is guaranted to have a value between 0
@@ -5143,6 +5150,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               * The maximum available resolution for {@link
                 android.graphics.ImageFormat#YUV_420_888} streams (both input/output) will match the
                 maximum available resolution of {@link android.graphics.ImageFormat#JPEG} streams.
+              * For a MONOCHROME camera with Y8 format support, all the requirements mentioned
+                above for YUV_420_888 apply for Y8 format as well.
               * Static metadata android.reprocess.maxCaptureStall.
               * Only the below controls are effective for reprocessing requests and will be present
                 in capture results. The reprocess requests are from the original capture results
@@ -5180,8 +5189,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               * The android.depth.depthIsExclusive entry is listed by this device.
               * As of Android P, the android.lens.poseReference entry is listed by this device.
               * A LIMITED camera with only the DEPTH_OUTPUT capability does not have to support
-                normal YUV_420_888, JPEG, and PRIV-format outputs. It only has to support the DEPTH16
-                format.
+                normal YUV_420_888, Y8, JPEG, and PRIV-format outputs. It only has to support the
+                DEPTH16 format.
 
               Generally, depth output operates at a slower frame rate than standard color capture,
               so the DEPTH16 and DEPTH_POINT_CLOUD formats will commonly have a stall duration that
@@ -5343,6 +5352,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               <notes>
               The camera device is a monochrome camera that doesn't contain a color filter array,
               and the pixel values on U and V planes are all 128.
+
+              A MONOCHROME camera must support the guaranteed stream combinations required for
+              its device level and capabilities. Additionally, if the monochrome camera device
+              supports Y8 format, all mandatory stream combination requirements related to {@link
+              android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888 YUV_420_888} apply
+              to {@link android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8 Y8} as well.
               </notes>
             </value>
 
@@ -5866,6 +5881,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value id="0x21">BLOB
               <notes>JPEG format</notes>
             </value>
+            <value id="0x25" hal_version="3.4">RAW10
+              <notes>RAW10</notes>
+            </value>
+            <value id="0x26" hal_version="3.4">RAW12
+              <notes>RAW12</notes>
+            </value>
+            <value id="0x20203859" hal_version="3.4">Y8
+              <notes>Y8</notes>
+            </value>
           </enum>
           <description>The list of image formats that are supported by this
           camera device for output streams.</description>
@@ -6101,6 +6125,17 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           Attempting to configure an input stream with output streams not
           listed as available in this map is not valid.
+
+          Additionally, if the camera device is MONOCHROME with Y8 support, it will also support
+          the following map of formats if its dependent capability
+          (android.request.availableCapabilities) is supported:
+
+            Input Format                                    | Output Format                                     | Capability
+          :-------------------------------------------------|:--------------------------------------------------|:----------
+          {@link android.graphics.ImageFormat#PRIVATE}      | {@link android.graphics.ImageFormat#Y8}           | PRIVATE_REPROCESSING
+          {@link android.graphics.ImageFormat#Y8}           | {@link android.graphics.ImageFormat#JPEG}         | YUV_REPROCESSING
+          {@link android.graphics.ImageFormat#Y8}           | {@link android.graphics.ImageFormat#Y8}           | YUV_REPROCESSING
+
           </details>
           <hal_details>
           For the formats, see `system/core/include/system/graphics.h` for a definition
@@ -6341,6 +6376,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * {@link android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888}
           * {@link android.graphics.ImageFormat#RAW10|AIMAGE_FORMAT_RAW10}
           * {@link android.graphics.ImageFormat#RAW12|AIMAGE_FORMAT_RAW12}
+          * {@link android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8}
 
           All other formats may or may not have an allowed stall duration on
           a per-capability basis; refer to android.request.availableCapabilities
@@ -9967,8 +10003,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           any correction at all would slow down capture rate.  Every output stream will have a
           similar amount of enhancement applied.
 
-          The correction only applies to processed outputs such as YUV, JPEG, or DEPTH16; it is not
-          applied to any RAW output.
+          The correction only applies to processed outputs such as YUV, Y8, JPEG, or DEPTH16; it is
+          not applied to any RAW output.
 
           This control will be on by default on devices that support this control. Applications
           disabling distortion correction need to pay extra attention with the coordinate system of

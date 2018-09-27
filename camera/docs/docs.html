@@ -16390,7 +16390,7 @@ into the 3 stream types as below:</p>
   <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#RAW12">RAW12</a>.<wbr/></li>
 <li>Processed (but not-stalling): any non-RAW format without a stall duration.<wbr/>  Typically
   <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a>,<wbr/>
-  <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#NV21">NV21</a>,<wbr/> or <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YV12">YV12</a>.<wbr/></li>
+  <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#NV21">NV21</a>,<wbr/> <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YV12">YV12</a>,<wbr/> or <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">Y8</a> .<wbr/></li>
 </ul>
             </td>
           </tr>
@@ -16527,6 +16527,7 @@ Typically:</p>
 <li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#NV21">NV21</a></li>
 <li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YV12">YV12</a></li>
 <li>Implementation-defined formats,<wbr/> i.<wbr/>e.<wbr/> <a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html#isOutputSupportedFor(Class)">StreamConfigurationMap#isOutputSupportedFor(Class)</a></li>
+<li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">Y8</a></li>
 </ul>
 <p>For full guarantees,<wbr/> query <a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html#getOutputStallDuration">StreamConfigurationMap#getOutputStallDuration</a> with a
 processed format -- it will return 0 for a non-stalling stream.<wbr/></p>
@@ -17036,6 +17037,8 @@ raw sensor images.<wbr/></p>
 <li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#PRIVATE">ImageFormat#PRIVATE</a> will be reprocessable into both
   <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">Image<wbr/>Format#YUV_<wbr/>420_<wbr/>888</a> and
   <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">ImageFormat#JPEG</a> formats.<wbr/></li>
+<li>For a MONOCHROME camera supporting Y8 format,<wbr/> <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#PRIVATE">ImageFormat#PRIVATE</a> will be reprocessable into
+  <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">ImageFormat#Y8</a>.<wbr/></li>
 <li>The maximum available resolution for PRIVATE streams
   (both input/<wbr/>output) will match the maximum available
   resolution of JPEG streams.<wbr/></li>
@@ -17106,6 +17109,8 @@ following:</p>
   <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">Image<wbr/>Format#YUV_<wbr/>420_<wbr/>888</a> and <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">ImageFormat#JPEG</a> formats.<wbr/></li>
 <li>The maximum available resolution for <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">Image<wbr/>Format#YUV_<wbr/>420_<wbr/>888</a> streams (both input/<wbr/>output) will match the
   maximum available resolution of <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">ImageFormat#JPEG</a> streams.<wbr/></li>
+<li>For a MONOCHROME camera with Y8 format support,<wbr/> all the requirements mentioned
+  above for YUV_<wbr/>420_<wbr/>888 apply for Y8 format as well.<wbr/></li>
 <li>Static metadata <a href="#static_android.reprocess.maxCaptureStall">android.<wbr/>reprocess.<wbr/>max<wbr/>Capture<wbr/>Stall</a>.<wbr/></li>
 <li>Only the below controls are effective for reprocessing requests and will be present
   in capture results.<wbr/> The reprocess requests are from the original capture results
@@ -17143,8 +17148,8 @@ following:</p>
 <li>The <a href="#static_android.depth.depthIsExclusive">android.<wbr/>depth.<wbr/>depth<wbr/>Is<wbr/>Exclusive</a> entry is listed by this device.<wbr/></li>
 <li>As of Android P,<wbr/> the <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> entry is listed by this device.<wbr/></li>
 <li>A LIMITED camera with only the DEPTH_<wbr/>OUTPUT capability does not have to support
-  normal YUV_<wbr/>420_<wbr/>888,<wbr/> JPEG,<wbr/> and PRIV-format outputs.<wbr/> It only has to support the DEPTH16
-  format.<wbr/></li>
+  normal YUV_<wbr/>420_<wbr/>888,<wbr/> Y8,<wbr/> JPEG,<wbr/> and PRIV-format outputs.<wbr/> It only has to support the
+  DEPTH16 format.<wbr/></li>
 </ul>
 <p>Generally,<wbr/> depth output operates at a slower frame rate than standard color capture,<wbr/>
 so the DEPTH16 and DEPTH_<wbr/>POINT_<wbr/>CLOUD formats will commonly have a stall duration that
@@ -17289,7 +17294,11 @@ of the physical and logical streams are the same.<wbr/></p></span>
                     <span class="entry_type_enum_name">MONOCHROME (v3.3)</span>
                     <span class="entry_type_enum_optional">[optional]</span>
                     <span class="entry_type_enum_notes"><p>The camera device is a monochrome camera that doesn't contain a color filter array,<wbr/>
-and the pixel values on U and V planes are all 128.<wbr/></p></span>
+and the pixel values on U and V planes are all 128.<wbr/></p>
+<p>A MONOCHROME camera must support the guaranteed stream combinations required for
+its device level and capabilities.<wbr/> Additionally,<wbr/> if the monochrome camera device
+supports Y8 format,<wbr/> all mandatory stream combination requirements related to <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a> apply
+to <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">Y8</a> as well.<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -18558,6 +18567,21 @@ performance guarantees.<wbr/></p></span>
                     <span class="entry_type_enum_value">0x21</span>
                     <span class="entry_type_enum_notes"><p>JPEG format</p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">RAW10 (v3.4)</span>
+                    <span class="entry_type_enum_value">0x25</span>
+                    <span class="entry_type_enum_notes"><p>RAW10</p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">RAW12 (v3.4)</span>
+                    <span class="entry_type_enum_value">0x26</span>
+                    <span class="entry_type_enum_notes"><p>RAW12</p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">Y8 (v3.4)</span>
+                    <span class="entry_type_enum_value">0x20203859</span>
+                    <span class="entry_type_enum_notes"><p>Y8</p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -19179,6 +19203,35 @@ with <a href="https://developer.android.com/reference/android/graphics/ImageForm
 or output will never hurt maximum frame rate (i.<wbr/>e.<wbr/>  <a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html#getOutputStallDuration">getOutputStallDuration(ImageFormat.<wbr/>PRIVATE,<wbr/> size)</a> is always 0),<wbr/></p>
 <p>Attempting to configure an input stream with output streams not
 listed as available in this map is not valid.<wbr/></p>
+<p>Additionally,<wbr/> if the camera device is MONOCHROME with Y8 support,<wbr/> it will also support
+the following map of formats if its dependent capability
+(<a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a>) is supported:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Input Format</th>
+<th align="left">Output Format</th>
+<th align="left">Capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#PRIVATE">ImageFormat#PRIVATE</a></td>
+<td align="left"><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">ImageFormat#Y8</a></td>
+<td align="left">PRIVATE_<wbr/>REPROCESSING</td>
+</tr>
+<tr>
+<td align="left"><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">ImageFormat#Y8</a></td>
+<td align="left"><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">ImageFormat#JPEG</a></td>
+<td align="left">YUV_<wbr/>REPROCESSING</td>
+</tr>
+<tr>
+<td align="left"><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">ImageFormat#Y8</a></td>
+<td align="left"><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">ImageFormat#Y8</a></td>
+<td align="left">YUV_<wbr/>REPROCESSING</td>
+</tr>
+</tbody>
+</table>
             </td>
           </tr>
 
@@ -19589,6 +19642,7 @@ ignored).<wbr/></p>
 <li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">Image<wbr/>Format#YUV_<wbr/>420_<wbr/>888</a></li>
 <li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#RAW10">ImageFormat#RAW10</a></li>
 <li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#RAW12">ImageFormat#RAW12</a></li>
+<li><a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">ImageFormat#Y8</a></li>
 </ul>
 <p>All other formats may or may not have an allowed stall duration on
 a per-capability basis; refer to <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a>
@@ -30372,8 +30426,8 @@ correction algorithms,<wbr/> even if it slows down capture rate.<wbr/> FAST mean
 will not slow down capture rate when applying correction.<wbr/> FAST may be the same as OFF if
 any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
 similar amount of enhancement applied.<wbr/></p>
-<p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
-applied to any RAW output.<wbr/></p>
+<p>The correction only applies to processed outputs such as YUV,<wbr/> Y8,<wbr/> JPEG,<wbr/> or DEPTH16; it is
+not applied to any RAW output.<wbr/></p>
 <p>This control will be on by default on devices that support this control.<wbr/> Applications
 disabling distortion correction need to pay extra attention with the coordinate system of
 metering regions,<wbr/> crop region,<wbr/> and face rectangles.<wbr/> When distortion correction is OFF,<wbr/>
@@ -30599,8 +30653,8 @@ correction algorithms,<wbr/> even if it slows down capture rate.<wbr/> FAST mean
 will not slow down capture rate when applying correction.<wbr/> FAST may be the same as OFF if
 any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
 similar amount of enhancement applied.<wbr/></p>
-<p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
-applied to any RAW output.<wbr/></p>
+<p>The correction only applies to processed outputs such as YUV,<wbr/> Y8,<wbr/> JPEG,<wbr/> or DEPTH16; it is
+not applied to any RAW output.<wbr/></p>
 <p>This control will be on by default on devices that support this control.<wbr/> Applications
 disabling distortion correction need to pay extra attention with the coordinate system of
 metering regions,<wbr/> crop region,<wbr/> and face rectangles.<wbr/> When distortion correction is OFF,<wbr/>
