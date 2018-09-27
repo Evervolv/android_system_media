@@ -19,8 +19,12 @@
 
 #include <fcntl.h>
 #include <future>
+#include <poll.h>
 #include <sstream>
 #include <unistd.h>
+#include <utils/Timers.h>
+
+#include "clock.h"
 
 namespace android {
 namespace audio_utils {
@@ -37,13 +41,14 @@ class FdToString {
 public:
     /**
      * \param prefix is the prefix string prepended to each new line.
+     * \param timeout is the total timeout to wait for obtaining data.
      */
-    explicit FdToString(const std::string &prefix = "- ", int timeoutMs = 1000)
+    explicit FdToString(const std::string &prefix = "- ", int timeoutMs = 200)
             : mPrefix(prefix)
-            , mTimeoutMs(timeoutMs) {
+            , mTimeoutTimeNs(systemTime() + timeoutMs * NANOS_PER_MILLISECOND) {
         const int status = pipe2(mPipeFd, O_CLOEXEC);
         if (status == 0) {
-            mOutput = std::async(std::launch::async, reader, mPipeFd[0], mPrefix);
+            mOutput = std::async(std::launch::async, reader, mPipeFd[0], mTimeoutTimeNs, mPrefix);
         }
         // on initialization failure fd() returns -1.
     }
@@ -79,17 +84,30 @@ public:
             close(mPipeFd[1]);
             mPipeFd[1] = -1;
         }
-        std::future_status status = mOutput.wait_for(std::chrono::milliseconds(mTimeoutMs));
+        const int waitMs = toMillisecondTimeoutDelay(systemTime(), mTimeoutTimeNs);
+        std::future_status status = mOutput.wait_for(std::chrono::milliseconds(waitMs));
         return status == std::future_status::ready ? mOutput.get() : "";
     }
 
 private:
-    static std::string reader(int fd, std::string prefix) {
+    static std::string reader(int fd, int64_t timeoutTimeNs, std::string prefix) {
         char buf[4096];
         int red;
         std::stringstream ss;
         bool requiresPrefix = true;
-        while ((red = read(fd, buf, sizeof(buf))) > 0) {
+
+        while (true) {
+            struct pollfd pfd = {
+                .fd = fd,
+                .events = POLLIN | POLLRDHUP,
+            };
+            const int waitMs = toMillisecondTimeoutDelay(systemTime(), timeoutTimeNs);
+            // ALOGD("waitMs: %d", waitMs);
+            if (waitMs <= 0) break;
+            const int retval = poll(&pfd, 1 /* nfds*/, waitMs);
+            if (retval <= 0 || (pfd.revents & POLLIN) != POLLIN) break; // error or timeout
+            // data is available
+            if ((red = read(fd, buf, sizeof(buf))) <= 0) break;
             char *delim, *bptr = buf;
             while (!prefix.empty() && (delim = (char *)memchr(bptr, '\n', red)) != nullptr) {
                 if (requiresPrefix) ss << prefix;
@@ -109,7 +127,7 @@ private:
     }
 
     const std::string mPrefix;
-    const int mTimeoutMs;
+    const int64_t mTimeoutTimeNs;
     int mPipeFd[2] = {-1, -1};
     std::future<std::string> mOutput;
 };

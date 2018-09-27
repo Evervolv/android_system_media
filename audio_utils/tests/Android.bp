@@ -7,6 +7,7 @@ cc_test {
     shared_libs: [
         "libcutils",
         "liblog",
+        "libutils", //for systemTime
     ],
     srcs: ["fdtostring_tests.cpp"],
     cflags: [
