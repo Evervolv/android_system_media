@@ -16,10 +16,10 @@
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "audio_utils_fdtostring_tests"
+#include <log/log.h>
 
 #include <audio_utils/FdToString.h>
 #include <gtest/gtest.h>
-#include <log/log.h>
 
 using namespace android::audio_utils;
 
