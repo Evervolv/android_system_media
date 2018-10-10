@@ -32,14 +32,13 @@
 /*
  * Annotation to tell clang that we intend to fall through from one case to
  * another in a switch (for c++ files). Sourced from android-base/macros.h.
- * TODO: See also C++17 [[fallthough]].
  */
 #ifndef FALLTHROUGH_INTENDED
-#if defined(__clang__) && defined(__cplusplus)
-#define FALLTHROUGH_INTENDED [[clang::fallthrough]]
+#ifdef __cplusplus
+#define FALLTHROUGH_INTENDED [[fallthrough]]
 #else
 #define FALLTHROUGH_INTENDED
-#endif // __clang__ && __cplusplus
+#endif // __cplusplus
 #endif // FALLTHROUGH_INTENDED
 
 __BEGIN_DECLS
