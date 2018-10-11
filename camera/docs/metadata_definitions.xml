@@ -5621,11 +5621,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <array>
             <size>n</size>
           </array>
-          <description>A subset of the available request keys that can be overriden for
+          <description>A subset of the available request keys that can be overridden for
           physical devices backing a logical multi-camera.</description>
           <details>
           This is a subset of android.request.availableRequestKeys which contains a list
-          of keys that can be overriden using {@link CaptureRequest.Builder#setPhysicalCameraKey}.
+          of keys that can be overridden using {@link CaptureRequest.Builder#setPhysicalCameraKey}.
           The respective value of such request key can be obtained by calling
           {@link CaptureRequest.Builder#getPhysicalCameraKey}. Capture requests that contain
           individual physical device requests must be built via
