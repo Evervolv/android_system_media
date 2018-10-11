@@ -1707,7 +1707,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value optional="true">CANDLELIGHT
               <notes>
               Optimized for dim settings where the main light source
-              is a flame.
+              is a candle.
               </notes>
             </value>
             <value optional="true">BARCODE
