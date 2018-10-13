@@ -29,6 +29,19 @@
 #include "audio-base.h"
 #include "audio-base-utils.h"
 
+/*
+ * Annotation to tell clang that we intend to fall through from one case to
+ * another in a switch (for c++ files). Sourced from android-base/macros.h.
+ * TODO: See also C++17 [[fallthough]].
+ */
+#ifndef FALLTHROUGH_INTENDED
+#if defined(__clang__) && defined(__cplusplus)
+#define FALLTHROUGH_INTENDED [[clang::fallthrough]]
+#else
+#define FALLTHROUGH_INTENDED
+#endif // __clang__ && __cplusplus
+#endif // FALLTHROUGH_INTENDED
+
 __BEGIN_DECLS
 
 /* The enums were moved here mostly from
@@ -688,7 +701,7 @@ static inline bool audio_is_input_channel(audio_channel_mask_t channel)
         if (bits & ~AUDIO_CHANNEL_IN_ALL) {
             bits = 0;
         }
-        // fall through
+        FALLTHROUGH_INTENDED;
     case AUDIO_CHANNEL_REPRESENTATION_INDEX:
         return bits != 0;
     default:
@@ -710,7 +723,7 @@ static inline bool audio_is_output_channel(audio_channel_mask_t channel)
         if (bits & ~AUDIO_CHANNEL_OUT_ALL) {
             bits = 0;
         }
-        // fall through
+        FALLTHROUGH_INTENDED;
     case AUDIO_CHANNEL_REPRESENTATION_INDEX:
         return bits != 0;
     default:
@@ -731,7 +744,7 @@ static inline uint32_t audio_channel_count_from_in_mask(audio_channel_mask_t cha
     case AUDIO_CHANNEL_REPRESENTATION_POSITION:
         // TODO: We can now merge with from_out_mask and remove anding
         bits &= AUDIO_CHANNEL_IN_ALL;
-        // fall through
+        FALLTHROUGH_INTENDED;
     case AUDIO_CHANNEL_REPRESENTATION_INDEX:
         return popcount(bits);
     default:
@@ -752,7 +765,7 @@ static inline uint32_t audio_channel_count_from_out_mask(audio_channel_mask_t ch
     case AUDIO_CHANNEL_REPRESENTATION_POSITION:
         // TODO: We can now merge with from_in_mask and remove anding
         bits &= AUDIO_CHANNEL_OUT_ALL;
-        // fall through
+        FALLTHROUGH_INTENDED;
     case AUDIO_CHANNEL_REPRESENTATION_INDEX:
         return popcount(bits);
     default:
