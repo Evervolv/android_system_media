@@ -5355,13 +5355,18 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value optional="true" hal_version="3.3" >MONOCHROME
               <notes>
               The camera device is a monochrome camera that doesn't contain a color filter array,
-              and the pixel values on U and V planes are all 128.
+              and for YUV_420_888 stream, the pixel values on U and V planes are all 128.
 
               A MONOCHROME camera must support the guaranteed stream combinations required for
               its device level and capabilities. Additionally, if the monochrome camera device
               supports Y8 format, all mandatory stream combination requirements related to {@link
               android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888 YUV_420_888} apply
-              to {@link android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8 Y8} as well.
+              to {@link android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8 Y8} as well. There are no
+              mandatory stream combination requirements with regard to
+              {@link android.graphics.ImageFormat#Y8|AIMAGE_FORMAT_Y8 Y8} for Bayer camera devices.
+
+              Starting from Android Q, the SENSOR_INFO_COLOR_FILTER_ARRANGEMENT of a MONOCHROME
+              camera will be either MONO or NIR.
               </notes>
             </value>
 
@@ -5443,22 +5448,24 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * Camera HAL is strongly recommended to advertise camera devices with best feature,
           power, performance, and latency tradeoffs at the front of the camera id list.
 
-          For MONOCHROME, the camera device must also advertise BACKWARD_COMPATIBLE capability, and
-          it is exclusive of both RAW and MANUAL_POST_PROCESSING capabilities:
+          A MONOCHROME camera device must also advertise BACKWARD_COMPATIBLE capability, and must
+          not advertise MANUAL_POST_PROCESSING capability.
 
           * To maintain backward compatibility, the camera device must support all
           BACKWARD_COMPATIBLE required keys. The android.control.awbAvailableModes key only contains
           AUTO, and android.control.awbState are either CONVERGED or LOCKED depending on
           android.control.awbLock.
 
-          * A monochrome device doesn't need to advertise DNG related optional metadata tags.
-
           * android.colorCorrection.mode, android.colorCorrection.transform, and
-          android.colorCorrection.gains are not applicable. So the camera device cannot
-          be a FULL device. However, the HAL can still advertise other individual capabilites.
+          android.colorCorrection.gains must not be in available request and result keys.
+          As a result, the camera device cannot be a FULL device. However, the HAL can
+          still advertise other individual capabilites.
 
           * If the device supports tonemap control, only android.tonemap.curveRed is used.
           CurveGreen and curveBlue are no-ops.
+
+          In Android API level 28, a MONOCHROME camera device must not have RAW capability. From
+          API level 29, a camera is allowed to have both MONOCHROME and RAW capabilities.
           </hal_details>
         </entry>
         <entry name="availableRequestKeys" type="int32" visibility="ndk_public"
@@ -5819,7 +5826,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               buffers with 16-bit pixels.
 
               Buffers of this format are typically expected to have a
-              Bayer Color Filter Array (CFA) layout, which is given in
+              Color Filter Array (CFA) layout, which is given in
               android.sensor.info.colorFilterArrangement. Sensors with
               CFAs that are not representable by a format in
               android.sensor.info.colorFilterArrangement should not
@@ -5916,7 +5923,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           need access the image data.
 
           YCbCr_420_888 format must be supported by the HAL. When an image stream
-          needs CPU/application direct access, this format will be used.
+          needs CPU/application direct access, this format will be used. For a MONOCHROME
+          camera device, the pixel value of Cb and Cr planes is 128.
 
           The BLOB format must be supported by the HAL. This is used for the JPEG stream.
 
@@ -6890,10 +6898,25 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               <notes>Sensor is not Bayer; output has 3 16-bit
               values for each pixel, instead of just 1 16-bit value
               per pixel.</notes></value>
+              <value hal_version="3.5">MONO
+              <notes>Sensor doesn't have any Bayer color filter.
+              Such sensor captures visible light in monochrome. The exact weighting and
+              wavelengths captured is not specified, but generally only includes the visible
+              frequencies. This value implies a MONOCHROME camera.</notes></value>
+              <value hal_version="3.5">NIR
+              <notes>Sensor has a near infrared filter capturing light with wavelength between
+              roughly 750nm and 1400nm, and the same filter covers the whole sensor array. This
+              value implies a MONOCHROME camera.</notes></value>
             </enum>
             <description>The arrangement of color filters on sensor;
             represents the colors in the top-left 2x2 section of
-            the sensor, in reading order.</description>
+            the sensor, in reading order, for a Bayer camera, or the
+            light spectrum it captures for MONOCHROME camera.
+            </description>
+            <hal_details>
+            Starting from Android Q, the colorFilterArrangement for a MONOCHROME camera must be
+            single color patterns, such as MONO or NIR.
+            </hal_details>
             <tag id="RAW" />
           </entry>
           <entry name="exposureTimeRange" type="int64" visibility="public"
@@ -7218,6 +7241,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Some devices may choose to provide a second set of calibration
           information for improved quality, including
           android.sensor.referenceIlluminant2 and its corresponding matrices.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <hal_details>
           The first reference illuminant (android.sensor.referenceIlluminant1)
@@ -7259,6 +7285,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           If this key is present, then android.sensor.colorTransform2,
           android.sensor.calibrationTransform2, and
           android.sensor.forwardMatrix2 will also be present.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7284,6 +7313,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           colorspace) into this camera device's native sensor color
           space under the first reference illuminant
           (android.sensor.referenceIlluminant1).
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7313,6 +7345,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           This matrix will only be present if the second reference
           illuminant is present.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7343,6 +7378,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           and the CIE XYZ colorspace when calculating this transform will
           match the standard white point for the first reference illuminant
           (i.e. no chromatic adaptation will be applied by this transform).
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7376,6 +7414,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           This matrix will only be present if the second reference
           illuminant is present.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7404,6 +7445,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           this matrix is chosen so that the standard white point for this reference
           illuminant in the reference sensor colorspace is mapped to D50 in the
           CIE XYZ colorspace.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7435,6 +7479,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           This matrix will only be present if the second reference
           illuminant is present.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7474,6 +7521,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           level values. For raw capture in particular, it is recommended to use
           pixels from android.sensor.opticalBlackRegions to calculate black
           level values for each frame.
+
+          For a MONOCHROME camera device, all of the 2x2 channels must have the same values.
           </details>
           <hal_details>
           The values are given in row-column scan order, with the first value
@@ -7612,6 +7661,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           processing raw sensor data.
 
           The order of the values is R, G, B; where R is in the lowest index.
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <tag id="RAW" />
         </entry>
@@ -7647,6 +7699,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           A more detailed description of the noise model can be found in the
           Adobe DNG specification for the NoiseProfile tag.
+
+          For a MONOCHROME camera, there is only one color channel. So the noise model coefficients
+          will only contain one S and one O.
+
           </details>
           <hal_details>
           For a CFA layout of RGGB, the list of coefficients would be given as
@@ -7751,6 +7807,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           correction to avoid demosaic errors (3-20% divergence).
           * R &amp;gt; 1.20 will require strong software correction to produce
           a usuable image (&amp;gt;20% divergence).
+
+          Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+          the camera device has RAW capability.
           </details>
           <hal_details>
           The green split given may be a static value based on prior
@@ -8045,6 +8104,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           layout key (see android.sensor.info.colorFilterArrangement), i.e. the
           nth value given corresponds to the black level offset for the nth
           color channel listed in the CFA.
+
+          For a MONOCHROME camera, all of the 2x2 channels must have the same values.
 
           This key will be available if android.sensor.opticalBlackRegions is available or the
           camera device advertises this key via {@link
@@ -8573,6 +8634,19 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           image of a gray wall (using bicubic interpolation for visual quality) as captured by the sensor gives:
 
           ![Image of a uniform white wall (inverse shading map)](android.statistics.lensShadingMap/inv_shading.png)
+
+          For a MONOCHROME camera, all of the 2x2 channels must have the same values. An example
+          shading map for such a camera is defined as:
+
+              android.lens.info.shadingMapSize = [ 4, 3 ]
+              android.statistics.lensShadingMap =
+              [ 1.3, 1.3, 1.3, 1.3,  1.2, 1.2, 1.2, 1.2,
+                  1.1, 1.1, 1.1, 1.1,  1.3, 1.3, 1.3, 1.3,
+                1.2, 1.2, 1.2, 1.2,  1.1, 1.1, 1.1, 1.1,
+                  1.0, 1.0, 1.0, 1.0,  1.2, 1.2, 1.2, 1.2,
+                1.3, 1.3, 1.3, 1.3,   1.2, 1.2, 1.2, 1.2,
+                  1.2, 1.2, 1.2, 1.2,  1.3, 1.3, 1.3, 1.3 ]
+
           </details>
         </entry>
         <entry name="lensShadingMap" type="float" visibility="ndk_public"
@@ -8617,15 +8691,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           pixel ( ((W-1)/(N-1)) * x, ((H-1)/(M-1)) * y) for the four color channels.
           The map is assumed to be bilinearly interpolated between the sample points.
 
-          The channel order is [R, Geven, Godd, B], where Geven is the green
-          channel for the even rows of a Bayer pattern, and Godd is the odd rows.
+          For a Bayer camera, the channel order is [R, Geven, Godd, B], where Geven is
+          the green channel for the even rows of a Bayer pattern, and Godd is the odd rows.
           The shading map is stored in a fully interleaved format, and its size
           is provided in the camera static metadata by android.lens.info.shadingMapSize.
 
           The shading map will generally have on the order of 30-40 rows and columns,
           and will be smaller than 64x64.
 
-          As an example, given a very small map defined as:
+          As an example, given a very small map for a Bayer camera defined as:
 
               android.lens.info.shadingMapSize = [ 4, 3 ]
               android.statistics.lensShadingMap =
@@ -8649,6 +8723,18 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           as captured by the sensor gives:
 
           ![Image of a uniform white wall (inverse shading map)](android.statistics.lensShadingMap/inv_shading.png)
+
+          For a MONOCHROME camera, all of the 2x2 channels must have the same values. An example
+          shading map for such a camera is defined as:
+
+              android.lens.info.shadingMapSize = [ 4, 3 ]
+              android.statistics.lensShadingMap =
+              [ 1.3, 1.3, 1.3, 1.3,  1.2, 1.2, 1.2, 1.2,
+                  1.1, 1.1, 1.1, 1.1,  1.3, 1.3, 1.3, 1.3,
+                1.2, 1.2, 1.2, 1.2,  1.1, 1.1, 1.1, 1.1,
+                  1.0, 1.0, 1.0, 1.0,  1.2, 1.2, 1.2, 1.2,
+                1.3, 1.3, 1.3, 1.3,   1.2, 1.2, 1.2, 1.2,
+                  1.2, 1.2, 1.2, 1.2,  1.3, 1.3, 1.3, 1.3 ]
 
           Note that the RAW image data might be subject to lens shading
           correction not reported on this map. Query
@@ -9007,8 +9093,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           always provide a curve with number of points equivalent to
           android.tonemap.maxCurvePoints).
 
-          For devices with MONOCHROME capability, only red channel is used. Green and blue channels
-          are ignored.
+          For devices with MONOCHROME capability, all three channels must have the same set of
+          control points.
 
           A few examples, and their corresponding graphical mappings; these
           only specify the red channel and the precision is limited to 4
@@ -9080,8 +9166,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           always provide a curve with number of points equivalent to
           android.tonemap.maxCurvePoints).
 
-          For devices with MONOCHROME capability, only red channel is used. Green and blue channels
-          are ignored.
+          For devices with MONOCHROME capability, all three channels must have the same set of
+          control points.
 
           A few examples, and their corresponding graphical mappings; these
           only specify the red channel and the precision is limited to 4

@@ -877,6 +877,8 @@ typedef enum camera_metadata_enum_android_sensor_info_color_filter_arrangement {
     ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_GBRG               , // HIDL v3.2
     ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_BGGR               , // HIDL v3.2
     ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGB                , // HIDL v3.2
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO               , // HIDL v3.5
+    ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR                , // HIDL v3.5
 } camera_metadata_enum_android_sensor_info_color_filter_arrangement_t;
 
 // ANDROID_SENSOR_INFO_TIMESTAMP_SOURCE

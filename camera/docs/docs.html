@@ -17300,11 +17300,15 @@ of the physical and logical streams are the same.<wbr/></p></span>
                     <span class="entry_type_enum_name">MONOCHROME (v3.3)</span>
                     <span class="entry_type_enum_optional">[optional]</span>
                     <span class="entry_type_enum_notes"><p>The camera device is a monochrome camera that doesn't contain a color filter array,<wbr/>
-and the pixel values on U and V planes are all 128.<wbr/></p>
+and for YUV_<wbr/>420_<wbr/>888 stream,<wbr/> the pixel values on U and V planes are all 128.<wbr/></p>
 <p>A MONOCHROME camera must support the guaranteed stream combinations required for
 its device level and capabilities.<wbr/> Additionally,<wbr/> if the monochrome camera device
 supports Y8 format,<wbr/> all mandatory stream combination requirements related to <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a> apply
-to <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">Y8</a> as well.<wbr/></p></span>
+to <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">Y8</a> as well.<wbr/> There are no
+mandatory stream combination requirements with regard to
+<a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#Y8">Y8</a> for Bayer camera devices.<wbr/></p>
+<p>Starting from Android Q,<wbr/> the SENSOR_<wbr/>INFO_<wbr/>COLOR_<wbr/>FILTER_<wbr/>ARRANGEMENT of a MONOCHROME
+camera will be either MONO or NIR.<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -17405,8 +17409,8 @@ is composed of physical_<wbr/>camera_<wbr/>N_<wbr/>id,<wbr/> camera framework wi
 power,<wbr/> performance,<wbr/> and latency tradeoffs at the front of the camera id list.<wbr/></p>
 </li>
 </ul>
-<p>For MONOCHROME,<wbr/> the camera device must also advertise BACKWARD_<wbr/>COMPATIBLE capability,<wbr/> and
-it is exclusive of both RAW and MANUAL_<wbr/>POST_<wbr/>PROCESSING capabilities:</p>
+<p>A MONOCHROME camera device must also advertise BACKWARD_<wbr/>COMPATIBLE capability,<wbr/> and must
+not advertise MANUAL_<wbr/>POST_<wbr/>PROCESSING capability.<wbr/></p>
 <ul>
 <li>
 <p>To maintain backward compatibility,<wbr/> the camera device must support all
@@ -17415,18 +17419,18 @@ AUTO,<wbr/> and <a href="#dynamic_android.control.awbState">android.<wbr/>contro
 <a href="#controls_android.control.awbLock">android.<wbr/>control.<wbr/>awb<wbr/>Lock</a>.<wbr/></p>
 </li>
 <li>
-<p>A monochrome device doesn't need to advertise DNG related optional metadata tags.<wbr/></p>
-</li>
-<li>
 <p><a href="#controls_android.colorCorrection.mode">android.<wbr/>color<wbr/>Correction.<wbr/>mode</a>,<wbr/> <a href="#controls_android.colorCorrection.transform">android.<wbr/>color<wbr/>Correction.<wbr/>transform</a>,<wbr/> and
-<a href="#controls_android.colorCorrection.gains">android.<wbr/>color<wbr/>Correction.<wbr/>gains</a> are not applicable.<wbr/> So the camera device cannot
-be a FULL device.<wbr/> However,<wbr/> the HAL can still advertise other individual capabilites.<wbr/></p>
+<a href="#controls_android.colorCorrection.gains">android.<wbr/>color<wbr/>Correction.<wbr/>gains</a> must not be in available request and result keys.<wbr/>
+As a result,<wbr/> the camera device cannot be a FULL device.<wbr/> However,<wbr/> the HAL can
+still advertise other individual capabilites.<wbr/></p>
 </li>
 <li>
 <p>If the device supports tonemap control,<wbr/> only <a href="#controls_android.tonemap.curveRed">android.<wbr/>tonemap.<wbr/>curve<wbr/>Red</a> is used.<wbr/>
 CurveGreen and curveBlue are no-ops.<wbr/></p>
 </li>
 </ul>
+<p>In Android API level 28,<wbr/> a MONOCHROME camera device must not have RAW capability.<wbr/> From
+API level 29,<wbr/> a camera is allowed to have both MONOCHROME and RAW capabilities.<wbr/></p>
             </td>
           </tr>
 
@@ -18500,7 +18504,7 @@ error,<wbr/> or other hardware limitations.<wbr/></p>
                     <span class="entry_type_enum_notes"><p>RAW16 is a standard,<wbr/> cross-platform format for raw image
 buffers with 16-bit pixels.<wbr/></p>
 <p>Buffers of this format are typically expected to have a
-Bayer Color Filter Array (CFA) layout,<wbr/> which is given in
+Color Filter Array (CFA) layout,<wbr/> which is given in
 <a href="#static_android.sensor.info.colorFilterArrangement">android.<wbr/>sensor.<wbr/>info.<wbr/>color<wbr/>Filter<wbr/>Arrangement</a>.<wbr/> Sensors with
 CFAs that are not representable by a format in
 <a href="#static_android.sensor.info.colorFilterArrangement">android.<wbr/>sensor.<wbr/>info.<wbr/>color<wbr/>Filter<wbr/>Arrangement</a> should not
@@ -18638,7 +18642,8 @@ by the camera HAL device and the other endpoint of the stream.<wbr/> It is
 usually used by preview and recording streams,<wbr/> where the application doesn't
 need access the image data.<wbr/></p>
 <p>YCb<wbr/>Cr_<wbr/>420_<wbr/>888 format must be supported by the HAL.<wbr/> When an image stream
-needs CPU/<wbr/>application direct access,<wbr/> this format will be used.<wbr/></p>
+needs CPU/<wbr/>application direct access,<wbr/> this format will be used.<wbr/> For a MONOCHROME
+camera device,<wbr/> the pixel value of Cb and Cr planes is 128.<wbr/></p>
 <p>The BLOB format must be supported by the HAL.<wbr/> This is used for the JPEG stream.<wbr/></p>
 <p>A RAW_<wbr/>OPAQUE buffer should contain only pixel data.<wbr/> It is strongly
 recommended that any information used by the camera device when
@@ -21023,7 +21028,7 @@ as defined in ISO 12232:2006.<wbr/></p>
                 
           <tr class="entry" id="static_android.sensor.info.colorFilterArrangement">
             <td class="entry_name
-             " rowspan="1">
+             " rowspan="3">
               android.<wbr/>sensor.<wbr/>info.<wbr/>color<wbr/>Filter<wbr/>Arrangement
             </td>
             <td class="entry_type">
@@ -21055,6 +21060,19 @@ as defined in ISO 12232:2006.<wbr/></p>
 values for each pixel,<wbr/> instead of just 1 16-bit value
 per pixel.<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">MONO (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>Sensor doesn't have any Bayer color filter.<wbr/>
+Such sensor captures visible light in monochrome.<wbr/> The exact weighting and
+wavelengths captured is not specified,<wbr/> but generally only includes the visible
+frequencies.<wbr/> This value implies a MONOCHROME camera.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">NIR (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>Sensor has a near infrared filter capturing light with wavelength between
+roughly 750nm and 1400nm,<wbr/> and the same filter covers the whole sensor array.<wbr/> This
+value implies a MONOCHROME camera.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -21062,7 +21080,8 @@ per pixel.<wbr/></p></span>
             <td class="entry_description">
               <p>The arrangement of color filters on sensor;
 represents the colors in the top-left 2x2 section of
-the sensor,<wbr/> in reading order.<wbr/></p>
+the sensor,<wbr/> in reading order,<wbr/> for a Bayer camera,<wbr/> or the
+light spectrum it captures for MONOCHROME camera.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -21083,6 +21102,15 @@ the sensor,<wbr/> in reading order.<wbr/></p>
 
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Starting from Android Q,<wbr/> the colorFilterArrangement for a MONOCHROME camera must be
+single color patterns,<wbr/> such as MONO or NIR.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -21865,6 +21893,8 @@ that are often used calibrating camera devices.<wbr/></p>
 <p>Some devices may choose to provide a second set of calibration
 information for improved quality,<wbr/> including
 <a href="#static_android.sensor.referenceIlluminant2">android.<wbr/>sensor.<wbr/>reference<wbr/>Illuminant2</a> and its corresponding matrices.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -21949,6 +21979,8 @@ calculating the <a href="#static_android.sensor.colorTransform2">android.<wbr/>s
 <p>If this key is present,<wbr/> then <a href="#static_android.sensor.colorTransform2">android.<wbr/>sensor.<wbr/>color<wbr/>Transform2</a>,<wbr/>
 <a href="#static_android.sensor.calibrationTransform2">android.<wbr/>sensor.<wbr/>calibration<wbr/>Transform2</a>,<wbr/> and
 <a href="#static_android.sensor.forwardMatrix2">android.<wbr/>sensor.<wbr/>forward<wbr/>Matrix2</a> will also be present.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22014,6 +22046,8 @@ from reference sensor color space (i.<wbr/>e.<wbr/> the "golden module"
 colorspace) into this camera device's native sensor color
 space under the first reference illuminant
 (<a href="#static_android.sensor.referenceIlluminant1">android.<wbr/>sensor.<wbr/>reference<wbr/>Illuminant1</a>).<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22082,6 +22116,8 @@ space under the second reference illuminant
 (<a href="#static_android.sensor.referenceIlluminant2">android.<wbr/>sensor.<wbr/>reference<wbr/>Illuminant2</a>).<wbr/></p>
 <p>This matrix will only be present if the second reference
 illuminant is present.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22151,6 +22187,8 @@ XYZ color space to the reference sensor color space (i.<wbr/>e.<wbr/> the
 and the CIE XYZ colorspace when calculating this transform will
 match the standard white point for the first reference illuminant
 (i.<wbr/>e.<wbr/> no chromatic adaptation will be applied by this transform).<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22222,6 +22260,8 @@ match the standard white point for the second reference illuminant
 (i.<wbr/>e.<wbr/> no chromatic adaptation will be applied by this transform).<wbr/></p>
 <p>This matrix will only be present if the second reference
 illuminant is present.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22289,6 +22329,8 @@ point.<wbr/></p>
 this matrix is chosen so that the standard white point for this reference
 illuminant in the reference sensor colorspace is mapped to D50 in the
 CIE XYZ colorspace.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22358,6 +22400,8 @@ illuminant in the reference sensor colorspace is mapped to D50 in the
 CIE XYZ colorspace.<wbr/></p>
 <p>This matrix will only be present if the second reference
 illuminant is present.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -22477,6 +22521,7 @@ supported by the camera device,<wbr/> which provides more accurate black
 level values.<wbr/> For raw capture in particular,<wbr/> it is recommended to use
 pixels from <a href="#static_android.sensor.opticalBlackRegions">android.<wbr/>sensor.<wbr/>optical<wbr/>Black<wbr/>Regions</a> to calculate black
 level values for each frame.<wbr/></p>
+<p>For a MONOCHROME camera device,<wbr/> all of the 2x2 channels must have the same values.<wbr/></p>
             </td>
           </tr>
 
@@ -23371,6 +23416,8 @@ currently estimated white point of the scene illumination.<wbr/>  It can be
 used to interpolate between the provided color transforms when
 processing raw sensor data.<wbr/></p>
 <p>The order of the values is R,<wbr/> G,<wbr/> B; where R is in the lowest index.<wbr/></p>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -23444,6 +23491,8 @@ the range [0,<wbr/> 1],<wbr/> and S and O are the noise model coeffiecients for
 that channel.<wbr/></p>
 <p>A more detailed description of the noise model can be found in the
 Adobe DNG specification for the NoiseProfile tag.<wbr/></p>
+<p>For a MONOCHROME camera,<wbr/> there is only one color channel.<wbr/> So the noise model coefficients
+will only contain one S and one O.<wbr/></p>
             </td>
           </tr>
 
@@ -23670,6 +23719,8 @@ correction to avoid demosaic errors (3-20% divergence).<wbr/></li>
 <li>R &gt; 1.<wbr/>20 will require strong software correction to produce
 a usuable image (&gt;20% divergence).<wbr/></li>
 </ul>
+<p>Starting from Android Q,<wbr/> this key will not be present for a MONOCHROME camera,<wbr/> even if
+the camera device has RAW capability.<wbr/></p>
             </td>
           </tr>
 
@@ -24060,6 +24111,7 @@ optical black pixels reported by <a href="#static_android.sensor.opticalBlackReg
 layout key (see <a href="#static_android.sensor.info.colorFilterArrangement">android.<wbr/>sensor.<wbr/>info.<wbr/>color<wbr/>Filter<wbr/>Arrangement</a>),<wbr/> i.<wbr/>e.<wbr/> the
 nth value given corresponds to the black level offset for the nth
 color channel listed in the CFA.<wbr/></p>
+<p>For a MONOCHROME camera,<wbr/> all of the 2x2 channels must have the same values.<wbr/></p>
 <p>This key will be available if <a href="#static_android.sensor.opticalBlackRegions">android.<wbr/>sensor.<wbr/>optical<wbr/>Black<wbr/>Regions</a> is available or the
 camera device advertises this key via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableCaptureResultKeys">CameraCharacteristics#getAvailableCaptureResultKeys</a>.<wbr/></p>
             </td>
@@ -26238,6 +26290,17 @@ values =
 <p>As a visualization only,<wbr/> inverting the full-color map to recover an
 image of a gray wall (using bicubic interpolation for visual quality) as captured by the sensor gives:</p>
 <p><img alt="Image of a uniform white wall (inverse shading map)" src="images/camera2/metadata/android.statistics.lensShadingMap/inv_shading.png"/></p>
+<p>For a MONOCHROME camera,<wbr/> all of the 2x2 channels must have the same values.<wbr/> An example
+shading map for such a camera is defined as:</p>
+<pre><code><a href="#static_android.lens.info.shadingMapSize">android.<wbr/>lens.<wbr/>info.<wbr/>shading<wbr/>Map<wbr/>Size</a> = [ 4,<wbr/> 3 ]
+<a href="#dynamic_android.statistics.lensShadingMap">android.<wbr/>statistics.<wbr/>lens<wbr/>Shading<wbr/>Map</a> =
+[ 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/>  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>
+    1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/>  1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/>
+  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>  1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/>
+    1.<wbr/>0,<wbr/> 1.<wbr/>0,<wbr/> 1.<wbr/>0,<wbr/> 1.<wbr/>0,<wbr/>  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>
+  1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/>   1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>
+    1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>  1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3 ]
+</code></pre>
             </td>
           </tr>
 
@@ -26318,13 +26381,13 @@ map,<wbr/> and an active pixel array size (W x H),<wbr/> shading map entry
 (x,<wbr/>y) ϵ (0 ...<wbr/> N-1,<wbr/> 0 ...<wbr/> M-1) is the value of the shading map at
 pixel ( ((W-1)/<wbr/>(N-1)) * x,<wbr/> ((H-1)/<wbr/>(M-1)) * y) for the four color channels.<wbr/>
 The map is assumed to be bilinearly interpolated between the sample points.<wbr/></p>
-<p>The channel order is [R,<wbr/> Geven,<wbr/> Godd,<wbr/> B],<wbr/> where Geven is the green
-channel for the even rows of a Bayer pattern,<wbr/> and Godd is the odd rows.<wbr/>
+<p>For a Bayer camera,<wbr/> the channel order is [R,<wbr/> Geven,<wbr/> Godd,<wbr/> B],<wbr/> where Geven is
+the green channel for the even rows of a Bayer pattern,<wbr/> and Godd is the odd rows.<wbr/>
 The shading map is stored in a fully interleaved format,<wbr/> and its size
 is provided in the camera static metadata by <a href="#static_android.lens.info.shadingMapSize">android.<wbr/>lens.<wbr/>info.<wbr/>shading<wbr/>Map<wbr/>Size</a>.<wbr/></p>
 <p>The shading map will generally have on the order of 30-40 rows and columns,<wbr/>
 and will be smaller than 64x64.<wbr/></p>
-<p>As an example,<wbr/> given a very small map defined as:</p>
+<p>As an example,<wbr/> given a very small map for a Bayer camera defined as:</p>
 <pre><code><a href="#static_android.lens.info.shadingMapSize">android.<wbr/>lens.<wbr/>info.<wbr/>shading<wbr/>Map<wbr/>Size</a> = [ 4,<wbr/> 3 ]
 <a href="#dynamic_android.statistics.lensShadingMap">android.<wbr/>statistics.<wbr/>lens<wbr/>Shading<wbr/>Map</a> =
 [ 1.<wbr/>3,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>15,<wbr/> 1.<wbr/>2,<wbr/>  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>15,<wbr/> 1.<wbr/>2,<wbr/>
@@ -26344,6 +26407,17 @@ and will be smaller than 64x64.<wbr/></p>
 image of a gray wall (using bicubic interpolation for visual quality)
 as captured by the sensor gives:</p>
 <p><img alt="Image of a uniform white wall (inverse shading map)" src="images/camera2/metadata/android.statistics.lensShadingMap/inv_shading.png"/></p>
+<p>For a MONOCHROME camera,<wbr/> all of the 2x2 channels must have the same values.<wbr/> An example
+shading map for such a camera is defined as:</p>
+<pre><code><a href="#static_android.lens.info.shadingMapSize">android.<wbr/>lens.<wbr/>info.<wbr/>shading<wbr/>Map<wbr/>Size</a> = [ 4,<wbr/> 3 ]
+<a href="#dynamic_android.statistics.lensShadingMap">android.<wbr/>statistics.<wbr/>lens<wbr/>Shading<wbr/>Map</a> =
+[ 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/>  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>
+    1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/>  1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/>
+  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>  1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/> 1.<wbr/>1,<wbr/>
+    1.<wbr/>0,<wbr/> 1.<wbr/>0,<wbr/> 1.<wbr/>0,<wbr/> 1.<wbr/>0,<wbr/>  1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>
+  1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/>   1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>
+    1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/> 1.<wbr/>2,<wbr/>  1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3,<wbr/> 1.<wbr/>3 ]
+</code></pre>
 <p>Note that the RAW image data might be subject to lens shading
 correction not reported on this map.<wbr/> Query
 <a href="#static_android.sensor.info.lensShadingApplied">android.<wbr/>sensor.<wbr/>info.<wbr/>lens<wbr/>Shading<wbr/>Applied</a> to see if RAW image data has subject
@@ -27331,8 +27405,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
-<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
-are ignored.<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> all three channels must have the same set of
+control points.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>
@@ -27438,8 +27512,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
-<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
-are ignored.<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> all three channels must have the same set of
+control points.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>
@@ -28087,8 +28161,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
-<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
-are ignored.<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> all three channels must have the same set of
+control points.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>
@@ -28194,8 +28268,8 @@ points.<wbr/></p>
 of points can be less than max (that is,<wbr/> the request doesn't have to
 always provide a curve with number of points equivalent to
 <a href="#static_android.tonemap.maxCurvePoints">android.<wbr/>tonemap.<wbr/>max<wbr/>Curve<wbr/>Points</a>).<wbr/></p>
-<p>For devices with MONOCHROME capability,<wbr/> only red channel is used.<wbr/> Green and blue channels
-are ignored.<wbr/></p>
+<p>For devices with MONOCHROME capability,<wbr/> all three channels must have the same set of
+control points.<wbr/></p>
 <p>A few examples,<wbr/> and their corresponding graphical mappings; these
 only specify the red channel and the precision is limited to 4
 digits,<wbr/> for conciseness.<wbr/></p>

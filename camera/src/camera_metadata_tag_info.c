@@ -2371,6 +2371,14 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "RGB";
                     ret = 0;
                     break;
+                case ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO:
+                    msg = "MONO";
+                    ret = 0;
+                    break;
+                case ANDROID_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR:
+                    msg = "NIR";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
