@@ -201,4 +201,3 @@ TEST(audio_utils_channels, adjust_channels_non_destructive) {
     // Comparison array must be identical to reference.
     expectEq(u16inout, u16ref);
 }
-

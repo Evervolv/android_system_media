@@ -98,4 +98,4 @@ size_t adjust_channels_non_destructive(const void* in_buff, size_t in_buff_chans
 __END_DECLS
 /** \endcond */
 
-#endif
+#endif  // !ANDROID_AUDIO_CHANNELS_H
