@@ -66,7 +66,9 @@ enum {
                                 AUDIO_CHANNEL_OUT_TOP_BACK_CENTER |
                                 AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT |
                                 AUDIO_CHANNEL_OUT_TOP_SIDE_LEFT |
-                                AUDIO_CHANNEL_OUT_TOP_SIDE_RIGHT,
+                                AUDIO_CHANNEL_OUT_TOP_SIDE_RIGHT |
+                                AUDIO_CHANNEL_OUT_HAPTIC_B |
+                                AUDIO_CHANNEL_OUT_HAPTIC_A,
 
     AUDIO_CHANNEL_IN_ALL      = AUDIO_CHANNEL_IN_LEFT |
                                 AUDIO_CHANNEL_IN_RIGHT |
@@ -88,6 +90,9 @@ enum {
                                 AUDIO_CHANNEL_IN_LOW_FREQUENCY |
                                 AUDIO_CHANNEL_IN_TOP_LEFT |
                                 AUDIO_CHANNEL_IN_TOP_RIGHT,
+
+    AUDIO_CHANNEL_HAPTIC_ALL  = AUDIO_CHANNEL_OUT_HAPTIC_B |
+                                AUDIO_CHANNEL_OUT_HAPTIC_A,
 
     AUDIO_DEVICE_OUT_ALL      = AUDIO_DEVICE_OUT_EARPIECE |
                                 AUDIO_DEVICE_OUT_SPEAKER |
