@@ -76,6 +76,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <typedef name="streamConfiguration">
       <language name="java">android.hardware.camera2.params.StreamConfiguration</language>
     </typedef>
+    <typedef name="recommendedStreamConfiguration">
+      <language
+      name="java">android.hardware.camera2.params.RecommendedStreamConfiguration</language>
+    </typedef>
     <typedef name="streamConfigurationDuration">
       <language name="java">android.hardware.camera2.params.StreamConfigurationDuration</language>
     </typedef>
@@ -6522,6 +6526,160 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           LEGACY capability devices will only support CENTER_ONLY cropping.
           </details>
         </entry>
+        <entry name="availableRecommendedStreamConfigurations" type="int32" visibility="ndk_public"
+            optional="true" enum="true" container="array" typedef="recommendedStreamConfiguration"
+            hal_version="3.4">
+          <array>
+            <size>n</size>
+            <size>5</size>
+          </array>
+          <enum>
+            <value id="0x0">PREVIEW
+            <notes>
+                Preview must only include non-stalling processed stream configurations with
+                output formats like YUV_420_888, IMPLEMENTATION_DEFINED, etc.
+            </notes>
+            </value>
+            <value id="0x1">RECORD
+            <notes>
+                Video record must include stream configurations that match the advertised
+                supported media profiles {@link android.media.CamcorderProfile} with
+                IMPLEMENTATION_DEFINED format.
+            </notes>
+            </value>
+            <value id="0x2">VIDEO_SNAPSHOT
+            <notes>
+                Video snapshot must include stream configurations at least as big as
+                the maximum RECORD resolutions and only with format BLOB + DATASPACE_JFIF
+                format/dataspace combination (JPEG). Additionally the configurations shouldn't cause
+                preview glitches and also be able to run at 30 fps.
+            </notes>
+            </value>
+            <value id="0x3">SNAPSHOT
+            <notes>
+                Recommended snapshot stream configurations must include at least one with
+                size close to android.sensor.info.activeArraySize with BLOB + DATASPACE_JFIF
+                format/dataspace combination (JPEG). Taking into account restrictions on aspect
+                ratio, alignment etc. the area of the maximum suggested size shouldn’t be less than
+                97% of the sensor array size area.
+            </notes>
+            </value>
+            <value id="0x4">ZSL
+            <notes>
+                If supported, recommended input stream configurations must only be advertised with
+                ZSL along with other processed and/or stalling output formats.
+            </notes>
+            </value>
+            <value id="0x5">RAW
+            <notes>
+                If supported, recommended raw stream configurations must only include RAW based
+                output formats.
+            </notes>
+            </value>
+            <value id="0x6">PUBLIC_END
+            </value>
+            <value id="0x18">VENDOR_START
+            <notes>
+                Vendor defined use cases. These depend on the vendor implementation.
+            </notes>
+            </value>
+          </enum>
+          <description>Recommended stream configurations for common client use cases.
+          </description>
+          <details>Optional subset of the android.scaler.availableStreamConfigurations that contains
+          similar tuples listed as
+          (i.e. width, height, format, output/input stream, usecase bit field).
+          Camera devices will be able to suggest particular stream configurations which are
+          power and performance efficient for specific use cases. For more information about
+          retrieving the suggestions see
+          {@link android.hardware.camera2.CameraCharacteristics#getRecommendedStreamConfigurationMap}.
+          </details>
+          <ndk_details>
+          The data representation is int[5], which maps to
+          (width, height, format, output/input stream, usecase bit field). The array can be
+          parsed using the following pseudo code:
+
+          struct StreamConfiguration {
+          int32_t format;
+          int32_t width;
+          int32_t height;
+          int32_t isInput; };
+
+          void getPreferredStreamConfigurations(
+              int32_t *array, size_t count, int32_t usecaseId,
+              Vector &lt; StreamConfiguration &gt; * scs) {
+              const size_t STREAM_CONFIGURATION_SIZE = 5;
+              const size_t STREAM_WIDTH_OFFSET = 0;
+              const size_t STREAM_HEIGHT_OFFSET = 1;
+              const size_t STREAM_FORMAT_OFFSET = 2;
+              const size_t STREAM_IS_INPUT_OFFSET = 3;
+              const size_t STREAM_USECASE_BITMAP_OFFSET = 4;
+
+              for (size_t i = 0; i &lt; count; i+= STREAM_CONFIGURATION_SIZE) {
+                  int32_t width = array[i + STREAM_WIDTH_OFFSET];
+                  int32_t height = array[i + STREAM_HEIGHT_OFFSET];
+                  int32_t format = array[i + STREAM_FORMAT_OFFSET];
+                  int32_t isInput = array[i + STREAM_IS_INPUT_OFFSET];
+                  int32_t supportedUsecases = array[i + STREAM_USECASE_BITMAP_OFFSET];
+                  if (supportedUsecases &amp; (1 &lt;&lt; usecaseId)) {
+                      StreamConfiguration sc = {format, width, height, isInput};
+                      scs->add(sc);
+                  }
+              }
+          }
+
+          </ndk_details>
+          <hal_details>
+          There are some requirements that need to be considered regarding the usecases and the
+          suggested configurations:
+
+          * If android.scaler.availableRecommendedStreamConfigurations is set, then recommended
+          stream configurations must be present for all mandatory usecases PREVIEW,
+          SNAPSHOT, RECORD, VIDEO_SNAPSHOT. ZSL and RAW are
+          required depending on device capabilities see android.request.availableCapabilities.
+          * Non-existing usecases and non-vendor usecases within the range
+          (RAW : VENDOR_START] are prohibited as well as stream configurations not
+          present in the exhaustive android.scaler.availableStreamConfigurations list.
+
+          For example, in case the camera device supports only 4K and 1080p and both resolutions are
+          recommended for the mandatory usecases except preview which can run efficiently only
+          on 1080p. The array may look like this:
+
+          [3840, 2160, HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED,
+           ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
+           (1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RECORD |
+           1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_SNAPSHOT |
+           1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VIDEO_SNAPSHOT),
+
+           1920, 1080, HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED,
+           ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
+           (1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PREVIEW |
+           1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RECORD |
+           1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_SNAPSHOT |
+           1&lt;&lt; ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VIDEO_SNAPSHOT)]
+
+          </hal_details>
+        </entry>
+        <entry name="availableRecommendedInputOutputFormatsMap" type="int32" visibility="ndk_public"
+          optional="true" typedef="reprocessFormatsMap" hal_version="3.4">
+          <description>Recommended mappings of image formats that are supported by this
+          camera device for input streams, to their corresponding output formats.
+          </description>
+          <details>
+          This is a recommended subset of the complete list of mappings found in
+          android.scaler.availableInputOutputFormatsMap. The same requirements apply here as well.
+          The list however doesn't need to contain all available and supported mappings. Instead of
+          this developers must list only recommended and efficient entries.
+          If set, the information will be available in the ZERO_SHUTTER_LAG recommended stream
+          configuration see
+          {@link android.hardware.camera2.CameraCharacteristics#getRecommendedStreamConfigurationMap}.
+          </details>
+          <hal_details>
+          For a code sample of the required data encoding please check
+          android.scaler.availableInputOutputFormatsMap.
+          </hal_details>
+          <tag id="REPROC" />
+        </entry>
       </static>
     </section>
     <section name="sensor">
@@ -9917,6 +10075,36 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           measure depth values, which causes the color image to be
           corrupted during depth measurement.
           </details>
+        </entry>
+        <entry name="availableRecommendedDepthStreamConfigurations" type="int32"
+            visibility="ndk_public" optional="true" container="array"
+            typedef="recommendedStreamConfiguration" hal_version="3.4">
+          <array>
+            <size>n</size>
+            <size>5</size>
+          </array>
+          <description>Recommended depth stream configurations for common client use cases.
+          </description>
+          <details>Optional subset of the android.depth.availableDepthStreamConfigurations that
+          contains similar tuples listed as
+          (i.e. width, height, format, output/input stream, usecase bit field).
+          Camera devices will be able to suggest particular depth stream configurations which are
+          power and performance efficient for specific use cases. For more information about
+          retrieving the suggestions see
+          {@link android.hardware.camera2.CameraCharacteristics#getRecommendedStreamConfigurationMap}.
+          </details>
+          <ndk_details>
+          For data representation please refer to
+          android.scaler.availableRecommendedStreamConfigurations
+          </ndk_details>
+          <hal_details>
+          Recommended depth configurations are expected to be declared with SNAPSHOT and/or
+          ZSL if supported by the device.
+          For additional details on how to declare recommended stream configurations, check
+          android.scaler.availableRecommendedStreamConfigurations.
+          For additional requirements on depth streams please consider
+          android.depth.availableDepthStreamConfigurations.
+          </hal_details>
         </entry>
       </static>
     </section>

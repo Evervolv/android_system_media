@@ -742,6 +742,10 @@
             ><a href="#static_android.scaler.streamConfigurationMap">android.scaler.streamConfigurationMap</a></li>
             <li
             ><a href="#static_android.scaler.croppingType">android.scaler.croppingType</a></li>
+            <li
+            ><a href="#static_android.scaler.availableRecommendedStreamConfigurations">android.scaler.availableRecommendedStreamConfigurations</a></li>
+            <li
+            ><a href="#static_android.scaler.availableRecommendedInputOutputFormatsMap">android.scaler.availableRecommendedInputOutputFormatsMap</a></li>
           </ul>
         </li>
         <li>
@@ -1171,6 +1175,8 @@
             ><a href="#static_android.depth.availableDepthStallDurations">android.depth.availableDepthStallDurations</a></li>
             <li
             ><a href="#static_android.depth.depthIsExclusive">android.depth.depthIsExclusive</a></li>
+            <li
+            ><a href="#static_android.depth.availableRecommendedDepthStreamConfigurations">android.depth.availableRecommendedDepthStreamConfigurations</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -19919,6 +19925,218 @@ return the final used crop region in capture result metadata <a href="#controls_
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="static_android.scaler.availableRecommendedStreamConfigurations">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>scaler.<wbr/>available<wbr/>Recommended<wbr/>Stream<wbr/>Configurations
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n x 5
+                </span>
+              <span class="entry_type_visibility"> [ndk_public as recommendedStreamConfiguration]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">PREVIEW (v3.4)</span>
+                    <span class="entry_type_enum_value">0x0</span>
+                    <span class="entry_type_enum_notes"><p>Preview must only include non-stalling processed stream configurations with
+output formats like YUV_<wbr/>420_<wbr/>888,<wbr/> IMPLEMENTATION_<wbr/>DEFINED,<wbr/> etc.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">RECORD (v3.4)</span>
+                    <span class="entry_type_enum_value">0x1</span>
+                    <span class="entry_type_enum_notes"><p>Video record must include stream configurations that match the advertised
+supported media profiles <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a> with
+IMPLEMENTATION_<wbr/>DEFINED format.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">VIDEO_SNAPSHOT (v3.4)</span>
+                    <span class="entry_type_enum_value">0x2</span>
+                    <span class="entry_type_enum_notes"><p>Video snapshot must include stream configurations at least as big as
+the maximum RECORD resolutions and only with format BLOB + DATASPACE_<wbr/>JFIF
+format/<wbr/>dataspace combination (JPEG).<wbr/> Additionally the configurations shouldn't cause
+preview glitches and also be able to run at 30 fps.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">SNAPSHOT (v3.4)</span>
+                    <span class="entry_type_enum_value">0x3</span>
+                    <span class="entry_type_enum_notes"><p>Recommended snapshot stream configurations must include at least one with
+size close to <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> with BLOB + DATASPACE_<wbr/>JFIF
+format/<wbr/>dataspace combination (JPEG).<wbr/> Taking into account restrictions on aspect
+ratio,<wbr/> alignment etc.<wbr/> the area of the maximum suggested size shouldn’t be less than
+97% of the sensor array size area.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">ZSL (v3.4)</span>
+                    <span class="entry_type_enum_value">0x4</span>
+                    <span class="entry_type_enum_notes"><p>If supported,<wbr/> recommended input stream configurations must only be advertised with
+ZSL along with other processed and/<wbr/>or stalling output formats.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">RAW (v3.4)</span>
+                    <span class="entry_type_enum_value">0x5</span>
+                    <span class="entry_type_enum_notes"><p>If supported,<wbr/> recommended raw stream configurations must only include RAW based
+output formats.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">PUBLIC_END (v3.4)</span>
+                    <span class="entry_type_enum_value">0x6</span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">VENDOR_START (v3.4)</span>
+                    <span class="entry_type_enum_value">0x18</span>
+                    <span class="entry_type_enum_notes"><p>Vendor defined use cases.<wbr/> These depend on the vendor implementation.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Recommended stream configurations for common client use cases.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Optional subset of the <a href="#static_android.scaler.availableStreamConfigurations">android.<wbr/>scaler.<wbr/>available<wbr/>Stream<wbr/>Configurations</a> that contains
+similar tuples listed as
+(i.<wbr/>e.<wbr/> width,<wbr/> height,<wbr/> format,<wbr/> output/<wbr/>input stream,<wbr/> usecase bit field).<wbr/>
+Camera devices will be able to suggest particular stream configurations which are
+power and performance efficient for specific use cases.<wbr/> For more information about
+retrieving the suggestions see
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getRecommendedStreamConfigurationMap">CameraCharacteristics#getRecommendedStreamConfigurationMap</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>There are some requirements that need to be considered regarding the usecases and the
+suggested configurations:</p>
+<ul>
+<li>If <a href="#static_android.scaler.availableRecommendedStreamConfigurations">android.<wbr/>scaler.<wbr/>available<wbr/>Recommended<wbr/>Stream<wbr/>Configurations</a> is set,<wbr/> then recommended
+stream configurations must be present for all mandatory usecases PREVIEW,<wbr/>
+SNAPSHOT,<wbr/> RECORD,<wbr/> VIDEO_<wbr/>SNAPSHOT.<wbr/> ZSL and RAW are
+required depending on device capabilities see <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a>.<wbr/></li>
+<li>Non-existing usecases and non-vendor usecases within the range
+(RAW : VENDOR_<wbr/>START] are prohibited as well as stream configurations not
+present in the exhaustive <a href="#static_android.scaler.availableStreamConfigurations">android.<wbr/>scaler.<wbr/>available<wbr/>Stream<wbr/>Configurations</a> list.<wbr/></li>
+</ul>
+<p>For example,<wbr/> in case the camera device supports only 4K and 1080p and both resolutions are
+recommended for the mandatory usecases except preview which can run efficiently only
+on 1080p.<wbr/> The array may look like this:</p>
+<p>[3840,<wbr/> 2160,<wbr/> HAL_<wbr/>PIXEL_<wbr/>FORMAT_<wbr/>IMPLEMENTATION_<wbr/>DEFINED,<wbr/>
+ ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>OUTPUT,<wbr/>
+ (1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>RECORD |<wbr/>
+ 1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>SNAPSHOT |<wbr/>
+ 1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>VIDEO_<wbr/>SNAPSHOT),<wbr/></p>
+<p>1920,<wbr/> 1080,<wbr/> HAL_<wbr/>PIXEL_<wbr/>FORMAT_<wbr/>IMPLEMENTATION_<wbr/>DEFINED,<wbr/>
+ ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>OUTPUT,<wbr/>
+ (1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>PREVIEW |<wbr/>
+ 1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>RECORD |<wbr/>
+ 1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>SNAPSHOT |<wbr/>
+ 1&lt;&lt; ANDROID_<wbr/>SCALER_<wbr/>AVAILABLE_<wbr/>RECOMMENDED_<wbr/>STREAM_<wbr/>CONFIGURATIONS_<wbr/>VIDEO_<wbr/>SNAPSHOT)]</p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.scaler.availableRecommendedInputOutputFormatsMap">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>scaler.<wbr/>available<wbr/>Recommended<wbr/>Input<wbr/>Output<wbr/>Formats<wbr/>Map
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+
+              <span class="entry_type_visibility"> [ndk_public as reprocessFormatsMap]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Recommended mappings of image formats that are supported by this
+camera device for input streams,<wbr/> to their corresponding output formats.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_REPROC">REPROC</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This is a recommended subset of the complete list of mappings found in
+<a href="#static_android.scaler.availableInputOutputFormatsMap">android.<wbr/>scaler.<wbr/>available<wbr/>Input<wbr/>Output<wbr/>Formats<wbr/>Map</a>.<wbr/> The same requirements apply here as well.<wbr/>
+The list however doesn't need to contain all available and supported mappings.<wbr/> Instead of
+this developers must list only recommended and efficient entries.<wbr/>
+If set,<wbr/> the information will be available in the ZERO_<wbr/>SHUTTER_<wbr/>LAG recommended stream
+configuration see
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getRecommendedStreamConfigurationMap">CameraCharacteristics#getRecommendedStreamConfigurationMap</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For a code sample of the required data encoding please check
+<a href="#static_android.scaler.availableInputOutputFormatsMap">android.<wbr/>scaler.<wbr/>available<wbr/>Input<wbr/>Output<wbr/>Formats<wbr/>Map</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -30154,6 +30372,78 @@ corrupted during depth measurement.<wbr/></p>
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="static_android.depth.availableRecommendedDepthStreamConfigurations">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>depth.<wbr/>available<wbr/>Recommended<wbr/>Depth<wbr/>Stream<wbr/>Configurations
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n x 5
+                </span>
+              <span class="entry_type_visibility"> [ndk_public as recommendedStreamConfiguration]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Recommended depth stream configurations for common client use cases.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Optional subset of the <a href="#static_android.depth.availableDepthStreamConfigurations">android.<wbr/>depth.<wbr/>available<wbr/>Depth<wbr/>Stream<wbr/>Configurations</a> that
+contains similar tuples listed as
+(i.<wbr/>e.<wbr/> width,<wbr/> height,<wbr/> format,<wbr/> output/<wbr/>input stream,<wbr/> usecase bit field).<wbr/>
+Camera devices will be able to suggest particular depth stream configurations which are
+power and performance efficient for specific use cases.<wbr/> For more information about
+retrieving the suggestions see
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getRecommendedStreamConfigurationMap">CameraCharacteristics#getRecommendedStreamConfigurationMap</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Recommended depth configurations are expected to be declared with SNAPSHOT and/<wbr/>or
+ZSL if supported by the device.<wbr/>
+For additional details on how to declare recommended stream configurations,<wbr/> check
+<a href="#static_android.scaler.availableRecommendedStreamConfigurations">android.<wbr/>scaler.<wbr/>available<wbr/>Recommended<wbr/>Stream<wbr/>Configurations</a>.<wbr/>
+For additional requirements on depth streams please consider
+<a href="#static_android.depth.availableDepthStreamConfigurations">android.<wbr/>depth.<wbr/>available<wbr/>Depth<wbr/>Stream<wbr/>Configurations</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -30898,6 +31188,7 @@ own requirements.<wbr/></p>
           <li><a href="#static_android.noiseReduction.availableNoiseReductionModes">android.noiseReduction.availableNoiseReductionModes</a> (static)</li>
           <li><a href="#static_android.request.maxNumInputStreams">android.request.maxNumInputStreams</a> (static)</li>
           <li><a href="#static_android.scaler.availableInputOutputFormatsMap">android.scaler.availableInputOutputFormatsMap</a> (static)</li>
+          <li><a href="#static_android.scaler.availableRecommendedInputOutputFormatsMap">android.scaler.availableRecommendedInputOutputFormatsMap</a> (static)</li>
           <li><a href="#controls_android.reprocess.effectiveExposureFactor">android.reprocess.effectiveExposureFactor</a> (controls)</li>
           <li><a href="#static_android.reprocess.maxCaptureStall">android.reprocess.maxCaptureStall</a> (static)</li>
           <li><a href="#static_android.distortionCorrection.availableModes">android.distortionCorrection.availableModes</a> (static)</li>
