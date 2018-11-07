@@ -2012,6 +2012,18 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "BLOB";
                     ret = 0;
                     break;
+                case ANDROID_SCALER_AVAILABLE_FORMATS_RAW10:
+                    msg = "RAW10";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_FORMATS_RAW12:
+                    msg = "RAW12";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_AVAILABLE_FORMATS_Y8:
+                    msg = "Y8";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
