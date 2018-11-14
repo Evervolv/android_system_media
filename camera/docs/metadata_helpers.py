@@ -166,6 +166,7 @@ def protobuf_type(entry):
     "sizeF"                  : "SizeF",
     "rectangle"              : "Rect",
     "streamConfigurationMap" : "StreamConfigurations",
+    "mandatoryStreamCombination" : "MandatoryStreamCombination",
     "rangeInt"               : "RangeInt",
     "rangeLong"              : "RangeLong",
     "colorSpaceTransform"    : "ColorSpaceTransform",
