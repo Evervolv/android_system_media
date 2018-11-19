@@ -3627,6 +3627,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           Optical zoom will not be supported on most devices.
           </details>
+          <hal_details>
+          For a logical camera device supporting both optical and digital zoom, if focalLength and
+          cropRegion change in the same request, the camera device must make sure that the new
+          focalLength and cropRegion take effect in the same frame. This is to make sure that there
+          is no visible field-of-view jump during zoom. For example, if cropRegion is applied
+          immediately, but focalLength takes more than 1 frame to take effect, the camera device
+          will delay the cropRegion so that it's synchronized with focalLength.
+          </hal_details>
           <tag id="V1" />
         </entry>
         <entry name="focusDistance" type="float" visibility="public" hwlevel="full">
@@ -4949,6 +4957,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               If this is supported, android.scaler.streamConfigurationMap will
               additionally return a min frame duration that is greater than
               zero for each supported size-format combination.
+
+              For camera devices with LOGICAL_MULTI_CAMERA capability, when the underlying active
+              physical camera switches, exposureTime, sensitivity, and lens properties may change
+              even if AE/AF is locked. However, the overall auto exposure and auto focus experience
+              for users will be consistent. Refer to LOGICAL_MULTI_CAMERA capability for details.
               </notes>
             </value>
             <value optional="true">MANUAL_POST_PROCESSING
@@ -4983,6 +4996,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
               A given camera device may also support additional post-processing
               controls, but this capability only covers the above list of controls.
+
+              For camera devices with LOGICAL_MULTI_CAMERA capability, when underlying active
+              physical camera switches, tonemap, white balance, and shading map may change even if
+              awb is locked. However, the overall post-processing experience for users will be
+              consistent. Refer to LOGICAL_MULTI_CAMERA capability for details.
               </notes>
             </value>
             <value optional="true">RAW
@@ -5332,7 +5350,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                   - android.lens.distortion
               * The SENSOR_INFO_TIMESTAMP_SOURCE of the logical device and physical devices must be
                 the same.
-              * The logical camera device must be LIMITED or higher device.
+              * The logical camera must be LIMITED or higher device.
 
               Both the logical camera device and its underlying physical devices support the
               mandatory stream combinations required for their device levels.
@@ -5353,6 +5371,56 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               Using physical streams in place of a logical stream of the same size and format will
               not slow down the frame rate of the capture, as long as the minimum frame duration
               of the physical and logical streams are the same.
+
+              A logical camera device's dynamic metadata may contain
+              android.logicalMultiCamera.activePhysicalId to notify the application of the current
+              active physical camera Id. An active physical camera is the physical camera from which
+              the logical camera's main image data outputs (YUV or RAW) and metadata come from.
+              In addition, this serves as an indication which physical camera is used to output to
+              a RAW stream, or in case only physical cameras support RAW, which physical RAW stream
+              the application should request.
+
+              Logical camera's static metadata tags below describe the default active physical
+              camera. An active physical camera is default if it's used when application directly
+              uses requests built from a template. All templates will default to the same active
+              physical camera.
+
+                - android.sensor.info.sensitivityRange
+                - android.sensor.info.colorFilterArrangement
+                - android.sensor.info.exposureTimeRange
+                - android.sensor.info.maxFrameDuration
+                - android.sensor.info.physicalSize
+                - android.sensor.info.whiteLevel
+                - android.sensor.info.lensShadingApplied
+                - android.sensor.referenceIlluminant1
+                - android.sensor.referenceIlluminant2
+                - android.sensor.calibrationTransform1
+                - android.sensor.calibrationTransform2
+                - android.sensor.colorTransform1
+                - android.sensor.colorTransform2
+                - android.sensor.forwardMatrix1
+                - android.sensor.forwardMatrix2
+                - android.sensor.blackLevelPattern
+                - android.sensor.maxAnalogSensitivity
+                - android.sensor.opticalBlackRegions
+                - android.sensor.availableTestPatternModes
+                - android.lens.info.hyperfocalDistance
+                - android.lens.info.minimumFocusDistance
+                - android.lens.info.focusDistanceCalibration
+                - android.lens.poseRotation
+                - android.lens.poseTranslation
+                - android.lens.intrinsicCalibration
+                - android.lens.poseReference
+                - android.lens.distortion
+
+              To maintain backward compatibility, the capture request and result metadata tags
+              required for basic camera functionalities will be solely based on the
+              logical camera capabiltity. Other request and result metadata tags, on the other
+              hand, will be based on current active physical camera. For example, the physical
+              cameras' sensor sensitivity and lens capability could be different from each other.
+              So when the application manually controls sensor exposure time/gain, or does manual
+              focus control, it must checks the current active physical camera's exposure, gain,
+              and focus distance range.
               </notes>
             </value>
             <value optional="true" hal_version="3.3" >MONOCHROME
@@ -5450,6 +5518,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           * Camera HAL is strongly recommended to advertise camera devices with best feature,
           power, performance, and latency tradeoffs at the front of the camera id list.
+
+          * Camera HAL may switch between physical cameras depending on focalLength or cropRegion.
+          If physical cameras have different sizes, HAL must maintain a single logical camera
+          activeArraySize/pixelArraySize/preCorrectionActiveArraySize, and must do proper mapping
+          between logical camera and underlying physical cameras.
 
           A MONOCHROME camera device must also advertise BACKWARD_COMPATIBLE capability, and must
           not advertise MANUAL_POST_PROCESSING capability.
@@ -10242,14 +10315,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </description>
           <units>UTF-8 null-terminated string</units>
           <details>
-            For a logical camera, this is concatenation of all underlying physical camera ids.
-            The null terminator for physical camera id must be preserved so that the whole string
-            can be tokenized using '\0' to generate list of physical camera ids.
+            For a logical camera, this is concatenation of all underlying physical camera IDs.
+            The null terminator for physical camera ID must be preserved so that the whole string
+            can be tokenized using '\0' to generate list of physical camera IDs.
 
-            For example, if the physical camera ids of the logical camera are "2" and "3", the
+            For example, if the physical camera IDs of the logical camera are "2" and "3", the
             value of this tag will be ['2', '\0', '3', '\0'].
 
-            The number of physical camera ids must be no less than 2.
+            The number of physical camera IDs must be no less than 2.
           </details>
           <tag id="LOGICALCAMERA" />
         </entry>
@@ -10286,6 +10359,31 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <tag id="LOGICALCAMERA" />
         </entry>
       </static>
+      <dynamic>
+      <entry name="activePhysicalId" type="byte" visibility="public"
+             typedef="string" hal_version="3.4">
+        <description>String containing the ID of the underlying active physical camera.
+        </description>
+        <units>UTF-8 null-terminated string</units>
+        <details>
+          The ID of the active physical camera that's backing the logical camera. All camera
+          streams and metadata that are not physical camera specific will be originating from this
+          physical camera. This must be one of valid physical IDs advertised in the physicalIds
+          static tag.
+
+          For a logical camera made up of physical cameras where each camera's lenses have
+          different characteristics, the camera device may choose to switch between the physical
+          cameras when application changes FOCAL_LENGTH or SCALER_CROP_REGION.
+          At the time of lens switch, this result metadata reflects the new active physical camera
+          ID.
+        </details>
+        <hal_details>
+          Staring from HIDL ICameraDevice version 3.5, the tag must be available in the capture
+          result metadata to indicate current active physical camera ID.
+        </hal_details>
+        <tag id="LOGICALCAMERA" />
+      </entry>
+    </dynamic>
     </section>
     <section name="distortionCorrection">
       <controls>
