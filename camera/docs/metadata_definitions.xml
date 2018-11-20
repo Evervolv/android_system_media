@@ -6898,12 +6898,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               <notes>Sensor is not Bayer; output has 3 16-bit
               values for each pixel, instead of just 1 16-bit value
               per pixel.</notes></value>
-              <value hal_version="3.5">MONO
+              <value hal_version="3.4">MONO
               <notes>Sensor doesn't have any Bayer color filter.
               Such sensor captures visible light in monochrome. The exact weighting and
               wavelengths captured is not specified, but generally only includes the visible
               frequencies. This value implies a MONOCHROME camera.</notes></value>
-              <value hal_version="3.5">NIR
+              <value hal_version="3.4">NIR
               <notes>Sensor has a near infrared filter capturing light with wavelength between
               roughly 750nm and 1400nm, and the same filter covers the whole sensor array. This
               value implies a MONOCHROME camera.</notes></value>
