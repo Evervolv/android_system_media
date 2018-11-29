@@ -2606,12 +2606,15 @@ CaptureResult.<wbr/></p>
             </td>
 
             <td class="entry_units">
-              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+            android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on
+            distortion correction capability and mode
             </td>
 
             <td class="entry_range">
               <p>Coordinates must be between <code>[(0,<wbr/>0),<wbr/> (width,<wbr/> height))</code> of
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>
+depending on distortion correction capability and mode</p>
             </td>
 
             <td class="entry_hal_version">
@@ -2634,11 +2637,26 @@ CaptureResult.<wbr/></p>
 Otherwise will always be present.<wbr/></p>
 <p>The maximum number of regions supported by the device is determined by the value
 of <a href="#static_android.control.maxRegionsAe">android.<wbr/>control.<wbr/>max<wbr/>Regions<wbr/>Ae</a>.<wbr/></p>
-<p>The coordinate system is based on the active pixel array,<wbr/>
-with (0,<wbr/>0) being the top-left pixel in the active pixel array,<wbr/> and
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/>0) being
+the top-left pixel in the active pixel array,<wbr/> and
 (<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the
-bottom-right pixel in the active pixel array.<wbr/></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array,<wbr/> and
+(<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right
+pixel in the pre-correction active pixel array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array,<wbr/> and
+(<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
 <p>The weight must be within <code>[0,<wbr/> 1000]</code>,<wbr/> and represents a weight
 for every pixel in the area.<wbr/> This means that a large metering area
 with the same weight as a smaller area will have more effect in
@@ -2667,7 +2685,9 @@ int[5 * area_<wbr/>count].<wbr/>
 Every five elements represent a metering region of
 (xmin,<wbr/> ymin,<wbr/> xmax,<wbr/> ymax,<wbr/> weight).<wbr/>
 The rectangle is defined to be inclusive on xmin and ymin,<wbr/> but
-exclusive on xmax and ymax.<wbr/></p>
+exclusive on xmax and ymax.<wbr/>
+HAL must always report metering regions in the coordinate system of pre-correction
+active array.<wbr/></p>
             </td>
           </tr>
 
@@ -3067,12 +3087,15 @@ that will arise on camera modules with open-loop VCMs.<wbr/></p>
             </td>
 
             <td class="entry_units">
-              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+            android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on
+            distortion correction capability and mode
             </td>
 
             <td class="entry_range">
               <p>Coordinates must be between <code>[(0,<wbr/>0),<wbr/> (width,<wbr/> height))</code> of
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>
+depending on distortion correction capability and mode</p>
             </td>
 
             <td class="entry_hal_version">
@@ -3095,11 +3118,26 @@ that will arise on camera modules with open-loop VCMs.<wbr/></p>
 Otherwise will always be present.<wbr/></p>
 <p>The maximum number of focus areas supported by the device is determined by the value
 of <a href="#static_android.control.maxRegionsAf">android.<wbr/>control.<wbr/>max<wbr/>Regions<wbr/>Af</a>.<wbr/></p>
-<p>The coordinate system is based on the active pixel array,<wbr/>
-with (0,<wbr/>0) being the top-left pixel in the active pixel array,<wbr/> and
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/>0) being
+the top-left pixel in the active pixel array,<wbr/> and
 (<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the
-bottom-right pixel in the active pixel array.<wbr/></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array,<wbr/> and
+(<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right
+pixel in the pre-correction active pixel array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array,<wbr/> and
+(<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
 <p>The weight must be within <code>[0,<wbr/> 1000]</code>,<wbr/> and represents a weight
 for every pixel in the area.<wbr/> This means that a large metering area
 with the same weight as a smaller area will have more effect in
@@ -3129,7 +3167,9 @@ int[5 * area_<wbr/>count].<wbr/>
 Every five elements represent a metering region of
 (xmin,<wbr/> ymin,<wbr/> xmax,<wbr/> ymax,<wbr/> weight).<wbr/>
 The rectangle is defined to be inclusive on xmin and ymin,<wbr/> but
-exclusive on xmax and ymax.<wbr/></p>
+exclusive on xmax and ymax.<wbr/>
+HAL must always report metering regions in the coordinate system of pre-correction
+active array.<wbr/></p>
             </td>
           </tr>
 
@@ -3528,12 +3568,15 @@ estimation.<wbr/></p>
             </td>
 
             <td class="entry_units">
-              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+            android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on
+            distortion correction capability and mode
             </td>
 
             <td class="entry_range">
               <p>Coordinates must be between <code>[(0,<wbr/>0),<wbr/> (width,<wbr/> height))</code> of
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>
+depending on distortion correction capability and mode</p>
             </td>
 
             <td class="entry_hal_version">
@@ -3556,11 +3599,26 @@ estimation.<wbr/></p>
 Otherwise will always be present.<wbr/></p>
 <p>The maximum number of regions supported by the device is determined by the value
 of <a href="#static_android.control.maxRegionsAwb">android.<wbr/>control.<wbr/>max<wbr/>Regions<wbr/>Awb</a>.<wbr/></p>
-<p>The coordinate system is based on the active pixel array,<wbr/>
-with (0,<wbr/>0) being the top-left pixel in the active pixel array,<wbr/> and
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/>0) being
+the top-left pixel in the active pixel array,<wbr/> and
 (<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the
-bottom-right pixel in the active pixel array.<wbr/></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array,<wbr/> and
+(<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right
+pixel in the pre-correction active pixel array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array,<wbr/> and
+(<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
 <p>The weight must range from 0 to 1000,<wbr/> and represents a weight
 for every pixel in the area.<wbr/> This means that a large metering area
 with the same weight as a smaller area will have more effect in
@@ -3589,7 +3647,9 @@ int[5 * area_<wbr/>count].<wbr/>
 Every five elements represent a metering region of
 (xmin,<wbr/> ymin,<wbr/> xmax,<wbr/> ymax,<wbr/> weight).<wbr/>
 The rectangle is defined to be inclusive on xmin and ymin,<wbr/> but
-exclusive on xmax and ymax.<wbr/></p>
+exclusive on xmax and ymax.<wbr/>
+HAL must always report metering regions in the coordinate system of pre-correction
+active array.<wbr/></p>
             </td>
           </tr>
 
@@ -6505,12 +6565,15 @@ CaptureResult.<wbr/></p>
             </td>
 
             <td class="entry_units">
-              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+            android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on
+            distortion correction capability and mode
             </td>
 
             <td class="entry_range">
               <p>Coordinates must be between <code>[(0,<wbr/>0),<wbr/> (width,<wbr/> height))</code> of
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>
+depending on distortion correction capability and mode</p>
             </td>
 
             <td class="entry_hal_version">
@@ -6533,11 +6596,26 @@ CaptureResult.<wbr/></p>
 Otherwise will always be present.<wbr/></p>
 <p>The maximum number of regions supported by the device is determined by the value
 of <a href="#static_android.control.maxRegionsAe">android.<wbr/>control.<wbr/>max<wbr/>Regions<wbr/>Ae</a>.<wbr/></p>
-<p>The coordinate system is based on the active pixel array,<wbr/>
-with (0,<wbr/>0) being the top-left pixel in the active pixel array,<wbr/> and
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/>0) being
+the top-left pixel in the active pixel array,<wbr/> and
 (<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the
-bottom-right pixel in the active pixel array.<wbr/></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array,<wbr/> and
+(<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right
+pixel in the pre-correction active pixel array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array,<wbr/> and
+(<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
 <p>The weight must be within <code>[0,<wbr/> 1000]</code>,<wbr/> and represents a weight
 for every pixel in the area.<wbr/> This means that a large metering area
 with the same weight as a smaller area will have more effect in
@@ -6566,7 +6644,9 @@ int[5 * area_<wbr/>count].<wbr/>
 Every five elements represent a metering region of
 (xmin,<wbr/> ymin,<wbr/> xmax,<wbr/> ymax,<wbr/> weight).<wbr/>
 The rectangle is defined to be inclusive on xmin and ymin,<wbr/> but
-exclusive on xmax and ymax.<wbr/></p>
+exclusive on xmax and ymax.<wbr/>
+HAL must always report metering regions in the coordinate system of pre-correction
+active array.<wbr/></p>
             </td>
           </tr>
 
@@ -7273,12 +7353,15 @@ that will arise on camera modules with open-loop VCMs.<wbr/></p>
             </td>
 
             <td class="entry_units">
-              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+            android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on
+            distortion correction capability and mode
             </td>
 
             <td class="entry_range">
               <p>Coordinates must be between <code>[(0,<wbr/>0),<wbr/> (width,<wbr/> height))</code> of
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>
+depending on distortion correction capability and mode</p>
             </td>
 
             <td class="entry_hal_version">
@@ -7301,11 +7384,26 @@ that will arise on camera modules with open-loop VCMs.<wbr/></p>
 Otherwise will always be present.<wbr/></p>
 <p>The maximum number of focus areas supported by the device is determined by the value
 of <a href="#static_android.control.maxRegionsAf">android.<wbr/>control.<wbr/>max<wbr/>Regions<wbr/>Af</a>.<wbr/></p>
-<p>The coordinate system is based on the active pixel array,<wbr/>
-with (0,<wbr/>0) being the top-left pixel in the active pixel array,<wbr/> and
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/>0) being
+the top-left pixel in the active pixel array,<wbr/> and
 (<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the
-bottom-right pixel in the active pixel array.<wbr/></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array,<wbr/> and
+(<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right
+pixel in the pre-correction active pixel array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array,<wbr/> and
+(<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
 <p>The weight must be within <code>[0,<wbr/> 1000]</code>,<wbr/> and represents a weight
 for every pixel in the area.<wbr/> This means that a large metering area
 with the same weight as a smaller area will have more effect in
@@ -7335,7 +7433,9 @@ int[5 * area_<wbr/>count].<wbr/>
 Every five elements represent a metering region of
 (xmin,<wbr/> ymin,<wbr/> xmax,<wbr/> ymax,<wbr/> weight).<wbr/>
 The rectangle is defined to be inclusive on xmin and ymin,<wbr/> but
-exclusive on xmax and ymax.<wbr/></p>
+exclusive on xmax and ymax.<wbr/>
+HAL must always report metering regions in the coordinate system of pre-correction
+active array.<wbr/></p>
             </td>
           </tr>
 
@@ -8280,12 +8380,15 @@ estimation.<wbr/></p>
             </td>
 
             <td class="entry_units">
-              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+              Pixel coordinates within android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+            android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on
+            distortion correction capability and mode
             </td>
 
             <td class="entry_range">
               <p>Coordinates must be between <code>[(0,<wbr/>0),<wbr/> (width,<wbr/> height))</code> of
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>
+depending on distortion correction capability and mode</p>
             </td>
 
             <td class="entry_hal_version">
@@ -8308,11 +8411,26 @@ estimation.<wbr/></p>
 Otherwise will always be present.<wbr/></p>
 <p>The maximum number of regions supported by the device is determined by the value
 of <a href="#static_android.control.maxRegionsAwb">android.<wbr/>control.<wbr/>max<wbr/>Regions<wbr/>Awb</a>.<wbr/></p>
-<p>The coordinate system is based on the active pixel array,<wbr/>
-with (0,<wbr/>0) being the top-left pixel in the active pixel array,<wbr/> and
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/>0) being
+the top-left pixel in the active pixel array,<wbr/> and
 (<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the
-bottom-right pixel in the active pixel array.<wbr/></p>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array,<wbr/> and
+(<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right
+pixel in the pre-correction active pixel array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array,<wbr/> and
+(<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>width - 1,<wbr/>
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>height - 1) being the bottom-right pixel in the
+active pixel array.<wbr/></p>
 <p>The weight must range from 0 to 1000,<wbr/> and represents a weight
 for every pixel in the area.<wbr/> This means that a large metering area
 with the same weight as a smaller area will have more effect in
@@ -8341,7 +8459,9 @@ int[5 * area_<wbr/>count].<wbr/>
 Every five elements represent a metering region of
 (xmin,<wbr/> ymin,<wbr/> xmax,<wbr/> ymax,<wbr/> weight).<wbr/>
 The rectangle is defined to be inclusive on xmin and ymin,<wbr/> but
-exclusive on xmax and ymax.<wbr/></p>
+exclusive on xmax and ymax.<wbr/>
+HAL must always report metering regions in the coordinate system of pre-correction
+active array.<wbr/></p>
             </td>
           </tr>
 
@@ -11680,9 +11800,9 @@ the camera device will handle thumbnail rotation in one of the following ways:</
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>The HAL must not squeeze or stretch the downscaled primary image to generate thumbnail.<wbr/>
-The cropping must be done on the primary jpeg image rather than the sensor active array.<wbr/>
-The stream cropping rule specified by "S5.<wbr/> Cropping" in camera3.<wbr/>h doesn't apply to the
-thumbnail image cropping.<wbr/></p>
+The cropping must be done on the primary jpeg image rather than the sensor pre-correction
+active array.<wbr/> The stream cropping rule specified by "S5.<wbr/> Cropping" in camera3.<wbr/>h doesn't
+apply to the thumbnail image cropping.<wbr/></p>
             </td>
           </tr>
 
@@ -12397,9 +12517,9 @@ the camera device will handle thumbnail rotation in one of the following ways:</
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>The HAL must not squeeze or stretch the downscaled primary image to generate thumbnail.<wbr/>
-The cropping must be done on the primary jpeg image rather than the sensor active array.<wbr/>
-The stream cropping rule specified by "S5.<wbr/> Cropping" in camera3.<wbr/>h doesn't apply to the
-thumbnail image cropping.<wbr/></p>
+The cropping must be done on the primary jpeg image rather than the sensor pre-correction
+active array.<wbr/> The stream cropping rule specified by "S5.<wbr/> Cropping" in camera3.<wbr/>h doesn't
+apply to the thumbnail image cropping.<wbr/></p>
             </td>
           </tr>
 
@@ -13565,7 +13685,9 @@ coordinate system,<wbr/> but not the origin.<wbr/></p>
 <p>If this device is the largest or only camera device with a given facing,<wbr/> then this
 position will be <code>(0,<wbr/> 0,<wbr/> 0)</code>; a camera device with a lens optical center located 3 cm
 from the main sensor along the +X axis (to the right from the user's perspective) will
-report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
+report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/>  Note that this means that,<wbr/> for many computer vision
+applications,<wbr/> the position needs to be negated to convert it to a translation from the
+camera to the origin.<wbr/></p>
 <p>To transform a pixel coordinates between two cameras facing the same direction,<wbr/> first
 the source camera <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> must be corrected for.<wbr/>  Then the source
 camera <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> needs to be applied,<wbr/> followed by the
@@ -13577,7 +13699,8 @@ coordinates.<wbr/></p>
 <p>To compare this against a real image from the destination camera,<wbr/> the destination camera
 image then needs to be corrected for radial distortion before comparison or sampling.<wbr/></p>
 <p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is GYROSCOPE,<wbr/> then this position is relative to
-the center of the primary gyroscope on the device.<wbr/></p>
+the center of the primary gyroscope on the device.<wbr/> The axis definitions are the same as
+with PRIMARY_<wbr/>CAMERA.<wbr/></p>
             </td>
           </tr>
 
@@ -13655,13 +13778,15 @@ being aligned with the lens plane.<wbr/></p>
 </code></pre>
 <p>which can then be combined with the camera pose rotation
 <code>R</code> and translation <code>t</code> (<a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> and
-<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respective) to calculate the
+<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respectively) to calculate the
 complete transform from world coordinates to pixel
 coordinates:</p>
-<pre><code>P = [ K 0   * [ R t
-     0 1 ]     0 1 ]
+<pre><code>P = [ K 0   * [ R -Rt
+     0 1 ]      0 1 ]
 </code></pre>
-<p>and with <code>p_<wbr/>w</code> being a point in the world coordinate system
+<p>(Note the negation of poseTranslation when mapping from camera
+to world coordinates,<wbr/> and multiplication by the rotation).<wbr/></p>
+<p>With <code>p_<wbr/>w</code> being a point in the world coordinate system
 and <code>p_<wbr/>s</code> being a point in the camera active pixel array
 coordinate system,<wbr/> and with the mapping including the
 homogeneous division by z:</p>
@@ -13683,6 +13808,13 @@ system (where <code>(0,<wbr/> 0)</code> is the top-left of the
 activeArraySize rectangle),<wbr/> to determine the final pixel
 coordinate of the world point for processed (non-RAW)
 output buffers.<wbr/></p>
+<p>For camera devices,<wbr/> the center of pixel <code>(x,<wbr/>y)</code> is located at
+coordinate <code>(x + 0.<wbr/>5,<wbr/> y + 0.<wbr/>5)</code>.<wbr/>  So on a device with a
+precorrection active array of size <code>(10,<wbr/>10)</code>,<wbr/> the valid pixel
+indices go from <code>(0,<wbr/>0)-(9,<wbr/>9)</code>,<wbr/> and an perfectly-built camera would
+have an optical center at the exact center of the pixel grid,<wbr/> at
+coordinates <code>(5.<wbr/>0,<wbr/> 5.<wbr/>0)</code>,<wbr/> which is the top-left corner of pixel
+<code>(5,<wbr/>5)</code>.<wbr/></p>
             </td>
           </tr>
 
@@ -14582,7 +14714,9 @@ coordinate system,<wbr/> but not the origin.<wbr/></p>
 <p>If this device is the largest or only camera device with a given facing,<wbr/> then this
 position will be <code>(0,<wbr/> 0,<wbr/> 0)</code>; a camera device with a lens optical center located 3 cm
 from the main sensor along the +X axis (to the right from the user's perspective) will
-report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
+report <code>(0.<wbr/>03,<wbr/> 0,<wbr/> 0)</code>.<wbr/>  Note that this means that,<wbr/> for many computer vision
+applications,<wbr/> the position needs to be negated to convert it to a translation from the
+camera to the origin.<wbr/></p>
 <p>To transform a pixel coordinates between two cameras facing the same direction,<wbr/> first
 the source camera <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> must be corrected for.<wbr/>  Then the source
 camera <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> needs to be applied,<wbr/> followed by the
@@ -14594,7 +14728,8 @@ coordinates.<wbr/></p>
 <p>To compare this against a real image from the destination camera,<wbr/> the destination camera
 image then needs to be corrected for radial distortion before comparison or sampling.<wbr/></p>
 <p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is GYROSCOPE,<wbr/> then this position is relative to
-the center of the primary gyroscope on the device.<wbr/></p>
+the center of the primary gyroscope on the device.<wbr/> The axis definitions are the same as
+with PRIMARY_<wbr/>CAMERA.<wbr/></p>
             </td>
           </tr>
 
@@ -14672,13 +14807,15 @@ being aligned with the lens plane.<wbr/></p>
 </code></pre>
 <p>which can then be combined with the camera pose rotation
 <code>R</code> and translation <code>t</code> (<a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> and
-<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respective) to calculate the
+<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> respectively) to calculate the
 complete transform from world coordinates to pixel
 coordinates:</p>
-<pre><code>P = [ K 0   * [ R t
-     0 1 ]     0 1 ]
+<pre><code>P = [ K 0   * [ R -Rt
+     0 1 ]      0 1 ]
 </code></pre>
-<p>and with <code>p_<wbr/>w</code> being a point in the world coordinate system
+<p>(Note the negation of poseTranslation when mapping from camera
+to world coordinates,<wbr/> and multiplication by the rotation).<wbr/></p>
+<p>With <code>p_<wbr/>w</code> being a point in the world coordinate system
 and <code>p_<wbr/>s</code> being a point in the camera active pixel array
 coordinate system,<wbr/> and with the mapping including the
 homogeneous division by z:</p>
@@ -14700,6 +14837,13 @@ system (where <code>(0,<wbr/> 0)</code> is the top-left of the
 activeArraySize rectangle),<wbr/> to determine the final pixel
 coordinate of the world point for processed (non-RAW)
 output buffers.<wbr/></p>
+<p>For camera devices,<wbr/> the center of pixel <code>(x,<wbr/>y)</code> is located at
+coordinate <code>(x + 0.<wbr/>5,<wbr/> y + 0.<wbr/>5)</code>.<wbr/>  So on a device with a
+precorrection active array of size <code>(10,<wbr/>10)</code>,<wbr/> the valid pixel
+indices go from <code>(0,<wbr/>0)-(9,<wbr/>9)</code>,<wbr/> and an perfectly-built camera would
+have an optical center at the exact center of the pixel grid,<wbr/> at
+coordinates <code>(5.<wbr/>0,<wbr/> 5.<wbr/>0)</code>,<wbr/> which is the top-left corner of pixel
+<code>(5,<wbr/>5)</code>.<wbr/></p>
             </td>
           </tr>
 
@@ -17094,11 +17238,11 @@ the recommendation is to switch between the first rear camera and the first fron
 camera in the list of supported camera devices.<wbr/></p>
 <p>This capability requires the camera device to support the following:</p>
 <ul>
-<li>This camera device must list the following static metadata entries in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>:<ul>
-<li><a href="#static_android.logicalMultiCamera.physicalIds">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>physical<wbr/>Ids</a></li>
-<li><a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a></li>
-</ul>
-</li>
+<li>The IDs of underlying physical cameras are returned via
+  <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getPhysicalCameraIds">CameraCharacteristics#getPhysicalCameraIds</a>.<wbr/></li>
+<li>This camera device must list static metadata
+  <a href="#static_android.logicalMultiCamera.sensorSyncType">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>sensor<wbr/>Sync<wbr/>Type</a> in
+  <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>.<wbr/></li>
 <li>The underlying physical cameras' static metadata must list the following entries,<wbr/>
   so that the application can correlate pixels from the physical streams:<ul>
 <li><a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a></li>
@@ -18083,7 +18227,9 @@ pipeline stages were actually used.<wbr/></p>
 
             <td class="entry_units">
               Pixel coordinates relative to
-          android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+          android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+          android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on distortion correction
+          capability and mode
             </td>
 
             <td class="entry_range">
@@ -18106,9 +18252,17 @@ pipeline stages were actually used.<wbr/></p>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>This control can be used to implement digital zoom.<wbr/></p>
-<p>The crop region coordinate system is based off
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being the
-top-left corner of the sensor active array.<wbr/></p>
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being
+the top-left pixel of the active array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
 <p>Output streams use this rectangle to produce their output,<wbr/>
 cropping to a smaller region if necessary to maintain the
 stream's aspect ratio,<wbr/> then scaling the sensor input to
@@ -18127,10 +18281,16 @@ region.<wbr/> 16:9 streams will further crop vertically
 outputs will crop horizontally (pillarbox),<wbr/> and 16:9
 streams will match exactly.<wbr/> These additional crops will
 be centered within the crop region.<wbr/></p>
-<p>The width and height of the crop region cannot
-be set to be smaller than
+<p>If the coordinate system is <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> the width and height
+of the crop region cannot be set to be smaller than
 <code>floor( activeArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code> and
 <code>floor( activeArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/> respectively.<wbr/></p>
+<p>If the coordinate system is <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> the width
+and height of the crop region cannot be set to be smaller than
+<code>floor( preCorrectionActiveArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>
+and
+<code>floor( preCorrectionActiveArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/>
+respectively.<wbr/></p>
 <p>The camera device may adjust the crop region to account
 for rounding and other hardware requirements; the final
 crop region used will be included in the output capture
@@ -18152,34 +18312,35 @@ rounded to nearest larger supportable width,<wbr/> especially
 for raw output,<wbr/> where only a few fixed scales may be
 possible.<wbr/></p>
 <p>For a set of output streams configured,<wbr/> if the sensor output is cropped to a smaller
-size than active array size,<wbr/> the HAL need follow below cropping rules:</p>
+size than pre-correction active array size,<wbr/> the HAL need follow below cropping rules:</p>
 <ul>
 <li>
-<p>The HAL need handle the cropRegion as if the sensor crop size is the effective active
-array size.<wbr/>More specifically,<wbr/> the HAL must transform the request cropRegion from
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> to the sensor cropped pixel area size in this way:</p>
+<p>The HAL need handle the cropRegion as if the sensor crop size is the effective
+pre-correction active array size.<wbr/> More specifically,<wbr/> the HAL must transform the request
+cropRegion from <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a> to the sensor cropped
+pixel area size in this way:</p>
 <ol>
 <li>Translate the requested cropRegion w.<wbr/>r.<wbr/>t.,<wbr/> the left top corner of the sensor
 cropped pixel area by (tx,<wbr/> ty),<wbr/>
-where <code>ty = sensorCrop.<wbr/>top * (sensorCrop.<wbr/>height /<wbr/> activeArraySize.<wbr/>height)</code>
-and <code>tx = sensorCrop.<wbr/>left * (sensorCrop.<wbr/>width /<wbr/> activeArraySize.<wbr/>width)</code>.<wbr/> The
-(sensorCrop.<wbr/>top,<wbr/> sensorCrop.<wbr/>left) is the coordinate based off the
+where <code>ty = sensorCrop.<wbr/>top * (sensorCrop.<wbr/>height /<wbr/> preCorrectionActiveArraySize.<wbr/>height)</code>
+and <code>tx = sensorCrop.<wbr/>left * (sensorCrop.<wbr/>width /<wbr/> preCorrectionActiveArraySize.<wbr/>width)</code>.<wbr/>
+The (sensorCrop.<wbr/>top,<wbr/> sensorCrop.<wbr/>left) is the coordinate based off the
 <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></li>
 <li>Scale the width and height of requested cropRegion with scaling factor of
-sensor<wbr/>Crop.<wbr/>width/<wbr/>active<wbr/>Array<wbr/>Size.<wbr/>width and sensor<wbr/>Crop.<wbr/>height/<wbr/>active<wbr/>Array<wbr/>Size.<wbr/>height
+sensor<wbr/>Crop.<wbr/>width/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size.<wbr/>width and sensor<wbr/>Crop.<wbr/>height/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size.<wbr/>height
 respectively.<wbr/>
 Once this new cropRegion is calculated,<wbr/> the HAL must use this region to crop the image
-with regard to the sensor crop size (effective active array size).<wbr/> The HAL still need
-follow the general cropping rule for this new cropRegion and effective active
-array size.<wbr/></li>
+with regard to the sensor crop size (effective pre-correction active array size).<wbr/> The
+HAL still need follow the general cropping rule for this new cropRegion and effective
+pre-correction active array size.<wbr/></li>
 </ol>
 </li>
 <li>
-<p>The HAL must report the cropRegion with regard to <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>
-The HAL need convert the new cropRegion generated above w.<wbr/>r.<wbr/>t.,<wbr/> full active array size.<wbr/>
-The reported cropRegion may be slightly different with the requested cropRegion since
-the HAL may adjust the crop region to account for rounding,<wbr/> conversion error,<wbr/> or other
-hardware limitations.<wbr/></p>
+<p>The HAL must report the cropRegion with regard to <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>
+The HAL need convert the new cropRegion generated above w.<wbr/>r.<wbr/>t.,<wbr/> full pre-correction
+active array size.<wbr/> The reported cropRegion may be slightly different with the requested
+cropRegion since the HAL may adjust the crop region to account for rounding,<wbr/> conversion
+error,<wbr/> or other hardware limitations.<wbr/></p>
 </li>
 </ul>
 <p>HAL2.<wbr/>x uses only (x,<wbr/> y,<wbr/> width)</p>
@@ -19683,7 +19844,9 @@ return the final used crop region in capture result metadata <a href="#controls_
 
             <td class="entry_units">
               Pixel coordinates relative to
-          android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size
+          android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+          android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size depending on distortion correction
+          capability and mode
             </td>
 
             <td class="entry_range">
@@ -19706,9 +19869,17 @@ return the final used crop region in capture result metadata <a href="#controls_
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>This control can be used to implement digital zoom.<wbr/></p>
-<p>The crop region coordinate system is based off
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being the
-top-left corner of the sensor active array.<wbr/></p>
+<p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being
+the top-left pixel of the active array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
 <p>Output streams use this rectangle to produce their output,<wbr/>
 cropping to a smaller region if necessary to maintain the
 stream's aspect ratio,<wbr/> then scaling the sensor input to
@@ -19727,10 +19898,16 @@ region.<wbr/> 16:9 streams will further crop vertically
 outputs will crop horizontally (pillarbox),<wbr/> and 16:9
 streams will match exactly.<wbr/> These additional crops will
 be centered within the crop region.<wbr/></p>
-<p>The width and height of the crop region cannot
-be set to be smaller than
+<p>If the coordinate system is <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> the width and height
+of the crop region cannot be set to be smaller than
 <code>floor( activeArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code> and
 <code>floor( activeArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/> respectively.<wbr/></p>
+<p>If the coordinate system is <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> the width
+and height of the crop region cannot be set to be smaller than
+<code>floor( preCorrectionActiveArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>
+and
+<code>floor( preCorrectionActiveArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/>
+respectively.<wbr/></p>
 <p>The camera device may adjust the crop region to account
 for rounding and other hardware requirements; the final
 crop region used will be included in the output capture
@@ -19752,34 +19929,35 @@ rounded to nearest larger supportable width,<wbr/> especially
 for raw output,<wbr/> where only a few fixed scales may be
 possible.<wbr/></p>
 <p>For a set of output streams configured,<wbr/> if the sensor output is cropped to a smaller
-size than active array size,<wbr/> the HAL need follow below cropping rules:</p>
+size than pre-correction active array size,<wbr/> the HAL need follow below cropping rules:</p>
 <ul>
 <li>
-<p>The HAL need handle the cropRegion as if the sensor crop size is the effective active
-array size.<wbr/>More specifically,<wbr/> the HAL must transform the request cropRegion from
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> to the sensor cropped pixel area size in this way:</p>
+<p>The HAL need handle the cropRegion as if the sensor crop size is the effective
+pre-correction active array size.<wbr/> More specifically,<wbr/> the HAL must transform the request
+cropRegion from <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a> to the sensor cropped
+pixel area size in this way:</p>
 <ol>
 <li>Translate the requested cropRegion w.<wbr/>r.<wbr/>t.,<wbr/> the left top corner of the sensor
 cropped pixel area by (tx,<wbr/> ty),<wbr/>
-where <code>ty = sensorCrop.<wbr/>top * (sensorCrop.<wbr/>height /<wbr/> activeArraySize.<wbr/>height)</code>
-and <code>tx = sensorCrop.<wbr/>left * (sensorCrop.<wbr/>width /<wbr/> activeArraySize.<wbr/>width)</code>.<wbr/> The
-(sensorCrop.<wbr/>top,<wbr/> sensorCrop.<wbr/>left) is the coordinate based off the
+where <code>ty = sensorCrop.<wbr/>top * (sensorCrop.<wbr/>height /<wbr/> preCorrectionActiveArraySize.<wbr/>height)</code>
+and <code>tx = sensorCrop.<wbr/>left * (sensorCrop.<wbr/>width /<wbr/> preCorrectionActiveArraySize.<wbr/>width)</code>.<wbr/>
+The (sensorCrop.<wbr/>top,<wbr/> sensorCrop.<wbr/>left) is the coordinate based off the
 <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></li>
 <li>Scale the width and height of requested cropRegion with scaling factor of
-sensor<wbr/>Crop.<wbr/>width/<wbr/>active<wbr/>Array<wbr/>Size.<wbr/>width and sensor<wbr/>Crop.<wbr/>height/<wbr/>active<wbr/>Array<wbr/>Size.<wbr/>height
+sensor<wbr/>Crop.<wbr/>width/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size.<wbr/>width and sensor<wbr/>Crop.<wbr/>height/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size.<wbr/>height
 respectively.<wbr/>
 Once this new cropRegion is calculated,<wbr/> the HAL must use this region to crop the image
-with regard to the sensor crop size (effective active array size).<wbr/> The HAL still need
-follow the general cropping rule for this new cropRegion and effective active
-array size.<wbr/></li>
+with regard to the sensor crop size (effective pre-correction active array size).<wbr/> The
+HAL still need follow the general cropping rule for this new cropRegion and effective
+pre-correction active array size.<wbr/></li>
 </ol>
 </li>
 <li>
-<p>The HAL must report the cropRegion with regard to <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>
-The HAL need convert the new cropRegion generated above w.<wbr/>r.<wbr/>t.,<wbr/> full active array size.<wbr/>
-The reported cropRegion may be slightly different with the requested cropRegion since
-the HAL may adjust the crop region to account for rounding,<wbr/> conversion error,<wbr/> or other
-hardware limitations.<wbr/></p>
+<p>The HAL must report the cropRegion with regard to <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/>
+The HAL need convert the new cropRegion generated above w.<wbr/>r.<wbr/>t.,<wbr/> full pre-correction
+active array size.<wbr/> The reported cropRegion may be slightly different with the requested
+cropRegion since the HAL may adjust the crop region to account for rounding,<wbr/> conversion
+error,<wbr/> or other hardware limitations.<wbr/></p>
 </li>
 </ul>
 <p>HAL2.<wbr/>x uses only (x,<wbr/> y,<wbr/> width)</p>
@@ -20401,8 +20579,18 @@ the full pixel array,<wbr/> and the size of the full pixel array is given by
 <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>,<wbr/> is defined relative to the active array rectangle given in
 this field,<wbr/> with <code>(0,<wbr/> 0)</code> being the top-left of this rectangle.<wbr/></p>
 <p>The active array may be smaller than the full pixel array,<wbr/> since the full array may
-include black calibration pixels or other inactive regions,<wbr/> and geometric correction
-resulting in scaling or cropping may have been applied.<wbr/></p>
+include black calibration pixels or other inactive regions.<wbr/></p>
+<p>For devices that do not support <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the active
+array must be the same as <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
+<p>For devices that support <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the active array must
+be enclosed by <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/> The difference between
+pre-correction active array and active array accounts for scaling or cropping caused
+by lens geometric distortion correction.<wbr/></p>
+<p>In general,<wbr/> application should always refer to active array size for controls like
+metering regions or crop region.<wbr/> Two exceptions are when the application is dealing with
+RAW image buffers (RAW_<wbr/>SENSOR,<wbr/> RAW10,<wbr/> RAW12 etc),<wbr/> or when application explicitly set
+<a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> to OFF.<wbr/> In these cases,<wbr/> application should refer
+to <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
             </td>
           </tr>
 
@@ -21157,9 +21345,9 @@ relative to the top,<wbr/>left of post-processed YUV output buffer with dimensio
 <ol>
 <li><a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a>.<wbr/></li>
 </ol>
-<p>If all of the geometric distortion fields are no-ops,<wbr/> this rectangle will be the same
-as the post-distortion-corrected rectangle given in
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
+<p>If the camera device doesn't support geometric distortion correction,<wbr/> or all of the
+geometric distortion fields are no-ops,<wbr/> this rectangle will be the same as the
+post-distortion-corrected rectangle given in <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
 <p>This rectangle is defined relative to the full pixel array; (0,<wbr/>0) is the top-left of
 the full pixel array,<wbr/> and the size of the full pixel array is given by
 <a href="#static_android.sensor.info.pixelArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pixel<wbr/>Array<wbr/>Size</a>.<wbr/></p>
@@ -24358,7 +24546,7 @@ the output result metadata.<wbr/></p>
                 
           <tr class="entry" id="controls_android.statistics.oisDataMode">
             <td class="entry_name
-             " rowspan="1">
+             " rowspan="3">
               android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
             </td>
             <td class="entry_type">
@@ -24384,8 +24572,8 @@ the output result metadata.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>A control for selecting whether OIS position information is included in output
-result metadata.<wbr/></p>
+              <p>A control for selecting whether optical stabilization (OIS) position
+information is included in output result metadata.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -24402,6 +24590,19 @@ result metadata.<wbr/></p>
             <td class="entry_tags">
             </td>
 
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Since optical image stabilization generally involves motion much faster than the duration
+of individualq image exposure,<wbr/> multiple OIS samples can be included for a single capture
+result.<wbr/> For example,<wbr/> if the OIS reporting operates at 200 Hz,<wbr/> a typical camera operating
+at 30fps may have 6-7 OIS samples per capture result.<wbr/> This information can be combined
+with the rolling shutter skew to account for lens motion during image exposure in
+post-processing algorithms.<wbr/></p>
+            </td>
           </tr>
 
 
@@ -25090,7 +25291,7 @@ assigned a new ID.<wbr/></p>
                 
           <tr class="entry" id="dynamic_android.statistics.faceLandmarks">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="5">
               android.<wbr/>statistics.<wbr/>face<wbr/>Landmarks
             </td>
             <td class="entry_type">
@@ -25138,12 +25339,30 @@ faces.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>The coordinate system is that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+              <p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being
+the top-left pixel of the active array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
 <code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
 <p>Only available if <a href="#controls_android.statistics.faceDetectMode">android.<wbr/>statistics.<wbr/>face<wbr/>Detect<wbr/>Mode</a> == FULL</p>
             </td>
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>HAL must always report face landmarks in the coordinate system of pre-correction
+active array.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -25151,7 +25370,7 @@ faces.<wbr/></p>
                 
           <tr class="entry" id="dynamic_android.statistics.faceRectangles">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="5">
               android.<wbr/>statistics.<wbr/>face<wbr/>Rectangles
             </td>
             <td class="entry_type">
@@ -25199,12 +25418,30 @@ faces.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>The coordinate system is that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+              <p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being
+the top-left pixel of the active array.<wbr/></p>
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
+system depends on the mode being set.<wbr/>
+When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
+<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array.<wbr/>
+When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
 <code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
 <p>Only available if <a href="#controls_android.statistics.faceDetectMode">android.<wbr/>statistics.<wbr/>face<wbr/>Detect<wbr/>Mode</a> != OFF</p>
             </td>
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>HAL must always report face rectangles in the coordinate system of pre-correction
+active array.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -26222,7 +26459,7 @@ the output result metadata.<wbr/></p>
                 
           <tr class="entry" id="dynamic_android.statistics.oisDataMode">
             <td class="entry_name
-             " rowspan="1">
+             " rowspan="3">
               android.<wbr/>statistics.<wbr/>ois<wbr/>Data<wbr/>Mode
             </td>
             <td class="entry_type">
@@ -26248,8 +26485,8 @@ the output result metadata.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>A control for selecting whether OIS position information is included in output
-result metadata.<wbr/></p>
+              <p>A control for selecting whether optical stabilization (OIS) position
+information is included in output result metadata.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -26266,6 +26503,19 @@ result metadata.<wbr/></p>
             <td class="entry_tags">
             </td>
 
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Since optical image stabilization generally involves motion much faster than the duration
+of individualq image exposure,<wbr/> multiple OIS samples can be included for a single capture
+result.<wbr/> For example,<wbr/> if the OIS reporting operates at 200 Hz,<wbr/> a typical camera operating
+at 30fps may have 6-7 OIS samples per capture result.<wbr/> This information can be combined
+with the rolling shutter skew to account for lens motion during image exposure in
+post-processing algorithms.<wbr/></p>
+            </td>
           </tr>
 
 
@@ -26374,11 +26624,15 @@ timebase as and comparable to <a href="#dynamic_android.sensor.timestamp">androi
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>The array contains the amount of shifts in x direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
-A positive value is a shift from left to right in active array coordinate system.<wbr/> For
-example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of
-(3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
+A positive value is a shift from left to right in the pre-correction active array
+coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in pre-correction
+active array coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
 <p>The number of shifts must match the number of timestamps in
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
+<p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+supporting devices).<wbr/> They are always reported in pre-correction active array coordinates,<wbr/>
+since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+is needed.<wbr/></p>
             </td>
           </tr>
 
@@ -26433,11 +26687,15 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>The array contains the amount of shifts in y direction,<wbr/> in pixels,<wbr/> based on OIS samples.<wbr/>
-A positive value is a shift from top to bottom in active array coordinate system.<wbr/> For
-example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of
-(0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
+A positive value is a shift from top to bottom in pre-correction active array coordinate
+system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordinates,<wbr/> a
+shift of (0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
 <p>The number of shifts must match the number of timestamps in
 <a href="#dynamic_android.statistics.oisTimestamps">android.<wbr/>statistics.<wbr/>ois<wbr/>Timestamps</a>.<wbr/></p>
+<p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+supporting devices).<wbr/> They are always reported in pre-correction active array coordinates,<wbr/>
+since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+is needed.<wbr/></p>
             </td>
           </tr>
 
@@ -26469,7 +26727,7 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>An array of OIS samples.<wbr/></p>
+              <p>An array of optical stabilization (OIS) position samples.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -26493,12 +26751,18 @@ example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array coordi
             <td class="entry_details" colspan="6">
               <p>Each OIS sample contains the timestamp and the amount of shifts in x and y direction,<wbr/>
 in pixels,<wbr/> of the OIS sample.<wbr/></p>
-<p>A positive value for a shift in x direction is a shift from left to right in active array
-coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array
-coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new optical center at (1003,<wbr/> 500).<wbr/></p>
-<p>A positive value for a shift in y direction is a shift from top to bottom in active array
-coordinate system.<wbr/> For example,<wbr/> if the optical center is (1000,<wbr/> 500) in active array
-coordinates,<wbr/> a shift of (0,<wbr/> 5) puts the new optical center at (1000,<wbr/> 505).<wbr/></p>
+<p>A positive value for a shift in x direction is a shift from left to right in the
+pre-correction active array coordinate system.<wbr/> For example,<wbr/> if the optical center is
+(1000,<wbr/> 500) in pre-correction active array coordinates,<wbr/> a shift of (3,<wbr/> 0) puts the new
+optical center at (1003,<wbr/> 500).<wbr/></p>
+<p>A positive value for a shift in y direction is a shift from top to bottom in
+pre-correction active array coordinate system.<wbr/> For example,<wbr/> if the optical center is
+(1000,<wbr/> 500) in active array coordinates,<wbr/> a shift of (0,<wbr/> 5) puts the new optical center at
+(1000,<wbr/> 505).<wbr/></p>
+<p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+supporting devices).<wbr/> They are always reported in pre-correction active array coordinates,<wbr/>
+since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+is needed.<wbr/></p>
             </td>
           </tr>
 
@@ -28290,12 +28554,26 @@ numerical value as well.<wbr/> To check if a given device is at least at a given
 the following code snippet can be used:</p>
 <pre><code>//<wbr/> Returns true if the device supports the required hardware level,<wbr/> or better.<wbr/>
 boolean isHardwareLevelSupported(CameraCharacteristics c,<wbr/> int requiredLevel) {
+    final int[] sortedHwLevels = {
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>LEGACY,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>EXTERNAL,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>LIMITED,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>FULL,<wbr/>
+        Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>3
+    };
     int deviceLevel = c.<wbr/>get(Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL);
-    if (deviceLevel == Camera<wbr/>Characteristics.<wbr/>INFO_<wbr/>SUPPORTED_<wbr/>HARDWARE_<wbr/>LEVEL_<wbr/>LEGACY) {
-        return requiredLevel == deviceLevel;
+    if (requiredLevel == deviceLevel) {
+        return true;
     }
-    //<wbr/> deviceLevel is not LEGACY,<wbr/> can use numerical sort
-    return requiredLevel &lt;= deviceLevel;
+
+    for (int sortedlevel : sortedHwLevels) {
+        if (sortedlevel == requiredLevel) {
+            return true;
+        } else if (sortedlevel == deviceLevel) {
+            return false;
+        }
+    }
+    return false; //<wbr/> Should never reach here
 }
 </code></pre>
 <p>At a high level,<wbr/> the levels are:</p>
@@ -28309,6 +28587,8 @@ boolean isHardwareLevelSupported(CameraCharacteristics c,<wbr/> int requiredLeve
   post-processing settings,<wbr/> and image capture at a high rate.<wbr/></li>
 <li><code>LEVEL_<wbr/>3</code> devices additionally support YUV reprocessing and RAW image capture,<wbr/> along
   with additional output stream configurations.<wbr/></li>
+<li><code>EXTERNAL</code> devices are similar to <code>LIMITED</code> devices with exceptions like some sensor or
+  lens information not reorted or less stable framerates.<wbr/></li>
 </ul>
 <p>See the individual level enums for full descriptions of the supported capabilities.<wbr/>  The
 <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a> entry describes the device's capabilities at a
@@ -29956,15 +30236,28 @@ will not slow down capture rate when applying correction.<wbr/> FAST may be the 
 any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
 similar amount of enhancement applied.<wbr/></p>
 <p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
-applied to any RAW output.<wbr/>  Metadata coordinates such as face rectangles or metering
-regions are also not affected by correction.<wbr/></p>
-<p>Applications enabling distortion correction need to pay extra attention when converting
-image coordinates between corrected output buffers and the sensor array.<wbr/> For example,<wbr/> if
-the app supports tap-to-focus and enables correction,<wbr/> it then has to apply the distortion
-model described in <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> to the image buffer tap coordinates to properly
-calculate the tap position on the sensor active array to be used with
-<a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a>.<wbr/> The same applies in reverse to detected face rectangles if
-they need to be drawn on top of the corrected output buffers.<wbr/></p>
+applied to any RAW output.<wbr/></p>
+<p>This control will be on by default on devices that support this control.<wbr/> Applications
+disabling distortion correction need to pay extra attention with the coordinate system of
+metering regions,<wbr/> crop region,<wbr/> and face rectangles.<wbr/> When distortion correction is OFF,<wbr/>
+metadata coordinates follow the coordinate system of
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/> When distortion is not OFF,<wbr/> metadata
+coordinates follow the coordinate system of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>  The
+camera device will map these metadata fields to match the corrected image produced by the
+camera device,<wbr/> for both capture requests and results.<wbr/>  However,<wbr/> this mapping is not very
+precise,<wbr/> since rectangles do not generally map to rectangles when corrected.<wbr/>  Only linear
+scaling between the active array and precorrection active array coordinates is
+performed.<wbr/> Applications that require precise correction of metadata need to undo that
+linear scaling,<wbr/> and apply a more complete correction that takes into the account the app's
+own requirements.<wbr/></p>
+<p>The full list of metadata that is affected in this way by distortion correction is:</p>
+<ul>
+<li><a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
+<li><a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a></li>
+<li><a href="#dynamic_android.statistics.faces">android.<wbr/>statistics.<wbr/>faces</a></li>
+</ul>
             </td>
           </tr>
 
@@ -30170,15 +30463,28 @@ will not slow down capture rate when applying correction.<wbr/> FAST may be the 
 any correction at all would slow down capture rate.<wbr/>  Every output stream will have a
 similar amount of enhancement applied.<wbr/></p>
 <p>The correction only applies to processed outputs such as YUV,<wbr/> JPEG,<wbr/> or DEPTH16; it is not
-applied to any RAW output.<wbr/>  Metadata coordinates such as face rectangles or metering
-regions are also not affected by correction.<wbr/></p>
-<p>Applications enabling distortion correction need to pay extra attention when converting
-image coordinates between corrected output buffers and the sensor array.<wbr/> For example,<wbr/> if
-the app supports tap-to-focus and enables correction,<wbr/> it then has to apply the distortion
-model described in <a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a> to the image buffer tap coordinates to properly
-calculate the tap position on the sensor active array to be used with
-<a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a>.<wbr/> The same applies in reverse to detected face rectangles if
-they need to be drawn on top of the corrected output buffers.<wbr/></p>
+applied to any RAW output.<wbr/></p>
+<p>This control will be on by default on devices that support this control.<wbr/> Applications
+disabling distortion correction need to pay extra attention with the coordinate system of
+metering regions,<wbr/> crop region,<wbr/> and face rectangles.<wbr/> When distortion correction is OFF,<wbr/>
+metadata coordinates follow the coordinate system of
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>.<wbr/> When distortion is not OFF,<wbr/> metadata
+coordinates follow the coordinate system of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/>  The
+camera device will map these metadata fields to match the corrected image produced by the
+camera device,<wbr/> for both capture requests and results.<wbr/>  However,<wbr/> this mapping is not very
+precise,<wbr/> since rectangles do not generally map to rectangles when corrected.<wbr/>  Only linear
+scaling between the active array and precorrection active array coordinates is
+performed.<wbr/> Applications that require precise correction of metadata need to undo that
+linear scaling,<wbr/> and apply a more complete correction that takes into the account the app's
+own requirements.<wbr/></p>
+<p>The full list of metadata that is affected in this way by distortion correction is:</p>
+<ul>
+<li><a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a></li>
+<li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
+<li><a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a></li>
+<li><a href="#dynamic_android.statistics.faces">android.<wbr/>statistics.<wbr/>faces</a></li>
+</ul>
             </td>
           </tr>
 
