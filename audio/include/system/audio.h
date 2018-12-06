@@ -85,6 +85,22 @@ typedef struct {
     char                 tags[AUDIO_ATTRIBUTES_TAGS_MAX_SIZE]; /* UTF8 */
 } __attribute__((packed)) audio_attributes_t; // sent through Binder;
 
+static const audio_attributes_t AUDIO_ATTRIBUTES_INITIALIZER = {
+    /* .content_type = */ AUDIO_CONTENT_TYPE_UNKNOWN,
+    /* .usage = */ AUDIO_USAGE_UNKNOWN,
+    /* .source = */ AUDIO_SOURCE_DEFAULT,
+    /* .flags = */ AUDIO_INPUT_FLAG_NONE,
+    /* .tags = */ ""
+};
+
+static inline audio_attributes_t attributes_initializer(audio_usage_t usage)
+{
+    audio_attributes_t attributes = AUDIO_ATTRIBUTES_INITIALIZER;
+    attributes.usage = usage;
+    return attributes;
+}
+
+
 /* a unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
  * effect ID (int), audio_module_handle_t, and audio_patch_handle_t.
  * Audio port IDs (audio_port_handle_t) are allocated by AudioPolicy
