@@ -443,7 +443,7 @@ typedef enum camera_metadata_tag {
                                                       // int32[]      | ndk_public   | HIDL v3.4
     ANDROID_DEPTH_END,
 
-    ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS =       // byte[]       | hidden       | HIDL v3.3
+    ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS =       // byte[]       | ndk_public   | HIDL v3.3
             ANDROID_LOGICAL_MULTI_CAMERA_START,
     ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE,    // enum         | public       | HIDL v3.3
     ANDROID_LOGICAL_MULTI_CAMERA_END,
