@@ -883,6 +883,22 @@ static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t cha
             AUDIO_CHANNEL_REPRESENTATION_POSITION, bits);
 }
 
+/* Derive a default haptic channel mask from a channel count.
+ */
+static inline audio_channel_mask_t haptic_channel_mask_from_count(uint32_t channel_count)
+{
+    switch(channel_count) {
+    case 0:
+        return AUDIO_CHANNEL_NONE;
+    case 1:
+        return AUDIO_CHANNEL_OUT_HAPTIC_A;
+    case 2:
+        return AUDIO_CHANNEL_OUT_HAPTIC_AB;
+    default:
+        return AUDIO_CHANNEL_INVALID;
+    }
+}
+
 static inline audio_channel_mask_t audio_channel_mask_in_to_out(audio_channel_mask_t in)
 {
     switch (in) {
@@ -925,6 +941,20 @@ static inline audio_channel_mask_t audio_channel_mask_out_to_in(audio_channel_ma
     default:
         return AUDIO_CHANNEL_INVALID;
     }
+}
+
+static inline bool audio_channel_position_mask_is_out_canonical(audio_channel_mask_t channelMask)
+{
+    if (audio_channel_mask_get_representation(channelMask)
+            != AUDIO_CHANNEL_REPRESENTATION_POSITION) {
+        return false;
+    }
+    const uint32_t audioChannelCount = audio_channel_count_from_out_mask(
+            channelMask & ~AUDIO_CHANNEL_HAPTIC_ALL);
+    const uint32_t hapticChannelCount = audio_channel_count_from_out_mask(
+            channelMask & AUDIO_CHANNEL_HAPTIC_ALL);
+    return channelMask == (audio_channel_out_mask_from_count(audioChannelCount) |
+            haptic_channel_mask_from_count(hapticChannelCount));
 }
 
 static inline bool audio_is_valid_format(audio_format_t format)
