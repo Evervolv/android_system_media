@@ -134,6 +134,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <typedef name="oisSample">
       <language name="java">android.hardware.camera2.params.OisSample</language>
     </typedef>
+    <typedef name="mandatoryStreamCombination">
+      <language name="java">android.hardware.camera2.params.MandatoryStreamCombination</language>
+    </typedef>
   </types>
 
   <namespace name="android">
@@ -6687,6 +6690,40 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           android.scaler.availableInputOutputFormatsMap.
           </hal_details>
           <tag id="REPROC" />
+        </entry>
+        <entry name="mandatoryStreamCombinations" type="int32" visibility="java_public"
+          synthetic="true" container="array" typedef="mandatoryStreamCombination" hwlevel="limited">
+          <array>
+            <size>n</size>
+          </array>
+          <description>
+          An array of mandatory stream combinations generated according to the camera device
+          {@link android.hardware.camera2.CameraCharacteristics#INFO_SUPPORTED_HARDWARE_LEVEL}
+          and {@link android.hardware.camera2.CameraCharacteristics#REQUEST_AVAILABLE_CAPABILITIES}.
+          This is an app-readable conversion of the mandatory stream combination
+          {@link android.hardware.camera2.CameraDevice#createCaptureSession tables}.
+          </description>
+          <details>
+          The array of
+          {@link android.hardware.camera2.params.MandatoryStreamCombination combinations} is
+          generated according to the documented
+          {@link android.hardware.camera2.CameraDevice#createCaptureSession guideline} based on
+          specific device level and capabilities.
+          Clients can use the array as a quick reference to find an appropriate camera stream
+          combination.
+          As per documentation, the stream combinations with given PREVIEW, RECORD and
+          MAXIMUM resolutions and anything smaller from the list given by
+          {@link android.hardware.camera2.params.StreamConfigurationMap#getOutputSizes} are
+          guaranteed to work.
+          The mandatory stream combination array will be {@code null} in case the device is a
+          physical camera not independently exposed in
+          {@link android.hardware.camera2.CameraManager#getCameraIdList} or is not backward
+          compatible.
+          </details>
+          <hal_details>
+          Do not set this property directly
+          (it is synthetic and will not be available at the HAL layer).
+          </hal_details>
         </entry>
       </static>
     </section>
