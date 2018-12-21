@@ -10233,7 +10233,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     </section>
     <section name="logicalMultiCamera">
       <static>
-        <entry name="physicalIds" type="byte" visibility="hidden"
+        <entry name="physicalIds" type="byte" visibility="ndk_public"
                container="array" hwlevel="limited" hal_version="3.3">
           <array>
             <size>n</size>
