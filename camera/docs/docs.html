@@ -1179,6 +1179,12 @@
             ><a href="#static_android.depth.depthIsExclusive">android.depth.depthIsExclusive</a></li>
             <li
             ><a href="#static_android.depth.availableRecommendedDepthStreamConfigurations">android.depth.availableRecommendedDepthStreamConfigurations</a></li>
+            <li
+            ><a href="#static_android.depth.availableDynamicDepthStreamConfigurations">android.depth.availableDynamicDepthStreamConfigurations</a></li>
+            <li
+            ><a href="#static_android.depth.availableDynamicDepthMinFrameDurations">android.depth.availableDynamicDepthMinFrameDurations</a></li>
+            <li
+            ><a href="#static_android.depth.availableDynamicDepthStallDurations">android.depth.availableDynamicDepthStallDurations</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -30602,6 +30608,236 @@ For additional requirements on depth streams please consider
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="static_android.depth.availableDynamicDepthStreamConfigurations">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>depth.<wbr/>available<wbr/>Dynamic<wbr/>Depth<wbr/>Stream<wbr/>Configurations
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n x 4
+                </span>
+              <span class="entry_type_visibility"> [ndk_public as streamConfiguration]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OUTPUT (v3.4)</span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">INPUT (v3.4)</span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The available dynamic depth dataspace stream
+configurations that this camera device supports
+(i.<wbr/>e.<wbr/> format,<wbr/> width,<wbr/> height,<wbr/> output/<wbr/>input stream).<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_DEPTH">DEPTH</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>These are output stream configurations for use with
+dataSpace DYNAMIC_<wbr/>DEPTH.<wbr/> The configurations are
+listed as <code>(format,<wbr/> width,<wbr/> height,<wbr/> input?)</code> tuples.<wbr/></p>
+<p>Only devices that support depth output for at least
+the HAL_<wbr/>PIXEL_<wbr/>FORMAT_<wbr/>Y16 dense depth map along with
+HAL_<wbr/>PIXEL_<wbr/>FORMAT_<wbr/>BLOB with the same size or size with
+the same aspect ratio can have dynamic depth dataspace
+stream configuration.<wbr/> <a href="#static_android.depth.depthIsExclusive">android.<wbr/>depth.<wbr/>depth<wbr/>Is<wbr/>Exclusive</a> also
+needs to be set to FALSE.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Do not set this property directly.<wbr/>
+It is populated by camera framework and must not be set
+at the HAL layer.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.depth.availableDynamicDepthMinFrameDurations">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>depth.<wbr/>available<wbr/>Dynamic<wbr/>Depth<wbr/>Min<wbr/>Frame<wbr/>Durations
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int64</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  4 x n
+                </span>
+              <span class="entry_type_visibility"> [ndk_public as streamConfigurationDuration]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>This lists the minimum frame duration for each
+format/<wbr/>size combination for dynamic depth output streams.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              (format,<wbr/> width,<wbr/> height,<wbr/> ns) x n
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_DEPTH">DEPTH</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This should correspond to the frame duration when only that
+stream is active,<wbr/> with all processing (typically in android.<wbr/>*.<wbr/>mode)
+set to either OFF or FAST.<wbr/></p>
+<p>When multiple streams are used in a request,<wbr/> the minimum frame
+duration will be max(individual stream min durations).<wbr/></p>
+<p>The minimum frame duration of a stream (of a particular format,<wbr/> size)
+is the same regardless of whether the stream is input or output.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Do not set this property directly.<wbr/>
+It is populated by camera framework and must not be set
+at the HAL layer.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.depth.availableDynamicDepthStallDurations">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>depth.<wbr/>available<wbr/>Dynamic<wbr/>Depth<wbr/>Stall<wbr/>Durations
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int64</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  4 x n
+                </span>
+              <span class="entry_type_visibility"> [ndk_public as streamConfigurationDuration]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>This lists the maximum stall duration for each
+output format/<wbr/>size combination for dynamic depth streams.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              (format,<wbr/> width,<wbr/> height,<wbr/> ns) x n
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>4</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_DEPTH">DEPTH</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>A stall duration is how much extra time would get added
+to the normal minimum frame duration for a repeating request
+that has streams with non-zero stall.<wbr/></p>
+<p>All dynamic depth output streams may have a nonzero stall
+duration.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Do not set this property directly.<wbr/>
+It is populated by camera framework and must not be set
+at the HAL layer.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -31334,6 +31570,9 @@ own requirements.<wbr/></p>
           <li><a href="#static_android.depth.availableDepthStreamConfigurations">android.depth.availableDepthStreamConfigurations</a> (static)</li>
           <li><a href="#static_android.depth.availableDepthMinFrameDurations">android.depth.availableDepthMinFrameDurations</a> (static)</li>
           <li><a href="#static_android.depth.availableDepthStallDurations">android.depth.availableDepthStallDurations</a> (static)</li>
+          <li><a href="#static_android.depth.availableDynamicDepthStreamConfigurations">android.depth.availableDynamicDepthStreamConfigurations</a> (static)</li>
+          <li><a href="#static_android.depth.availableDynamicDepthMinFrameDurations">android.depth.availableDynamicDepthMinFrameDurations</a> (static)</li>
+          <li><a href="#static_android.depth.availableDynamicDepthStallDurations">android.depth.availableDynamicDepthStallDurations</a> (static)</li>
         </ul>
       </li> <!-- tag_DEPTH -->
       <li id="tag_REPROC">REPROC - 

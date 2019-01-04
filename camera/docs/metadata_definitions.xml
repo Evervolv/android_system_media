@@ -10229,6 +10229,92 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           android.depth.availableDepthStreamConfigurations.
           </hal_details>
         </entry>
+        <entry name="availableDynamicDepthStreamConfigurations" type="int32" visibility="ndk_public"
+               enum="true" container="array" typedef="streamConfiguration" hal_version="3.4">
+          <array>
+            <size>n</size>
+            <size>4</size>
+          </array>
+          <enum>
+            <value>OUTPUT</value>
+            <value>INPUT</value>
+          </enum>
+          <description>The available dynamic depth dataspace stream
+          configurations that this camera device supports
+          (i.e. format, width, height, output/input stream).
+          </description>
+          <details>
+            These are output stream configurations for use with
+            dataSpace DYNAMIC_DEPTH. The configurations are
+            listed as `(format, width, height, input?)` tuples.
+
+            Only devices that support depth output for at least
+            the HAL_PIXEL_FORMAT_Y16 dense depth map along with
+            HAL_PIXEL_FORMAT_BLOB with the same size or size with
+            the same aspect ratio can have dynamic depth dataspace
+            stream configuration. android.depth.depthIsExclusive also
+            needs to be set to FALSE.
+          </details>
+          <hal_details>
+            Do not set this property directly.
+            It is populated by camera framework and must not be set
+            at the HAL layer.
+          </hal_details>
+          <tag id="DEPTH" />
+        </entry>
+        <entry name="availableDynamicDepthMinFrameDurations" type="int64" visibility="ndk_public"
+               container="array" typedef="streamConfigurationDuration" hal_version="3.4">
+          <array>
+            <size>4</size>
+            <size>n</size>
+          </array>
+          <description>This lists the minimum frame duration for each
+          format/size combination for dynamic depth output streams.
+          </description>
+          <units>(format, width, height, ns) x n</units>
+          <details>
+          This should correspond to the frame duration when only that
+          stream is active, with all processing (typically in android.*.mode)
+          set to either OFF or FAST.
+
+          When multiple streams are used in a request, the minimum frame
+          duration will be max(individual stream min durations).
+
+          The minimum frame duration of a stream (of a particular format, size)
+          is the same regardless of whether the stream is input or output.
+          </details>
+          <hal_details>
+            Do not set this property directly.
+            It is populated by camera framework and must not be set
+            at the HAL layer.
+          </hal_details>
+          <tag id="DEPTH" />
+        </entry>
+        <entry name="availableDynamicDepthStallDurations" type="int64" visibility="ndk_public"
+               container="array" typedef="streamConfigurationDuration" hal_version="3.4">
+          <array>
+            <size>4</size>
+            <size>n</size>
+          </array>
+          <description>This lists the maximum stall duration for each
+          output format/size combination for dynamic depth streams.
+          </description>
+          <units>(format, width, height, ns) x n</units>
+          <details>
+          A stall duration is how much extra time would get added
+          to the normal minimum frame duration for a repeating request
+          that has streams with non-zero stall.
+
+          All dynamic depth output streams may have a nonzero stall
+          duration.
+          </details>
+          <hal_details>
+            Do not set this property directly.
+            It is populated by camera framework and must not be set
+            at the HAL layer.
+          </hal_details>
+          <tag id="DEPTH" />
+        </entry>
       </static>
     </section>
     <section name="logicalMultiCamera">
