@@ -579,17 +579,21 @@ struct audio_mmap_position {
                                     is called */
 };
 
-/** Metadata of a record track for an in stream. */
+/** Metadata of a playback track for an in stream. */
 typedef struct playback_track_metadata {
     audio_usage_t usage;
     audio_content_type_t content_type;
     float gain; // Normalized linear volume. 0=silence, 1=0dbfs...
 } playback_track_metadata_t;
 
-/** Metadata of a playback track for an out stream. */
+/** Metadata of a record track for an out stream. */
 typedef struct record_track_metadata {
     audio_source_t source;
     float gain; // Normalized linear volume. 0=silence, 1=0dbfs...
+    // For record tracks originating from a software patch, the dest_device
+    // fields provide information about the downstream device.
+    audio_devices_t dest_device;
+    char dest_device_address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
 } record_track_metadata_t;
 
 
