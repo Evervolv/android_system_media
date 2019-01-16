@@ -36,7 +36,7 @@ enum {
    /** Total number of stream. */
     AUDIO_STREAM_CNT          = AUDIO_STREAM_PATCH + 1,
 
-    AUDIO_SOURCE_MAX          = AUDIO_SOURCE_UNPROCESSED,
+    AUDIO_SOURCE_MAX          = AUDIO_SOURCE_VOICE_PERFORMANCE,
     AUDIO_SOURCE_CNT          = AUDIO_SOURCE_MAX + 1,
 
     AUDIO_MODE_MAX            = AUDIO_MODE_IN_COMMUNICATION,
@@ -161,6 +161,7 @@ enum {
                                 AUDIO_DEVICE_IN_PROXY |
                                 AUDIO_DEVICE_IN_USB_HEADSET |
                                 AUDIO_DEVICE_IN_BLUETOOTH_BLE |
+                                AUDIO_DEVICE_IN_ECHO_REFERENCE |
                                 AUDIO_DEVICE_IN_DEFAULT,
 
     AUDIO_DEVICE_IN_ALL_SCO   = AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
