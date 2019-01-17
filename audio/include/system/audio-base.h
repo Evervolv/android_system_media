@@ -460,6 +460,12 @@ typedef enum {
     AUDIO_LATENCY_NORMAL = 1, // (::android::hardware::audio::common::V4_0::AudioMixLatencyClass.LOW implicitly + 1)
 } audio_mix_latency_class_t;
 
+typedef enum {
+    MIC_DIRECTION_UNSPECIFIED = 0,
+    MIC_DIRECTION_FRONT = 1,
+    MIC_DIRECTION_BACK = 2,
+    MIC_DIRECTION_EXTERNAL = 3,
+} audio_microphone_direction_t;
 #ifdef __cplusplus
 }
 #endif
