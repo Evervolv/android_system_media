@@ -109,6 +109,9 @@ typedef enum {
     AUDIO_FORMAT_AC4                 = 0x22000000u,
     AUDIO_FORMAT_LDAC                = 0x23000000u,
     AUDIO_FORMAT_MAT                 = 0x24000000u,
+    AUDIO_FORMAT_AAC_LATM            = 0x25000000u,
+    AUDIO_FORMAT_CELT                = 0x26000000u,
+    AUDIO_FORMAT_APTX_ADAPTIVE       = 0x27000000u,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000u,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFu,
 
@@ -173,6 +176,9 @@ typedef enum {
     AUDIO_FORMAT_AAC_ADTS_HE_V2        = 0x1e000100u, // (AAC_ADTS | AAC_SUB_HE_V2)
     AUDIO_FORMAT_AAC_ADTS_ELD          = 0x1e000200u, // (AAC_ADTS | AAC_SUB_ELD)
     AUDIO_FORMAT_AAC_ADTS_XHE          = 0x1e000300u, // (AAC_ADTS | AAC_SUB_XHE)
+    AUDIO_FORMAT_AAC_LATM_LC           = 0x25000002u, // (AAC_LATM | AAC_SUB_LC)
+    AUDIO_FORMAT_AAC_LATM_HE_V1        = 0x25000010u, // (AAC_LATM | AAC_SUB_HE_V1)
+    AUDIO_FORMAT_AAC_LATM_HE_V2        = 0x25000100u, // (AAC_LATM | AAC_SUB_HE_V2)
     AUDIO_FORMAT_E_AC3_JOC             = 0xA000001u,  // (E_AC3 | E_AC3_SUB_JOC)
     AUDIO_FORMAT_MAT_1_0               = 0x24000001u, // (MAT | MAT_SUB_1_0)
     AUDIO_FORMAT_MAT_2_0               = 0x24000002u, // (MAT | MAT_SUB_2_0)
