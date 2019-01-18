@@ -161,6 +161,7 @@ enum {
                                 AUDIO_DEVICE_IN_PROXY |
                                 AUDIO_DEVICE_IN_USB_HEADSET |
                                 AUDIO_DEVICE_IN_BLUETOOTH_BLE |
+                                AUDIO_DEVICE_IN_HDMI_ARC |
                                 AUDIO_DEVICE_IN_ECHO_REFERENCE |
                                 AUDIO_DEVICE_IN_DEFAULT,
 
