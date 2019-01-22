@@ -1014,6 +1014,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_MAT_1_0:
     case AUDIO_FORMAT_MAT_2_0:
     case AUDIO_FORMAT_MAT_2_1:
+    case AUDIO_FORMAT_SBC:
     case AUDIO_FORMAT_APTX:
     case AUDIO_FORMAT_APTX_HD:
     case AUDIO_FORMAT_AAC_LATM:
@@ -1022,6 +1023,8 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_AAC_LATM_HE_V2:
     case AUDIO_FORMAT_CELT:
     case AUDIO_FORMAT_APTX_ADAPTIVE:
+    case AUDIO_FORMAT_LHDC:
+    case AUDIO_FORMAT_LHDC_LL:
         return true;
     default:
         return false;

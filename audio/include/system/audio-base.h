@@ -112,6 +112,8 @@ typedef enum {
     AUDIO_FORMAT_AAC_LATM            = 0x25000000u,
     AUDIO_FORMAT_CELT                = 0x26000000u,
     AUDIO_FORMAT_APTX_ADAPTIVE       = 0x27000000u,
+    AUDIO_FORMAT_LHDC                = 0x28000000u,
+    AUDIO_FORMAT_LHDC_LL             = 0x29000000u,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000u,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFu,
 
