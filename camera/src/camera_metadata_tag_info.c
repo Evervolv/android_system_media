@@ -727,6 +727,8 @@ static tag_info_t android_logical_multi_camera[ANDROID_LOGICAL_MULTI_CAMERA_END 
     { "physicalIds",                   TYPE_BYTE   },
     [ ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE - ANDROID_LOGICAL_MULTI_CAMERA_START ] =
     { "sensorSyncType",                TYPE_BYTE   },
+    [ ANDROID_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID - ANDROID_LOGICAL_MULTI_CAMERA_START ] =
+    { "activePhysicalId",              TYPE_BYTE   },
 };
 
 static tag_info_t android_distortion_correction[ANDROID_DISTORTION_CORRECTION_END -
@@ -2886,6 +2888,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID: {
             break;
         }
 

@@ -751,7 +751,7 @@ def generate_extra_javadoc_detail(entry):
   range.
   """
   def inner(text):
-    if entry.units:
+    if entry.units and not (entry.typedef and entry.typedef.name == 'string'):
       text += '\n\n<b>Units</b>: %s\n' % (dedent(entry.units))
     if entry.enum and not (entry.typedef and entry.typedef.languages.get('java')):
       text += '\n\n<b>Possible values:</b>\n<ul>\n'
