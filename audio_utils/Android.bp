@@ -22,6 +22,7 @@ cc_library {
     defaults: ["audio_utils_defaults"],
 
     srcs: [
+        "Balance.cpp",
         "channels.c",
         "ErrorLog.cpp",
         "fifo.cpp",
