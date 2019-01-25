@@ -1975,6 +1975,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "MONOCHROME";
                     ret = 0;
                     break;
+                case ANDROID_REQUEST_AVAILABLE_CAPABILITIES_SECURE_IMAGE_DATA:
+                    msg = "SECURE_IMAGE_DATA";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }

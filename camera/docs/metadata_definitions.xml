@@ -5440,6 +5440,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               camera will be either MONO or NIR.
               </notes>
             </value>
+            <value optional="true" hal_version="3.4" >SECURE_IMAGE_DATA
+              <notes>
+                The camera device is capable of writing image data into a region of memory
+                inaccessible to Android userspace or the Android kernel, and only accessible to
+                trusted execution environments (TEE).
+              </notes>
+            </value>
+
 
           </enum>
           <description>List of capabilities that this camera device
