@@ -441,6 +441,12 @@ typedef enum camera_metadata_tag {
     ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE,                 // enum         | public       | HIDL v3.2
     ANDROID_DEPTH_AVAILABLE_RECOMMENDED_DEPTH_STREAM_CONFIGURATIONS,
                                                       // int32[]      | ndk_public   | HIDL v3.4
+    ANDROID_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS,
+                                                      // enum[]       | ndk_public   | HIDL v3.4
+    ANDROID_DEPTH_AVAILABLE_DYNAMIC_DEPTH_MIN_FRAME_DURATIONS,
+                                                      // int64[]      | ndk_public   | HIDL v3.4
+    ANDROID_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STALL_DURATIONS,
+                                                      // int64[]      | ndk_public   | HIDL v3.4
     ANDROID_DEPTH_END,
 
     ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS =       // byte[]       | ndk_public   | HIDL v3.3
@@ -1024,6 +1030,14 @@ typedef enum camera_metadata_enum_android_depth_depth_is_exclusive {
     ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_FALSE                          , // HIDL v3.2
     ANDROID_DEPTH_DEPTH_IS_EXCLUSIVE_TRUE                           , // HIDL v3.2
 } camera_metadata_enum_android_depth_depth_is_exclusive_t;
+
+// ANDROID_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS
+typedef enum camera_metadata_enum_android_depth_available_dynamic_depth_stream_configurations {
+    ANDROID_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS_OUTPUT
+                                                                     , // HIDL v3.4
+    ANDROID_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS_INPUT
+                                                                     , // HIDL v3.4
+} camera_metadata_enum_android_depth_available_dynamic_depth_stream_configurations_t;
 
 
 // ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE
