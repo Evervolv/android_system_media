@@ -18,20 +18,6 @@
 
 namespace android::audio_utils {
 
-// Implementation detail: parametric volume curve transfer function
-
-constexpr float CURVE_PARAMETER = 2.f;
-
-static inline float curve(float parameter, float inVolume) {
-    return exp(parameter * inVolume) - 1.f;
-}
-
-Balance::Balance()
-    : mCurveNorm(1.f / curve(CURVE_PARAMETER, 1.f /* inVolume */))
-{
-    setChannelMask(AUDIO_CHANNEL_OUT_STEREO);
-}
-
 void Balance::setChannelMask(audio_channel_mask_t channelMask)
 {
     channelMask &= ~ AUDIO_CHANNEL_HAPTIC_ALL;
@@ -43,10 +29,24 @@ void Balance::setChannelMask(audio_channel_mask_t channelMask)
     mChannelMask = channelMask;
     mChannelCount = audio_channel_count_from_out_mask(channelMask);
 
-    // reset mVolumes (the next process() will recalculate if needed).
+    // save mBalance into balance for later restoring, then reset
+    const float balance = mBalance;
+    mBalance = 0.f;
+
+    // reset mVolumes
     mVolumes.resize(mChannelCount);
     std::fill(mVolumes.begin(), mVolumes.end(), 1.f);
-    mBalance = 0.f;
+
+    // reset ramping variables
+    mRampBalance = 0.f;
+    mRampVolumes.clear();
+
+    if (audio_channel_mask_get_representation(mChannelMask)
+            == AUDIO_CHANNEL_REPRESENTATION_INDEX) {
+        mSides.clear();       // mSides unused for channel index masks.
+        setBalance(balance);  // recompute balance
+        return;
+    }
 
     // Implementation detail (may change):
     // For implementation speed, we precompute the side (left, right, center),
@@ -82,18 +82,53 @@ void Balance::setChannelMask(audio_channel_mask_t channelMask)
     mSides.resize(mChannelCount);
     for (unsigned i = 0, channel = channelMask; channel != 0; ++i) {
         const int index = __builtin_ctz(channel);
-        if (index < sizeof(sideFromChannel) / sizeof(sideFromChannel[0])) {
-            mSides[i] = 2; // consider center
-        } else {
+        if (index < std::size(sideFromChannel)) {
             mSides[i] = sideFromChannel[index];
+        } else {
+            mSides[i] = 2; // consider center
         }
         channel &= ~(1 << index);
     }
+    setBalance(balance); // recompute balance
 }
 
-void Balance::process(float *buffer, float balance, size_t frames)
+void Balance::process(float *buffer, size_t frames)
 {
-    setBalance(balance);
+    if (mBalance == 0.f || mChannelCount < 2) {
+        return;
+    }
+
+    if (mRamp) {
+        if (mRampVolumes.size() != mVolumes.size()) {
+            // If mRampVolumes is empty, we do not ramp in this process() but directly
+            // apply the existing mVolumes. We save the balance and volume state here
+            // and fall through to non-ramping code below. The next process() will ramp if needed.
+            mRampBalance = mBalance;
+            mRampVolumes = mVolumes;
+        } else if (mRampBalance != mBalance) {
+            if (frames > 0) {
+                std::vector<float> mDeltas(mVolumes.size());
+                const float r = 1.f / frames;
+                for (size_t j = 0; j < mChannelCount; ++j) {
+                    mDeltas[j] = (mVolumes[j] - mRampVolumes[j]) * r;
+                }
+
+                // ramped balance
+                for (size_t i = 0; i < frames; ++i) {
+                    const float findex = i;
+                    for (size_t j = 0; j < mChannelCount; ++j) { // better precision: delta * i
+                        *buffer++ *= mRampVolumes[j] + mDeltas[j] * findex;
+                    }
+                }
+            }
+            mRampBalance = mBalance;
+            mRampVolumes = mVolumes;
+            return;
+        }
+        // fall through
+    }
+
+    // non-ramped balance
     for (size_t i = 0; i < frames; ++i) {
         for (size_t j = 0; j < mChannelCount; ++j) {
             *buffer++ *= mVolumes[j];
@@ -101,26 +136,22 @@ void Balance::process(float *buffer, float balance, size_t frames)
     }
 }
 
-// Implementation detail (may change):
-// This is not an energy preserving balance (e.g. using sin/cos cross fade or some such).
-// Rather it preserves full gain on left and right when balance is 0.f,
-// and decreases the right or left as one changes the balance.
 void Balance::computeStereoBalance(float balance, float *left, float *right) const
 {
     if (balance > 0.f) {
-        *left = curve(CURVE_PARAMETER, 1.f - balance) * mCurveNorm;
+        *left = mCurve(1.f - balance);
         *right = 1.f;
     } else if (balance < 0.f) {
         *left = 1.f;
-        *right = curve(CURVE_PARAMETER, 1.f + balance) * mCurveNorm;
+        *right = mCurve(1.f + balance);
     } else {
         *left = 1.f;
         *right = 1.f;
     }
 
     // Functionally:
-    // *left = balance > 0.f ? curve(CURVE_PARAMETER, 1.f - balance) * mCurveNorm : 1.f;
-    // *right = balance < 0.f ? curve(CURVE_PARAMETER, 1.f + balance) * mCurveNorm : 1.f;
+    // *left = balance > 0.f ? mCurve(1.f - balance) : 1.f;
+    // *right = balance < 0.f ? mCurve(1.f + balance) : 1.f;
 }
 
 std::string Balance::toString() const
@@ -130,19 +161,25 @@ std::string Balance::toString() const
     for (float volume : mVolumes) {
         ss << " " << volume;
     }
+    // we do not show mSides, which is only valid for channel position masks.
     return ss.str();
 }
 
 void Balance::setBalance(float balance)
 {
-    if (isnan(balance) || fabs(balance) > 1.f              // balance out of range
-            || mBalance == balance || mChannelCount < 2) { // change not applicable
+    if (mBalance == balance                         // no change
+        || isnan(balance) || fabs(balance) > 1.f) { // balance out of range
         return;
     }
 
     mBalance = balance;
 
-    // handle the common cases
+    if (mChannelCount < 2) { // if channel count is 1, mVolumes[0] is already set to 1.f
+        return;              // and if channel count < 2, we don't do anything in process().
+    }
+
+    // Handle the common cases:
+    // stereo and channel index masks only affect the first two channels as left and right.
     if (mChannelMask == AUDIO_CHANNEL_OUT_STEREO
             || audio_channel_mask_get_representation(mChannelMask)
                     == AUDIO_CHANNEL_REPRESENTATION_INDEX) {
@@ -150,6 +187,8 @@ void Balance::setBalance(float balance)
         return;
     }
 
+    // For position masks with more than 2 channels, we consider which side the
+    // speaker position is on to figure the volume used.
     float balanceVolumes[3]; // left, right, center
     computeStereoBalance(balance, &balanceVolumes[0], &balanceVolumes[1]);
     balanceVolumes[2] = 1.f; // center  TODO: consider center scaling.
@@ -160,4 +199,3 @@ void Balance::setBalance(float balance)
 }
 
 } // namespace android::audio_utils
-
