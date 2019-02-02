@@ -100,6 +100,23 @@ static inline audio_attributes_t attributes_initializer(audio_usage_t usage)
     return attributes;
 }
 
+static inline void audio_flags_to_audio_output_flags(
+                                           const audio_flags_mask_t audio_flags,
+                                           audio_output_flags_t *flags)
+{
+    if ((audio_flags & AUDIO_FLAG_HW_AV_SYNC) != 0) {
+        *flags = (audio_output_flags_t)(*flags |
+            AUDIO_OUTPUT_FLAG_HW_AV_SYNC | AUDIO_OUTPUT_FLAG_DIRECT);
+    }
+    if ((audio_flags & AUDIO_FLAG_LOW_LATENCY) != 0) {
+        *flags = (audio_output_flags_t)(*flags | AUDIO_OUTPUT_FLAG_FAST);
+    }
+    // check deep buffer after flags have been modified above
+    if (*flags == AUDIO_OUTPUT_FLAG_NONE && (audio_flags & AUDIO_FLAG_DEEP_BUFFER) != 0) {
+        *flags = AUDIO_OUTPUT_FLAG_DEEP_BUFFER;
+    }
+}
+
 
 /* a unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
  * effect ID (int), audio_module_handle_t, and audio_patch_handle_t.
