@@ -42,6 +42,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <tag id="LOGICALCAMERA">
         Entry is required for logical multi-camera capability.
     </tag>
+    <tag id="HEIC">
+        Entry is required for devices with HEIC (High Efficiency Image Format) support.
+    </tag>
     <tag id="FUTURE">
         Entry is  under-specified and is not required for now. This is for book-keeping purpose,
         do not implement or use it, it may be revised for future.
@@ -3366,6 +3369,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Setting a location object in a request will include the GPS coordinates of the location
           into any JPEG images captured based on the request. These coordinates can then be
           viewed by anyone who receives the JPEG image.
+
+          This tag is also used for HEIC image capture.
           </details>
         </entry>
         <entry name="gpsCoordinates" type="double" visibility="ndk_public"
@@ -3377,6 +3382,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>GPS coordinates to include in output JPEG
           EXIF.</description>
           <range>(-180 - 180], [-90,90], [-inf, inf]</range>
+          <details>This tag is also used for HEIC image capture.</details>
           <tag id="BC" />
         </entry>
         <entry name="gpsProcessingMethod" type="byte" visibility="ndk_public"
@@ -3384,12 +3390,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>32 characters describing GPS algorithm to
           include in EXIF.</description>
           <units>UTF-8 null-terminated string</units>
+          <details>This tag is also used for HEIC image capture.</details>
           <tag id="BC" />
         </entry>
         <entry name="gpsTimestamp" type="int64" visibility="ndk_public" hwlevel="legacy">
           <description>Time GPS fix was made to include in
           EXIF.</description>
           <units>UTC in seconds since January 1, 1970</units>
+          <details>This tag is also used for HEIC image capture.</details>
           <tag id="BC" />
         </entry>
         <entry name="orientation" type="int32" visibility="public" hwlevel="legacy">
@@ -3431,6 +3439,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           For EXTERNAL cameras the sensor orientation will always be set to 0 and the facing will
           also be set to EXTERNAL. The above code is not relevant in such case.
+
+          This tag is also used to describe the orientation of the HEIC image capture, in which
+          case the rotation is reflected by
+          {@link android.media.ExifInterface#TAG_ORIENTATION EXIF orientation flag}, and not by
+          rotating the image data itself.
           </details>
           <tag id="BC" />
         </entry>
@@ -3438,13 +3451,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>Compression quality of the final JPEG
           image.</description>
           <range>1-100; larger is higher quality</range>
-          <details>85-95 is typical usage range.</details>
+          <details>85-95 is typical usage range. This tag is also used to describe the quality
+          of the HEIC image capture.</details>
           <tag id="BC" />
         </entry>
         <entry name="thumbnailQuality" type="byte" visibility="public" hwlevel="legacy">
           <description>Compression quality of JPEG
           thumbnail.</description>
           <range>1-100; larger is higher quality</range>
+          <details>This tag is also used to describe the quality of the HEIC image capture.</details>
           <tag id="BC" />
         </entry>
         <entry name="thumbnailSize" type="int32" visibility="public"
@@ -3478,6 +3493,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             capture result, so the width and height will be interchanged if 90 or 270 degree
             orientation is requested. LEGACY device will always report unrotated thumbnail
             size.
+
+          The tag is also used as thumbnail size for HEIC image format capture, in which case the
+          the thumbnail rotation is reflected by
+          {@link android.media.ExifInterface#TAG_ORIENTATION EXIF orientation flag}, and not by
+          rotating the thumbnail data itself.
           </details>
           <hal_details>
           The HAL must not squeeze or stretch the downscaled primary image to generate thumbnail.
@@ -3512,7 +3532,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * Each output JPEG size in android.scaler.availableStreamConfigurations will have at least
           one corresponding size that has the same aspect ratio in availableThumbnailSizes,
           and vice versa.
-          * All non-`(0, 0)` sizes will have non-zero widths and heights.</details>
+          * All non-`(0, 0)` sizes will have non-zero widths and heights.
+
+          This list is also used as supported thumbnail sizes for HEIC image format capture.
+          </details>
           <tag id="BC" />
         </entry>
         <entry name="maxSize" type="int32" visibility="system">
@@ -10562,6 +10585,204 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <clone entry="android.distortionCorrection.mode" kind="controls" hal_version="3.3">
         </clone>
       </dynamic>
+    </section>
+    <section name="heic">
+      <static>
+        <namespace name="info">
+          <entry name="supported" type="byte" visibility="system" enum="true"
+                 typedef="boolean" hwlevel="limited" hal_version="3.4">
+            <enum>
+              <value>FALSE</value>
+              <value>TRUE</value>
+            </enum>
+            <description>Whether this camera device can support identical set of stream combinations
+            involving HEIC image format, compared to the
+            {@link android.hardware.camera2.CameraDevice#createCaptureSession table of combinations}
+            involving JPEG image format required for the device's hardware level and capabilities.
+            </description>
+            <details>
+            All the static, control and dynamic metadata tags related to JPEG apply to HEIC formats
+            as well. For example, the same android.jpeg.orientation and android.jpeg.quality are
+            used to control the orientation and quality of the HEIC image. Configuring JPEG and
+            HEIC streams at the same time is not supported.
+
+            If a camera device supports HEIC format (ISO/IEC 23008-12), not only does it
+            support the existing mandatory stream
+            {@link android.hardware.camera2.CameraDevice#createCaptureSession combinations}
+            required for the device's hardware level and capabilities, it also supports swapping
+            each JPEG stream with HEIC stream in all guaranteed combinations.
+
+            For every HEIC stream configured by the application, the camera framework sets up 2
+            internal streams with camera HAL:
+
+            * A YUV_420_888 or IMPLEMENTATION_DEFINED HAL stream as input to HEIC or HEVC encoder.
+            * A BLOB stream with JPEG_APPS_SEGMENTS dataspace to extract application markers
+            including EXIF and thumbnail to be saved in HEIF container.
+
+            A camera device can output HEIC format to the application if and only if:
+
+            * The system contains a HEIC or HEVC encoder with constant quality mode, and
+            * This tag is set to TRUE, meaning that camera HAL supports replacing JPEG streams in
+            all mandatory stream combinations with a [YUV_420_888/IMPLEMENTATION_DEFINED stream +
+            JPEG_APPS_SEGMENT BLOB stream] combo.
+
+            As an example, if the camera device's hardware level is LIMITED, and it supports HEIC,
+            in addition to the required stream combinations, HAL must support below stream
+            combinations as well:
+
+            * IMPLEMENTATION_DEFINED/YUV_420_888 MAXIMUM + JPEG_SEGMENTS_BLOB,
+            * PRIV PREVIEW + IMPLEMENTATION_DEFINED/YUV_420_888 MAXIMUM + JPEG_SEGMENTS_BLOB,
+            * YUV PREVIEW + IMPLEMENTATION_DEFINED/YUV_420_888 MAXIMUM + JPEG_SEGMENTS_BLOB,
+            * PRIV PREVIEW + YUV PREVIEW + IMPLEMENTATION_DEFINED/YUV_420_888 MAXIMUM +
+            JPEG_SEGMENTS_BLOB
+
+            The selection logic between YUV_420_888 and IMPLEMENTATION_DEFINED for HAL internal
+            stream is as follows:
+
+                if (HEIC encoder exists and supports the size) {
+                    use IMPLEMENTATION_DEFINED with GRALLOC_USAGE_HW_IMAGE_ENCODER usage flag;
+                } else {
+                    // HVC encoder exists
+                    if (size is less than framework predefined tile size) {
+                        use IMPLEMENTATINO_DEFINED with GRALLOC_USAGE_HW_VIDEO_ENCODER usage flag;
+                    } else {
+                        use YUV_420_888;
+                    }
+                }
+          </details>
+          <tag id="HEIC" />
+          </entry>
+          <entry name="maxJpegAppSegmentsCount" type="byte" visibility="system"
+                 hwlevel="limited" hal_version="3.4">
+            <description>The maximum number of Jpeg APP segments supported by the camera HAL device.
+            </description>
+            <details>
+            The camera framework will use this value to derive the size of the BLOB buffer with
+            JPEG_APP_SEGMENTS dataspace, with each APP segment occupying at most 64K bytes. If the
+            value of this tag is n, the size of the framework allocated buffer will be:
+
+                n * (2 + 0xFFFF) + sizeof(struct CameraBlob)
+
+            where 2 is number of bytes for APP marker, 0xFFFF is the maximum size per APP segment
+            (including segment size).
+
+            The value of this tag must be at least 1, and APP1 marker (0xFFE1) segment must be the
+            first segment stored in the JPEG_APPS_SEGMENTS BLOB buffer. APP1 segment stores EXIF and
+            thumbnail.
+
+            Since media encoder embeds the orientation in the metadata of the output image, to be
+            consistent between main image and thumbnail, camera HAL must not rotate the thumbnail
+            image data based on android.jpeg.orientation. The framework will write the orientation
+            into EXIF and HEIC container.
+
+            APP1 segment is followed immediately by one or multiple APP2 segments, and APPn
+            segments. After the HAL fills and returns the JPEG_APP_SEGMENTS buffer, the camera
+            framework modifies the APP1 segment by filling in the EXIF tags that are related to
+            main image bitstream and the tags that can be derived from capture result metadata,
+            before saving them into the HEIC container.
+
+            The value of this tag must not be more than 16.
+            </details>
+            <tag id="HEIC" />
+          </entry>
+        </namespace>
+
+        <entry name="availableHeicStreamConfigurations" type="int32" visibility="ndk_public"
+            enum="true" container="array" typedef="streamConfiguration"
+            hwlevel="limited" hal_version="3.4">
+          <array>
+            <size>n</size>
+            <size>4</size>
+          </array>
+          <enum>
+            <value>OUTPUT</value>
+            <value>INPUT</value>
+          </enum>
+          <description>The available HEIC (ISO/IEC 23008-12) stream
+          configurations that this camera device supports
+          (i.e. format, width, height, output/input stream).
+          </description>
+          <details>
+          The configurations are listed as `(format, width, height, input?)` tuples.
+
+          If the camera device supports HEIC image format, it will support identical set of stream
+          combinations involving HEIC image format, compared to the combinations involving JPEG
+          image format as required by the device's hardware level and capabilities.
+
+          All the static, control, and dynamic metadata tags related to JPEG apply to HEIC formats.
+          Configuring JPEG and HEIC streams at the same time is not supported.
+          </details>
+          <ndk_details>
+          All the configuration tuples `(format, width, height, input?)` will contain
+          AIMAGE_FORMAT_HEIC format as OUTPUT only.
+          </ndk_details>
+          <hal_details>
+          These are output stream configurations for use with dataSpace HAL_DATASPACE_HEIF.
+
+          Do not set this property directly. It is populated by camera framework and must not be
+          set by the HAL layer.
+          </hal_details>
+         <tag id="HEIC" />
+        </entry>
+        <entry name="availableHeicMinFrameDurations" type="int64" visibility="ndk_public"
+               container="array" typedef="streamConfigurationDuration" hwlevel="limited"
+               hal_version="3.4">
+          <array>
+            <size>4</size>
+            <size>n</size>
+          </array>
+          <description>This lists the minimum frame duration for each
+          format/size combination for HEIC output formats.
+          </description>
+          <units>(format, width, height, ns) x n</units>
+          <details>
+          This should correspond to the frame duration when only that
+          stream is active, with all processing (typically in android.*.mode)
+          set to either OFF or FAST.
+
+          When multiple streams are used in a request, the minimum frame
+          duration will be max(individual stream min durations).
+
+          See android.sensor.frameDuration and
+          android.scaler.availableStallDurations for more details about
+          calculating the max frame rate.
+          </details>
+          <hal_details>
+          Do not set this property directly. It is populated by camera framework and must not be
+          set by the HAL layer.
+          </hal_details>
+          <tag id="HEIC" />
+        </entry>
+        <entry name="availableHeicStallDurations" type="int64" visibility="ndk_public"
+               container="array" typedef="streamConfigurationDuration" hwlevel="limited"
+               hal_version="3.4">
+          <array>
+            <size>4</size>
+            <size>n</size>
+          </array>
+          <description>This lists the maximum stall duration for each
+          output format/size combination for HEIC streams.
+          </description>
+          <units>(format, width, height, ns) x n</units>
+          <details>
+          A stall duration is how much extra time would get added
+          to the normal minimum frame duration for a repeating request
+          that has streams with non-zero stall.
+
+          This functions similarly to
+          android.scaler.availableStallDurations for HEIC
+          streams.
+
+          All HEIC output stream formats may have a nonzero stall
+          duration.
+          </details>
+          <hal_details>
+          Do not set this property directly. It is populated by camera framework and must not be
+          set by the HAL layer.
+          </hal_details>
+          <tag id="HEIC" />
+        </entry>
+      </static>
     </section>
   </namespace>
 </metadata>

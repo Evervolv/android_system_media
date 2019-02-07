@@ -60,6 +60,8 @@ const char *camera_metadata_section_names[ANDROID_SECTION_COUNT] = {
     [ANDROID_LOGICAL_MULTI_CAMERA] = "android.logicalMultiCamera",
     [ANDROID_DISTORTION_CORRECTION]
                                     = "android.distortionCorrection",
+    [ANDROID_HEIC]                 = "android.heic",
+    [ANDROID_HEIC_INFO]            = "android.heic.info",
 };
 
 unsigned int camera_metadata_section_bounds[ANDROID_SECTION_COUNT][2] = {
@@ -120,6 +122,10 @@ unsigned int camera_metadata_section_bounds[ANDROID_SECTION_COUNT][2] = {
     [ANDROID_DISTORTION_CORRECTION]
                                     = { ANDROID_DISTORTION_CORRECTION_START,
                                        ANDROID_DISTORTION_CORRECTION_END },
+    [ANDROID_HEIC]                 = { ANDROID_HEIC_START,
+                                       ANDROID_HEIC_END },
+    [ANDROID_HEIC_INFO]            = { ANDROID_HEIC_INFO_START,
+                                       ANDROID_HEIC_INFO_END },
 };
 
 static tag_info_t android_color_correction[ANDROID_COLOR_CORRECTION_END -
@@ -748,6 +754,26 @@ static tag_info_t android_distortion_correction[ANDROID_DISTORTION_CORRECTION_EN
     { "availableModes",                TYPE_BYTE   },
 };
 
+static tag_info_t android_heic[ANDROID_HEIC_END -
+        ANDROID_HEIC_START] = {
+    [ ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS - ANDROID_HEIC_START ] =
+    { "availableHeicStreamConfigurations",
+                                        TYPE_INT32  },
+    [ ANDROID_HEIC_AVAILABLE_HEIC_MIN_FRAME_DURATIONS - ANDROID_HEIC_START ] =
+    { "availableHeicMinFrameDurations",
+                                        TYPE_INT64  },
+    [ ANDROID_HEIC_AVAILABLE_HEIC_STALL_DURATIONS - ANDROID_HEIC_START ] =
+    { "availableHeicStallDurations",   TYPE_INT64  },
+};
+
+static tag_info_t android_heic_info[ANDROID_HEIC_INFO_END -
+        ANDROID_HEIC_INFO_START] = {
+    [ ANDROID_HEIC_INFO_SUPPORTED - ANDROID_HEIC_INFO_START ] =
+    { "supported",                     TYPE_BYTE   },
+    [ ANDROID_HEIC_INFO_MAX_JPEG_APP_SEGMENTS_COUNT - ANDROID_HEIC_INFO_START ] =
+    { "maxJpegAppSegmentsCount",       TYPE_BYTE   },
+};
+
 
 tag_info_t *tag_info[ANDROID_SECTION_COUNT] = {
     android_color_correction,
@@ -778,6 +804,8 @@ tag_info_t *tag_info[ANDROID_SECTION_COUNT] = {
     android_depth,
     android_logical_multi_camera,
     android_distortion_correction,
+    android_heic,
+    android_heic_info,
 };
 
 static int32_t tag_permission_needed[16] = {
@@ -2948,6 +2976,47 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_DISTORTION_CORRECTION_AVAILABLE_MODES: {
+            break;
+        }
+
+        case ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS: {
+            switch (value) {
+                case ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS_OUTPUT:
+                    msg = "OUTPUT";
+                    ret = 0;
+                    break;
+                case ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS_INPUT:
+                    msg = "INPUT";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_HEIC_AVAILABLE_HEIC_MIN_FRAME_DURATIONS: {
+            break;
+        }
+        case ANDROID_HEIC_AVAILABLE_HEIC_STALL_DURATIONS: {
+            break;
+        }
+
+        case ANDROID_HEIC_INFO_SUPPORTED: {
+            switch (value) {
+                case ANDROID_HEIC_INFO_SUPPORTED_FALSE:
+                    msg = "FALSE";
+                    ret = 0;
+                    break;
+                case ANDROID_HEIC_INFO_SUPPORTED_TRUE:
+                    msg = "TRUE";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_HEIC_INFO_MAX_JPEG_APP_SEGMENTS_COUNT: {
             break;
         }
 

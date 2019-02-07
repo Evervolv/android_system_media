@@ -63,6 +63,8 @@ typedef enum camera_metadata_section {
     ANDROID_DEPTH,
     ANDROID_LOGICAL_MULTI_CAMERA,
     ANDROID_DISTORTION_CORRECTION,
+    ANDROID_HEIC,
+    ANDROID_HEIC_INFO,
     ANDROID_SECTION_COUNT,
 
     VENDOR_SECTION = 0x8000
@@ -105,6 +107,8 @@ typedef enum camera_metadata_section_start {
     ANDROID_DISTORTION_CORRECTION_START
                                    = ANDROID_DISTORTION_CORRECTION
                                                                 << 16,
+    ANDROID_HEIC_START             = ANDROID_HEIC              << 16,
+    ANDROID_HEIC_INFO_START        = ANDROID_HEIC_INFO         << 16,
     VENDOR_SECTION_START           = VENDOR_SECTION            << 16
 } camera_metadata_section_start_t;
 
@@ -459,6 +463,18 @@ typedef enum camera_metadata_tag {
             ANDROID_DISTORTION_CORRECTION_START,
     ANDROID_DISTORTION_CORRECTION_AVAILABLE_MODES,    // byte[]       | public       | HIDL v3.3
     ANDROID_DISTORTION_CORRECTION_END,
+
+    ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS = 
+                                                      // enum[]       | ndk_public   | HIDL v3.4
+            ANDROID_HEIC_START,
+    ANDROID_HEIC_AVAILABLE_HEIC_MIN_FRAME_DURATIONS,  // int64[]      | ndk_public   | HIDL v3.4
+    ANDROID_HEIC_AVAILABLE_HEIC_STALL_DURATIONS,      // int64[]      | ndk_public   | HIDL v3.4
+    ANDROID_HEIC_END,
+
+    ANDROID_HEIC_INFO_SUPPORTED =                     // enum         | system       | HIDL v3.4
+            ANDROID_HEIC_INFO_START,
+    ANDROID_HEIC_INFO_MAX_JPEG_APP_SEGMENTS_COUNT,    // byte         | system       | HIDL v3.4
+    ANDROID_HEIC_INFO_END,
 
 } camera_metadata_tag_t;
 
@@ -1054,5 +1070,19 @@ typedef enum camera_metadata_enum_android_distortion_correction_mode {
     ANDROID_DISTORTION_CORRECTION_MODE_FAST                         , // HIDL v3.3
     ANDROID_DISTORTION_CORRECTION_MODE_HIGH_QUALITY                 , // HIDL v3.3
 } camera_metadata_enum_android_distortion_correction_mode_t;
+
+
+// ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS
+typedef enum camera_metadata_enum_android_heic_available_heic_stream_configurations {
+    ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS_OUTPUT        , // HIDL v3.4
+    ANDROID_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS_INPUT         , // HIDL v3.4
+} camera_metadata_enum_android_heic_available_heic_stream_configurations_t;
+
+
+// ANDROID_HEIC_INFO_SUPPORTED
+typedef enum camera_metadata_enum_android_heic_info_supported {
+    ANDROID_HEIC_INFO_SUPPORTED_FALSE                               , // HIDL v3.4
+    ANDROID_HEIC_INFO_SUPPORTED_TRUE                                , // HIDL v3.4
+} camera_metadata_enum_android_heic_info_supported_t;
 
 
