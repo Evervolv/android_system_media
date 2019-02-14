@@ -173,5 +173,11 @@ enum {
                                 AUDIO_PORT_CONFIG_GAIN,
 }; // enum
 
+// Add new aliases
+enum {
+    AUDIO_CHANNEL_OUT_TRI                   = 0x7u,     // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_FRONT_CENTER
+    AUDIO_CHANNEL_OUT_TRI_BACK              = 0x103u,   // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_BACK_CENTER
+    AUDIO_CHANNEL_OUT_3POINT1               = 0xFu,     // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_FRONT_CENTER | OUT_LOW_FREQUENCY
+};
 
 #endif  // ANDROID_AUDIO_BASE_UTILS_H
