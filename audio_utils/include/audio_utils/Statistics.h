@@ -17,6 +17,8 @@
 #ifndef ANDROID_AUDIO_UTILS_STATISTICS_H
 #define ANDROID_AUDIO_UTILS_STATISTICS_H
 
+#ifdef __cplusplus
+
 #include "variadic_utils.h"
 
 // variadic_utils already contains stl headers; in addition:
@@ -800,5 +802,56 @@ constexpr T sqrt_constexpr(T x) {
 
 } // namespace audio_utils
 } // namespace android
+
+#endif // __cplusplus
+
+/** \cond */
+ __BEGIN_DECLS
+/** \endcond */
+
+/** Simple stats structure for low overhead statistics gathering.
+ * Designed to be accessed by C (with no functional getters).
+ * Zero initialize {} to clear or reset.
+ */
+typedef struct {
+   int64_t n;
+   double min;
+   double max;
+   double last;
+   double mean;
+} simple_stats_t;
+
+/** logs new value to the simple_stats_t */
+static inline void simple_stats_log(simple_stats_t *stats, double value) {
+    if (++stats->n == 1) {
+        stats->min = stats->max = stats->last = stats->mean = value;
+    } else {
+        stats->last = value;
+        if (value < stats->min) {
+            stats->min = value;
+        } else if (value > stats->max) {
+            stats->max = value;
+        }
+        // Welford's algorithm for mean
+        const double delta = value - stats->mean;
+        stats->mean += delta / stats->n;
+    }
+}
+
+/** dumps statistics to a string, returns the length of string excluding null termination. */
+static inline size_t simple_stats_to_string(simple_stats_t *stats, char *buffer, size_t size) {
+    if (size == 0) {
+        return 0;
+    } else if (stats->n == 0) {
+        return snprintf(buffer, size, "none");
+    } else {
+        return snprintf(buffer, size, "(mean: %lf  min: %lf  max: %lf  last: %lf  n: %lld)",
+                stats->mean, stats->min, stats->max, stats->last, (long long)stats->n);
+    }
+}
+
+/** \cond */
+__END_DECLS
+/** \endcond */
 
 #endif // !ANDROID_AUDIO_UTILS_STATISTICS_H
