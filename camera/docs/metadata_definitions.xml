@@ -5749,7 +5749,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           {@link android.hardware.camera2.CameraCharacteristics#getAvailableSessionKeys}.
           </hal_details>
         </entry>
-        <entry name="availablePhysicalCameraRequestKeys" type="int32" visibility="hidden"
+        <entry name="availablePhysicalCameraRequestKeys" type="int32" visibility="ndk_public"
                container="array" hwlevel="limited" hal_version="3.3">
           <array>
             <size>n</size>
