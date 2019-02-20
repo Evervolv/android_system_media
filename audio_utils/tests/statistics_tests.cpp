@@ -550,3 +550,22 @@ TEST_P(StatisticsTest, stat_simple_char)
 const char *pets[] = {"cat", "dog", "elephant", "mountain lion"};
 INSTANTIATE_TEST_CASE_P(PetNameStatistics, StatisticsTest,
                         ::testing::ValuesIn(pets));
+
+TEST(StatisticsTest, simple_stats)
+{
+    simple_stats_t ss{};
+
+    for (const double value : { -1., 1., 3.}) {
+        simple_stats_log(&ss, value);
+    }
+
+    PRINT_AND_EXPECT_EQ(3., ss.last);
+    PRINT_AND_EXPECT_EQ(1., ss.mean);
+    PRINT_AND_EXPECT_EQ(-1., ss.min);
+    PRINT_AND_EXPECT_EQ(3., ss.max);
+    PRINT_AND_EXPECT_EQ(3, ss.n);
+
+    char buffer[256];
+    simple_stats_to_string(&ss, buffer, sizeof(buffer));
+    printf("simple_stats: %s", buffer);
+}
