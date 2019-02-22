@@ -241,6 +241,16 @@ public:
     constexpr uint32_t getSampleRate() const { return mSampleRate; }
 
     constexpr FrameTime getLastCorrectedTimestamp() const { return mLastCorrectedTimestamp; }
+
+    // Inf+-, NaN is possible only if sampleRate is 0 (should not happen)
+    static constexpr double computeJitterMs(
+            const FrameTime &current, const FrameTime &last, uint32_t sampleRate) {
+        const auto diff = sub(current, last);
+        const double frameDifferenceNs = diff.first * 1e9 / sampleRate;
+        const double jitterNs = diff.second - frameDifferenceNs;  // actual - expected
+        return jitterNs * 1e-6;
+    }
+
 private:
     // our statistics have exponentially weighted history.
     // the defaults are here.
@@ -283,15 +293,6 @@ private:
         return std::make_pair<
                 typename std::make_signed<F>::type, typename std::make_signed<T>::type>(
                         left.mFrames - right.mFrames, left.mTimeNs - right.mTimeNs);
-    }
-
-    // Inf+-, NaN is possible only if sampleRate is 0 (should not happen)
-    static constexpr double computeJitterMs(
-            const FrameTime &current, const FrameTime &last, uint32_t sampleRate) {
-        const auto diff = sub(current, last);
-        const double frameDifferenceNs = diff.first * 1e9 / sampleRate;
-        const double jitterNs = frameDifferenceNs - diff.second;
-        return jitterNs * 1e-6;
     }
 
     // Inf+-, Nan possible depending on differences between current and last.
