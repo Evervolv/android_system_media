@@ -766,7 +766,7 @@ def generate_extra_javadoc_detail(entry):
         text += '\n\n<b>Range of valid values:</b><br>\n'
       text += '%s\n' % (dedent(entry.range))
     if entry.hwlevel != 'legacy': # covers any of (None, 'limited', 'full')
-      text += '\n\n<b>Optional</b> - This value may be {@code null} on some devices.\n'
+      text += '\n\n<b>Optional</b> - The value for this key may be {@code null} on some devices.\n'
     if entry.hwlevel == 'full':
       text += \
         '\n<b>Full capability</b> - \n' + \
