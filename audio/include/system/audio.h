@@ -1015,102 +1015,46 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_AMR_NB:
     case AUDIO_FORMAT_AMR_WB:
     case AUDIO_FORMAT_AAC:
-        switch (format) {
-        case AUDIO_FORMAT_AAC:
-        case AUDIO_FORMAT_AAC_MAIN:
-        case AUDIO_FORMAT_AAC_LC:
-        case AUDIO_FORMAT_AAC_SSR:
-        case AUDIO_FORMAT_AAC_LTP:
-        case AUDIO_FORMAT_AAC_HE_V1:
-        case AUDIO_FORMAT_AAC_SCALABLE:
-        case AUDIO_FORMAT_AAC_ERLC:
-        case AUDIO_FORMAT_AAC_LD:
-        case AUDIO_FORMAT_AAC_HE_V2:
-        case AUDIO_FORMAT_AAC_ELD:
-        case AUDIO_FORMAT_AAC_XHE:
-            return true;
-        default:
-            return false;
-        }
-        /* not reached */
+    case AUDIO_FORMAT_AAC_ADTS:
     case AUDIO_FORMAT_HE_AAC_V1:
     case AUDIO_FORMAT_HE_AAC_V2:
+    case AUDIO_FORMAT_AAC_ELD:
+    case AUDIO_FORMAT_AAC_XHE:
     case AUDIO_FORMAT_VORBIS:
     case AUDIO_FORMAT_OPUS:
     case AUDIO_FORMAT_AC3:
     case AUDIO_FORMAT_E_AC3:
-        switch (format) {
-        case AUDIO_FORMAT_E_AC3:
-        case AUDIO_FORMAT_E_AC3_JOC:
-            return true;
-        default:
-            return false;
-        }
-        /* not reached */
     case AUDIO_FORMAT_DTS:
     case AUDIO_FORMAT_DTS_HD:
     case AUDIO_FORMAT_IEC61937:
     case AUDIO_FORMAT_DOLBY_TRUEHD:
+    case AUDIO_FORMAT_QCELP:
     case AUDIO_FORMAT_EVRC:
     case AUDIO_FORMAT_EVRCB:
     case AUDIO_FORMAT_EVRCWB:
-    case AUDIO_FORMAT_EVRCNW:
     case AUDIO_FORMAT_AAC_ADIF:
-    case AUDIO_FORMAT_WMA:
-    case AUDIO_FORMAT_WMA_PRO:
     case AUDIO_FORMAT_AMR_WB_PLUS:
     case AUDIO_FORMAT_MP2:
-    case AUDIO_FORMAT_QCELP:
-    case AUDIO_FORMAT_DSD:
+    case AUDIO_FORMAT_EVRCNW:
     case AUDIO_FORMAT_FLAC:
     case AUDIO_FORMAT_ALAC:
     case AUDIO_FORMAT_APE:
-    case AUDIO_FORMAT_AAC_ADTS:
-        switch (format) {
-        case AUDIO_FORMAT_AAC_ADTS:
-        case AUDIO_FORMAT_AAC_ADTS_MAIN:
-        case AUDIO_FORMAT_AAC_ADTS_LC:
-        case AUDIO_FORMAT_AAC_ADTS_SSR:
-        case AUDIO_FORMAT_AAC_ADTS_LTP:
-        case AUDIO_FORMAT_AAC_ADTS_HE_V1:
-        case AUDIO_FORMAT_AAC_ADTS_SCALABLE:
-        case AUDIO_FORMAT_AAC_ADTS_ERLC:
-        case AUDIO_FORMAT_AAC_ADTS_LD:
-        case AUDIO_FORMAT_AAC_ADTS_HE_V2:
-        case AUDIO_FORMAT_AAC_ADTS_ELD:
-        case AUDIO_FORMAT_AAC_ADTS_XHE:
-            return true;
-        default:
-            return false;
-        }
-        /* not reached */
+    case AUDIO_FORMAT_WMA:
+    case AUDIO_FORMAT_WMA_PRO:
+    case AUDIO_FORMAT_DSD:
+    case AUDIO_FORMAT_AC4:
+    case AUDIO_FORMAT_LDAC:
+    case AUDIO_FORMAT_E_AC3_JOC:
+    case AUDIO_FORMAT_MAT_1_0:
+    case AUDIO_FORMAT_MAT_2_0:
+    case AUDIO_FORMAT_MAT_2_1:
     case AUDIO_FORMAT_SBC:
     case AUDIO_FORMAT_APTX:
     case AUDIO_FORMAT_APTX_HD:
-    case AUDIO_FORMAT_AC4:
-    case AUDIO_FORMAT_LDAC:
-    case AUDIO_FORMAT_MAT:
-        switch (format) {
-        case AUDIO_FORMAT_MAT:
-        case AUDIO_FORMAT_MAT_1_0:
-        case AUDIO_FORMAT_MAT_2_0:
-        case AUDIO_FORMAT_MAT_2_1:
-            return true;
-        default:
-            return false;
-        }
-        /* not reached */
     case AUDIO_FORMAT_AAC_LATM:
-        switch (format) {
-        case AUDIO_FORMAT_AAC_LATM:
-        case AUDIO_FORMAT_AAC_LATM_LC:
-        case AUDIO_FORMAT_AAC_LATM_HE_V1:
-        case AUDIO_FORMAT_AAC_LATM_HE_V2:
-            return true;
-        default:
-            return false;
-        }
-        /* not reached */
+    case AUDIO_FORMAT_AAC_LATM_LC:
+    case AUDIO_FORMAT_AAC_LATM_HE_V1:
+    case AUDIO_FORMAT_AAC_LATM_HE_V2:
     case AUDIO_FORMAT_CELT:
     case AUDIO_FORMAT_APTX_ADAPTIVE:
     case AUDIO_FORMAT_LHDC:
