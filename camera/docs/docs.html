@@ -17401,14 +17401,23 @@ results for use cases such as image stabilization or augmented reality.<wbr/></p
                   <li>
                     <span class="entry_type_enum_name">LOGICAL_MULTI_CAMERA (v3.3)</span>
                     <span class="entry_type_enum_optional">[optional]</span>
-                    <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras.<wbr/> In
-API level 28,<wbr/> the physical cameras must also be exposed to the application via
-<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> Starting from API
-level 29,<wbr/> some or all physical cameras may not be independently exposed to the
-application,<wbr/> in which case the physical camera IDs will not be available in
-<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> But the application
-can still query the physical cameras' characteristics by calling
-<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>.<wbr/></p>
+                    <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras.<wbr/></p>
+<p>In API level 28,<wbr/> the physical cameras must also be exposed to the application via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/></p>
+<p>Starting from API level 29,<wbr/> some or all physical cameras may not be independently
+exposed to the application,<wbr/> in which case the physical camera IDs will not be
+available in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> But the
+application can still query the physical cameras' characteristics by calling
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>.<wbr/> Additionally,<wbr/>
+if a physical camera is hidden from camera ID list,<wbr/> the mandatory stream combinations
+for that physical camera must be supported through the logical camera using physical
+streams.<wbr/></p>
+<p>Combinations of logical and physical streams,<wbr/> or physical streams from different
+physical cameras are not guaranteed.<wbr/> However,<wbr/> if the camera device supports
+<a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>,<wbr/>
+application must be able to query whether a stream combination involving physical
+streams is supported by calling
+<a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>.<wbr/></p>
 <p>Camera application shouldn't assume that there are at most 1 rear camera and 1 front
 camera in the system.<wbr/> For an application that switches between front and back cameras,<wbr/>
 the recommendation is to switch between the first rear camera and the first front
@@ -17433,24 +17442,6 @@ camera in the list of supported camera devices.<wbr/></p>
   the same.<wbr/></li>
 <li>The logical camera must be LIMITED or higher device.<wbr/></li>
 </ul>
-<p>Both the logical camera device and its underlying physical devices support the
-mandatory stream combinations required for their device levels.<wbr/></p>
-<p>Additionally,<wbr/> for each guaranteed stream combination,<wbr/> the logical camera supports:</p>
-<ul>
-<li>For each guaranteed stream combination,<wbr/> the logical camera supports replacing one
-  logical <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">YUV_<wbr/>420_<wbr/>888</a>
-  or raw stream with two physical streams of the same size and format,<wbr/> each from a
-  separate physical camera,<wbr/> given that the size and format are supported by both
-  physical cameras.<wbr/></li>
-<li>If the logical camera doesn't advertise RAW capability,<wbr/> but the underlying physical
-  cameras do,<wbr/> the logical camera will support guaranteed stream combinations for RAW
-  capability,<wbr/> except that the RAW streams will be physical streams,<wbr/> each from a separate
-  physical camera.<wbr/> This is usually the case when the physical cameras have different
-  sensor sizes.<wbr/></li>
-</ul>
-<p>Using physical streams in place of a logical stream of the same size and format will
-not slow down the frame rate of the capture,<wbr/> as long as the minimum frame duration
-of the physical and logical streams are the same.<wbr/></p>
 <p>A logical camera device's dynamic metadata may contain
 <a href="#dynamic_android.logicalMultiCamera.activePhysicalId">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>active<wbr/>Physical<wbr/>Id</a> to notify the application of the current
 active physical camera Id.<wbr/> An active physical camera is the physical camera from which
@@ -17624,6 +17615,11 @@ power,<wbr/> performance,<wbr/> and latency tradeoffs at the front of the camera
 If physical cameras have different sizes,<wbr/> HAL must maintain a single logical camera
 active<wbr/>Array<wbr/>Size/<wbr/>pixel<wbr/>Array<wbr/>Size/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size,<wbr/> and must do proper mapping
 between logical camera and underlying physical cameras.<wbr/></p>
+</li>
+<li>
+<p>Starting from HIDL ICameraDevice version 3.<wbr/>5,<wbr/> camera HAL must support
+isStreamCombinationSupported for application to query whether a particular logical and
+physical streams combination are supported.<wbr/></p>
 </li>
 </ul>
 <p>A MONOCHROME camera device must also advertise BACKWARD_<wbr/>COMPATIBLE capability,<wbr/> and must
@@ -20434,10 +20430,12 @@ As per documentation,<wbr/> the stream combinations with given PREVIEW,<wbr/> RE
 MAXIMUM resolutions and anything smaller from the list given by
 <a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html#getOutputSizes">StreamConfigurationMap#getOutputSizes</a> are
 guaranteed to work.<wbr/>
-The mandatory stream combination array will be {@code null} in case the device is a
-physical camera not independently exposed in
-<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a> or is not backward
-compatible.<wbr/></p>
+For a physical camera not independently exposed in
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>,<wbr/> the mandatory stream
+combinations for that physical camera Id are also generated,<wbr/> so that the application can
+configure them as physical streams via the logical camera.<wbr/>
+The mandatory stream combination array will be {@code null} in case the device is not
+backward compatible.<wbr/></p>
             </td>
           </tr>
 
@@ -31223,6 +31221,8 @@ master-master mode,<wbr/> and there could be offset between their start of expos
 <p>In both cases,<wbr/> all images generated for a particular capture request still carry the same
 timestamps,<wbr/> so that they can be used to look up the matching frame number and
 onCaptureStarted callback.<wbr/></p>
+<p>This tag is only applicable if the logical camera device supports concurrent physical
+streams from different physical cameras.<wbr/></p>
             </td>
           </tr>
 
