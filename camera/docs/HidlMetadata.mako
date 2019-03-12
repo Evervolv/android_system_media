@@ -35,7 +35,6 @@
 package android.hardware.camera.metadata@${hal_major_version()}.${hal_minor_version()};
 
 % if first_hal_minor_version(hal_major_version()) != hal_minor_version():
-/* Include definitions from all prior minor HAL metadata revisions */
   % for i in range(first_hal_minor_version(hal_major_version()),hal_minor_version()):
 import android.hardware.camera.metadata@${hal_major_version()}.${i};
   % endfor
