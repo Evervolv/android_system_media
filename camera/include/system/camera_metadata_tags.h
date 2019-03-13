@@ -853,8 +853,10 @@ typedef enum camera_metadata_enum_android_scaler_available_recommended_stream_co
                                                                       = 0x3, // HIDL v3.4
     ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_ZSL   = 0x4, // HIDL v3.4
     ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RAW   = 0x5, // HIDL v3.4
-    ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PUBLIC_END
+    ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_LOW_LATENCY_SNAPSHOT
                                                                       = 0x6, // HIDL v3.4
+    ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PUBLIC_END
+                                                                      = 0x7, // HIDL v3.4
     ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VENDOR_START
                                                                       = 0x18, // HIDL v3.4
 } camera_metadata_enum_android_scaler_available_recommended_stream_configurations_t;

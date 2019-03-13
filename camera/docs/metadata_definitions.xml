@@ -6652,7 +6652,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value id="0x0">PREVIEW
             <notes>
                 Preview must only include non-stalling processed stream configurations with
-                output formats like YUV_420_888, IMPLEMENTATION_DEFINED, etc.
+                output formats like
+                {@link android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888},
+                {@link android.graphics.ImageFormat#PRIVATE|AIMAGE_FORMAT_PRIVATE}, etc.
             </notes>
             </value>
             <value id="0x1">RECORD
@@ -6665,18 +6667,19 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value id="0x2">VIDEO_SNAPSHOT
             <notes>
                 Video snapshot must include stream configurations at least as big as
-                the maximum RECORD resolutions and only with format BLOB + DATASPACE_JFIF
-                format/dataspace combination (JPEG). Additionally the configurations shouldn't cause
-                preview glitches and also be able to run at 30 fps.
+                the maximum RECORD resolutions and only with
+                {@link android.graphics.ImageFormat#JPEG|AIMAGE_FORMAT_JPEG JPEG output format}.
+                Additionally the configurations shouldn't cause preview glitches and also be able to
+                run at 30 fps.
             </notes>
             </value>
             <value id="0x3">SNAPSHOT
             <notes>
                 Recommended snapshot stream configurations must include at least one with
-                size close to android.sensor.info.activeArraySize with BLOB + DATASPACE_JFIF
-                format/dataspace combination (JPEG). Taking into account restrictions on aspect
-                ratio, alignment etc. the area of the maximum suggested size shouldn’t be less than
-                97% of the sensor array size area.
+                size close to android.sensor.info.activeArraySize and
+                {@link android.graphics.ImageFormat#JPEG|AIMAGE_FORMAT_JPEG JPEG output format}.
+                Taking into account restrictions on aspect ratio, alignment etc. the area of the
+                maximum suggested size shouldn’t be less than 97% of the sensor array size area.
             </notes>
             </value>
             <value id="0x4">ZSL
@@ -6691,7 +6694,17 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 output formats.
             </notes>
             </value>
-            <value id="0x6">PUBLIC_END
+            <value id="0x6">LOW_LATENCY_SNAPSHOT
+            <notes>
+                If supported, the recommended low latency stream configurations must have
+                end-to-end latency that does not exceed 200 ms. under standard operating conditions
+                (reasonable light levels, not loaded system) and using template
+                TEMPLATE_STILL_CAPTURE. This is primarily for listing configurations for the
+                {@link android.graphics.ImageFormat#JPEG|AIMAGE_FORMAT_JPEG JPEG output format}
+                however other supported output formats can be added as well.
+            </notes>
+            </value>
+            <value id="0x7">PUBLIC_END
             </value>
             <value id="0x18">VENDOR_START
             <notes>

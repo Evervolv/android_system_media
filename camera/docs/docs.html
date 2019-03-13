@@ -20171,7 +20171,9 @@ return the final used crop region in capture result metadata <a href="#controls_
                     <span class="entry_type_enum_name">PREVIEW (v3.4)</span>
                     <span class="entry_type_enum_value">0x0</span>
                     <span class="entry_type_enum_notes"><p>Preview must only include non-stalling processed stream configurations with
-output formats like YUV_<wbr/>420_<wbr/>888,<wbr/> IMPLEMENTATION_<wbr/>DEFINED,<wbr/> etc.<wbr/></p></span>
+output formats like
+<a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YUV_420_888">Image<wbr/>Format#YUV_<wbr/>420_<wbr/>888</a>,<wbr/>
+<a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#PRIVATE">ImageFormat#PRIVATE</a>,<wbr/> etc.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">RECORD (v3.4)</span>
@@ -20184,18 +20186,19 @@ IMPLEMENTATION_<wbr/>DEFINED format.<wbr/></p></span>
                     <span class="entry_type_enum_name">VIDEO_SNAPSHOT (v3.4)</span>
                     <span class="entry_type_enum_value">0x2</span>
                     <span class="entry_type_enum_notes"><p>Video snapshot must include stream configurations at least as big as
-the maximum RECORD resolutions and only with format BLOB + DATASPACE_<wbr/>JFIF
-format/<wbr/>dataspace combination (JPEG).<wbr/> Additionally the configurations shouldn't cause
-preview glitches and also be able to run at 30 fps.<wbr/></p></span>
+the maximum RECORD resolutions and only with
+<a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">JPEG output format</a>.<wbr/>
+Additionally the configurations shouldn't cause preview glitches and also be able to
+run at 30 fps.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">SNAPSHOT (v3.4)</span>
                     <span class="entry_type_enum_value">0x3</span>
                     <span class="entry_type_enum_notes"><p>Recommended snapshot stream configurations must include at least one with
-size close to <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> with BLOB + DATASPACE_<wbr/>JFIF
-format/<wbr/>dataspace combination (JPEG).<wbr/> Taking into account restrictions on aspect
-ratio,<wbr/> alignment etc.<wbr/> the area of the maximum suggested size shouldn’t be less than
-97% of the sensor array size area.<wbr/></p></span>
+size close to <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> and
+<a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">JPEG output format</a>.<wbr/>
+Taking into account restrictions on aspect ratio,<wbr/> alignment etc.<wbr/> the area of the
+maximum suggested size shouldn’t be less than 97% of the sensor array size area.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">ZSL (v3.4)</span>
@@ -20210,8 +20213,18 @@ ZSL along with other processed and/<wbr/>or stalling output formats.<wbr/></p></
 output formats.<wbr/></p></span>
                   </li>
                   <li>
-                    <span class="entry_type_enum_name">PUBLIC_END (v3.4)</span>
+                    <span class="entry_type_enum_name">LOW_LATENCY_SNAPSHOT (v3.4)</span>
                     <span class="entry_type_enum_value">0x6</span>
+                    <span class="entry_type_enum_notes"><p>If supported,<wbr/> the recommended low latency stream configurations must have
+end-to-end latency that does not exceed 200 ms.<wbr/> under standard operating conditions
+(reasonable light levels,<wbr/> not loaded system) and using template
+TEMPLATE_<wbr/>STILL_<wbr/>CAPTURE.<wbr/> This is primarily for listing configurations for the
+<a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#JPEG">JPEG output format</a>
+however other supported output formats can be added as well.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">PUBLIC_END (v3.4)</span>
+                    <span class="entry_type_enum_value">0x7</span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">VENDOR_START (v3.4)</span>

@@ -2167,6 +2167,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "RAW";
                     ret = 0;
                     break;
+                case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_LOW_LATENCY_SNAPSHOT:
+                    msg = "LOW_LATENCY_SNAPSHOT";
+                    ret = 0;
+                    break;
                 case ANDROID_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PUBLIC_END:
                     msg = "PUBLIC_END";
                     ret = 0;
