@@ -73,8 +73,9 @@ enum {
     AUDIO_FLAG_BYPASS_MUTE                = 0x80,
     AUDIO_FLAG_LOW_LATENCY                = 0x100,
     AUDIO_FLAG_DEEP_BUFFER                = 0x200,
-    AUDIO_FLAG_NO_CAPTURE                 = 0X400,
+    AUDIO_FLAG_NO_MEDIA_PROJECTION        = 0X400,
     AUDIO_FLAG_MUTE_HAPTIC                = 0x800,
+    AUDIO_FLAG_NO_SYSTEM_CAPTURE          = 0X1000,
 };
 
 /* Audio attributes */
