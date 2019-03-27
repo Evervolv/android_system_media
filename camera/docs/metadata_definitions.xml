@@ -5534,10 +5534,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           same way as a physical camera device based on its hardware level and capabilities.
           It's recommended that its feature set is superset of that of individual physical cameras.
 
-          * In camera1 API, to maintain application compatibility, for each {logical_camera_id,
-          physical_camera_1_id, physical_camera_2_id, ...} combination, where logical_camera_id
-          is composed of physical_camera_N_id, camera framework will only advertise one camera id
-          (within the combination) that is frontmost in the HAL published camera id list.
+          * In camera1 API, to maintain application compatibility, for each camera facing, there
+          may be one or more {logical_camera_id, physical_camera_1_id, physical_camera_2_id, ...}
+          combinations, where logical_camera_id is composed of physical_camera_N_id, camera
+          framework will only advertise one camera id
+          (within the combinations for the particular facing) that is frontmost in the HAL
+          published camera id list.
+          For example, if HAL advertises 6 back facing camera IDs (ID0 to ID5), among which ID4
+          and ID5 are logical cameras backed by ID0+ID1 and ID2+ID3 respectively. In this case,
+          only ID0 will be available for camera1 API to use.
 
           * Camera HAL is strongly recommended to advertise camera devices with best feature,
           power, performance, and latency tradeoffs at the front of the camera id list.
