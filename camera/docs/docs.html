@@ -19641,6 +19641,12 @@ configurations based on the hardware level
 </table>
 <p>Refer to <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a> for additional
 mandatory stream configurations on a per-capability basis.<wbr/></p>
+<p>Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability for
+downscaling from larger resolution to smaller,<wbr/> and the QCIF resolution sometimes is not
+fully supported due to this limitation on devices with high-resolution image sensors.<wbr/>
+Therefore,<wbr/> trying to configure a QCIF resolution stream together with any other
+stream larger than 1920x1080 resolution (either width or height) might not be supported,<wbr/>
+and capture session creation will fail if it is not.<wbr/></p>
             </td>
           </tr>
 
@@ -20026,6 +20032,12 @@ if the sensor maximum resolution is 3280x2464,<wbr/> if the maximum JPEG size ha
 ratio 4:3,<wbr/> and the JPEG encoder alignment requirement is 16,<wbr/> the maximum JPEG size will be
 3264x2448.<wbr/></li>
 </ul>
+<p>Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability on
+downscaling from larger resolution to smaller ones,<wbr/> and the QCIF resolution can sometimes
+not be fully supported due to this limitation on devices with high-resolution image
+sensors.<wbr/> Therefore,<wbr/> trying to configure a QCIF resolution stream together with any other
+stream larger than 1920x1080 resolution (either width or height) might not be supported,<wbr/>
+and capture session creation will fail if it is not.<wbr/></p>
             </td>
           </tr>
 
@@ -29322,7 +29334,7 @@ boolean isHardwareLevelSupported(CameraCharacteristics c,<wbr/> int requiredLeve
 <li><code>LEVEL_<wbr/>3</code> devices additionally support YUV reprocessing and RAW image capture,<wbr/> along
   with additional output stream configurations.<wbr/></li>
 <li><code>EXTERNAL</code> devices are similar to <code>LIMITED</code> devices with exceptions like some sensor or
-  lens information not reorted or less stable framerates.<wbr/></li>
+  lens information not reported or less stable framerates.<wbr/></li>
 </ul>
 <p>See the individual level enums for full descriptions of the supported capabilities.<wbr/>  The
 <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a> entry describes the device's capabilities at a
