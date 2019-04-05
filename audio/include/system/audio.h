@@ -92,7 +92,7 @@ static const audio_attributes_t AUDIO_ATTRIBUTES_INITIALIZER = {
     /* .content_type = */ AUDIO_CONTENT_TYPE_UNKNOWN,
     /* .usage = */ AUDIO_USAGE_UNKNOWN,
     /* .source = */ AUDIO_SOURCE_DEFAULT,
-    /* .flags = */ AUDIO_INPUT_FLAG_NONE,
+    /* .flags = */ AUDIO_FLAG_NONE,
     /* .tags = */ ""
 };
 
