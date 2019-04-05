@@ -17601,10 +17601,15 @@ same way as a physical camera device based on its hardware level and capabilitie
 It's recommended that its feature set is superset of that of individual physical cameras.<wbr/></p>
 <ul>
 <li>
-<p>In camera1 API,<wbr/> to maintain application compatibility,<wbr/> for each {logical_<wbr/>camera_<wbr/>id,<wbr/>
-physical_<wbr/>camera_<wbr/>1_<wbr/>id,<wbr/> physical_<wbr/>camera_<wbr/>2_<wbr/>id,<wbr/> ...<wbr/>} combination,<wbr/> where logical_<wbr/>camera_<wbr/>id
-is composed of physical_<wbr/>camera_<wbr/>N_<wbr/>id,<wbr/> camera framework will only advertise one camera id
-(within the combination) that is frontmost in the HAL published camera id list.<wbr/></p>
+<p>In camera1 API,<wbr/> to maintain application compatibility,<wbr/> for each camera facing,<wbr/> there
+may be one or more {logical_<wbr/>camera_<wbr/>id,<wbr/> physical_<wbr/>camera_<wbr/>1_<wbr/>id,<wbr/> physical_<wbr/>camera_<wbr/>2_<wbr/>id,<wbr/> ...<wbr/>}
+combinations,<wbr/> where logical_<wbr/>camera_<wbr/>id is composed of physical_<wbr/>camera_<wbr/>N_<wbr/>id,<wbr/> camera
+framework will only advertise one camera id
+(within the combinations for the particular facing) that is frontmost in the HAL
+published camera id list.<wbr/>
+For example,<wbr/> if HAL advertises 6 back facing camera IDs (ID0 to ID5),<wbr/> among which ID4
+and ID5 are logical cameras backed by ID0+ID1 and ID2+ID3 respectively.<wbr/> In this case,<wbr/>
+only ID0 will be available for camera1 API to use.<wbr/></p>
 </li>
 <li>
 <p>Camera HAL is strongly recommended to advertise camera devices with best feature,<wbr/>
