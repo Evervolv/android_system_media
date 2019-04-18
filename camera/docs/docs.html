@@ -17482,6 +17482,24 @@ physical camera.<wbr/></p>
 <li><a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a></li>
 <li><a href="#static_android.lens.distortion">android.<wbr/>lens.<wbr/>distortion</a></li>
 </ul>
+<p>The field of view of all non-RAW physical streams must be the same or as close as
+possible to that of non-RAW logical streams.<wbr/> If the requested FOV is outside of the
+range supported by the physical camera,<wbr/> the physical stream for that physical camera
+will use either the maximum or minimum scaler crop region,<wbr/> depending on which one is
+closer to the requested FOV.<wbr/> For example,<wbr/> for a logical camera with wide-tele lens
+configuration where the wide lens is the default,<wbr/> if the logical camera's crop region
+is set to maximum,<wbr/> the physical stream for the tele lens will be configured to its
+maximum crop region.<wbr/> On the other hand,<wbr/> if the logical camera has a normal-wide lens
+configuration where the normal lens is the default,<wbr/> when the logical camera's crop
+region is set to maximum,<wbr/> the FOV of the logical streams will be that of the normal
+lens.<wbr/> The FOV of the physical streams for the wide lens will be the same as the
+logical stream,<wbr/> by making the crop region smaller than its active array size to
+compensate for the smaller focal length.<wbr/></p>
+<p>Even if the underlying physical cameras have different RAW characteristics (such as
+size or CFA pattern),<wbr/> a logical camera can still advertise RAW capability.<wbr/> In this
+case,<wbr/> when the application configures a RAW stream,<wbr/> the camera device will make sure
+the active physical camera will remain active to ensure consistent RAW output
+behavior,<wbr/> and not switch to other physical cameras.<wbr/></p>
 <p>To maintain backward compatibility,<wbr/> the capture request and result metadata tags
 required for basic camera functionalities will be solely based on the
 logical camera capabiltity.<wbr/> Other request and result metadata tags,<wbr/> on the other
@@ -17619,7 +17637,8 @@ power,<wbr/> performance,<wbr/> and latency tradeoffs at the front of the camera
 <p>Camera HAL may switch between physical cameras depending on focalLength or cropRegion.<wbr/>
 If physical cameras have different sizes,<wbr/> HAL must maintain a single logical camera
 active<wbr/>Array<wbr/>Size/<wbr/>pixel<wbr/>Array<wbr/>Size/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size,<wbr/> and must do proper mapping
-between logical camera and underlying physical cameras.<wbr/></p>
+between logical camera and underlying physical cameras for all related metadata tags,<wbr/>
+such as crop region,<wbr/> 3A regions,<wbr/> and intrinsicCalibration.<wbr/></p>
 </li>
 <li>
 <p>Starting from HIDL ICameraDevice version 3.<wbr/>5,<wbr/> camera HAL must support
