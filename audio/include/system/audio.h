@@ -1201,13 +1201,22 @@ static inline char *audio_device_address_to_parameter(audio_devices_t device, co
     const size_t kSize = AUDIO_DEVICE_MAX_ADDRESS_LEN + sizeof("a2dp_sink_address=");
     char param[kSize];
 
-    if (device & AUDIO_DEVICE_OUT_ALL_A2DP)
-        snprintf(param, kSize, "%s=%s", "a2dp_sink_address", address);
-    else if (device & AUDIO_DEVICE_OUT_REMOTE_SUBMIX)
-        snprintf(param, kSize, "%s=%s", "mix", address);
-    else
-        snprintf(param, kSize, "%s", address);
-
+    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
+        device &= ~AUDIO_DEVICE_BIT_IN;
+        if (device & AUDIO_DEVICE_IN_BLUETOOTH_A2DP)
+            snprintf(param, kSize, "%s=%s", "a2dp_source_address", address);
+        else if (device & AUDIO_DEVICE_IN_REMOTE_SUBMIX)
+            snprintf(param, kSize, "%s=%s", "mix", address);
+        else
+            snprintf(param, kSize, "%s", address);
+    } else {
+        if (device & AUDIO_DEVICE_OUT_ALL_A2DP)
+            snprintf(param, kSize, "%s=%s", "a2dp_sink_address", address);
+        else if (device & AUDIO_DEVICE_OUT_REMOTE_SUBMIX)
+            snprintf(param, kSize, "%s=%s", "mix", address);
+        else
+            snprintf(param, kSize, "%s", address);
+    }
     return strdup(param);
 }
 
