@@ -5108,10 +5108,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             <value optional="true">BURST_CAPTURE
               <notes>
               The camera device supports capturing high-resolution images at &gt;= 20 frames per
-              second, in at least the uncompressed YUV format, when post-processing settings are set
-              to FAST. Additionally, maximum-resolution images can be captured at &gt;= 10 frames
-              per second.  Here, 'high resolution' means at least 8 megapixels, or the maximum
-              resolution of the device, whichever is smaller.
+              second, in at least the uncompressed YUV format, when post-processing settings are
+              set to FAST. Additionally, all image resolutions less than 24 megapixels can be
+              captured at &gt;= 10 frames per second. Here, 'high resolution' means at least 8
+              megapixels, or the maximum resolution of the device, whichever is smaller.
               </notes>
               <sdk_notes>
               More specifically, this means that a size matching the camera device's active array
@@ -5120,9 +5120,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               android.hardware.camera2.params.StreamConfigurationMap#getOutputSizes} or {@link
               android.hardware.camera2.params.StreamConfigurationMap#getHighResolutionOutputSizes},
               with a minimum frame duration for that format and size of either &lt;= 1/20 s, or
-              &lt;= 1/10 s, respectively; and the android.control.aeAvailableTargetFpsRanges entry
-              lists at least one FPS range where the minimum FPS is &gt;= 1 / minimumFrameDuration
-              for the maximum-size YUV_420_888 format.  If that maximum size is listed in {@link
+              &lt;= 1/10 s if the image size is less than 24 megapixels, respectively; and
+              the android.control.aeAvailableTargetFpsRanges entry lists at least one FPS range
+              where the minimum FPS is &gt;= 1 / minimumFrameDuration for the maximum-size
+              YUV_420_888 format.  If that maximum size is listed in {@link
               android.hardware.camera2.params.StreamConfigurationMap#getHighResolutionOutputSizes},
               then the list of resolutions for YUV_420_888 from {@link
               android.hardware.camera2.params.StreamConfigurationMap#getOutputSizes} contains at
@@ -5154,9 +5155,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               android.graphics.ImageFormat#YUV_420_888|AIMAGE_FORMAT_YUV_420_888} size listed in
               {@link
               android.hardware.camera2.params.StreamConfigurationMap|ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS},
-              camera device can capture this size for at least 10 frames per second.  Also the
-              android.control.aeAvailableTargetFpsRanges entry lists at least one FPS range where
-              the minimum FPS is &gt;= 1 / minimumFrameDuration for the largest YUV_420_888 size.
+              camera device can capture this size for at least 10 frames per second if the size is
+              less than 24 megapixels. Also the android.control.aeAvailableTargetFpsRanges entry
+              lists at least one FPS range where the minimum FPS is &gt;= 1 / minimumFrameDuration
+              for the largest YUV_420_888 size.
 
               If the device supports the {@link
               android.graphics.ImageFormat#RAW10|AIMAGE_FORMAT_RAW10}, {@link
