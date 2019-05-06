@@ -271,7 +271,11 @@ camera_metadata_t *place_camera_metadata(void *dst,
 
     size_t memory_needed = calculate_camera_metadata_size(entry_capacity,
                                                           data_capacity);
-    if (memory_needed > dst_size) return NULL;
+    if (memory_needed > dst_size) {
+      ALOGE("%s: Memory needed to place camera metadata (%zu) > dst size (%zu)", __FUNCTION__,
+              memory_needed, dst_size);
+      return NULL;
+    }
 
     camera_metadata_t *metadata = (camera_metadata_t*)dst;
     metadata->version = CURRENT_METADATA_VERSION;
@@ -343,7 +347,11 @@ camera_metadata_t* copy_camera_metadata(void *dst, size_t dst_size,
     size_t memory_needed = get_camera_metadata_compact_size(src);
 
     if (dst == NULL) return NULL;
-    if (dst_size < memory_needed) return NULL;
+    if (dst_size < memory_needed) {
+        ALOGE("%s: Memory needed to place camera metadata (%zu) > dst size (%zu)", __FUNCTION__,
+                memory_needed, dst_size);
+      return NULL;
+    }
 
     camera_metadata_t *metadata =
         place_camera_metadata(dst, dst_size, src->entry_count, src->data_count);
