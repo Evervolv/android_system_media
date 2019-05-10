@@ -378,7 +378,7 @@ typedef int audio_module_handle_t;
 #define FLOAT_NOMINAL_RANGE_HEADROOM 1.412538
 
 /* If the audio hardware supports gain control on some audio paths,
- * the platform can expose them in the audio_policy.conf file. The audio HAL
+ * the platform can expose them in the audio_policy_configuration.xml file. The audio HAL
  * will then implement gain control functions that will use the following data
  * structures. */
 
