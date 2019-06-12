@@ -2056,9 +2056,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           For devices at the LIMITED level or above:
 
-          * For YUV_420_888 burst capture use case, this list will always include (`min`, `max`)
-          and (`max`, `max`) where `min` &lt;= 15 and `max` = the maximum output frame rate of the
+          * For devices that advertise NIR color filter arrangement in
+          android.sensor.info.colorFilterArrangement, this list will always include
+          (`max`, `max`) where `max` = the maximum output frame rate of the maximum YUV_420_888
+          output size.
+          * For devices advertising any color filter arrangement other than NIR, or devices not
+          advertising color filter arrangement, this list will always include (`min`, `max`) and
+          (`max`, `max`) where `min` &lt;= 15 and `max` = the maximum output frame rate of the
           maximum YUV_420_888 output size.
+
           </details>
           <tag id="BC" />
         </entry>

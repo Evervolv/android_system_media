@@ -4878,8 +4878,13 @@ normal <a href="https://developer.android.com/reference/android/media/CamcorderP
 </ul>
 <p>For devices at the LIMITED level or above:</p>
 <ul>
-<li>For YUV_<wbr/>420_<wbr/>888 burst capture use case,<wbr/> this list will always include (<code>min</code>,<wbr/> <code>max</code>)
-and (<code>max</code>,<wbr/> <code>max</code>) where <code>min</code> &lt;= 15 and <code>max</code> = the maximum output frame rate of the
+<li>For devices that advertise NIR color filter arrangement in
+<a href="#static_android.sensor.info.colorFilterArrangement">android.<wbr/>sensor.<wbr/>info.<wbr/>color<wbr/>Filter<wbr/>Arrangement</a>,<wbr/> this list will always include
+(<code>max</code>,<wbr/> <code>max</code>) where <code>max</code> = the maximum output frame rate of the maximum YUV_<wbr/>420_<wbr/>888
+output size.<wbr/></li>
+<li>For devices advertising any color filter arrangement other than NIR,<wbr/> or devices not
+advertising color filter arrangement,<wbr/> this list will always include (<code>min</code>,<wbr/> <code>max</code>) and
+(<code>max</code>,<wbr/> <code>max</code>) where <code>min</code> &lt;= 15 and <code>max</code> = the maximum output frame rate of the
 maximum YUV_<wbr/>420_<wbr/>888 output size.<wbr/></li>
 </ul>
             </td>
