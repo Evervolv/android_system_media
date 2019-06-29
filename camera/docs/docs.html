@@ -17500,14 +17500,14 @@ size or CFA pattern),<wbr/> a logical camera can still advertise RAW capability.
 case,<wbr/> when the application configures a RAW stream,<wbr/> the camera device will make sure
 the active physical camera will remain active to ensure consistent RAW output
 behavior,<wbr/> and not switch to other physical cameras.<wbr/></p>
-<p>To maintain backward compatibility,<wbr/> the capture request and result metadata tags
-required for basic camera functionalities will be solely based on the
-logical camera capabiltity.<wbr/> Other request and result metadata tags,<wbr/> on the other
-hand,<wbr/> will be based on current active physical camera.<wbr/> For example,<wbr/> the physical
-cameras' sensor sensitivity and lens capability could be different from each other.<wbr/>
-So when the application manually controls sensor exposure time/<wbr/>gain,<wbr/> or does manual
-focus control,<wbr/> it must checks the current active physical camera's exposure,<wbr/> gain,<wbr/>
-and focus distance range.<wbr/></p></span>
+<p>The capture request and result metadata tags required for backward compatible camera
+functionalities will be solely based on the logical camera capabiltity.<wbr/> On the other
+hand,<wbr/> the use of manual capture controls (sensor or post-processing) with a
+logical camera may result in unexpected behavior when the HAL decides to switch
+between physical cameras with different characteristics under the hood.<wbr/> For example,<wbr/>
+when the application manually sets exposure time and sensitivity while zooming in,<wbr/>
+the brightness of the camera images may suddenly change because HAL switches from one
+physical camera to the other.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">MONOCHROME (v3.3)</span>
