@@ -28,7 +28,7 @@ cc_library_shared {
     ],
 
     product_variables: {
-        debuggable: {
+        eng: {
             // Enable assert()
             cflags: [
                 "-UNDEBUG",
