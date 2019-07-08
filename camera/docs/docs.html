@@ -20950,6 +20950,12 @@ value.<wbr/> The final sensitivity used will be available in the
 output capture result.<wbr/></p>
 <p>This control is only effective if <a href="#controls_android.control.aeMode">android.<wbr/>control.<wbr/>ae<wbr/>Mode</a> or <a href="#controls_android.control.mode">android.<wbr/>control.<wbr/>mode</a> is set to
 OFF; otherwise the auto-exposure algorithm will override this value.<wbr/></p>
+<p>Note that for devices supporting postRawSensitivityBoost,<wbr/> the total sensitivity applied
+to the final processed image is the combination of <a href="#controls_android.sensor.sensitivity">android.<wbr/>sensor.<wbr/>sensitivity</a> and
+<a href="#controls_android.control.postRawSensitivityBoost">android.<wbr/>control.<wbr/>post<wbr/>Raw<wbr/>Sensitivity<wbr/>Boost</a>.<wbr/> In case the application uses the sensor
+sensitivity from last capture result of an auto request for a manual request,<wbr/> in order
+to achieve the same brightness in the output image,<wbr/> the application should also
+set postRawSensitivityBoost.<wbr/></p>
             </td>
           </tr>
 
@@ -23559,6 +23565,12 @@ value.<wbr/> The final sensitivity used will be available in the
 output capture result.<wbr/></p>
 <p>This control is only effective if <a href="#controls_android.control.aeMode">android.<wbr/>control.<wbr/>ae<wbr/>Mode</a> or <a href="#controls_android.control.mode">android.<wbr/>control.<wbr/>mode</a> is set to
 OFF; otherwise the auto-exposure algorithm will override this value.<wbr/></p>
+<p>Note that for devices supporting postRawSensitivityBoost,<wbr/> the total sensitivity applied
+to the final processed image is the combination of <a href="#controls_android.sensor.sensitivity">android.<wbr/>sensor.<wbr/>sensitivity</a> and
+<a href="#controls_android.control.postRawSensitivityBoost">android.<wbr/>control.<wbr/>post<wbr/>Raw<wbr/>Sensitivity<wbr/>Boost</a>.<wbr/> In case the application uses the sensor
+sensitivity from last capture result of an auto request for a manual request,<wbr/> in order
+to achieve the same brightness in the output image,<wbr/> the application should also
+set postRawSensitivityBoost.<wbr/></p>
             </td>
           </tr>
 

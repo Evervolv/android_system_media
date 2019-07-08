@@ -7012,6 +7012,13 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           This control is only effective if android.control.aeMode or android.control.mode is set to
           OFF; otherwise the auto-exposure algorithm will override this value.
+
+          Note that for devices supporting postRawSensitivityBoost, the total sensitivity applied
+          to the final processed image is the combination of android.sensor.sensitivity and
+          android.control.postRawSensitivityBoost. In case the application uses the sensor
+          sensitivity from last capture result of an auto request for a manual request, in order
+          to achieve the same brightness in the output image, the application should also
+          set postRawSensitivityBoost.
           </details>
           <hal_details>ISO 12232:2006 REI method is acceptable.</hal_details>
           <tag id="V1" />
