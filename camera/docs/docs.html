@@ -193,6 +193,8 @@
             ><a href="#controls_android.control.postRawSensitivityBoost">android.control.postRawSensitivityBoost</a></li>
             <li
             ><a href="#controls_android.control.enableZsl">android.control.enableZsl</a></li>
+            <li
+            ><a href="#controls_android.control.bokehMode">android.control.bokehMode</a></li>
           </ul>
         </li>
         <li>
@@ -238,6 +240,8 @@
             ><a href="#static_android.control.availableModes">android.control.availableModes</a></li>
             <li
             ><a href="#static_android.control.postRawSensitivityBoostRange">android.control.postRawSensitivityBoostRange</a></li>
+            <li
+            ><a href="#static_android.control.availableBokehCapabilities">android.control.availableBokehCapabilities</a></li>
           </ul>
         </li>
         <li>
@@ -297,6 +301,8 @@
             ><a href="#dynamic_android.control.enableZsl">android.control.enableZsl</a></li>
             <li
             ><a href="#dynamic_android.control.afSceneChange">android.control.afSceneChange</a></li>
+            <li
+            ><a href="#dynamic_android.control.bokehMode">android.control.bokehMode</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -1385,7 +1391,7 @@ control is overridden by the AWB routine.<wbr/> When AWB is disabled,<wbr/> the
 application controls how the color mapping is performed.<wbr/></p>
 <p>We define the expected processing pipeline below.<wbr/> For consistency
 across devices,<wbr/> this is always the case with TRANSFORM_<wbr/>MATRIX.<wbr/></p>
-<p>When either FULL or HIGH_<wbr/>QUALITY is used,<wbr/> the camera device may
+<p>When either FAST or HIGH_<wbr/>QUALITY is used,<wbr/> the camera device may
 do additional processing but <a href="#controls_android.colorCorrection.gains">android.<wbr/>color<wbr/>Correction.<wbr/>gains</a> and
 <a href="#controls_android.colorCorrection.transform">android.<wbr/>color<wbr/>Correction.<wbr/>transform</a> will still be provided by the
 camera device (in the results) and be roughly correct.<wbr/></p>
@@ -1770,7 +1776,7 @@ control is overridden by the AWB routine.<wbr/> When AWB is disabled,<wbr/> the
 application controls how the color mapping is performed.<wbr/></p>
 <p>We define the expected processing pipeline below.<wbr/> For consistency
 across devices,<wbr/> this is always the case with TRANSFORM_<wbr/>MATRIX.<wbr/></p>
-<p>When either FULL or HIGH_<wbr/>QUALITY is used,<wbr/> the camera device may
+<p>When either FAST or HIGH_<wbr/>QUALITY is used,<wbr/> the camera device may
 do additional processing but <a href="#controls_android.colorCorrection.gains">android.<wbr/>color<wbr/>Correction.<wbr/>gains</a> and
 <a href="#controls_android.colorCorrection.transform">android.<wbr/>color<wbr/>Correction.<wbr/>transform</a> will still be provided by the
 camera device (in the results) and be roughly correct.<wbr/></p>
@@ -4640,6 +4646,102 @@ capture intent.<wbr/></p>
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="controls_android.control.bokehMode">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>control.<wbr/>bokeh<wbr/>Mode
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OFF (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>Bokeh mode is disabled.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">STILL_CAPTURE (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>High quality bokeh mode is enabled for all non-raw streams (including YUV,<wbr/>
+JPEG,<wbr/> and IMPLEMENTATION_<wbr/>DEFINED) when capture intent is STILL_<wbr/>CAPTURE.<wbr/> Due to the
+extra image processing,<wbr/> this mode may introduce additional stall to non-raw streams.<wbr/>
+This mode should be used in high quality still capture use case.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">CONTINUOUS (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>Bokeh effect must not slow down capture rate relative to sensor raw output,<wbr/>
+and the effect is applied to all processed streams no larger than the maximum
+streaming dimension.<wbr/> This mode should be used if performance and power are a
+priority,<wbr/> such as video recording.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Whether bokeh mode is enabled for a particular capture request.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>With bokeh mode,<wbr/> the camera device may blur out the parts of scene that are not in
+focus,<wbr/> creating a bokeh (or shallow depth of field) effect for people or objects.<wbr/></p>
+<p>When set to STILL_<wbr/>CAPTURE bokeh mode with STILL_<wbr/>CAPTURE capture intent,<wbr/> due to the extra
+processing needed for high quality bokeh effect,<wbr/> the stall may be longer than when
+capture intent is not STILL_<wbr/>CAPTURE.<wbr/></p>
+<p>When set to STILL_<wbr/>CAPTURE bokeh mode with PREVIEW capture intent,<wbr/></p>
+<ul>
+<li>If the camera device has BURST_<wbr/>CAPTURE capability,<wbr/> the frame rate requirement of
+BURST_<wbr/>CAPTURE must still be met.<wbr/></li>
+<li>All streams not larger than the maximum streaming dimension for STILL_<wbr/>CAPTURE mode
+(queried via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#CONTROL_AVAILABLE_BOKEH_CAPABILITIES">Camera<wbr/>Characteristics#CONTROL_<wbr/>AVAILABLE_<wbr/>BOKEH_<wbr/>CAPABILITIES</a>)
+will have preview bokeh effect applied.<wbr/></li>
+</ul>
+<p>When set to CONTINUOUS mode,<wbr/> configured streams dimension should not exceed this mode's
+maximum streaming dimension in order to have bokeh effect applied.<wbr/> Bokeh effect may not
+be available for streams larger than the maximum streaming dimension.<wbr/></p>
+<p>Switching between different bokeh modes may involve reconfiguration of the camera
+pipeline,<wbr/> resulting in long latency.<wbr/> The application should check this key against the
+available session keys queried via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableSessionKeys">CameraCharacteristics#getAvailableSessionKeys</a>.<wbr/></p>
+<p>When bokeh mode is on,<wbr/> the camera device may override certain control parameters,<wbr/> such as
+reduce frame rate or use face priority scene mode,<wbr/> to achieve best power and quality
+tradeoffs.<wbr/> When turned on,<wbr/> AE,<wbr/> AWB,<wbr/> and AF run in auto modes,<wbr/> and only the mandatory
+stream combinations of LIMITED hardware level are guaranteed.<wbr/></p>
+<p>For a logical multi-camera,<wbr/> bokeh may be implemented by stereo vision from sub-cameras
+with different field of view.<wbr/> As a result,<wbr/> when bokeh mode is enabled,<wbr/> the camera device
+may override android.<wbr/>scaler.<wbr/>Crop<wbr/>Region,<wbr/> and the field of view will be smaller than when
+bokeh mode is off.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -6057,6 +6159,91 @@ list <code>(100,<wbr/> 100)</code> in this key.<wbr/></p>
 framework will generate this key as <code>(100,<wbr/> 100)</code> if device supports any of RAW output
 formats.<wbr/>  All legacy HAL3.<wbr/>4 and above devices should list this key if device supports
 any of RAW output formats.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.control.availableBokehCapabilities">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Capabilities
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  3 x n
+                </span>
+              <span class="entry_type_visibility"> [public as capabilityAndMaxSize]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+                <div class="entry_type_notes">List of bokeh modes and the corresponding max streaming sizes.<wbr/></div>
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The list of bokeh modes that are supported by this camera device,<wbr/> and each bokeh mode's
+maximum streaming (non-stall) size with bokeh effect.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              (mode,<wbr/> width,<wbr/> height)
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For OFF mode,<wbr/> the camera behaves normally with no bokeh effect.<wbr/></p>
+<p>For STILL_<wbr/>CAPTURE mode,<wbr/> the maximum streaming dimension specifies the limit under which
+bokeh is effective when capture intent is PREVIEW.<wbr/> Note that when capture intent is
+PREVIEW,<wbr/> the bokeh effect may not be as high quality compared to STILL_<wbr/>CAPTURE intent
+in order to maintain reasonable frame rate.<wbr/> The maximum streaming dimension must be one
+of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions in availableStreamConfigurations,<wbr/> or (0,<wbr/> 0)
+if preview bokeh is not supported.<wbr/> If the application configures a stream larger than
+the maximum streaming dimension,<wbr/> bokeh effect may not be applied for this stream for
+PREVIEW intent.<wbr/></p>
+<p>For CONTINUOUS mode,<wbr/> the maximum streaming dimension specifies the limit under which
+bokeh is effective.<wbr/> This dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions
+in availableStreamConfigurations,<wbr/> and if the sensor maximum resolution is larger than or
+equal to 1080p,<wbr/> the maximum streaming dimension must be at least 1080p.<wbr/> If the
+application configures a stream with larger dimension,<wbr/> the stream may not have bokeh
+effect applied.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For available bokeh modes,<wbr/> OFF will always be listed.<wbr/> Unlike other controls with FAST
+and HIGH_<wbr/>QUALITY modes,<wbr/> where FAST and HIGH_<wbr/>QUALITY must both be supported,<wbr/> the camera
+device isn't required to support both STILL_<wbr/>CAPTURE and CONTINUOUS bokeh modes if one
+of them is supported.<wbr/></p>
+<p>HAL must support either STILL_<wbr/>CAPTURE,<wbr/> or CONTINUOUS,<wbr/> or both if bokehMode control is
+available on the camera device.<wbr/> For OFF mode,<wbr/> the maximum streaming resolution must be
+set to (0,<wbr/> 0).<wbr/></p>
             </td>
           </tr>
 
@@ -9705,6 +9892,102 @@ significant illumination change,<wbr/> this value will be set to DETECTED for a 
 result.<wbr/> Otherwise the value will be NOT_<wbr/>DETECTED.<wbr/> The threshold for detection is similar
 to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus modes.<wbr/></p>
 <p>This key will be available if the camera device advertises this key via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableCaptureResultKeys">CameraCharacteristics#getAvailableCaptureResultKeys</a>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.control.bokehMode">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>control.<wbr/>bokeh<wbr/>Mode
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OFF (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>Bokeh mode is disabled.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">STILL_CAPTURE (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>High quality bokeh mode is enabled for all non-raw streams (including YUV,<wbr/>
+JPEG,<wbr/> and IMPLEMENTATION_<wbr/>DEFINED) when capture intent is STILL_<wbr/>CAPTURE.<wbr/> Due to the
+extra image processing,<wbr/> this mode may introduce additional stall to non-raw streams.<wbr/>
+This mode should be used in high quality still capture use case.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">CONTINUOUS (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>Bokeh effect must not slow down capture rate relative to sensor raw output,<wbr/>
+and the effect is applied to all processed streams no larger than the maximum
+streaming dimension.<wbr/> This mode should be used if performance and power are a
+priority,<wbr/> such as video recording.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Whether bokeh mode is enabled for a particular capture request.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>With bokeh mode,<wbr/> the camera device may blur out the parts of scene that are not in
+focus,<wbr/> creating a bokeh (or shallow depth of field) effect for people or objects.<wbr/></p>
+<p>When set to STILL_<wbr/>CAPTURE bokeh mode with STILL_<wbr/>CAPTURE capture intent,<wbr/> due to the extra
+processing needed for high quality bokeh effect,<wbr/> the stall may be longer than when
+capture intent is not STILL_<wbr/>CAPTURE.<wbr/></p>
+<p>When set to STILL_<wbr/>CAPTURE bokeh mode with PREVIEW capture intent,<wbr/></p>
+<ul>
+<li>If the camera device has BURST_<wbr/>CAPTURE capability,<wbr/> the frame rate requirement of
+BURST_<wbr/>CAPTURE must still be met.<wbr/></li>
+<li>All streams not larger than the maximum streaming dimension for STILL_<wbr/>CAPTURE mode
+(queried via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#CONTROL_AVAILABLE_BOKEH_CAPABILITIES">Camera<wbr/>Characteristics#CONTROL_<wbr/>AVAILABLE_<wbr/>BOKEH_<wbr/>CAPABILITIES</a>)
+will have preview bokeh effect applied.<wbr/></li>
+</ul>
+<p>When set to CONTINUOUS mode,<wbr/> configured streams dimension should not exceed this mode's
+maximum streaming dimension in order to have bokeh effect applied.<wbr/> Bokeh effect may not
+be available for streams larger than the maximum streaming dimension.<wbr/></p>
+<p>Switching between different bokeh modes may involve reconfiguration of the camera
+pipeline,<wbr/> resulting in long latency.<wbr/> The application should check this key against the
+available session keys queried via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableSessionKeys">CameraCharacteristics#getAvailableSessionKeys</a>.<wbr/></p>
+<p>When bokeh mode is on,<wbr/> the camera device may override certain control parameters,<wbr/> such as
+reduce frame rate or use face priority scene mode,<wbr/> to achieve best power and quality
+tradeoffs.<wbr/> When turned on,<wbr/> AE,<wbr/> AWB,<wbr/> and AF run in auto modes,<wbr/> and only the mandatory
+stream combinations of LIMITED hardware level are guaranteed.<wbr/></p>
+<p>For a logical multi-camera,<wbr/> bokeh may be implemented by stereo vision from sub-cameras
+with different field of view.<wbr/> As a result,<wbr/> when bokeh mode is enabled,<wbr/> the camera device
+may override android.<wbr/>scaler.<wbr/>Crop<wbr/>Region,<wbr/> and the field of view will be smaller than when
+bokeh mode is off.<wbr/></p>
             </td>
           </tr>
 

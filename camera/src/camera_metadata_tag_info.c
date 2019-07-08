@@ -234,6 +234,10 @@ static tag_info_t android_control[ANDROID_CONTROL_END -
     { "enableZsl",                     TYPE_BYTE   },
     [ ANDROID_CONTROL_AF_SCENE_CHANGE - ANDROID_CONTROL_START ] =
     { "afSceneChange",                 TYPE_BYTE   },
+    [ ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES - ANDROID_CONTROL_START ] =
+    { "availableBokehCapabilities",    TYPE_INT32  },
+    [ ANDROID_CONTROL_BOKEH_MODE - ANDROID_CONTROL_START ] =
+    { "bokehMode",                     TYPE_BYTE   },
 };
 
 static tag_info_t android_demosaic[ANDROID_DEMOSAIC_END -
@@ -1505,6 +1509,28 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     break;
                 case ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED:
                     msg = "DETECTED";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES: {
+            break;
+        }
+        case ANDROID_CONTROL_BOKEH_MODE: {
+            switch (value) {
+                case ANDROID_CONTROL_BOKEH_MODE_OFF:
+                    msg = "OFF";
+                    ret = 0;
+                    break;
+                case ANDROID_CONTROL_BOKEH_MODE_STILL_CAPTURE:
+                    msg = "STILL_CAPTURE";
+                    ret = 0;
+                    break;
+                case ANDROID_CONTROL_BOKEH_MODE_CONTINUOUS:
+                    msg = "CONTINUOUS";
                     ret = 0;
                     break;
                 default:
@@ -3854,6 +3880,30 @@ int camera_metadata_enum_value(uint32_t tag,
                 enumName = "DETECTED";
                 if (strncmp(name, enumName, size) == 0) {
                     *value = ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED;
+                    ret = 0;
+                    break;
+                }
+            break;
+        }
+        case ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES: {
+            break;
+        }
+        case ANDROID_CONTROL_BOKEH_MODE: {
+                enumName = "OFF";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_BOKEH_MODE_OFF;
+                    ret = 0;
+                    break;
+                }
+                enumName = "STILL_CAPTURE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_BOKEH_MODE_STILL_CAPTURE;
+                    ret = 0;
+                    break;
+                }
+                enumName = "CONTINUOUS";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_BOKEH_MODE_CONTINUOUS;
                     ret = 0;
                     break;
                 }
