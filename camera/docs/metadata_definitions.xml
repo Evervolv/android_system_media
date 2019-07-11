@@ -5614,11 +5614,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <array>
             <size>n</size>
           </array>
-          <description>A subset of the available request keys that can be overriden for
+          <description>A subset of the available request keys that can be overridden for
           physical devices backing a logical multi-camera.</description>
           <details>
           This is a subset of android.request.availableRequestKeys which contains a list
-          of keys that can be overriden using {@link CaptureRequest.Builder#setPhysicalCameraKey}.
+          of keys that can be overridden using {@link CaptureRequest.Builder#setPhysicalCameraKey}.
           The respective value of such request key can be obtained by calling
           {@link CaptureRequest.Builder#getPhysicalCameraKey}. Capture requests that contain
           individual physical device requests must be built via
@@ -6169,6 +6169,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           Refer to android.request.availableCapabilities for additional
           mandatory stream configurations on a per-capability basis.
+
+          Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability for
+          downscaling from larger resolution to smaller, and the QCIF resolution sometimes is not
+          fully supported due to this limitation on devices with high-resolution image sensors.
+          Therefore, trying to configure a QCIF resolution stream together with any other
+          stream larger than 1920x1080 resolution (either width or height) might not be supported,
+          and capture session creation will fail if it is not.
+
           </details>
           <hal_details>
           It is recommended (but not mandatory) to also include half/quarter
@@ -6385,6 +6393,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           if the sensor maximum resolution is 3280x2464, if the maximum JPEG size has aspect
           ratio 4:3, and the JPEG encoder alignment requirement is 16, the maximum JPEG size will be
           3264x2448.
+
+          Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability on
+          downscaling from larger resolution to smaller ones, and the QCIF resolution can sometimes
+          not be fully supported due to this limitation on devices with high-resolution image
+          sensors. Therefore, trying to configure a QCIF resolution stream together with any other
+          stream larger than 1920x1080 resolution (either width or height) might not be supported,
+          and capture session creation will fail if it is not.
+
           </details>
           <hal_details>
           Do not set this property directly
@@ -9308,7 +9324,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * `LEVEL_3` devices additionally support YUV reprocessing and RAW image capture, along
             with additional output stream configurations.
           * `EXTERNAL` devices are similar to `LIMITED` devices with exceptions like some sensor or
-            lens information not reorted or less stable framerates.
+            lens information not reported or less stable framerates.
 
           See the individual level enums for full descriptions of the supported capabilities.  The
           android.request.availableCapabilities entry describes the device's capabilities at a
