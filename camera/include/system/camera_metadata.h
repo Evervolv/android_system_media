@@ -579,6 +579,16 @@ int camera_metadata_enum_snprint(uint32_t tag,
                                  char *dst,
                                  size_t size);
 
+/**
+ * Retrieves back the binary value of a given tag enum entry name. Only works for enum tags.
+ * Returns 0 on success, -1 on failure.
+ */
+ANDROID_API
+int camera_metadata_enum_value(uint32_t tag /*in*/,
+                               const char* name /*in*/,
+                               size_t size /*in*/,
+                               uint32_t *value /*out*/);
+
 #ifdef __cplusplus
 }
 #endif
