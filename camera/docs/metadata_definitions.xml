@@ -5490,6 +5490,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 trusted execution environments (TEE).
               </notes>
             </value>
+            <value optional="true" hal_version="3.5" >SYSTEM_CAMERA
+              <notes>
+                The camera device is only accessible by Android's system components and privileged
+                applications. Processes need to have the android.permission.SYSTEM_CAMERA in
+                addition to android.permission.CAMERA in order to connect to this camera device.
+              </notes>
+            </value>
+
 
 
           </enum>

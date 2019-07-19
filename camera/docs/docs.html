@@ -17535,6 +17535,13 @@ camera will be either MONO or NIR.<wbr/></p></span>
 inaccessible to Android userspace or the Android kernel,<wbr/> and only accessible to
 trusted execution environments (TEE).<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">SYSTEM_CAMERA (v3.5)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>The camera device is only accessible by Android's system components and privileged
+applications.<wbr/> Processes need to have the android.<wbr/>permission.<wbr/>SYSTEM_<wbr/>CAMERA in
+addition to android.<wbr/>permission.<wbr/>CAMERA in order to connect to this camera device.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
