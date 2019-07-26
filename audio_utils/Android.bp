@@ -32,6 +32,7 @@ cc_library {
         "format.c",
         "limiter.c",
         "minifloat.c",
+        "mono_blend.cpp",
         "power.cpp",
         "PowerLog.cpp",
         "primitives.c",
@@ -57,7 +58,7 @@ cc_library {
     target: {
         android: {
             srcs: [
-                "mono_blend.cpp",
+                // "mono_blend.cpp",
                 "resampler.c",
                 "echo_reference.c",
             ],
