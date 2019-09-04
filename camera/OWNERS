@@ -1,7 +1,2 @@
 set noparent
-cychen@google.com
-epeev@google.com
-etalvala@google.com
-shuzhenwang@google.com
-yinchiayeh@google.com
-zhijunhe@google.com
+include platform/frameworks/av:/camera/OWNERS
