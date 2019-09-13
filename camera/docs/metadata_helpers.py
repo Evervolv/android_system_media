@@ -1137,7 +1137,7 @@ def md(text, img_src_prefix="", table_ext=True):
     # full list of extensions at http://pythonhosted.org/Markdown/extensions/
     md_extensions = ['tables'] if table_ext else []# make <table> with ASCII |_| tables
     # render with markdown
-    text = markdown.markdown(text, md_extensions)
+    text = markdown.markdown(text, extensions=md_extensions)
 
     # prepend a prefix to each <img src="foo"> -> <img src="${prefix}foo">
     text = re.sub(r'src="([^"]*)"', 'src="' + img_src_prefix + r'\1"', text)
