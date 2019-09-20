@@ -770,13 +770,25 @@ static inline bool audio_is_usb_device(audio_devices_t device)
 
 static inline bool audio_is_remote_submix_device(audio_devices_t device)
 {
-    if ((audio_is_output_devices(device) &&
-         (device & AUDIO_DEVICE_OUT_REMOTE_SUBMIX) == AUDIO_DEVICE_OUT_REMOTE_SUBMIX)
-        || (!audio_is_output_devices(device) &&
-         (device & AUDIO_DEVICE_IN_REMOTE_SUBMIX) == AUDIO_DEVICE_IN_REMOTE_SUBMIX))
-        return true;
-    else
-        return false;
+    return device == AUDIO_DEVICE_OUT_REMOTE_SUBMIX ||
+           device == AUDIO_DEVICE_IN_REMOTE_SUBMIX;
+}
+
+static inline bool audio_is_digital_out_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_DIGITAL_CNT, device);
+}
+
+static inline bool audio_is_digital_in_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_DIGITAL_CNT, device);
+}
+
+static inline bool audio_device_is_digital(audio_devices_t device) {
+    return audio_is_digital_in_device(device) ||
+           audio_is_digital_out_device(device);
 }
 
 /* Returns true if:
@@ -1241,46 +1253,19 @@ static inline size_t audio_bytes_per_frame(uint32_t channel_count, audio_format_
 /* converts device address to string sent to audio HAL via set_parameters */
 static inline char *audio_device_address_to_parameter(audio_devices_t device, const char *address)
 {
-    const size_t kSize = AUDIO_DEVICE_MAX_ADDRESS_LEN + sizeof("a2dp_sink_address=");
+    const size_t kSize = AUDIO_DEVICE_MAX_ADDRESS_LEN + sizeof("a2dp_source_address=");
     char param[kSize];
 
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        device &= ~AUDIO_DEVICE_BIT_IN;
-        if (device & AUDIO_DEVICE_IN_BLUETOOTH_A2DP)
-            snprintf(param, kSize, "%s=%s", "a2dp_source_address", address);
-        else if (device & AUDIO_DEVICE_IN_REMOTE_SUBMIX)
-            snprintf(param, kSize, "%s=%s", "mix", address);
-        else
-            snprintf(param, kSize, "%s", address);
+    if (device == AUDIO_DEVICE_IN_BLUETOOTH_A2DP) {
+        snprintf(param, kSize, "%s=%s", "a2dp_source_address", address);
+    } else if (audio_is_a2dp_out_device(device)) {
+        snprintf(param, kSize, "%s=%s", "a2dp_sink_address", address);
+    } else if (audio_is_remote_submix_device(device)) {
+        snprintf(param, kSize, "%s=%s", "mix", address);
     } else {
-        if (device & AUDIO_DEVICE_OUT_ALL_A2DP)
-            snprintf(param, kSize, "%s=%s", "a2dp_sink_address", address);
-        else if (device & AUDIO_DEVICE_OUT_REMOTE_SUBMIX)
-            snprintf(param, kSize, "%s=%s", "mix", address);
-        else
-            snprintf(param, kSize, "%s", address);
+        snprintf(param, kSize, "%s", address);
     }
     return strdup(param);
-}
-
-static inline bool audio_device_is_digital(audio_devices_t device) {
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        // input
-        return (~AUDIO_DEVICE_BIT_IN & device & (AUDIO_DEVICE_IN_ALL_USB |
-                          AUDIO_DEVICE_IN_HDMI |
-                          AUDIO_DEVICE_IN_HDMI_ARC |
-                          AUDIO_DEVICE_IN_SPDIF |
-                          AUDIO_DEVICE_IN_IP |
-                          AUDIO_DEVICE_IN_BUS)) != 0;
-    } else {
-        // output
-        return (device & (AUDIO_DEVICE_OUT_ALL_USB |
-                          AUDIO_DEVICE_OUT_HDMI |
-                          AUDIO_DEVICE_OUT_HDMI_ARC |
-                          AUDIO_DEVICE_OUT_SPDIF |
-                          AUDIO_DEVICE_OUT_IP |
-                          AUDIO_DEVICE_OUT_BUS)) != 0;
-    }
 }
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
