@@ -250,6 +250,19 @@ static const uint32_t AUDIO_DEVICE_OUT_ALL_USB_ARRAY[] = {
     AUDIO_DEVICE_OUT_USB_HEADSET,               // 0x04000000u
 };
 
+// Digital out device array should contain all usb out devices
+// inline constexpr
+static const uint32_t AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY[] = {
+    AUDIO_DEVICE_OUT_HDMI,                      // 0x00000400u, OUT_AUX_DIGITAL
+    AUDIO_DEVICE_OUT_USB_ACCESSORY,             // 0x00002000u
+    AUDIO_DEVICE_OUT_USB_DEVICE,                // 0x00004000u
+    AUDIO_DEVICE_OUT_HDMI_ARC,                  // 0x00040000u
+    AUDIO_DEVICE_OUT_SPDIF,                     // 0x00080000u
+    AUDIO_DEVICE_OUT_IP,                        // 0x00800000u
+    AUDIO_DEVICE_OUT_BUS,                       // 0x01000000u
+    AUDIO_DEVICE_OUT_USB_HEADSET,               // 0x04000000u
+};
+
 // inline constexpr
 static const uint32_t AUDIO_DEVICE_IN_ALL_ARRAY[] = {
     AUDIO_DEVICE_IN_COMMUNICATION,              // 0x80000001u
@@ -293,6 +306,19 @@ static const uint32_t AUDIO_DEVICE_IN_ALL_USB_ARRAY[] = {
     AUDIO_DEVICE_IN_USB_HEADSET,                // 0x82000000u
 };
 
+// Digital in device array should contain all usb in devices
+// inline constexpr
+static const uint32_t AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY[] = {
+    AUDIO_DEVICE_IN_HDMI,                       // 0x80000020u, IN_AUX_DIGITAL
+    AUDIO_DEVICE_IN_USB_ACCESSORY,              // 0x80000800u
+    AUDIO_DEVICE_IN_USB_DEVICE,                 // 0x80001000u
+    AUDIO_DEVICE_IN_SPDIF,                      // 0x80010000u
+    AUDIO_DEVICE_IN_IP,                         // 0x80080000u
+    AUDIO_DEVICE_IN_BUS,                        // 0x80100000u
+    AUDIO_DEVICE_IN_USB_HEADSET,                // 0x82000000u
+    AUDIO_DEVICE_IN_HDMI_ARC,                   // 0x88000000u
+};
+
 #ifndef AUDIO_ARRAY_SIZE
 // std::size()
 #define AUDIO_ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -303,8 +329,12 @@ static const uint32_t AUDIO_DEVICE_OUT_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_OUT_A
 static const uint32_t AUDIO_DEVICE_OUT_A2DP_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_OUT_ALL_A2DP_ARRAY);
 static const uint32_t AUDIO_DEVICE_OUT_SCO_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_OUT_ALL_SCO_ARRAY);
 static const uint32_t AUDIO_DEVICE_OUT_USB_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_OUT_ALL_USB_ARRAY);
+static const uint32_t AUDIO_DEVICE_OUT_DIGITAL_CNT = AUDIO_ARRAY_SIZE(
+                                                     AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY);
 static const uint32_t AUDIO_DEVICE_IN_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_IN_ALL_ARRAY);
 static const uint32_t AUDIO_DEVICE_IN_SCO_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_IN_ALL_SCO_ARRAY);
 static const uint32_t AUDIO_DEVICE_IN_USB_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_IN_ALL_USB_ARRAY);
+static const uint32_t AUDIO_DEVICE_IN_DIGITAL_CNT = AUDIO_ARRAY_SIZE(
+                                                    AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY);
 
 #endif  // ANDROID_AUDIO_BASE_UTILS_H
