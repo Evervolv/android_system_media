@@ -48,6 +48,7 @@ SPDIFEncoder::SPDIFEncoder(audio_format_t format)
     switch(format) {
         case AUDIO_FORMAT_AC3:
         case AUDIO_FORMAT_E_AC3:
+        case AUDIO_FORMAT_E_AC3_JOC:
             mFramer = new AC3FrameScanner(format);
             break;
         case AUDIO_FORMAT_DTS:
@@ -88,6 +89,7 @@ bool SPDIFEncoder::isFormatSupported(audio_format_t format)
     switch(format) {
         case AUDIO_FORMAT_AC3:
         case AUDIO_FORMAT_E_AC3:
+        case AUDIO_FORMAT_E_AC3_JOC:
         case AUDIO_FORMAT_DTS:
         case AUDIO_FORMAT_DTS_HD:
             return true;
