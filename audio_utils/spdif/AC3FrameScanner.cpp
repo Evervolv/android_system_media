@@ -241,7 +241,7 @@ bool AC3FrameScanner::parseHeader()
                     * kAC3FrameSizeTable[frmsizcod][fscod];
         }
         mAudioBlocksPerSyncFrame = 6;
-        if (mFormat == AUDIO_FORMAT_E_AC3) {
+        if (mFormat == AUDIO_FORMAT_E_AC3 || mFormat == AUDIO_FORMAT_E_AC3_JOC) {
             ALOGV("Its a Ac3 substream in EAC3 stream");
             mStreamType = 2;
             mSubstreamID = 0;
