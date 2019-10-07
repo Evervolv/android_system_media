@@ -822,6 +822,7 @@ typedef enum camera_metadata_enum_android_request_available_capabilities {
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_MONOCHROME               , // HIDL v3.3
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_SECURE_IMAGE_DATA        , // HIDL v3.4
     ANDROID_REQUEST_AVAILABLE_CAPABILITIES_SYSTEM_CAMERA            , // HIDL v3.5
+    ANDROID_REQUEST_AVAILABLE_CAPABILITIES_OFFLINE_PROCESSING       , // HIDL v3.5
 } camera_metadata_enum_android_request_available_capabilities_t;
 
 

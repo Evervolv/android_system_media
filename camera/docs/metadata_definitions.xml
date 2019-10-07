@@ -2240,7 +2240,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>
           List of the maximum number of regions that can be used for metering in
           auto-exposure (AE), auto-white balance (AWB), and auto-focus (AF);
-          this corresponds to the the maximum number of elements in
+          this corresponds to the maximum number of elements in
           android.control.aeRegions, android.control.awbRegions,
           and android.control.afRegions.
           </description>
@@ -2260,7 +2260,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           value will be &amp;gt;= 1.
           </range>
           <details>
-          This corresponds to the the maximum allowed number of elements in
+          This corresponds to the maximum allowed number of elements in
           android.control.aeRegions.
           </details>
           <hal_details>This entry is private to the framework. Fill in
@@ -2276,7 +2276,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <range>Value will be &amp;gt;= 0.
           </range>
           <details>
-          This corresponds to the the maximum allowed number of elements in
+          This corresponds to the maximum allowed number of elements in
           android.control.awbRegions.
           </details>
           <hal_details>This entry is private to the framework. Fill in
@@ -2292,7 +2292,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           value will be &amp;gt;= 1.
           </range>
           <details>
-          This corresponds to the the maximum allowed number of elements in
+          This corresponds to the maximum allowed number of elements in
           android.control.afRegions.
           </details>
           <hal_details>This entry is private to the framework. Fill in
@@ -5609,9 +5609,47 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 addition to android.permission.CAMERA in order to connect to this camera device.
               </notes>
             </value>
+            <value optional="true" ndk_hidden="true" hal_version="3.5">OFFLINE_PROCESSING
+              <notes>
+              The camera device supports the OFFLINE_PROCESSING use case.
 
+              With OFFLINE_PROCESSING capability, the application can switch an ongoing
+              capture session to offline mode by calling the
+              CameraCaptureSession#switchToOffline method and specify streams to be kept in offline
+              mode. The camera will then stop currently active repeating requests, prepare for
+              some requests to go into offline mode, and return an offline session object. After
+              the switchToOffline call returns, the original capture session is in closed state as
+              if the CameraCaptureSession#close method has been called.
+              In the offline mode, all inflight requests will continue to be processed in the
+              background, and the application can immediately close the camera or create a new
+              capture session without losing those requests' output images and capture results.
 
+              While the camera device is processing offline requests, it
+              might not be able to support all stream configurations it can support
+              without offline requests. When that happens, the createCaptureSession
+              method call will fail. The following stream configurations are guaranteed to work
+              without hitting the resource busy exception:
 
+              * One ongoing offline session: target one output surface of YUV or
+              JPEG format, any resolution.
+              * The active camera capture session:
+                  1. One preview surface (SurfaceView or SurfaceTexture) up to 1920 width
+                  1. One YUV ImageReader surface up to 1920 width
+                  1. One Jpeg ImageReader, any resolution: the camera device is
+                     allowed to slow down JPEG output speed by 50% if there is any ongoing offline
+                     session.
+                  1. One ImageWriter surface of private format, any resolution if the device supports
+                     PRIVATE_REPROCESSING capability
+              * Alternatively, the active camera session above can be replaced by an legacy
+              {@link android.hardware.Camera Camera} with the following parameter settings:
+                  1. Preview size up to 1920 width
+                  1. Preview callback size up to 1920 width
+                  1. Video size up to 1920 width
+                  1. Picture size, any resolution: the camera device is
+                      allowed to slow down JPEG output speed by 50% if there is any ongoing offline
+                      session.
+              </notes>
+            </value>
           </enum>
           <description>List of capabilities that this camera device
           advertises as fully supporting.</description>
@@ -5723,6 +5761,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           In Android API level 28, a MONOCHROME camera device must not have RAW capability. From
           API level 29, a camera is allowed to have both MONOCHROME and RAW capabilities.
+
+          To support the legacy API to ICameraDevice 3.x shim layer, devices advertising
+          OFFLINE_PROCESSING capability must also support configuring an input stream of the same
+          size as the picture size if:
+
+          * The device supports PRIVATE_REPROCESSING capability
+          * The device's maximal JPEG resolution can reach 30 FPS min frame duration
+          * The device does not support HAL based ZSL (android.control.enableZsl)
           </hal_details>
         </entry>
         <entry name="availableRequestKeys" type="int32" visibility="ndk_public"
