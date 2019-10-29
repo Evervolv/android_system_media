@@ -31,7 +31,7 @@
 
 /*
  * Annotation to tell clang that we intend to fall through from one case to
- * another in a switch (for c++ files). Sourced from android-base/macros.h.
+ * another in a switch. Sourced from android-base/macros.h.
  */
 #ifndef FALLTHROUGH_INTENDED
 #ifdef __cplusplus
