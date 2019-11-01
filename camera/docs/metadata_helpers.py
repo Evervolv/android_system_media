@@ -178,7 +178,8 @@ def protobuf_type(entry):
     "int32"                  : "int32",
     "int64"                  : "int64",
     "enumList"               : "int32",
-    "string"                 : "string"
+    "string"                 : "string",
+    "capabilityAndMaxSize"   : "CapabilityAndMaxSize"
   }
 
   if typeName not in typename_to_protobuftype:

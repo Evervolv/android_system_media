@@ -174,6 +174,8 @@ typedef enum camera_metadata_tag {
     ANDROID_CONTROL_POST_RAW_SENSITIVITY_BOOST,       // int32        | public       | HIDL v3.2
     ANDROID_CONTROL_ENABLE_ZSL,                       // enum         | public       | HIDL v3.2
     ANDROID_CONTROL_AF_SCENE_CHANGE,                  // enum         | public       | HIDL v3.3
+    ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES,     // int32[]      | public       | HIDL v3.5
+    ANDROID_CONTROL_BOKEH_MODE,                       // enum         | public       | HIDL v3.5
     ANDROID_CONTROL_END,
 
     ANDROID_DEMOSAIC_MODE =                           // enum         | system       | HIDL v3.2
@@ -681,6 +683,13 @@ typedef enum camera_metadata_enum_android_control_af_scene_change {
     ANDROID_CONTROL_AF_SCENE_CHANGE_NOT_DETECTED                    , // HIDL v3.3
     ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED                        , // HIDL v3.3
 } camera_metadata_enum_android_control_af_scene_change_t;
+
+// ANDROID_CONTROL_BOKEH_MODE
+typedef enum camera_metadata_enum_android_control_bokeh_mode {
+    ANDROID_CONTROL_BOKEH_MODE_OFF                                  , // HIDL v3.5
+    ANDROID_CONTROL_BOKEH_MODE_STILL_CAPTURE                        , // HIDL v3.5
+    ANDROID_CONTROL_BOKEH_MODE_CONTINUOUS                           , // HIDL v3.5
+} camera_metadata_enum_android_control_bokeh_mode_t;
 
 
 // ANDROID_DEMOSAIC_MODE
