@@ -78,6 +78,7 @@ enum {
     AUDIO_FLAG_NO_MEDIA_PROJECTION        = 0X400,
     AUDIO_FLAG_MUTE_HAPTIC                = 0x800,
     AUDIO_FLAG_NO_SYSTEM_CAPTURE          = 0X1000,
+    AUDIO_FLAG_CAPTURE_PRIVATE            = 0X2000,
 };
 
 /* Audio attributes */
