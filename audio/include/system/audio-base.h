@@ -318,6 +318,7 @@ typedef enum {
     AUDIO_MODE_RINGTONE = 1,
     AUDIO_MODE_IN_CALL = 2,
     AUDIO_MODE_IN_COMMUNICATION = 3,
+    AUDIO_MODE_CALL_SCREEN = 4,
 } audio_mode_t;
 
 enum {
