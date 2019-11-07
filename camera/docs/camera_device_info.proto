@@ -54,6 +54,11 @@ message CameraDeviceInfo {
         repeated StreamConfig availableStreamConfigurations = 1;
     }
 
+    message RangeFloat {
+        optional int32 lower = 1;
+        optional int32 upper = 2;
+    }
+
     message RangeInt {
         optional int32 lower = 1;
         optional int32 upper = 2;
@@ -93,7 +98,8 @@ message CameraDeviceInfo {
     optional bool android_control_awbLockAvailable = 131086;
     repeated int32 android_control_availableModes = 131087;
     optional RangeInt android_control_postRawSensitivityBoostRange = 131088;
-    repeated CapabilityAndMaxSize android_control_availableBokehCapabilities = 131089;
+    repeated Capability android_control_availableBokehCapabilities = 131089;
+    optional RangeFloat android_control_zoomRatioRange = 131090;
     repeated int32 android_edge_availableEdgeModes = 262144;
     optional bool android_flash_info_available = 393216;
     repeated int32 android_hotPixel_availableHotPixelModes = 458752;

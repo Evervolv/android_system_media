@@ -195,6 +195,8 @@
             ><a href="#controls_android.control.enableZsl">android.control.enableZsl</a></li>
             <li
             ><a href="#controls_android.control.bokehMode">android.control.bokehMode</a></li>
+            <li
+            ><a href="#controls_android.control.zoomRatio">android.control.zoomRatio</a></li>
           </ul>
         </li>
         <li>
@@ -241,7 +243,13 @@
             <li
             ><a href="#static_android.control.postRawSensitivityBoostRange">android.control.postRawSensitivityBoostRange</a></li>
             <li
+            ><a href="#static_android.control.availableBokehMaxSizes">android.control.availableBokehMaxSizes</a></li>
+            <li
+            ><a href="#static_android.control.availableBokehZoomRatioRanges">android.control.availableBokehZoomRatioRanges</a></li>
+            <li
             ><a href="#static_android.control.availableBokehCapabilities">android.control.availableBokehCapabilities</a></li>
+            <li
+            ><a href="#static_android.control.zoomRatioRange">android.control.zoomRatioRange</a></li>
           </ul>
         </li>
         <li>
@@ -303,6 +311,8 @@
             ><a href="#dynamic_android.control.afSceneChange">android.control.afSceneChange</a></li>
             <li
             ><a href="#dynamic_android.control.bokehMode">android.control.bokehMode</a></li>
+            <li
+            ><a href="#dynamic_android.control.zoomRatio">android.control.zoomRatio</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -2725,6 +2735,16 @@ capture result metadata,<wbr/> the camera device will ignore the sections outsid
 region and output only the intersection rectangle as the metering region in the result
 metadata.<wbr/>  If the region is entirely outside the crop region,<wbr/> it will be ignored and
 not reported in the result metadata.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoom field of view.<wbr/> This means that the same aeRegions values at different
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> represent different parts of the scene.<wbr/> The aeRegions
+coordinates are relative to the activeArray/<wbr/>preCorrectionActiveArray representing the
+zoomed field of view.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0 (default),<wbr/> the same
+aeRegions at different <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> still represent the same parts of the
+scene as they do before.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use
+activeArraySize or preCorrectionActiveArraySize still depends on distortion correction
+mode.<wbr/></p>
             </td>
           </tr>
 
@@ -3207,6 +3227,16 @@ capture result metadata,<wbr/> the camera device will ignore the sections outsid
 region and output only the intersection rectangle as the metering region in the result
 metadata.<wbr/> If the region is entirely outside the crop region,<wbr/> it will be ignored and
 not reported in the result metadata.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoom field of view.<wbr/> This means that the same afRegions values at different
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> represent different parts of the scene.<wbr/> The afRegions
+coordinates are relative to the activeArray/<wbr/>preCorrectionActiveArray representing the
+zoomed field of view.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0 (default),<wbr/> the same
+afRegions at different <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> still represent the same parts of the
+scene as they do before.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use
+activeArraySize or preCorrectionActiveArraySize still depends on distortion correction
+mode.<wbr/></p>
             </td>
           </tr>
 
@@ -3687,6 +3717,16 @@ capture result metadata,<wbr/> the camera device will ignore the sections outsid
 region and output only the intersection rectangle as the metering region in the result
 metadata.<wbr/>  If the region is entirely outside the crop region,<wbr/> it will be ignored and
 not reported in the result metadata.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoom field of view.<wbr/> This means that the same awbRegions values at different
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> represent different parts of the scene.<wbr/> The awbRegions
+coordinates are relative to the activeArray/<wbr/>preCorrectionActiveArray representing the
+zoomed field of view.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0 (default),<wbr/> the same
+awbRegions at different <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> still represent the same parts of
+the scene as they do before.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use
+activeArraySize or preCorrectionActiveArraySize still depends on distortion correction
+mode.<wbr/></p>
             </td>
           </tr>
 
@@ -4209,6 +4249,7 @@ android.<wbr/>control.<wbr/>* fields continue to work,<wbr/> such as</p>
 <li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
 <li><a href="#controls_android.control.afTrigger">android.<wbr/>control.<wbr/>af<wbr/>Trigger</a></li>
 <li><a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a></li>
+<li><a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a></li>
 </ul>
 <p>Outside of android.<wbr/>control.<wbr/>*,<wbr/> the following controls will work:</p>
 <ul>
@@ -4738,6 +4779,94 @@ bokeh mode is off.<wbr/></p>
             </td>
           </tr>
 
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="controls_android.control.zoomRatio">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>control.<wbr/>zoom<wbr/>Ratio
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The desired zoom ratio</p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p><a href="#static_android.control.zoomRatioRange">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio<wbr/>Range</a></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Instead of using <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> with dual purposes of crop and zoom,<wbr/> the
+application can now choose to use this tag to specify the desired zoom level.<wbr/> The
+<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> can still be used to specify the horizontal or vertical
+crop to achieve aspect ratios different than the native camera sensor.<wbr/></p>
+<p>By using this control,<wbr/> the application gains a simpler way to control zoom,<wbr/> which can
+be a combination of optical and digital zoom.<wbr/> More specifically,<wbr/> for a logical
+multi-camera with more than one focal length,<wbr/> using a floating point zoom ratio offers
+more zoom precision when a telephoto lens is used,<wbr/> as well as allowing zoom ratio of
+less than 1.<wbr/>0 to zoom out to a wide field of view.<wbr/></p>
+<p>Note that the coordinate system of cropRegion,<wbr/> AE/<wbr/>AWB/<wbr/>AF regions,<wbr/> and faces now changes
+to the effective after-zoom field-of-view represented by rectangle of (0,<wbr/> 0,<wbr/>
+activeArrayWidth,<wbr/> activeArrayHeight).<wbr/></p>
+<p>For example,<wbr/> if <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> is 4032*3024,<wbr/> and the preview stream
+is configured to the same 4:3 aspect ratio,<wbr/> the application can achieve 2.<wbr/>0x zoom in
+one of two ways:</p>
+<ul>
+<li>zoomRatio = 2.<wbr/>0,<wbr/> scaler.<wbr/>cropRegion = (0,<wbr/> 0,<wbr/> 4032,<wbr/> 3024)</li>
+<li>zoomRatio = 1.<wbr/>0 (default),<wbr/> scaler.<wbr/>cropRegion = (1008,<wbr/> 756,<wbr/> 3024,<wbr/> 2268)</li>
+</ul>
+<p>If the application intends to set aeRegions to be top-left quarter of the preview
+field-of-view,<wbr/> the <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a> should be set to (0,<wbr/> 0,<wbr/> 2016,<wbr/> 1512) with
+zoomRatio set to 2.<wbr/>0.<wbr/> Alternatively,<wbr/> the application can set aeRegions to the equivalent
+region of (1008,<wbr/> 756,<wbr/> 2016,<wbr/> 1512) for zoomRatio of 1.<wbr/>0.<wbr/> If the application doesn't
+explicitly set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> its value defaults to 1.<wbr/>0.<wbr/></p>
+<p>This coordinate system change isn't applicable to RAW capture and its related metadata
+such as intrinsicCalibration and lensShadingMap.<wbr/></p>
+<p>One limitation of controlling zoom using zoomRatio is that the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
+must only be used for letterboxing or pillarboxing of the sensor active array,<wbr/> and no
+FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For all capture request templates,<wbr/> this field must be set to 1.<wbr/>0 in order to have
+consistent field of views between different modes.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -6166,10 +6295,10 @@ any of RAW output formats.<wbr/></p>
            <!-- end of entry -->
         
                 
-          <tr class="entry" id="static_android.control.availableBokehCapabilities">
+          <tr class="entry" id="static_android.control.availableBokehMaxSizes">
             <td class="entry_name
              " rowspan="5">
-              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Capabilities
+              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Max<wbr/>Sizes
             </td>
             <td class="entry_type">
                 <span class="entry_type_name">int32</span>
@@ -6178,7 +6307,7 @@ any of RAW output formats.<wbr/></p>
                 <span class="entry_type_array">
                   3 x n
                 </span>
-              <span class="entry_type_visibility"> [public as capabilityAndMaxSize]</span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
 
 
               <span class="entry_type_hwlevel">[limited] </span>
@@ -6190,8 +6319,8 @@ any of RAW output formats.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>The list of bokeh modes that are supported by this camera device,<wbr/> and each bokeh mode's
-maximum streaming (non-stall) size with bokeh effect.<wbr/></p>
+              <p>The list of bokeh modes for <a href="#controls_android.control.bokehMode">android.<wbr/>control.<wbr/>bokeh<wbr/>Mode</a> that are supported by this camera
+device,<wbr/> and each bokeh mode's maximum streaming (non-stall) size with bokeh effect.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -6244,6 +6373,216 @@ of them is supported.<wbr/></p>
 <p>HAL must support either STILL_<wbr/>CAPTURE,<wbr/> or CONTINUOUS,<wbr/> or both if bokehMode control is
 available on the camera device.<wbr/> For OFF mode,<wbr/> the maximum streaming resolution must be
 set to (0,<wbr/> 0).<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.control.availableBokehZoomRatioRanges">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Zoom<wbr/>Ratio<wbr/>Ranges
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  2 x n
+                </span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+                <div class="entry_type_notes">Zoom ranges for all supported non-OFF bokeh modes.<wbr/></div>
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The ranges of supported zoom ratio for non-OFF <a href="#controls_android.control.bokehMode">android.<wbr/>control.<wbr/>bokeh<wbr/>Mode</a>.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              (minZoom,<wbr/> maxZoom)
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When bokeh mode is enabled,<wbr/> the camera device may have limited range of zoom ratios
+compared to when bokeh mode is disabled.<wbr/> This tag lists the zoom ratio ranges for all
+supported non-OFF bokeh modes,<wbr/> in the same order as in
+<a href="#static_android.control.availableBokehCapabilities">android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Capabilities</a>.<wbr/></p>
+<p>Range [1.<wbr/>0,<wbr/> 1.<wbr/>0] means that no zoom (optical or digital) is supported.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.control.availableBokehCapabilities">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Capabilities
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [public as capability]</span>
+
+              <span class="entry_type_synthetic">[synthetic] </span>
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The list of bokeh modes for <a href="#controls_android.control.bokehMode">android.<wbr/>control.<wbr/>bokeh<wbr/>Mode</a> that are supported by
+this camera device,<wbr/> and each bokeh mode's capabilities such as maximum streaming size
+with bokeh effect,<wbr/> and supported zoom ratio ranges.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For OFF mode,<wbr/> the camera behaves normally with no bokeh effect.<wbr/></p>
+<p>For STILL_<wbr/>CAPTURE mode,<wbr/> the maximum streaming dimension specifies the limit under which
+bokeh is effective when capture intent is PREVIEW.<wbr/> Note that when capture intent is
+PREVIEW,<wbr/> the bokeh effect may not be as high quality compared to STILL_<wbr/>CAPTURE intent
+in order to maintain reasonable frame rate.<wbr/> The maximum streaming dimension must be one
+of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions in availableStreamConfigurations,<wbr/> or (0,<wbr/> 0)
+if preview bokeh is not supported.<wbr/> If the application configures a stream larger than
+the maximum streaming dimension,<wbr/> bokeh effect may not be applied for this stream for
+PREVIEW intent.<wbr/></p>
+<p>For CONTINUOUS mode,<wbr/> the maximum streaming dimension specifies the limit under which
+bokeh is effective.<wbr/> This dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions
+in availableStreamConfigurations,<wbr/> and if the sensor maximum resolution is larger than or
+equal to 1080p,<wbr/> the maximum streaming dimension must be at least 1080p.<wbr/> If the
+application configures a stream with larger dimension,<wbr/> the stream may not have bokeh
+effect applied.<wbr/></p>
+<p>When bokeh mode is enabled,<wbr/> the camera device may have limited range of zoom ratios
+compared to when bokeh mode is disabled.<wbr/> availableBokehCapabilities lists the zoom
+ranges for all supported bokeh modes.<wbr/> A range of (1.<wbr/>0,<wbr/> 1.<wbr/>0) means that no zoom
+(optical or digital) is supported.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.control.zoomRatioRange">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>control.<wbr/>zoom<wbr/>Ratio<wbr/>Range
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  2
+                </span>
+              <span class="entry_type_visibility"> [public as rangeFloat]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+                <div class="entry_type_notes">The range of zoom ratios that this camera device supports.<wbr/></div>
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Minimum and maximum zoom ratios supported by this camera device.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              A pair of zoom ratio in floating points: (minZoom,<wbr/> maxZoom)
+            </td>
+
+            <td class="entry_range">
+              <p>maxZoom &gt;= 1.<wbr/>0 &gt;= minZoom</p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>If the camera device supports zoom-out from 1x zoom,<wbr/> minZoom will be less than 1.<wbr/>0,<wbr/> and
+setting android.<wbr/>control.<wbr/>zoom<wbr/>Ration to values less than 1.<wbr/>0 increases the camera's field
+of view.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When the key is reported,<wbr/> the camera device must be setting
+<a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> to be the same as maxZoom.<wbr/> The camera framework
+makes sure to always controls zoom via <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>.<wbr/> The
+<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> tag is only used to do horizontal or vertical cropping (but
+not both) to achieve aspect ratio different than the camera sensor's native aspect
+ratio.<wbr/></p>
+<p>For a logical multi-camera device,<wbr/> this key must either be reported for both the logical
+camera device and all its physical sub-cameras,<wbr/> or none of them.<wbr/></p>
+<p>When the key is not reported,<wbr/> camera framework derives the application-facing
+zoomRatioRange to be (1,<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a>).<wbr/></p>
             </td>
           </tr>
 
@@ -6870,6 +7209,16 @@ capture result metadata,<wbr/> the camera device will ignore the sections outsid
 region and output only the intersection rectangle as the metering region in the result
 metadata.<wbr/>  If the region is entirely outside the crop region,<wbr/> it will be ignored and
 not reported in the result metadata.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoom field of view.<wbr/> This means that the same aeRegions values at different
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> represent different parts of the scene.<wbr/> The aeRegions
+coordinates are relative to the activeArray/<wbr/>preCorrectionActiveArray representing the
+zoomed field of view.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0 (default),<wbr/> the same
+aeRegions at different <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> still represent the same parts of the
+scene as they do before.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use
+activeArraySize or preCorrectionActiveArraySize still depends on distortion correction
+mode.<wbr/></p>
             </td>
           </tr>
 
@@ -7659,6 +8008,16 @@ capture result metadata,<wbr/> the camera device will ignore the sections outsid
 region and output only the intersection rectangle as the metering region in the result
 metadata.<wbr/> If the region is entirely outside the crop region,<wbr/> it will be ignored and
 not reported in the result metadata.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoom field of view.<wbr/> This means that the same afRegions values at different
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> represent different parts of the scene.<wbr/> The afRegions
+coordinates are relative to the activeArray/<wbr/>preCorrectionActiveArray representing the
+zoomed field of view.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0 (default),<wbr/> the same
+afRegions at different <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> still represent the same parts of the
+scene as they do before.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use
+activeArraySize or preCorrectionActiveArraySize still depends on distortion correction
+mode.<wbr/></p>
             </td>
           </tr>
 
@@ -8685,6 +9044,16 @@ capture result metadata,<wbr/> the camera device will ignore the sections outsid
 region and output only the intersection rectangle as the metering region in the result
 metadata.<wbr/>  If the region is entirely outside the crop region,<wbr/> it will be ignored and
 not reported in the result metadata.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoom field of view.<wbr/> This means that the same awbRegions values at different
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> represent different parts of the scene.<wbr/> The awbRegions
+coordinates are relative to the activeArray/<wbr/>preCorrectionActiveArray representing the
+zoomed field of view.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0 (default),<wbr/> the same
+awbRegions at different <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> still represent the same parts of
+the scene as they do before.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use
+activeArraySize or preCorrectionActiveArraySize still depends on distortion correction
+mode.<wbr/></p>
             </td>
           </tr>
 
@@ -9397,6 +9766,7 @@ android.<wbr/>control.<wbr/>* fields continue to work,<wbr/> such as</p>
 <li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
 <li><a href="#controls_android.control.afTrigger">android.<wbr/>control.<wbr/>af<wbr/>Trigger</a></li>
 <li><a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a></li>
+<li><a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a></li>
 </ul>
 <p>Outside of android.<wbr/>control.<wbr/>*,<wbr/> the following controls will work:</p>
 <ul>
@@ -9991,6 +10361,94 @@ bokeh mode is off.<wbr/></p>
             </td>
           </tr>
 
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.control.zoomRatio">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>control.<wbr/>zoom<wbr/>Ratio
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The desired zoom ratio</p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p><a href="#static_android.control.zoomRatioRange">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio<wbr/>Range</a></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>5</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Instead of using <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> with dual purposes of crop and zoom,<wbr/> the
+application can now choose to use this tag to specify the desired zoom level.<wbr/> The
+<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> can still be used to specify the horizontal or vertical
+crop to achieve aspect ratios different than the native camera sensor.<wbr/></p>
+<p>By using this control,<wbr/> the application gains a simpler way to control zoom,<wbr/> which can
+be a combination of optical and digital zoom.<wbr/> More specifically,<wbr/> for a logical
+multi-camera with more than one focal length,<wbr/> using a floating point zoom ratio offers
+more zoom precision when a telephoto lens is used,<wbr/> as well as allowing zoom ratio of
+less than 1.<wbr/>0 to zoom out to a wide field of view.<wbr/></p>
+<p>Note that the coordinate system of cropRegion,<wbr/> AE/<wbr/>AWB/<wbr/>AF regions,<wbr/> and faces now changes
+to the effective after-zoom field-of-view represented by rectangle of (0,<wbr/> 0,<wbr/>
+activeArrayWidth,<wbr/> activeArrayHeight).<wbr/></p>
+<p>For example,<wbr/> if <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> is 4032*3024,<wbr/> and the preview stream
+is configured to the same 4:3 aspect ratio,<wbr/> the application can achieve 2.<wbr/>0x zoom in
+one of two ways:</p>
+<ul>
+<li>zoomRatio = 2.<wbr/>0,<wbr/> scaler.<wbr/>cropRegion = (0,<wbr/> 0,<wbr/> 4032,<wbr/> 3024)</li>
+<li>zoomRatio = 1.<wbr/>0 (default),<wbr/> scaler.<wbr/>cropRegion = (1008,<wbr/> 756,<wbr/> 3024,<wbr/> 2268)</li>
+</ul>
+<p>If the application intends to set aeRegions to be top-left quarter of the preview
+field-of-view,<wbr/> the <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a> should be set to (0,<wbr/> 0,<wbr/> 2016,<wbr/> 1512) with
+zoomRatio set to 2.<wbr/>0.<wbr/> Alternatively,<wbr/> the application can set aeRegions to the equivalent
+region of (1008,<wbr/> 756,<wbr/> 2016,<wbr/> 1512) for zoomRatio of 1.<wbr/>0.<wbr/> If the application doesn't
+explicitly set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> its value defaults to 1.<wbr/>0.<wbr/></p>
+<p>This coordinate system change isn't applicable to RAW capture and its related metadata
+such as intrinsicCalibration and lensShadingMap.<wbr/></p>
+<p>One limitation of controlling zoom using zoomRatio is that the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
+must only be used for letterboxing or pillarboxing of the sensor active array,<wbr/> and no
+FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For all capture request templates,<wbr/> this field must be set to 1.<wbr/>0 in order to have
+consistent field of views between different modes.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -13184,6 +13642,9 @@ focalLength and cropRegion take effect in the same frame.<wbr/> This is to make 
 is no visible field-of-view jump during zoom.<wbr/> For example,<wbr/> if cropRegion is applied
 immediately,<wbr/> but focalLength takes more than 1 frame to take effect,<wbr/> the camera device
 will delay the cropRegion so that it's synchronized with focalLength.<wbr/></p>
+<p>Starting from API level 30,<wbr/> it's strongly recommended for HAL to implement the
+combination of optical and digital zoom using the new <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> API,<wbr/> in
+lieu of using <a href="#controls_android.lens.focalLength">android.<wbr/>lens.<wbr/>focal<wbr/>Length</a> and <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>.<wbr/></p>
             </td>
           </tr>
 
@@ -14724,6 +15185,9 @@ focalLength and cropRegion take effect in the same frame.<wbr/> This is to make 
 is no visible field-of-view jump during zoom.<wbr/> For example,<wbr/> if cropRegion is applied
 immediately,<wbr/> but focalLength takes more than 1 frame to take effect,<wbr/> the camera device
 will delay the cropRegion so that it's synchronized with focalLength.<wbr/></p>
+<p>Starting from API level 30,<wbr/> it's strongly recommended for HAL to implement the
+combination of optical and digital zoom using the new <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> API,<wbr/> in
+lieu of using <a href="#controls_android.lens.focalLength">android.<wbr/>lens.<wbr/>focal<wbr/>Length</a> and <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>.<wbr/></p>
             </td>
           </tr>
 
@@ -17642,6 +18106,7 @@ android.<wbr/>control.<wbr/>* fields continue to work,<wbr/> such as</p>
 <li><a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a></li>
 <li><a href="#controls_android.control.afTrigger">android.<wbr/>control.<wbr/>af<wbr/>Trigger</a></li>
 <li><a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a></li>
+<li><a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a></li>
 </ul>
 <p>Outside of android.<wbr/>control.<wbr/>*,<wbr/> the following controls will work:</p>
 <ul>
@@ -17929,11 +18394,11 @@ only ID0 will be available for camera1 API to use.<wbr/></p>
 power,<wbr/> performance,<wbr/> and latency tradeoffs at the front of the camera id list.<wbr/></p>
 </li>
 <li>
-<p>Camera HAL may switch between physical cameras depending on focalLength or cropRegion.<wbr/>
-If physical cameras have different sizes,<wbr/> HAL must maintain a single logical camera
-active<wbr/>Array<wbr/>Size/<wbr/>pixel<wbr/>Array<wbr/>Size/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size,<wbr/> and must do proper mapping
-between logical camera and underlying physical cameras for all related metadata tags,<wbr/>
-such as crop region,<wbr/> 3A regions,<wbr/> and intrinsicCalibration.<wbr/></p>
+<p>Camera HAL may switch between physical cameras depending on focalLength,<wbr/> cropRegion,<wbr/> or
+zoomRatio.<wbr/> If physical cameras have different sizes,<wbr/> HAL must maintain a single logical
+camera active<wbr/>Array<wbr/>Size/<wbr/>pixel<wbr/>Array<wbr/>Size/<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size,<wbr/> and must do proper
+mapping between logical camera and underlying physical cameras for all related metadata
+tags,<wbr/> such as crop region,<wbr/> zoomRatio,<wbr/> 3A regions,<wbr/> and intrinsicCalibration.<wbr/></p>
 </li>
 <li>
 <p>Starting from HIDL ICameraDevice version 3.<wbr/>5,<wbr/> camera HAL must support
@@ -18924,6 +19389,14 @@ respectively.<wbr/></p>
 for rounding and other hardware requirements; the final
 crop region used will be included in the output capture
 result.<wbr/></p>
+<p>Starting from API level 30,<wbr/> it's strongly recommended to use <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
+to take advantage of better support for zoom with logical multi-camera.<wbr/> The benefits
+include better precision with optical-digital zoom combination,<wbr/> and ability to do
+zoom-out from 1.<wbr/>0x.<wbr/> When using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for zoom,<wbr/> the crop region in
+the capture request must be either letterboxing or pillarboxing (but not both).<wbr/> The
+coordinate system is post-zoom,<wbr/> meaning that the activeArraySize or
+preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>
+See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
             </td>
           </tr>
 
@@ -18944,11 +19417,18 @@ possible.<wbr/></p>
 size than pre-correction active array size,<wbr/> the HAL need follow below cropping rules:</p>
 <ul>
 <li>
-<p>The HAL need handle the cropRegion as if the sensor crop size is the effective
+<p>The HAL need to handle the cropRegion as if the sensor crop size is the effective
 pre-correction active array size.<wbr/> More specifically,<wbr/> the HAL must transform the request
 cropRegion from <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a> to the sensor cropped
 pixel area size in this way:</p>
 <ol>
+<li>If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to value x,<wbr/> scale the requested cropRegion
+with 1.<wbr/>0/<wbr/>x in relation to its center as the origin.<wbr/> For example,<wbr/> say the requested
+cropRegion is (crX,<wbr/> crY,<wbr/> crWidth,<wbr/> crHeight),<wbr/> override it with
+    <code>crX' = crX + crWidth * (1.<wbr/>0 - 1.<wbr/>0 /<wbr/> x) /<wbr/> 2</code>,<wbr/>
+    <code>crY' = crY + crHeight * (1.<wbr/>0 - 1.<wbr/>0 /<wbr/> x) /<wbr/> 2</code>,<wbr/>
+    <code>crWidth' = crWidth /<wbr/> x</code>,<wbr/> and
+    <code>crHeight' = crHeight /<wbr/> x</code>.<wbr/></li>
 <li>Translate the requested cropRegion w.<wbr/>r.<wbr/>t.,<wbr/> the left top corner of the sensor
 cropped pixel area by (tx,<wbr/> ty),<wbr/>
 where <code>ty = sensorCrop.<wbr/>top * (sensorCrop.<wbr/>height /<wbr/> preCorrectionActiveArraySize.<wbr/>height)</code>
@@ -18972,6 +19452,11 @@ cropRegion since the HAL may adjust the crop region to account for rounding,<wbr
 error,<wbr/> or other hardware limitations.<wbr/></p>
 </li>
 </ul>
+<p>If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is supported by the HAL,<wbr/> the HAL must report the zoom
+ratio via <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> and change the coordinate system such that
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>(depending on whether <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> is supported) is used to
+represent the camera field-of-view after zoom.<wbr/> see <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for
+details.<wbr/></p>
 <p>HAL2.<wbr/>x uses only (x,<wbr/> y,<wbr/> width)</p>
             </td>
           </tr>
@@ -19328,7 +19813,7 @@ and should include half/<wbr/>quarter of sensor maximum resolution.<wbr/></p>
                 
           <tr class="entry" id="static_android.scaler.availableMaxDigitalZoom">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="5">
               android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom
             </td>
             <td class="entry_type">
@@ -19380,9 +19865,21 @@ window size.<wbr/></p>
 <p>Crop regions that have a width or height that is smaller
 than this ratio allows will be rounded up to the minimum
 allowed size by the camera device.<wbr/></p>
+<p>Starting from API level 30,<wbr/> when using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> to zoom in or out,<wbr/>
+the application must use <a href="#static_android.control.zoomRatioRange">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio<wbr/>Range</a> to query both the minimum and
+maximum zoom ratio.<wbr/></p>
             </td>
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>If the HAL supports <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> this value must be equal to the maximum
+supported zoomRatio specified in <a href="#static_android.control.zoomRatioRange">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio<wbr/>Range</a>.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -20409,7 +20906,7 @@ YUV_<wbr/>420_<wbr/>888 must also be available for IMPLEMENTATION_<wbr/>DEFINED.
                 
           <tr class="entry" id="static_android.scaler.croppingType">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="5">
               android.<wbr/>scaler.<wbr/>cropping<wbr/>Type
             </td>
             <td class="entry_type">
@@ -20466,10 +20963,33 @@ final used crop region in metadata result <a href="#controls_android.scaler.crop
 <p>Camera devices that support FREEFORM cropping will support any crop region that
 is inside of the active array.<wbr/> The camera device will apply the same crop region and
 return the final used crop region in capture result metadata <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>.<wbr/></p>
+<p>Starting from API level 30,<wbr/></p>
+<ul>
+<li>If the camera device supports FREEFORM cropping,<wbr/> in order to do FREEFORM cropping,<wbr/> the
+application must set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> to 1.<wbr/>0,<wbr/> and use <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
+for zoom.<wbr/></li>
+<li>To do CENTER_<wbr/>ONLY zoom,<wbr/> the application has below 2 options:<ol>
+<li>Set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> to 1.<wbr/>0; adjust zoom by <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>.<wbr/></li>
+<li>Adjust zoom by <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>; use <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to crop
+the field of view vertically (letterboxing) or horizontally (pillarboxing),<wbr/> but not
+windowboxing.<wbr/></li>
+</ol>
+</li>
+<li>Setting <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> to values different than 1.<wbr/>0 and
+<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to be windowboxing at the same time is undefined behavior.<wbr/></li>
+</ul>
 <p>LEGACY capability devices will only support CENTER_<wbr/>ONLY cropping.<wbr/></p>
             </td>
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>If the HAL supports <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> this tag must be set to CENTER_<wbr/>ONLY.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -20908,6 +21428,14 @@ respectively.<wbr/></p>
 for rounding and other hardware requirements; the final
 crop region used will be included in the output capture
 result.<wbr/></p>
+<p>Starting from API level 30,<wbr/> it's strongly recommended to use <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
+to take advantage of better support for zoom with logical multi-camera.<wbr/> The benefits
+include better precision with optical-digital zoom combination,<wbr/> and ability to do
+zoom-out from 1.<wbr/>0x.<wbr/> When using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for zoom,<wbr/> the crop region in
+the capture request must be either letterboxing or pillarboxing (but not both).<wbr/> The
+coordinate system is post-zoom,<wbr/> meaning that the activeArraySize or
+preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>
+See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
             </td>
           </tr>
 
@@ -20928,11 +21456,18 @@ possible.<wbr/></p>
 size than pre-correction active array size,<wbr/> the HAL need follow below cropping rules:</p>
 <ul>
 <li>
-<p>The HAL need handle the cropRegion as if the sensor crop size is the effective
+<p>The HAL need to handle the cropRegion as if the sensor crop size is the effective
 pre-correction active array size.<wbr/> More specifically,<wbr/> the HAL must transform the request
 cropRegion from <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a> to the sensor cropped
 pixel area size in this way:</p>
 <ol>
+<li>If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to value x,<wbr/> scale the requested cropRegion
+with 1.<wbr/>0/<wbr/>x in relation to its center as the origin.<wbr/> For example,<wbr/> say the requested
+cropRegion is (crX,<wbr/> crY,<wbr/> crWidth,<wbr/> crHeight),<wbr/> override it with
+    <code>crX' = crX + crWidth * (1.<wbr/>0 - 1.<wbr/>0 /<wbr/> x) /<wbr/> 2</code>,<wbr/>
+    <code>crY' = crY + crHeight * (1.<wbr/>0 - 1.<wbr/>0 /<wbr/> x) /<wbr/> 2</code>,<wbr/>
+    <code>crWidth' = crWidth /<wbr/> x</code>,<wbr/> and
+    <code>crHeight' = crHeight /<wbr/> x</code>.<wbr/></li>
 <li>Translate the requested cropRegion w.<wbr/>r.<wbr/>t.,<wbr/> the left top corner of the sensor
 cropped pixel area by (tx,<wbr/> ty),<wbr/>
 where <code>ty = sensorCrop.<wbr/>top * (sensorCrop.<wbr/>height /<wbr/> preCorrectionActiveArraySize.<wbr/>height)</code>
@@ -20956,6 +21491,11 @@ cropRegion since the HAL may adjust the crop region to account for rounding,<wbr
 error,<wbr/> or other hardware limitations.<wbr/></p>
 </li>
 </ul>
+<p>If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is supported by the HAL,<wbr/> the HAL must report the zoom
+ratio via <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> and change the coordinate system such that
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a> or <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>(depending on whether <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> is supported) is used to
+represent the camera field-of-view after zoom.<wbr/> see <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for
+details.<wbr/></p>
 <p>HAL2.<wbr/>x uses only (x,<wbr/> y,<wbr/> width)</p>
             </td>
           </tr>
@@ -26405,7 +26945,16 @@ When the distortion correction mode is OFF,<wbr/> the coordinate system follows
 When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
 <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
 <code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
-<p>Only available if <a href="#controls_android.statistics.faceDetectMode">android.<wbr/>statistics.<wbr/>face<wbr/>Detect<wbr/>Mode</a> == FULL</p>
+<p>Only available if <a href="#controls_android.statistics.faceDetectMode">android.<wbr/>statistics.<wbr/>face<wbr/>Detect<wbr/>Mode</a> == FULL.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoomRatio field of view.<wbr/> This means that if the relative position of faces and
+the camera device doesn't change,<wbr/> when zooming in by increasing
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> the face landmarks move farther away from the center of the
+activeArray or preCorrectionActiveArray.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is set to 1.<wbr/>0
+(default),<wbr/> the face landmarks coordinates won't change as <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
+changes.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use activeArraySize or
+preCorrectionActiveArraySize still depends on distortion correction mode.<wbr/></p>
             </td>
           </tr>
 
@@ -26484,7 +27033,16 @@ When the distortion correction mode is OFF,<wbr/> the coordinate system follows
 When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
 <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
 <code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
-<p>Only available if <a href="#controls_android.statistics.faceDetectMode">android.<wbr/>statistics.<wbr/>face<wbr/>Detect<wbr/>Mode</a> != OFF</p>
+<p>Only available if <a href="#controls_android.statistics.faceDetectMode">android.<wbr/>statistics.<wbr/>face<wbr/>Detect<wbr/>Mode</a> != OFF.<wbr/></p>
+<p>Starting from API level 30,<wbr/> the coordinate system of activeArraySize or
+preCorrectionActiveArraySize is used to represent post-zoomRatio field of view,<wbr/> not
+pre-zoomRatio field of view.<wbr/> This means that if the relative position of faces and
+the camera device doesn't change,<wbr/> when zooming in by increasing
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> the face rectangles grow larger and move farther away from
+the center of the activeArray or preCorrectionActiveArray.<wbr/> If <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
+is set to 1.<wbr/>0 (default),<wbr/> the face rectangles won't change as <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
+changes.<wbr/> See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/> Whether to use activeArraySize or
+preCorrectionActiveArraySize still depends on distortion correction mode.<wbr/></p>
             </td>
           </tr>
 

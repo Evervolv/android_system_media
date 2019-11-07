@@ -169,6 +169,7 @@ def protobuf_type(entry):
     "mandatoryStreamCombination" : "MandatoryStreamCombination",
     "rangeInt"               : "RangeInt",
     "rangeLong"              : "RangeLong",
+    "rangeFloat"             : "RangeFloat",
     "colorSpaceTransform"    : "ColorSpaceTransform",
     "blackLevelPattern"      : "BlackLevelPattern",
     "byte"                   : "int32", # protocol buffer don't support byte
@@ -179,7 +180,7 @@ def protobuf_type(entry):
     "int64"                  : "int64",
     "enumList"               : "int32",
     "string"                 : "string",
-    "capabilityAndMaxSize"   : "CapabilityAndMaxSize"
+    "capability"             : "Capability"
   }
 
   if typeName not in typename_to_protobuftype:

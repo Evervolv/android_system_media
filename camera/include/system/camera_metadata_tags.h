@@ -174,8 +174,11 @@ typedef enum camera_metadata_tag {
     ANDROID_CONTROL_POST_RAW_SENSITIVITY_BOOST,       // int32        | public       | HIDL v3.2
     ANDROID_CONTROL_ENABLE_ZSL,                       // enum         | public       | HIDL v3.2
     ANDROID_CONTROL_AF_SCENE_CHANGE,                  // enum         | public       | HIDL v3.3
-    ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES,     // int32[]      | public       | HIDL v3.5
+    ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES,        // int32[]      | ndk_public   | HIDL v3.5
+    ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES,// float[]      | ndk_public   | HIDL v3.5
     ANDROID_CONTROL_BOKEH_MODE,                       // enum         | public       | HIDL v3.5
+    ANDROID_CONTROL_ZOOM_RATIO_RANGE,                 // float[]      | public       | HIDL v3.5
+    ANDROID_CONTROL_ZOOM_RATIO,                       // float        | public       | HIDL v3.5
     ANDROID_CONTROL_END,
 
     ANDROID_DEMOSAIC_MODE =                           // enum         | system       | HIDL v3.2

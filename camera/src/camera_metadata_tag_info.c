@@ -234,10 +234,16 @@ static tag_info_t android_control[ANDROID_CONTROL_END -
     { "enableZsl",                     TYPE_BYTE   },
     [ ANDROID_CONTROL_AF_SCENE_CHANGE - ANDROID_CONTROL_START ] =
     { "afSceneChange",                 TYPE_BYTE   },
-    [ ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES - ANDROID_CONTROL_START ] =
-    { "availableBokehCapabilities",    TYPE_INT32  },
+    [ ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES - ANDROID_CONTROL_START ] =
+    { "availableBokehMaxSizes",        TYPE_INT32  },
+    [ ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES - ANDROID_CONTROL_START ] =
+    { "availableBokehZoomRatioRanges", TYPE_FLOAT  },
     [ ANDROID_CONTROL_BOKEH_MODE - ANDROID_CONTROL_START ] =
     { "bokehMode",                     TYPE_BYTE   },
+    [ ANDROID_CONTROL_ZOOM_RATIO_RANGE - ANDROID_CONTROL_START ] =
+    { "zoomRatioRange",                TYPE_FLOAT  },
+    [ ANDROID_CONTROL_ZOOM_RATIO - ANDROID_CONTROL_START ] =
+    { "zoomRatio",                     TYPE_FLOAT  },
 };
 
 static tag_info_t android_demosaic[ANDROID_DEMOSAIC_END -
@@ -1516,7 +1522,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
             }
             break;
         }
-        case ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES: {
+        case ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES: {
+            break;
+        }
+        case ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES: {
             break;
         }
         case ANDROID_CONTROL_BOKEH_MODE: {
@@ -1536,6 +1545,12 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_CONTROL_ZOOM_RATIO_RANGE: {
+            break;
+        }
+        case ANDROID_CONTROL_ZOOM_RATIO: {
             break;
         }
 
@@ -3885,7 +3900,10 @@ int camera_metadata_enum_value(uint32_t tag,
                 }
             break;
         }
-        case ANDROID_CONTROL_AVAILABLE_BOKEH_CAPABILITIES: {
+        case ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES: {
+            break;
+        }
+        case ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES: {
             break;
         }
         case ANDROID_CONTROL_BOKEH_MODE: {
@@ -3907,6 +3925,12 @@ int camera_metadata_enum_value(uint32_t tag,
                     ret = 0;
                     break;
                 }
+            break;
+        }
+        case ANDROID_CONTROL_ZOOM_RATIO_RANGE: {
+            break;
+        }
+        case ANDROID_CONTROL_ZOOM_RATIO: {
             break;
         }
 
