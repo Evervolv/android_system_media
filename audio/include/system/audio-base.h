@@ -64,6 +64,7 @@ typedef enum {
 } audio_source_t;
 
 typedef enum {
+    AUDIO_SESSION_DEVICE = -2,
     AUDIO_SESSION_OUTPUT_STAGE = -1, // (-1)
     AUDIO_SESSION_OUTPUT_MIX = 0,
     AUDIO_SESSION_ALLOCATE = 0,
