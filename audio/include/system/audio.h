@@ -639,25 +639,74 @@ typedef struct record_track_metadata {
  *  Helper functions
  *****************************/
 
-static inline bool audio_is_output_device(audio_devices_t device)
+// see also: std::binary_search
+// search range [left, right)
+static inline bool audio_binary_search_uint_array(const uint32_t audio_array[], size_t left,
+                                                  size_t right, uint32_t target)
 {
-    if (((device & AUDIO_DEVICE_BIT_IN) == 0) &&
-            (popcount(device) == 1) && ((device & ~AUDIO_DEVICE_OUT_ALL) == 0))
-        return true;
-    else
+    if (right <= left || target < audio_array[left] || target > audio_array[right - 1]) {
         return false;
-}
+    }
 
-static inline bool audio_is_input_device(audio_devices_t device)
-{
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        device &= ~AUDIO_DEVICE_BIT_IN;
-        if ((popcount(device) == 1) && ((device & ~AUDIO_DEVICE_IN_ALL) == 0))
+    while (left < right) {
+        const size_t mid = left + (right - left) / 2;
+        if (audio_array[mid] == target) {
             return true;
+        } else if (audio_array[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
     }
     return false;
 }
 
+static inline bool audio_is_output_device(audio_devices_t device)
+{
+    switch (device) {
+    case AUDIO_DEVICE_OUT_SPEAKER_SAFE:
+    case AUDIO_DEVICE_OUT_SPEAKER:
+    case AUDIO_DEVICE_OUT_BLUETOOTH_A2DP:
+    case AUDIO_DEVICE_OUT_WIRED_HEADSET:
+    case AUDIO_DEVICE_OUT_USB_HEADSET:
+    case AUDIO_DEVICE_OUT_BLUETOOTH_SCO:
+    case AUDIO_DEVICE_OUT_EARPIECE:
+    case AUDIO_DEVICE_OUT_REMOTE_SUBMIX:
+    case AUDIO_DEVICE_OUT_TELEPHONY_TX:
+        // Search the most common devices first as these devices are most likely
+        // to be used. Put the most common devices in the order of the likelihood
+        // of usage to get a quick return.
+        return true;
+    default:
+        // Binary seach all devices if the device is not a most common device.
+        return audio_binary_search_uint_array(
+                AUDIO_DEVICE_OUT_ALL_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_CNT, device);
+    }
+}
+
+static inline bool audio_is_input_device(audio_devices_t device)
+{
+    switch (device) {
+    case AUDIO_DEVICE_IN_BUILTIN_MIC:
+    case AUDIO_DEVICE_IN_BACK_MIC:
+    case AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET:
+    case AUDIO_DEVICE_IN_WIRED_HEADSET:
+    case AUDIO_DEVICE_IN_USB_HEADSET:
+    case AUDIO_DEVICE_IN_REMOTE_SUBMIX:
+    case AUDIO_DEVICE_IN_TELEPHONY_RX:
+        // Search the most common devices first as these devices are most likely
+        // to be used. Put the most common devices in the order of the likelihood
+        // of usage to get a quick return.
+        return true;
+    default:
+        // Binary seach all devices if the device is not a most common device.
+        return audio_binary_search_uint_array(
+                AUDIO_DEVICE_IN_ALL_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_CNT, device);
+    }
+}
+
+// TODO: this function expects a combination of audio device types as parameter. It should
+// be deprecated as audio device types should not be use as bit mask any more since R.
 static inline bool audio_is_output_devices(audio_devices_t device)
 {
     return (device & AUDIO_DEVICE_BIT_IN) == 0;
@@ -665,20 +714,13 @@ static inline bool audio_is_output_devices(audio_devices_t device)
 
 static inline bool audio_is_a2dp_in_device(audio_devices_t device)
 {
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        device &= ~AUDIO_DEVICE_BIT_IN;
-        if ((popcount(device) == 1) && (device & AUDIO_DEVICE_IN_BLUETOOTH_A2DP))
-            return true;
-    }
-    return false;
+    return device == AUDIO_DEVICE_IN_BLUETOOTH_A2DP;
 }
 
 static inline bool audio_is_a2dp_out_device(audio_devices_t device)
 {
-    if ((popcount(device) == 1) && (device & AUDIO_DEVICE_OUT_ALL_A2DP))
-        return true;
-    else
-        return false;
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_OUT_ALL_A2DP_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_A2DP_CNT, device);
 }
 
 // Deprecated - use audio_is_a2dp_out_device() instead
@@ -687,18 +729,22 @@ static inline bool audio_is_a2dp_device(audio_devices_t device)
     return audio_is_a2dp_out_device(device);
 }
 
+static inline bool audio_is_bluetooth_out_sco_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_OUT_ALL_SCO_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_SCO_CNT, device);
+}
+
+static inline bool audio_is_bluetooth_in_sco_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_IN_ALL_SCO_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_SCO_CNT, device);
+}
+
 static inline bool audio_is_bluetooth_sco_device(audio_devices_t device)
 {
-    if ((device & AUDIO_DEVICE_BIT_IN) == 0) {
-        if ((popcount(device) == 1) && ((device & ~AUDIO_DEVICE_OUT_ALL_SCO) == 0))
-            return true;
-    } else {
-        device &= ~AUDIO_DEVICE_BIT_IN;
-        if ((popcount(device) == 1) && ((device & ~AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET) == 0))
-            return true;
-    }
-
-    return false;
+    return audio_is_bluetooth_out_sco_device(device) ||
+            audio_is_bluetooth_in_sco_device(device);
 }
 
 static inline bool audio_is_hearing_aid_out_device(audio_devices_t device)
@@ -708,17 +754,14 @@ static inline bool audio_is_hearing_aid_out_device(audio_devices_t device)
 
 static inline bool audio_is_usb_out_device(audio_devices_t device)
 {
-    return ((popcount(device) == 1) && (device & AUDIO_DEVICE_OUT_ALL_USB));
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_OUT_ALL_USB_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_USB_CNT, device);
 }
 
 static inline bool audio_is_usb_in_device(audio_devices_t device)
 {
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        device &= ~AUDIO_DEVICE_BIT_IN;
-        if (popcount(device) == 1 && (device & AUDIO_DEVICE_IN_ALL_USB) != 0)
-            return true;
-    }
-    return false;
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_IN_ALL_USB_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_USB_CNT, device);
 }
 
 /* OBSOLETE - use audio_is_usb_out_device() instead. */
@@ -729,13 +772,25 @@ static inline bool audio_is_usb_device(audio_devices_t device)
 
 static inline bool audio_is_remote_submix_device(audio_devices_t device)
 {
-    if ((audio_is_output_devices(device) &&
-         (device & AUDIO_DEVICE_OUT_REMOTE_SUBMIX) == AUDIO_DEVICE_OUT_REMOTE_SUBMIX)
-        || (!audio_is_output_devices(device) &&
-         (device & AUDIO_DEVICE_IN_REMOTE_SUBMIX) == AUDIO_DEVICE_IN_REMOTE_SUBMIX))
-        return true;
-    else
-        return false;
+    return device == AUDIO_DEVICE_OUT_REMOTE_SUBMIX ||
+           device == AUDIO_DEVICE_IN_REMOTE_SUBMIX;
+}
+
+static inline bool audio_is_digital_out_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_DIGITAL_CNT, device);
+}
+
+static inline bool audio_is_digital_in_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_DIGITAL_CNT, device);
+}
+
+static inline bool audio_device_is_digital(audio_devices_t device) {
+    return audio_is_digital_in_device(device) ||
+           audio_is_digital_out_device(device);
 }
 
 /* Returns true if:
@@ -1200,46 +1255,19 @@ static inline size_t audio_bytes_per_frame(uint32_t channel_count, audio_format_
 /* converts device address to string sent to audio HAL via set_parameters */
 static inline char *audio_device_address_to_parameter(audio_devices_t device, const char *address)
 {
-    const size_t kSize = AUDIO_DEVICE_MAX_ADDRESS_LEN + sizeof("a2dp_sink_address=");
+    const size_t kSize = AUDIO_DEVICE_MAX_ADDRESS_LEN + sizeof("a2dp_source_address=");
     char param[kSize];
 
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        device &= ~AUDIO_DEVICE_BIT_IN;
-        if (device & AUDIO_DEVICE_IN_BLUETOOTH_A2DP)
-            snprintf(param, kSize, "%s=%s", "a2dp_source_address", address);
-        else if (device & AUDIO_DEVICE_IN_REMOTE_SUBMIX)
-            snprintf(param, kSize, "%s=%s", "mix", address);
-        else
-            snprintf(param, kSize, "%s", address);
+    if (device == AUDIO_DEVICE_IN_BLUETOOTH_A2DP) {
+        snprintf(param, kSize, "%s=%s", "a2dp_source_address", address);
+    } else if (audio_is_a2dp_out_device(device)) {
+        snprintf(param, kSize, "%s=%s", "a2dp_sink_address", address);
+    } else if (audio_is_remote_submix_device(device)) {
+        snprintf(param, kSize, "%s=%s", "mix", address);
     } else {
-        if (device & AUDIO_DEVICE_OUT_ALL_A2DP)
-            snprintf(param, kSize, "%s=%s", "a2dp_sink_address", address);
-        else if (device & AUDIO_DEVICE_OUT_REMOTE_SUBMIX)
-            snprintf(param, kSize, "%s=%s", "mix", address);
-        else
-            snprintf(param, kSize, "%s", address);
+        snprintf(param, kSize, "%s", address);
     }
     return strdup(param);
-}
-
-static inline bool audio_device_is_digital(audio_devices_t device) {
-    if ((device & AUDIO_DEVICE_BIT_IN) != 0) {
-        // input
-        return (~AUDIO_DEVICE_BIT_IN & device & (AUDIO_DEVICE_IN_ALL_USB |
-                          AUDIO_DEVICE_IN_HDMI |
-                          AUDIO_DEVICE_IN_HDMI_ARC |
-                          AUDIO_DEVICE_IN_SPDIF |
-                          AUDIO_DEVICE_IN_IP |
-                          AUDIO_DEVICE_IN_BUS)) != 0;
-    } else {
-        // output
-        return (device & (AUDIO_DEVICE_OUT_ALL_USB |
-                          AUDIO_DEVICE_OUT_HDMI |
-                          AUDIO_DEVICE_OUT_HDMI_ARC |
-                          AUDIO_DEVICE_OUT_SPDIF |
-                          AUDIO_DEVICE_OUT_IP |
-                          AUDIO_DEVICE_OUT_BUS)) != 0;
-    }
 }
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
