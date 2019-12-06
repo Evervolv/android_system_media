@@ -1185,6 +1185,23 @@ static inline bool audio_is_valid_format(audio_format_t format)
     }
 }
 
+static inline bool audio_is_iec61937_compatible(audio_format_t format)
+{
+    switch (format) {
+    case AUDIO_FORMAT_AC3:       // IEC 61937-3:2017
+    case AUDIO_FORMAT_AC4:       // IEC 61937-14:2017
+    case AUDIO_FORMAT_E_AC3:     // IEC 61937-3:2017
+    case AUDIO_FORMAT_E_AC3_JOC: // IEC 61937-3:2017
+    case AUDIO_FORMAT_MAT:       // IEC 61937-9:2017
+    case AUDIO_FORMAT_MAT_1_0:   // IEC 61937-9:2017
+    case AUDIO_FORMAT_MAT_2_0:   // IEC 61937-9:2017
+    case AUDIO_FORMAT_MAT_2_1:   // IEC 61937-9:2017
+        return true;
+    default:
+        return false;
+    }
+}
+
 /**
  * Extract the primary format, eg. PCM, AC3, etc.
  */
