@@ -172,8 +172,8 @@ enum {
                                 AUDIO_DEVICE_IN_USB_DEVICE |
                                 AUDIO_DEVICE_IN_USB_HEADSET,
 
-    AUDIO_USAGE_MAX           = AUDIO_USAGE_ASSISTANT,
-    AUDIO_USAGE_CNT           = AUDIO_USAGE_ASSISTANT + 1,
+    AUDIO_USAGE_MAX           = AUDIO_USAGE_CALL_ASSISTANT,
+    AUDIO_USAGE_CNT           = AUDIO_USAGE_CALL_ASSISTANT + 1,
 
     AUDIO_PORT_CONFIG_ALL     = AUDIO_PORT_CONFIG_SAMPLE_RATE |
                                 AUDIO_PORT_CONFIG_CHANNEL_MASK |

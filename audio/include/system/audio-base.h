@@ -441,6 +441,7 @@ typedef enum {
     AUDIO_USAGE_GAME = 14,
     AUDIO_USAGE_VIRTUAL_SOURCE = 15,
     AUDIO_USAGE_ASSISTANT = 16,
+    AUDIO_USAGE_CALL_ASSISTANT = 17,
 } audio_usage_t;
 
 typedef enum {
