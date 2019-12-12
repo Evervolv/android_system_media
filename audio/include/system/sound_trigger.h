@@ -137,6 +137,38 @@ struct sound_trigger_generic_sound_model {
     struct sound_trigger_sound_model common;
 };
 
+/*
+ * Model specific parameters to be used with parameter set and get APIs
+ */
+typedef enum {
+    /*
+     * Controls the sensitivity threshold adjustment factor for a given model.
+     * Negative value corresponds to less sensitive model (high threshold) and
+     * a positive value corresponds to a more sensitive model (low threshold).
+     * Default value is 0.
+     */
+    MODEL_PARAMETER_THRESHOLD_FACTOR = 0,
+
+    /*
+     * Placeholder for invalid model parameter used for returning error or
+     * passing an invalid value.
+     */
+    MODEL_PARAMETER_INVALID = -1,
+} sound_trigger_model_parameter_t;
+
+/**
+ * Model specific support for a given parameter
+ */
+typedef struct {
+    /**
+     * start of supported value range inclusive
+     */
+    int32_t start;
+    /**
+     * end of supported value range inclusive
+     */
+    int32_t end;
+} sound_trigger_model_parameter_range_t;
 
 /*
  * Generic recognition event sent via recognition callback
