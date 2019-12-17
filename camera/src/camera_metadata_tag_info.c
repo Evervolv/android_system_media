@@ -2037,6 +2037,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "SYSTEM_CAMERA";
                     ret = 0;
                     break;
+                case ANDROID_REQUEST_AVAILABLE_CAPABILITIES_OFFLINE_PROCESSING:
+                    msg = "OFFLINE_PROCESSING";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
@@ -4458,6 +4462,12 @@ int camera_metadata_enum_value(uint32_t tag,
                 enumName = "SYSTEM_CAMERA";
                 if (strncmp(name, enumName, size) == 0) {
                     *value = ANDROID_REQUEST_AVAILABLE_CAPABILITIES_SYSTEM_CAMERA;
+                    ret = 0;
+                    break;
+                }
+                enumName = "OFFLINE_PROCESSING";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_REQUEST_AVAILABLE_CAPABILITIES_OFFLINE_PROCESSING;
                     ret = 0;
                     break;
                 }

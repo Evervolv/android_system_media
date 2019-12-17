@@ -5477,7 +5477,7 @@ mode camera devices.<wbr/></p>
             <td class="entry_description">
               <p>List of the maximum number of regions that can be used for metering in
 auto-exposure (AE),<wbr/> auto-white balance (AWB),<wbr/> and auto-focus (AF);
-this corresponds to the the maximum number of elements in
+this corresponds to the maximum number of elements in
 <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a>,<wbr/> <a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a>,<wbr/>
 and <a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a>.<wbr/></p>
             </td>
@@ -5553,7 +5553,7 @@ value will be &gt;= 1.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>This corresponds to the the maximum allowed number of elements in
+              <p>This corresponds to the maximum allowed number of elements in
 <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a>.<wbr/></p>
             </td>
           </tr>
@@ -5616,7 +5616,7 @@ routine.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>This corresponds to the the maximum allowed number of elements in
+              <p>This corresponds to the maximum allowed number of elements in
 <a href="#controls_android.control.awbRegions">android.<wbr/>control.<wbr/>awb<wbr/>Regions</a>.<wbr/></p>
             </td>
           </tr>
@@ -5679,7 +5679,7 @@ value will be &gt;= 1.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>This corresponds to the the maximum allowed number of elements in
+              <p>This corresponds to the maximum allowed number of elements in
 <a href="#controls_android.control.afRegions">android.<wbr/>control.<wbr/>af<wbr/>Regions</a>.<wbr/></p>
             </td>
           </tr>
@@ -17825,6 +17825,50 @@ trusted execution environments (TEE).<wbr/></p></span>
 applications.<wbr/> Processes need to have the android.<wbr/>permission.<wbr/>SYSTEM_<wbr/>CAMERA in
 addition to android.<wbr/>permission.<wbr/>CAMERA in order to connect to this camera device.<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">OFFLINE_PROCESSING (v3.5)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>The camera device supports the OFFLINE_<wbr/>PROCESSING use case.<wbr/></p>
+<p>With OFFLINE_<wbr/>PROCESSING capability,<wbr/> the application can switch an ongoing
+capture session to offline mode by calling the
+CameraCaptureSession#switchToOffline method and specify streams to be kept in offline
+mode.<wbr/> The camera will then stop currently active repeating requests,<wbr/> prepare for
+some requests to go into offline mode,<wbr/> and return an offline session object.<wbr/> After
+the switchToOffline call returns,<wbr/> the original capture session is in closed state as
+if the CameraCaptureSession#close method has been called.<wbr/>
+In the offline mode,<wbr/> all inflight requests will continue to be processed in the
+background,<wbr/> and the application can immediately close the camera or create a new
+capture session without losing those requests' output images and capture results.<wbr/></p>
+<p>While the camera device is processing offline requests,<wbr/> it
+might not be able to support all stream configurations it can support
+without offline requests.<wbr/> When that happens,<wbr/> the createCaptureSession
+method call will fail.<wbr/> The following stream configurations are guaranteed to work
+without hitting the resource busy exception:</p>
+<ul>
+<li>One ongoing offline session: target one output surface of YUV or
+JPEG format,<wbr/> any resolution.<wbr/></li>
+<li>The active camera capture session:<ol>
+<li>One preview surface (SurfaceView or SurfaceTexture) up to 1920 width</li>
+<li>One YUV ImageReader surface up to 1920 width</li>
+<li>One Jpeg ImageReader,<wbr/> any resolution: the camera device is
+   allowed to slow down JPEG output speed by 50% if there is any ongoing offline
+   session.<wbr/></li>
+<li>One ImageWriter surface of private format,<wbr/> any resolution if the device supports
+   PRIVATE_<wbr/>REPROCESSING capability</li>
+</ol>
+</li>
+<li>Alternatively,<wbr/> the active camera session above can be replaced by an legacy
+<a href="https://developer.android.com/reference/android/hardware/Camera.html">Camera</a> with the following parameter settings:<ol>
+<li>Preview size up to 1920 width</li>
+<li>Preview callback size up to 1920 width</li>
+<li>Video size up to 1920 width</li>
+<li>Picture size,<wbr/> any resolution: the camera device is
+    allowed to slow down JPEG output speed by 50% if there is any ongoing offline
+    session.<wbr/></li>
+</ol>
+</li>
+</ul></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
@@ -17963,6 +18007,14 @@ CurveGreen and curveBlue are no-ops.<wbr/></p>
 </ul>
 <p>In Android API level 28,<wbr/> a MONOCHROME camera device must not have RAW capability.<wbr/> From
 API level 29,<wbr/> a camera is allowed to have both MONOCHROME and RAW capabilities.<wbr/></p>
+<p>To support the legacy API to ICameraDevice 3.<wbr/>x shim layer,<wbr/> devices advertising
+OFFLINE_<wbr/>PROCESSING capability must also support configuring an input stream of the same
+size as the picture size if:</p>
+<ul>
+<li>The device supports PRIVATE_<wbr/>REPROCESSING capability</li>
+<li>The device's maximal JPEG resolution can reach 30 FPS min frame duration</li>
+<li>The device does not support HAL based ZSL (<a href="#controls_android.control.enableZsl">android.<wbr/>control.<wbr/>enable<wbr/>Zsl</a>)</li>
+</ul>
             </td>
           </tr>
 
