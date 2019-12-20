@@ -26,7 +26,7 @@
  */
 enum {
     /** Number of audio stream available to vendors. */
-    AUDIO_STREAM_PUBLIC_CNT = AUDIO_STREAM_ACCESSIBILITY + 1,
+    AUDIO_STREAM_PUBLIC_CNT = AUDIO_STREAM_ASSISTANT + 1,
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
     /** Total number of stream handled by the policy*/
