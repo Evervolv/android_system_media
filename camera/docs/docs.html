@@ -4774,7 +4774,7 @@ tradeoffs.<wbr/> When turned on,<wbr/> AE,<wbr/> AWB,<wbr/> and AF run in auto m
 stream combinations of LIMITED hardware level are guaranteed.<wbr/></p>
 <p>For a logical multi-camera,<wbr/> bokeh may be implemented by stereo vision from sub-cameras
 with different field of view.<wbr/> As a result,<wbr/> when bokeh mode is enabled,<wbr/> the camera device
-may override android.<wbr/>scaler.<wbr/>Crop<wbr/>Region,<wbr/> and the field of view will be smaller than when
+may override <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>,<wbr/> and the field of view will be smaller than when
 bokeh mode is off.<wbr/></p>
             </td>
           </tr>
@@ -6563,7 +6563,7 @@ ranges for all supported bokeh modes.<wbr/> A range of (1.<wbr/>0,<wbr/> 1.<wbr/
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
               <p>If the camera device supports zoom-out from 1x zoom,<wbr/> minZoom will be less than 1.<wbr/>0,<wbr/> and
-setting android.<wbr/>control.<wbr/>zoom<wbr/>Ration to values less than 1.<wbr/>0 increases the camera's field
+setting <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> to values less than 1.<wbr/>0 increases the camera's field
 of view.<wbr/></p>
             </td>
           </tr>
@@ -10356,7 +10356,7 @@ tradeoffs.<wbr/> When turned on,<wbr/> AE,<wbr/> AWB,<wbr/> and AF run in auto m
 stream combinations of LIMITED hardware level are guaranteed.<wbr/></p>
 <p>For a logical multi-camera,<wbr/> bokeh may be implemented by stereo vision from sub-cameras
 with different field of view.<wbr/> As a result,<wbr/> when bokeh mode is enabled,<wbr/> the camera device
-may override android.<wbr/>scaler.<wbr/>Crop<wbr/>Region,<wbr/> and the field of view will be smaller than when
+may override <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>,<wbr/> and the field of view will be smaller than when
 bokeh mode is off.<wbr/></p>
             </td>
           </tr>
@@ -19401,32 +19401,70 @@ pipeline stages were actually used.<wbr/></p>
 <p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
 system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being
 the top-left pixel of the active array.<wbr/></p>
-<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
-system depends on the mode being set.<wbr/>
-When the distortion correction mode is OFF,<wbr/> the coordinate system follows
-<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
-<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array.<wbr/>
-When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
-<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
-<p>Output streams use this rectangle to produce their output,<wbr/>
-cropping to a smaller region if necessary to maintain the
-stream's aspect ratio,<wbr/> then scaling the sensor input to
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate system
+depends on the mode being set.<wbr/>  When the distortion correction mode is OFF,<wbr/> the
+coordinate system follows <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/>
+0)</code> being the top-left pixel of the pre-correction active array.<wbr/>  When the distortion
+correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being the top-left pixel of the
+active array.<wbr/></p>
+<p>Output streams use this rectangle to produce their output,<wbr/> cropping to a smaller region
+if necessary to maintain the stream's aspect ratio,<wbr/> then scaling the sensor input to
 match the output's configured resolution.<wbr/></p>
-<p>The crop region is applied after the RAW to other color
-space (e.<wbr/>g.<wbr/> YUV) conversion.<wbr/> Since raw streams
-(e.<wbr/>g.<wbr/> RAW16) don't have the conversion stage,<wbr/> they are not
+<p>The crop region is applied after the RAW to other color space (e.<wbr/>g.<wbr/> YUV)
+conversion.<wbr/> Since raw streams (e.<wbr/>g.<wbr/> RAW16) don't have the conversion stage,<wbr/> they are not
 croppable.<wbr/> The crop region will be ignored by raw streams.<wbr/></p>
-<p>For non-raw streams,<wbr/> any additional per-stream cropping will
-be done to maximize the final pixel area of the stream.<wbr/></p>
-<p>For example,<wbr/> if the crop region is set to a 4:3 aspect
-ratio,<wbr/> then 4:3 streams will use the exact crop
-region.<wbr/> 16:9 streams will further crop vertically
-(letterbox).<wbr/></p>
-<p>Conversely,<wbr/> if the crop region is set to a 16:9,<wbr/> then 4:3
-outputs will crop horizontally (pillarbox),<wbr/> and 16:9
-streams will match exactly.<wbr/> These additional crops will
-be centered within the crop region.<wbr/></p>
+<p>For non-raw streams,<wbr/> any additional per-stream cropping will be done to maximize the
+final pixel area of the stream.<wbr/></p>
+<p>For example,<wbr/> if the crop region is set to a 4:3 aspect ratio,<wbr/> then 4:3 streams will use
+the exact crop region.<wbr/> 16:9 streams will further crop vertically (letterbox).<wbr/></p>
+<p>Conversely,<wbr/> if the crop region is set to a 16:9,<wbr/> then 4:3 outputs will crop horizontally
+(pillarbox),<wbr/> and 16:9 streams will match exactly.<wbr/> These additional crops will be
+centered within the crop region.<wbr/></p>
+<p>To illustrate,<wbr/> here are several scenarios of different crop regions and output streams,<wbr/>
+for a hypothetical camera device with an active array of size <code>(2000,<wbr/>1500)</code>.<wbr/>  Note that
+several of these examples use non-centered crop regions for ease of illustration; such
+regions are only supported on devices with FREEFORM capability
+(<a href="#static_android.scaler.croppingType">android.<wbr/>scaler.<wbr/>cropping<wbr/>Type</a> <code>== FREEFORM</code>),<wbr/> but this does not affect the way the crop
+rules work otherwise.<wbr/></p>
+<ul>
+<li>Camera Configuration:<ul>
+<li>Active array size: <code>2000x1500</code> (3 MP,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #1: <code>640x480</code> (VGA,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #2: <code>1280x720</code> (720p,<wbr/> 16:9 aspect ratio)</li>
+</ul>
+</li>
+<li>Case #1: 4:3 crop region with 2x digital zoom<ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125) //<wbr/> (left,<wbr/> top,<wbr/> right,<wbr/> bottom)</code></li>
+<li><img alt="4:3 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-43-ratio.png"/></li>
+<li><code>640x480</code> stream source area: <code>(500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125)</code> (equal to crop region)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 469,<wbr/> 1500,<wbr/> 1031)</code> (letterboxed)</li>
+</ul>
+</li>
+<li>Case #2: 16:9 crop region with ~1.<wbr/>5x digital zoom.<wbr/><ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1833,<wbr/> 1125)</code></li>
+<li><img alt="16:9 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-169-ratio.png"/></li>
+<li><code>640x480</code> stream source area: <code>(666,<wbr/> 375,<wbr/> 1666,<wbr/> 1125)</code> (pillarboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 375,<wbr/> 1833,<wbr/> 1125)</code> (equal to crop region)</li>
+</ul>
+</li>
+<li>Case #3: 1:1 crop region with ~2.<wbr/>6x digital zoom.<wbr/><ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1250,<wbr/> 1125)</code></li>
+<li><img alt="1:1 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-11-ratio.png"/></li>
+<li><code>640x480</code> stream source area: <code>(500,<wbr/> 469,<wbr/> 1250,<wbr/> 1031)</code> (letterboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 543,<wbr/> 1250,<wbr/> 957)</code> (letterboxed)</li>
+</ul>
+</li>
+<li>Case #4: Replace <code>640x480</code> stream with <code>1024x1024</code> stream,<wbr/> with 4:3 crop region:<ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125)</code></li>
+<li><img alt="Square output, 4:3 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-43-square-ratio.png"/></li>
+<li><code>1024x1024</code> stream source area: <code>(625,<wbr/> 375,<wbr/> 1375,<wbr/> 1125)</code> (pillarboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 469,<wbr/> 1500,<wbr/> 1031)</code> (letterboxed)</li>
+<li>Note that in this case,<wbr/> neither of the two outputs is a subset of the other,<wbr/> with
+  each containing image data the other doesn't have.<wbr/></li>
+</ul>
+</li>
+</ul>
 <p>If the coordinate system is <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> the width and height
 of the crop region cannot be set to be smaller than
 <code>floor( activeArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code> and
@@ -19437,18 +19475,16 @@ and height of the crop region cannot be set to be smaller than
 and
 <code>floor( preCorrectionActiveArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/>
 respectively.<wbr/></p>
-<p>The camera device may adjust the crop region to account
-for rounding and other hardware requirements; the final
-crop region used will be included in the output capture
-result.<wbr/></p>
+<p>The camera device may adjust the crop region to account for rounding and other hardware
+requirements; the final crop region used will be included in the output capture result.<wbr/></p>
 <p>Starting from API level 30,<wbr/> it's strongly recommended to use <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
 to take advantage of better support for zoom with logical multi-camera.<wbr/> The benefits
 include better precision with optical-digital zoom combination,<wbr/> and ability to do
 zoom-out from 1.<wbr/>0x.<wbr/> When using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for zoom,<wbr/> the crop region in
 the capture request must be either letterboxing or pillarboxing (but not both).<wbr/> The
 coordinate system is post-zoom,<wbr/> meaning that the activeArraySize or
-preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>
-See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
+preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>  See
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
             </td>
           </tr>
 
@@ -21440,32 +21476,70 @@ backward compatible.<wbr/></p>
 <p>For devices not supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
 system always follows that of <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being
 the top-left pixel of the active array.<wbr/></p>
-<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate
-system depends on the mode being set.<wbr/>
-When the distortion correction mode is OFF,<wbr/> the coordinate system follows
-<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with
-<code>(0,<wbr/> 0)</code> being the top-left pixel of the pre-correction active array.<wbr/>
-When the distortion correction mode is not OFF,<wbr/> the coordinate system follows
-<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with
-<code>(0,<wbr/> 0)</code> being the top-left pixel of the active array.<wbr/></p>
-<p>Output streams use this rectangle to produce their output,<wbr/>
-cropping to a smaller region if necessary to maintain the
-stream's aspect ratio,<wbr/> then scaling the sensor input to
+<p>For devices supporting <a href="#controls_android.distortionCorrection.mode">android.<wbr/>distortion<wbr/>Correction.<wbr/>mode</a> control,<wbr/> the coordinate system
+depends on the mode being set.<wbr/>  When the distortion correction mode is OFF,<wbr/> the
+coordinate system follows <a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/>
+0)</code> being the top-left pixel of the pre-correction active array.<wbr/>  When the distortion
+correction mode is not OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with <code>(0,<wbr/> 0)</code> being the top-left pixel of the
+active array.<wbr/></p>
+<p>Output streams use this rectangle to produce their output,<wbr/> cropping to a smaller region
+if necessary to maintain the stream's aspect ratio,<wbr/> then scaling the sensor input to
 match the output's configured resolution.<wbr/></p>
-<p>The crop region is applied after the RAW to other color
-space (e.<wbr/>g.<wbr/> YUV) conversion.<wbr/> Since raw streams
-(e.<wbr/>g.<wbr/> RAW16) don't have the conversion stage,<wbr/> they are not
+<p>The crop region is applied after the RAW to other color space (e.<wbr/>g.<wbr/> YUV)
+conversion.<wbr/> Since raw streams (e.<wbr/>g.<wbr/> RAW16) don't have the conversion stage,<wbr/> they are not
 croppable.<wbr/> The crop region will be ignored by raw streams.<wbr/></p>
-<p>For non-raw streams,<wbr/> any additional per-stream cropping will
-be done to maximize the final pixel area of the stream.<wbr/></p>
-<p>For example,<wbr/> if the crop region is set to a 4:3 aspect
-ratio,<wbr/> then 4:3 streams will use the exact crop
-region.<wbr/> 16:9 streams will further crop vertically
-(letterbox).<wbr/></p>
-<p>Conversely,<wbr/> if the crop region is set to a 16:9,<wbr/> then 4:3
-outputs will crop horizontally (pillarbox),<wbr/> and 16:9
-streams will match exactly.<wbr/> These additional crops will
-be centered within the crop region.<wbr/></p>
+<p>For non-raw streams,<wbr/> any additional per-stream cropping will be done to maximize the
+final pixel area of the stream.<wbr/></p>
+<p>For example,<wbr/> if the crop region is set to a 4:3 aspect ratio,<wbr/> then 4:3 streams will use
+the exact crop region.<wbr/> 16:9 streams will further crop vertically (letterbox).<wbr/></p>
+<p>Conversely,<wbr/> if the crop region is set to a 16:9,<wbr/> then 4:3 outputs will crop horizontally
+(pillarbox),<wbr/> and 16:9 streams will match exactly.<wbr/> These additional crops will be
+centered within the crop region.<wbr/></p>
+<p>To illustrate,<wbr/> here are several scenarios of different crop regions and output streams,<wbr/>
+for a hypothetical camera device with an active array of size <code>(2000,<wbr/>1500)</code>.<wbr/>  Note that
+several of these examples use non-centered crop regions for ease of illustration; such
+regions are only supported on devices with FREEFORM capability
+(<a href="#static_android.scaler.croppingType">android.<wbr/>scaler.<wbr/>cropping<wbr/>Type</a> <code>== FREEFORM</code>),<wbr/> but this does not affect the way the crop
+rules work otherwise.<wbr/></p>
+<ul>
+<li>Camera Configuration:<ul>
+<li>Active array size: <code>2000x1500</code> (3 MP,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #1: <code>640x480</code> (VGA,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #2: <code>1280x720</code> (720p,<wbr/> 16:9 aspect ratio)</li>
+</ul>
+</li>
+<li>Case #1: 4:3 crop region with 2x digital zoom<ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125) //<wbr/> (left,<wbr/> top,<wbr/> right,<wbr/> bottom)</code></li>
+<li><img alt="4:3 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-43-ratio.png"/></li>
+<li><code>640x480</code> stream source area: <code>(500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125)</code> (equal to crop region)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 469,<wbr/> 1500,<wbr/> 1031)</code> (letterboxed)</li>
+</ul>
+</li>
+<li>Case #2: 16:9 crop region with ~1.<wbr/>5x digital zoom.<wbr/><ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1833,<wbr/> 1125)</code></li>
+<li><img alt="16:9 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-169-ratio.png"/></li>
+<li><code>640x480</code> stream source area: <code>(666,<wbr/> 375,<wbr/> 1666,<wbr/> 1125)</code> (pillarboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 375,<wbr/> 1833,<wbr/> 1125)</code> (equal to crop region)</li>
+</ul>
+</li>
+<li>Case #3: 1:1 crop region with ~2.<wbr/>6x digital zoom.<wbr/><ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1250,<wbr/> 1125)</code></li>
+<li><img alt="1:1 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-11-ratio.png"/></li>
+<li><code>640x480</code> stream source area: <code>(500,<wbr/> 469,<wbr/> 1250,<wbr/> 1031)</code> (letterboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 543,<wbr/> 1250,<wbr/> 957)</code> (letterboxed)</li>
+</ul>
+</li>
+<li>Case #4: Replace <code>640x480</code> stream with <code>1024x1024</code> stream,<wbr/> with 4:3 crop region:<ul>
+<li>Crop region: <code>Rect(500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125)</code></li>
+<li><img alt="Square output, 4:3 aspect ratio crop diagram" src="images/camera2/metadata/android.scaler.cropRegion/crop-region-43-square-ratio.png"/></li>
+<li><code>1024x1024</code> stream source area: <code>(625,<wbr/> 375,<wbr/> 1375,<wbr/> 1125)</code> (pillarboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(500,<wbr/> 469,<wbr/> 1500,<wbr/> 1031)</code> (letterboxed)</li>
+<li>Note that in this case,<wbr/> neither of the two outputs is a subset of the other,<wbr/> with
+  each containing image data the other doesn't have.<wbr/></li>
+</ul>
+</li>
+</ul>
 <p>If the coordinate system is <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> the width and height
 of the crop region cannot be set to be smaller than
 <code>floor( activeArraySize.<wbr/>width /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code> and
@@ -21476,18 +21550,16 @@ and height of the crop region cannot be set to be smaller than
 and
 <code>floor( preCorrectionActiveArraySize.<wbr/>height /<wbr/> <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> )</code>,<wbr/>
 respectively.<wbr/></p>
-<p>The camera device may adjust the crop region to account
-for rounding and other hardware requirements; the final
-crop region used will be included in the output capture
-result.<wbr/></p>
+<p>The camera device may adjust the crop region to account for rounding and other hardware
+requirements; the final crop region used will be included in the output capture result.<wbr/></p>
 <p>Starting from API level 30,<wbr/> it's strongly recommended to use <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
 to take advantage of better support for zoom with logical multi-camera.<wbr/> The benefits
 include better precision with optical-digital zoom combination,<wbr/> and ability to do
 zoom-out from 1.<wbr/>0x.<wbr/> When using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for zoom,<wbr/> the crop region in
 the capture request must be either letterboxing or pillarboxing (but not both).<wbr/> The
 coordinate system is post-zoom,<wbr/> meaning that the activeArraySize or
-preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>
-See <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
+preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>  See
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
             </td>
           </tr>
 
