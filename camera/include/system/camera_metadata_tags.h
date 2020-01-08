@@ -767,6 +767,7 @@ typedef enum camera_metadata_enum_android_lens_state {
 typedef enum camera_metadata_enum_android_lens_pose_reference {
     ANDROID_LENS_POSE_REFERENCE_PRIMARY_CAMERA                      , // HIDL v3.3
     ANDROID_LENS_POSE_REFERENCE_GYROSCOPE                           , // HIDL v3.3
+    ANDROID_LENS_POSE_REFERENCE_UNDEFINED                           , // HIDL v3.5
 } camera_metadata_enum_android_lens_pose_reference_t;
 
 

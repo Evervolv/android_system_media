@@ -14513,6 +14513,9 @@ used:</p>
 <p><code>p' = Rp</code></p>
 <p>where <code>p</code> is in the device sensor coordinate system,<wbr/> and
  <code>p'</code> is in the camera-oriented coordinate system.<wbr/></p>
+<p>If <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is UNDEFINED,<wbr/> the quaternion rotation cannot
+ be accurately represented by the camera device,<wbr/> and will be represented by
+ default values matching its default facing.<wbr/></p>
             </td>
           </tr>
 
@@ -14595,6 +14598,8 @@ image then needs to be corrected for radial distortion before comparison or samp
 <p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is GYROSCOPE,<wbr/> then this position is relative to
 the center of the primary gyroscope on the device.<wbr/> The axis definitions are the same as
 with PRIMARY_<wbr/>CAMERA.<wbr/></p>
+<p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is UNDEFINED,<wbr/> this position cannot be accurately
+represented by the camera device,<wbr/> and will be represented as <code>(0,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
             </td>
           </tr>
 
@@ -14831,12 +14836,22 @@ the largest camera device facing the same direction as this camera.<wbr/></p>
                     <span class="entry_type_enum_notes"><p>The value of <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a> is relative to the position of the
 primary gyroscope of this Android device.<wbr/></p></span>
                   </li>
+                  <li>
+                    <span class="entry_type_enum_name">UNDEFINED (v3.5)</span>
+                    <span class="entry_type_enum_notes"><p>The camera device cannot represent the values of <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>
+and <a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> accurately enough.<wbr/> One such example is a camera device
+on the cover of a foldable phone: in order to measure the pose translation and rotation,<wbr/>
+some kind of hinge position sensor would be needed.<wbr/></p>
+<p>The value of <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a> must be all zeros,<wbr/> and
+<a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a> must be values matching its default facing.<wbr/></p></span>
+                  </li>
                 </ul>
 
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>The origin for <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>.<wbr/></p>
+              <p>The origin for <a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a>,<wbr/> and the accuracy of
+<a href="#static_android.lens.poseTranslation">android.<wbr/>lens.<wbr/>pose<wbr/>Translation</a> and <a href="#static_android.lens.poseRotation">android.<wbr/>lens.<wbr/>pose<wbr/>Rotation</a>.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -15558,6 +15573,9 @@ used:</p>
 <p><code>p' = Rp</code></p>
 <p>where <code>p</code> is in the device sensor coordinate system,<wbr/> and
  <code>p'</code> is in the camera-oriented coordinate system.<wbr/></p>
+<p>If <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is UNDEFINED,<wbr/> the quaternion rotation cannot
+ be accurately represented by the camera device,<wbr/> and will be represented by
+ default values matching its default facing.<wbr/></p>
             </td>
           </tr>
 
@@ -15640,6 +15658,8 @@ image then needs to be corrected for radial distortion before comparison or samp
 <p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is GYROSCOPE,<wbr/> then this position is relative to
 the center of the primary gyroscope on the device.<wbr/> The axis definitions are the same as
 with PRIMARY_<wbr/>CAMERA.<wbr/></p>
+<p>When <a href="#static_android.lens.poseReference">android.<wbr/>lens.<wbr/>pose<wbr/>Reference</a> is UNDEFINED,<wbr/> this position cannot be accurately
+represented by the camera device,<wbr/> and will be represented as <code>(0,<wbr/> 0,<wbr/> 0)</code>.<wbr/></p>
             </td>
           </tr>
 
