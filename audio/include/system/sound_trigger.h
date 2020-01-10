@@ -82,6 +82,46 @@ struct sound_trigger_properties {
                                                    with TDB silence/sound/speech ratio */
 };
 
+/*
+ * Properties header used to describe the version and size of extended properties.
+ * A header struct can be passed as a polymorphic struct (see usage below).
+ *
+ * Ex. cast to access properties:
+ * if (header->version >= SOUND_TRIGGER_DEVICE_API_VERSION_1_3) {
+ *   sound_trigger_properties_extended_1_3 *properties =
+ *       (sound_trigger_properties_extended_1_3*)header;
+ * }
+ *
+ * Ex. copy based on total size:
+ * void* buffer = malloc(header->size);
+ * memcpy(buffer, header, header->size);
+ *
+ * Each new version update must append to the previous one. This allows higher
+ * versioned extended properties structs to be cast down to previous versions.
+ */
+struct sound_trigger_properties_header {
+    uint32_t version;
+    size_t size;
+};
+
+/*
+ * extended soundtrigger implementation descriptor containing verbose implementation
+ * properties. This is an extension of the base sound_trigger_properties struct.
+ * sound_trigger_properties_extended_1_3.header.version is expected to be
+ * SOUND_TRIGGER_DEVICE_API_VERSION_1_3.
+ */
+struct sound_trigger_properties_extended_1_3 {
+    /** header descriptor defining the struct's version */
+    struct sound_trigger_properties_header header;
+    /** base properties */
+    struct sound_trigger_properties base;
+    /**
+     * String naming the architecture used for running the supported models.
+     * (eg. DSP architecture)
+     */
+    char supported_model_arch[SOUND_TRIGGER_MAX_STRING_LEN];
+};
+
 typedef int sound_trigger_module_handle_t;
 
 struct sound_trigger_module_descriptor {
