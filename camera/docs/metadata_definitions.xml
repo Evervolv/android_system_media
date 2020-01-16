@@ -4273,6 +4273,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
              where `p` is in the device sensor coordinate system, and
              `p'` is in the camera-oriented coordinate system.
+
+             If android.lens.poseReference is UNDEFINED, the quaternion rotation cannot
+             be accurately represented by the camera device, and will be represented by
+             default values matching its default facing.
           </details>
           <tag id="DEPTH" />
         </entry>
@@ -4315,6 +4319,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             When android.lens.poseReference is GYROSCOPE, then this position is relative to
             the center of the primary gyroscope on the device. The axis definitions are the same as
             with PRIMARY_CAMERA.
+
+            When android.lens.poseReference is UNDEFINED, this position cannot be accurately
+            represented by the camera device, and will be represented as `(0, 0, 0)`.
           </details>
           <tag id="DEPTH" />
         </entry>
@@ -4553,9 +4560,20 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             primary gyroscope of this Android device.
             </notes>
             </value>
+            <value hal_version="3.5">UNDEFINED
+            <notes>The camera device cannot represent the values of android.lens.poseTranslation
+            and android.lens.poseRotation accurately enough. One such example is a camera device
+            on the cover of a foldable phone: in order to measure the pose translation and rotation,
+            some kind of hinge position sensor would be needed.
+
+            The value of android.lens.poseTranslation must be all zeros, and
+            android.lens.poseRotation must be values matching its default facing.
+            </notes>
+            </value>
           </enum>
           <description>
-            The origin for android.lens.poseTranslation.
+            The origin for android.lens.poseTranslation, and the accuracy of
+            android.lens.poseTranslation and android.lens.poseRotation.
           </description>
           <details>
             Different calibration methods and use cases can produce better or worse results

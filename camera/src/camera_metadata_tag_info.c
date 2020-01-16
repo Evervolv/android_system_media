@@ -1818,6 +1818,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "GYROSCOPE";
                     ret = 0;
                     break;
+                case ANDROID_LENS_POSE_REFERENCE_UNDEFINED:
+                    msg = "UNDEFINED";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
@@ -4218,6 +4222,12 @@ int camera_metadata_enum_value(uint32_t tag,
                 enumName = "GYROSCOPE";
                 if (strncmp(name, enumName, size) == 0) {
                     *value = ANDROID_LENS_POSE_REFERENCE_GYROSCOPE;
+                    ret = 0;
+                    break;
+                }
+                enumName = "UNDEFINED";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_LENS_POSE_REFERENCE_UNDEFINED;
                     ret = 0;
                     break;
                 }
