@@ -124,24 +124,31 @@ static inline void audio_flags_to_audio_output_flags(
 }
 
 
-/* a unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
- * effect ID (int), audio_module_handle_t, and audio_patch_handle_t.
+/* A unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
+ * audio_effect_handle_t, audio_module_handle_t, and audio_patch_handle_t.
  * Audio port IDs (audio_port_handle_t) are allocated by AudioPolicy
  * in a different namespace than AudioFlinger unique IDs.
  */
 typedef int audio_unique_id_t;
 
+/* A unique ID with use AUDIO_UNIQUE_ID_USE_EFFECT */
+typedef int audio_effect_handle_t;
+
 /* Possible uses for an audio_unique_id_t */
 typedef enum {
     AUDIO_UNIQUE_ID_USE_UNSPECIFIED = 0,
-    AUDIO_UNIQUE_ID_USE_SESSION = 1,    // for allocated sessions, not special AUDIO_SESSION_*
-    AUDIO_UNIQUE_ID_USE_MODULE = 2,
-    AUDIO_UNIQUE_ID_USE_EFFECT = 3,
-    AUDIO_UNIQUE_ID_USE_PATCH = 4,
-    AUDIO_UNIQUE_ID_USE_OUTPUT = 5,
-    AUDIO_UNIQUE_ID_USE_INPUT = 6,
+    AUDIO_UNIQUE_ID_USE_SESSION = 1, // audio_session_t
+                                     // for allocated sessions, not special AUDIO_SESSION_*
+    AUDIO_UNIQUE_ID_USE_MODULE = 2,  // audio_module_handle_t
+    AUDIO_UNIQUE_ID_USE_EFFECT = 3,  // audio_effect_handle_t
+    AUDIO_UNIQUE_ID_USE_PATCH = 4,   // audio_patch_handle_t
+    AUDIO_UNIQUE_ID_USE_OUTPUT = 5,  // audio_io_handle_t
+    AUDIO_UNIQUE_ID_USE_INPUT = 6,   // audio_io_handle_t
     AUDIO_UNIQUE_ID_USE_CLIENT = 7,  // client-side players and recorders
-    AUDIO_UNIQUE_ID_USE_MAX = 8,  // must be a power-of-two
+                                     // FIXME should move to a separate namespace;
+                                     // these IDs are allocated by AudioFlinger on client request,
+                                     // but are never used by AudioFlinger
+    AUDIO_UNIQUE_ID_USE_MAX = 8,     // must be a power-of-two
     AUDIO_UNIQUE_ID_USE_MASK = AUDIO_UNIQUE_ID_USE_MAX - 1
 } audio_unique_id_use_t;
 
