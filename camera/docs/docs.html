@@ -18177,14 +18177,20 @@ results for use cases such as image stabilization or augmented reality.<wbr/></p
                     <span class="entry_type_enum_notes"><p>The camera device is a logical camera backed by two or more physical cameras.<wbr/></p>
 <p>In API level 28,<wbr/> the physical cameras must also be exposed to the application via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/></p>
-<p>Starting from API level 29,<wbr/> some or all physical cameras may not be independently
-exposed to the application,<wbr/> in which case the physical camera IDs will not be
-available in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> But the
+<p>Starting from API level 29:</p>
+<ul>
+<li>Some or all physical cameras may not be independently exposed to the application,<wbr/>
+in which case the physical camera IDs will not be available in
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.<wbr/> But the
 application can still query the physical cameras' characteristics by calling
-<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>.<wbr/> Additionally,<wbr/>
-if a physical camera is hidden from camera ID list,<wbr/> the mandatory stream combinations
-for that physical camera must be supported through the logical camera using physical
-streams.<wbr/></p>
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>.<wbr/></li>
+<li>If a physical camera is hidden from camera ID list,<wbr/> the mandatory stream
+combinations for that physical camera must be supported through the logical camera
+using physical streams.<wbr/> One exception is that in API level 30,<wbr/> a physical camera
+may become unavailable via
+<a href="https://developer.android.com/reference/CameraManager/AvailabilityCallback.html#onPhysicalCameraUnavailable">AvailabilityCallback#onPhysicalCameraUnavailable</a>
+callback.<wbr/></li>
+</ul>
 <p>Combinations of logical and physical streams,<wbr/> or physical streams from different
 physical cameras are not guaranteed.<wbr/> However,<wbr/> if the camera device supports
 <a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>,<wbr/>
