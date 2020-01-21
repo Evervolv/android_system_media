@@ -140,7 +140,7 @@ class audio_utils_fifo : public audio_utils_fifo_base {
 
     friend class audio_utils_fifo_reader;
     friend class audio_utils_fifo_writer;
-    friend class audio_utils_fifo_writer32;
+    template <typename T> friend class audio_utils_fifo_writer_T;
 
 public:
 
