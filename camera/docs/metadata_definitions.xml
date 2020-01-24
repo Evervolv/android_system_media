@@ -7333,7 +7333,154 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           (it is synthetic and will not be available at the HAL layer).
           </hal_details>
         </entry>
+        <entry name="availableRotateAndCropModes" type="byte" visibility="public"
+               type_notes="list of enums" container="array" typedef="enumList"
+               hal_version="3.5">
+          <array>
+            <size>n</size>
+          </array>
+          <description>
+            List of rotate-and-crop modes for android.scaler.rotateAndCrop that are supported by this camera device.
+          </description>
+          <range>Any value listed in android.scaler.rotateAndCrop</range>
+          <details>
+            This entry lists the valid modes for android.scaler.rotateAndCrop for this camera device.
+
+            Starting with API level 30, all devices will list at least `ROTATE_AND_CROP_NONE`.
+            Devices with support for rotate-and-crop will additionally list at least
+            `ROTATE_AND_CROP_AUTO` and `ROTATE_AND_CROP_90`.
+          </details>
+        </entry>
       </static>
+      <controls>
+        <entry name="rotateAndCrop" type="byte" visibility="public" enum="true"
+               hal_version="3.5">
+          <enum>
+            <value>NONE
+              <notes>No rotate and crop is applied. Processed outputs are in the sensor orientation.
+              </notes>
+            </value>
+            <value>90
+              <notes>Processed images are rotated by 90 degrees clockwise, and then cropped
+               to the original aspect ratio.</notes>
+            </value>
+            <value>180
+              <notes>Processed images are rotated by 180 degrees.  Since the aspect ratio does not
+              change, no cropping is performed.</notes>
+            </value>
+            <value>270
+              <notes>Processed images are rotated by 270 degrees clockwise, and then cropped
+               to the original aspect ratio.</notes>
+            </value>
+            <value>AUTO
+              <notes>The camera API automatically selects the best concrete value for
+              rotate-and-crop based on the application's support for resizability and the current
+              multi-window mode.
+
+              If the application does not support resizing but the display mode for its main
+              Activity is not in a typical orientation, the camera API will set `ROTATE_AND_CROP_90`
+              or some other supported rotation value, depending on device configuration,
+              to ensure preview and captured images are correctly shown to the user. Otherwise,
+              `ROTATE_AND_CROP_NONE` will be selected.
+
+              When a value other than NONE is selected, several metadata fields will also be parsed
+              differently to ensure that coordinates are correctly handled for features like drawing
+              face detection boxes or passing in tap-to-focus coordinates.  The camera API will
+              convert positions in the active array coordinate system to/from the cropped-and-rotated
+              coordinate system to make the operation transparent for applications.
+
+              No coordinate mapping will be done when the application selects a non-AUTO mode.
+              </notes>
+            </value>
+          </enum>
+          <description>Whether a rotation-and-crop operation is applied to processed
+          outputs from the camera.</description>
+          <range>android.scaler.availableRotateAndCropModes</range>
+          <details>
+            This control is primarily intended to help camera applications with no support for
+            multi-window modes to work correctly on devices where multi-window scenarios are
+            unavoidable, such as foldables or other devices with variable display geometry or more
+            free-form window placement (such as laptops, which often place portrait-orientation apps
+            in landscape with pillarboxing).
+
+            If supported, the default value is `ROTATE_AND_CROP_AUTO`, which allows the camera API
+            to enable backwards-compatibility support for applications that do not support resizing
+            / multi-window modes, when the device is in fact in a multi-window mode (such as inset
+            portrait on laptops, or on a foldable device in some fold states).  In addition,
+            `ROTATE_AND_CROP_NONE` and `ROTATE_AND_CROP_90` will always be available if this control
+            is supported by the device.  If not supported, devices API level 30 or higher will always
+            list only `ROTATE_AND_CROP_NONE`.
+
+            When `CROP_AUTO` is in use, and the camera API activates backward-compatibility mode,
+            several metadata fields will also be parsed differently to ensure that coordinates are
+            correctly handled for features like drawing face detection boxes or passing in
+            tap-to-focus coordinates.  The camera API will convert positions in the active array
+            coordinate system to/from the cropped-and-rotated coordinate system to make the
+            operation transparent for applications.  The following controls are affected:
+
+            *  android.control.aeRegions
+            *  android.control.afRegions
+            *  android.control.awbRegions
+            *  android.statistics.faces
+
+            Capture results will contain the actual value selected by the API;
+            `ROTATE_AND_CROP_AUTO` will never be seen in a capture result.
+
+            Applications can also select their preferred cropping mode, either to opt out of the
+            backwards-compatibility treatment, or to use the cropping feature themselves as needed.
+            In this case, no coordinate translation will be done automatically, and all controls
+            will continue to use the normal active array coordinates.
+
+            Cropping and rotating is done after the application of digital zoom (via either
+            android.scaler.cropRegion or android.control.zoomRatio), but before each individual
+            output is further cropped and scaled. It only affects processed outputs such as
+            YUV, PRIVATE, and JPEG.  It has no effect on RAW outputs.
+
+            When `CROP_90` or `CROP_270` are selected, there is a significant loss to the field of
+            view. For example, with a 4:3 aspect ratio output of 1600x1200, `CROP_90` will still
+            produce 1600x1200 output, but these buffers are cropped from a vertical 3:4 slice at the
+            center of the 4:3 area, then rotated to be 4:3, and then upscaled to 1600x1200.  Only
+            56.25% of the original FOV is still visible.  In general, for an aspect ratio of `w:h`,
+            the crop and rotate operation leaves `(h/w)^2` of the field of view visible. For 16:9,
+            this is ~31.6%.
+
+            As a visual example, the figure below shows the effect of `ROTATE_AND_CROP_90` on the
+            outputs for the following parameters:
+
+            * Sensor active array: `2000x1500`
+            * Crop region: top-left: `(500, 375)`, size: `(1000, 750)` (4:3 aspect ratio)
+            * Output streams: YUV `640x480` and YUV `1280x720`
+            * `ROTATE_AND_CROP_90`
+
+            ![Effect of ROTATE_AND_CROP_90](android.scaler.rotateAndCrop/crop-region-rotate-90-43-ratio.png)
+
+            With these settings, the regions of the active array covered by the output streams are:
+
+            * 640x480 stream crop: top-left: `(219, 375)`, size: `(562, 750)`
+            * 1280x720 stream crop: top-left: `(289, 375)`, size: `(422, 750)`
+
+            Since the buffers are rotated, the buffers as seen by the application are:
+
+            * 640x480 stream: top-left: `(781, 375)` on active array, size: `(640, 480)`, downscaled 1.17x from sensor pixels
+            * 1280x720 stream: top-left: `(711, 375)` on active array, size: `(1280, 720)`, upscaled 1.71x from sensor pixels
+          </details>
+          <hal_details>
+            ROTATE_AND_CROP_AUTO will never be sent to the HAL, though it must be set as the default
+            value in all the capture request templates by the HAL.  The camera service will
+            translate AUTO to a specific rotation value based on the current application's
+            multi-window state and its support of resizability.
+
+            The HAL also does not need to consider coordinate transforms for ROTATE_AND_CROP - all
+            capture request and result fields should be kept in the active array coordinate frame.
+            Any translation required to implement ROTATE_AND_CROP_AUTO will be handled by the camera
+            service.
+          </hal_details>
+        </entry>
+      </controls>
+      <dynamic>
+        <clone entry="android.scaler.rotateAndCrop" kind="controls" hal_version="3.5">
+        </clone>
+      </dynamic>
     </section>
     <section name="sensor">
       <controls>

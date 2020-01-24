@@ -476,6 +476,10 @@ static tag_info_t android_scaler[ANDROID_SCALER_END -
     [ ANDROID_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP - ANDROID_SCALER_START ] =
     { "availableRecommendedInputOutputFormatsMap",
                                         TYPE_INT32  },
+    [ ANDROID_SCALER_AVAILABLE_ROTATE_AND_CROP_MODES - ANDROID_SCALER_START ] =
+    { "availableRotateAndCropModes",   TYPE_BYTE   },
+    [ ANDROID_SCALER_ROTATE_AND_CROP - ANDROID_SCALER_START ] =
+    { "rotateAndCrop",                 TYPE_BYTE   },
 };
 
 static tag_info_t android_sensor[ANDROID_SENSOR_END -
@@ -2238,6 +2242,36 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP: {
+            break;
+        }
+        case ANDROID_SCALER_AVAILABLE_ROTATE_AND_CROP_MODES: {
+            break;
+        }
+        case ANDROID_SCALER_ROTATE_AND_CROP: {
+            switch (value) {
+                case ANDROID_SCALER_ROTATE_AND_CROP_NONE:
+                    msg = "NONE";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_ROTATE_AND_CROP_90:
+                    msg = "90";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_ROTATE_AND_CROP_180:
+                    msg = "180";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_ROTATE_AND_CROP_270:
+                    msg = "270";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_ROTATE_AND_CROP_AUTO:
+                    msg = "AUTO";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
             break;
         }
 
@@ -4710,6 +4744,42 @@ int camera_metadata_enum_value(uint32_t tag,
             break;
         }
         case ANDROID_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP: {
+            break;
+        }
+        case ANDROID_SCALER_AVAILABLE_ROTATE_AND_CROP_MODES: {
+            break;
+        }
+        case ANDROID_SCALER_ROTATE_AND_CROP: {
+                enumName = "NONE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_ROTATE_AND_CROP_NONE;
+                    ret = 0;
+                    break;
+                }
+                enumName = "90";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_ROTATE_AND_CROP_90;
+                    ret = 0;
+                    break;
+                }
+                enumName = "180";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_ROTATE_AND_CROP_180;
+                    ret = 0;
+                    break;
+                }
+                enumName = "270";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_ROTATE_AND_CROP_270;
+                    ret = 0;
+                    break;
+                }
+                enumName = "AUTO";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_ROTATE_AND_CROP_AUTO;
+                    ret = 0;
+                    break;
+                }
             break;
         }
 
