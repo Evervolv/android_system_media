@@ -39,7 +39,7 @@ enum {
     AUDIO_SOURCE_MAX          = AUDIO_SOURCE_VOICE_PERFORMANCE,
     AUDIO_SOURCE_CNT          = AUDIO_SOURCE_MAX + 1,
 
-    AUDIO_MODE_MAX            = AUDIO_MODE_IN_COMMUNICATION,
+    AUDIO_MODE_MAX            = AUDIO_MODE_CALL_SCREEN,
     AUDIO_MODE_CNT            = AUDIO_MODE_MAX + 1,
 
     /** For retrocompatibility AUDIO_MODE_* and AUDIO_STREAM_* must be signed. */
