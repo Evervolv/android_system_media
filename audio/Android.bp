@@ -20,3 +20,11 @@ cc_library_headers {
         },
     }
 }
+
+filegroup {
+    name: "libaudio_system_audio_base",
+    srcs: [
+        "include/system/audio-base.h",
+    ],
+    path: "include",
+}
