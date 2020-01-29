@@ -298,7 +298,7 @@ cc_test {
     name: "statistics_tests",
     host_supported: false,
 
-    shared_libs: ["libaudioutils"],
+    header_libs: ["libaudioutils_headers"],
     srcs: ["statistics_tests.cpp"],
     cflags: [
         "-Wall",
@@ -311,7 +311,7 @@ cc_test {
     name: "timestampverifier_tests",
     host_supported: false,
 
-    shared_libs: ["libaudioutils"],
+    header_libs: ["libaudioutils_headers"],
     srcs: ["timestampverifier_tests.cpp"],
     cflags: [
         "-Wall",
