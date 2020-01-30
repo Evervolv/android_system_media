@@ -344,7 +344,7 @@ static int echo_reference_read(struct echo_reference_itfe *echo_reference,
         pthread_cond_timedwait(&er->cond, &er->lock, &ts);
 
         ALOGV_IF((er->frames_in < buffer->frame_count),
-                 "echo_reference_read() waited %d ms but still not enough frames"\
+                 "echo_reference_read() waited %d ms but still not enough frames"
                  " er->frames_in: %d, buffer->frame_count = %d",
                  timeoutMs, er->frames_in, buffer->frame_count);
     }
@@ -354,7 +354,7 @@ static int echo_reference_read(struct echo_reference_itfe *echo_reference,
 
     if ((er->wr_render_time.tv_sec == 0 && er->wr_render_time.tv_nsec == 0) ||
         (buffer->time_stamp.tv_sec == 0 && buffer->time_stamp.tv_nsec == 0)) {
-        ALOGV("echo_reference_read(): NEW:timestamp is zero---------setting timeDiff = 0, "\
+        ALOGV("echo_reference_read(): NEW:timestamp is zero---------setting timeDiff = 0, "
              "not updating delay this time");
         timeDiff = 0;
     } else {
