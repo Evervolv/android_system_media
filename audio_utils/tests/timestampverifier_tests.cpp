@@ -99,3 +99,41 @@ TEST(TimestampVerifier, sanity)
     EXPECT_EQ(48000., b);
     EXPECT_NEAR(1., r2, std::numeric_limits<double>::epsilon());
 }
+
+TEST(TimestampVerifier, discontinuity_zero)
+{
+    android::TimestampVerifier<int64_t, int64_t> tv;
+    tv.setDiscontinuityMode(tv.DISCONTINUITY_MODE_ZERO);
+
+    // Add timestamps advancing at normal rate over 2 seconds
+    tv.add(0, 0, 48000);
+    tv.add(48000, 1000000000, 48000);
+    tv.add(96000, 2000000000, 48000);
+
+    // Raise (mode zero) discontinuity at "3 seconds"
+    tv.discontinuity();
+    // Add timestamp where frame count has reset to zero (and not advancing)
+    tv.add(0, 3000000000, 48000);
+
+    // The last corrected timestamp after discontinuity (mode zero) should be zeroed
+    EXPECT_EQ(0., tv.getLastCorrectedTimestamp().mFrames);
+    EXPECT_EQ(3000000000., tv.getLastCorrectedTimestamp().mTimeNs);
+
+    // Add timestamp where frame count has not advanced from zero, but time has advanced 100 ms more
+    tv.add(0, 3100000000, 48000);
+
+    // The last corrected frame should be the raw timestamp if not advancing at normal rate
+    EXPECT_EQ(0., tv.getLastCorrectedTimestamp().mFrames);
+    EXPECT_EQ(3100000000., tv.getLastCorrectedTimestamp().mTimeNs);
+
+    // Add imperfect normal advancing timestamps
+    tv.add(48000*0.9, 4100000000*1.1, 48000);
+    tv.add(96000*1.1, 5100000000*0.9, 48000);
+
+    // Last corrected timestamp frame count should not be raw (or zero) as timestamps are now
+    // advancing at a (imperfect) normal rate (but the time should, as implementation uses frame
+    // rather than time correction).
+    EXPECT_NE(0, tv.getLastCorrectedTimestamp().mFrames);
+    EXPECT_NE(96000*1.1, tv.getLastCorrectedTimestamp().mFrames);
+    EXPECT_EQ(5100000000*0.9, tv.getLastCorrectedTimestamp().mTimeNs);
+}
