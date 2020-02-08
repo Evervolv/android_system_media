@@ -34,7 +34,7 @@ enum {
 #endif
 
    /** Total number of stream. */
-    AUDIO_STREAM_CNT          = AUDIO_STREAM_PATCH + 1,
+    AUDIO_STREAM_CNT          = AUDIO_STREAM_CALL_ASSISTANT + 1,
 
     AUDIO_SOURCE_MAX          = AUDIO_SOURCE_VOICE_PERFORMANCE,
     AUDIO_SOURCE_CNT          = AUDIO_SOURCE_MAX + 1,

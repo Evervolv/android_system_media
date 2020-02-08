@@ -37,6 +37,8 @@ typedef enum {
     AUDIO_STREAM_REROUTING = 12,
     /** For audio flinger tracks volume. Only used by the audioflinger */
     AUDIO_STREAM_PATCH = 13,
+    /** stream for corresponding to AUDIO_USAGE_CALL_ASSISTANT */
+    AUDIO_STREAM_CALL_ASSISTANT = 14,
 #endif // AUDIO_NO_SYSTEM_DECLARATIONS
 } audio_stream_type_t;
 
