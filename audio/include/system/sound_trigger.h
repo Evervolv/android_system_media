@@ -221,6 +221,12 @@ typedef enum {
  */
 typedef struct {
     /**
+     * Boolean flag to determine if the parameter is supported by the hardware.
+     * The value of this parameter must be true to consider the start and end
+     * fields to be valid values.
+     */
+    bool is_supported;
+    /**
      * start of supported value range inclusive
      */
     int32_t start;
