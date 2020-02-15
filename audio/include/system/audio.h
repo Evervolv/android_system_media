@@ -308,13 +308,16 @@ typedef struct {
     uint32_t bit_width;
     uint32_t offload_buffer_size;       // offload fragment size
     audio_usage_t usage;
+    audio_encapsulation_mode_t encapsulation_mode;  // version 0.2:
+    int32_t content_id;                 // version 0.2: content id from tuner hal (0 if none)
+    int32_t sync_id;                    // version 0.2: sync id from tuner hal (0 if none)
 } __attribute__((aligned(8))) audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
             ((((maj) & 0xff) << 8) | ((min) & 0xff))
 
-#define AUDIO_OFFLOAD_INFO_VERSION_0_1 AUDIO_MAKE_OFFLOAD_INFO_VERSION(0, 1)
-#define AUDIO_OFFLOAD_INFO_VERSION_CURRENT AUDIO_OFFLOAD_INFO_VERSION_0_1
+#define AUDIO_OFFLOAD_INFO_VERSION_0_2 AUDIO_MAKE_OFFLOAD_INFO_VERSION(0, 2)
+#define AUDIO_OFFLOAD_INFO_VERSION_CURRENT AUDIO_OFFLOAD_INFO_VERSION_0_2
 
 static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .version = */ AUDIO_OFFLOAD_INFO_VERSION_CURRENT,
@@ -329,7 +332,10 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .is_streaming = */ false,
     /* .bit_width = */ 16,
     /* .offload_buffer_size = */ 0,
-    /* .usage = */ AUDIO_USAGE_UNKNOWN
+    /* .usage = */ AUDIO_USAGE_UNKNOWN,
+    /* .encapsulation_mode = */ AUDIO_ENCAPSULATION_MODE_NONE,
+    /* .content_id = */ 0,
+    /* .sync_id = */ 0,
 };
 
 /* common audio stream configuration parameters
@@ -363,7 +369,10 @@ static const audio_config_t AUDIO_CONFIG_INITIALIZER = {
         /* .is_streaming = */ false,
         /* .bit_width = */ 16,
         /* .offload_buffer_size = */ 0,
-        /* .usage = */ AUDIO_USAGE_UNKNOWN
+        /* .usage = */ AUDIO_USAGE_UNKNOWN,
+        /* .encapsulation_mode = */ AUDIO_ENCAPSULATION_MODE_NONE,
+        /* .content_id = */ 0,
+        /* .sync_id = */ 0,
     },
     /* .frame_count = */ 0,
 };
