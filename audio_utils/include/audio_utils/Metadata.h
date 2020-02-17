@@ -40,20 +40,81 @@
  * std::string                         (String)
  * Data (std::map<std::string, Datum>) (Map<String, Object>)
  *
- * TEST ONLY std::vector<Datum>        (Object[])
- * TEST ONLY std::pair<Datum, Datum>   (Pair<Object, Object>)
- *
- * As can be seen, std::map, std::vector, std::pair are
- * recursive types on Datum.
+ * Metadata code supports advanced automatic parceling.
+ * TEST ONLY:
+ * std::vector<Datum>                  (Object[])             --> vector of Objects
+ * std::pair<Datum, Datum>             (Pair<Object, Object>) --> pair of Objects
+ * std::vector<std::vector<std::pair<std::string, short>>>    --> recursive containers
+ * struct { int i0; std::vector<int> v1; std::pair<int, int> p2; } --> struct parceling
  *
  * The Data map accepts typed Keys, which designate the type T of the
  * value associated with the Key<T> in the template parameter.
  *
  * CKey<T> is the constexpr version suitable for fixed compile-time constants.
  * Key<T> is the non-constexpr version.
+ *
+ * Notes: for future extensibility:
+ *
+ * In order to add a new type in.
+ *
+ * 1) Add the new type to the END of the metadata_types lists below.
+ *
+ * 2) Update the copyFromByteString() code, since that isn't automatically
+ * generated (the switch is faster for speed).
+ *
+ * 3) The new type can be a primitive, or make use of containers std::map, std::vector,
+ * std::pair, or be simple structs (see below).
+ *
+ * 4) Simple structs contain no pointers and all public data. The members can be based
+ * on existing types.
+ *   a) If trivially copyable (packed) primitive data,
+ *      add to primitive_metadata_types.
+ *   b) If the struct requires member-wise parceling, add to structural_metadata_types
+ *      (current limit is 4 members).
+ *
+ * 5) The type system is recursive.
+ *
+ * Design notes:
+ * 1) Tuple is intentionally not implemented as it isn't that readable.  This can
+ * be revisited if the need comes up.  If you have more than a couple of elements,
+ * we suggest embedding in a Data typed map or a Simple struct.
+ *
+ * 2) Each custom type e.g. vector<int>, pair<short, char> takes one
+ * slot in the type index.  A full type description language is not implemented
+ * here for brevity and clarity.
  */
 
 namespace android::audio_utils::metadata {
+
+// Determine if a type is a specialization of a templated type
+// Example: is_specialization_v<T, std::vector>
+// https://stackoverflow.com/questions/16337610/how-to-know-if-a-type-is-a-specialization-of-stdvector
+
+template <typename Test, template <typename...> class Ref>
+struct is_specialization : std::false_type {};
+
+template <template <typename...> class Ref, typename... Args>
+struct is_specialization<Ref<Args...>, Ref>: std::true_type {};
+
+template <typename Test, template <typename...> class Ref>
+inline constexpr bool is_specialization_v = is_specialization<Test, Ref>::value;
+
+// Determine the number of arguments required for structured binding.
+// See the discussion here and follow the links:
+// https://isocpp.org/blog/2016/08/cpp17-structured-bindings-convert-struct-to-a-tuple-simple-reflection
+struct any_type {
+  template<class T>
+  constexpr operator T(); // non explicit
+};
+
+template <typename T, typename... TArgs>
+decltype(void(T{std::declval<TArgs>()...}), std::true_type{}) test_is_braces_constructible(int);
+
+template <typename, typename...>
+std::false_type test_is_braces_constructible(...);
+
+template <typename T, typename... TArgs>
+using is_braces_constructible = decltype(test_is_braces_constructible<T, TArgs...>(0));
 
 // Set up type comparison system
 // see std::variant for the how the type_index() may be used.
@@ -154,6 +215,15 @@ struct MoveCount {
         return *this;
     }
 };
+
+// We can automatically parcel this "Arbitrary" struct
+// since it has no pointers and all public members.
+struct Arbitrary {
+    int i0;
+    std::vector<int> v1;
+    std::pair<int, int> p2;
+};
+
 #endif
 
 class Data;
@@ -171,20 +241,33 @@ using metadata_types = compound_type<
 #ifdef METADATA_TESTING
     , std::vector<Datum>      // another complex object for testing
     , std::pair<Datum, Datum> // another complex object for testing
+    , std::vector<std::vector<std::pair<std::string, short>>> // complex object
     , MoveCount
+    , Arbitrary
 #endif
     >;
 
-// A subset of the metadata types may be directly copied.
+// A subset of the metadata types may be directly copied as bytes
 using primitive_metadata_types = compound_type<int32_t, int64_t, float, double
 #ifdef METADATA_TESTING
     , MoveCount
 #endif
     >;
 
+// A subset of metadata types which are a struct-based.
+using structural_metadata_types = compound_type<
+#ifdef METADATA_TESTING
+    Arbitrary
+#endif
+    >;
+
 template <typename T>
 inline constexpr bool is_primitive_metadata_type_v =
     primitive_metadata_types::contains_v<T>;
+
+template <typename T>
+inline constexpr bool is_structural_metadata_type_v =
+    structural_metadata_types::contains_v<T>;
 
 template <typename T>
 inline constexpr bool is_metadata_type_v =
@@ -251,6 +334,7 @@ public:
     template <typename T, typename = std::enable_if_t<is_metadata_type_v<T>>>
     Datum& operator=(T&& t) {
         static_cast<std::any *>(this)->operator=(std::forward<T>(t));
+        return *this;
     }
 
     Datum(const char *t) : std::any(std::string(t)) {}; // special string handling
@@ -370,15 +454,41 @@ static_assert(!std::is_polymorphic_v<Data>);
 
 /**
  * Parceling of Datum by recursive descent to a ByteString
+ *
+ * Parceling Format:
+ * All values are native endian order.
+ *
+ * Datum = { (datum_size_t) Size (size of datum, including the size field)
+ *           (type_size_t)  Type (the type index from type_as_value<T>.)
+ *           (byte string)  Payload<Type>
+ *         }
+ *
+ * Primitive types:
+ * Payload<Type> = { bytes in native endian order }
+ *
+ * Vector, Map, Container types:
+ * Payload<Type> = { (index_size_t) number of elements
+ *                   (byte string)  Payload<Element_Type> * number
+ *                 }
+ *
+ * Pair container types:
+ * Payload<Type> = { (byte string) Payload<first>,
+ *                   (byte string) Payload<second>
+ *                 }
+ *
+ * Design notes:
+ *
+ * 1) The size of each datum allows skipping of unknown types for compatibility
+ * of older code with newer Datums.
  */
 
 // Platform Apex compatibility note:
 // type_size_t may not change.
-using type_size_t = uint16_t;
+using type_size_t = uint32_t;
 
 // Platform Apex compatibility note:
 // index_size_t must not change.
-using index_size_t = uint16_t;
+using index_size_t = uint32_t;
 
 // Platform Apex compatibility note:
 // datum_size_t must not change.
@@ -390,6 +500,8 @@ using ByteString = std::basic_string<uint8_t>;
 
 /*
     These should correspond to the Java AudioMetadata.java
+
+    Permitted type indexes:
 
     TYPE_NONE = 0,
     TYPE_INT32 = 1,
@@ -408,71 +520,94 @@ inline constexpr type_size_t get_type_as_value() {
 template <typename T>
 inline constexpr type_size_t type_as_value = get_type_as_value<T>();
 
-// forward decl for recursion.
+// forward decl for recursion - do not remove.
 bool copyToByteString(const Datum& datum, ByteString &bs);
 
-template <typename T,  typename = std::enable_if_t<
-    is_primitive_metadata_type_v<T> || std::is_arithmetic_v<std::decay_t<T>>
-    >>
-bool copyToByteString(const T *t, ByteString& bs) {
-    bs.append((uint8_t*)t, sizeof(*t));
+template <template <typename ...> class V, typename... Args>
+bool copyToByteString(const V<Args...>& v, ByteString&bs);
+// end forward decl
+
+// primitives handled here
+template <typename T>
+std::enable_if_t<
+    is_primitive_metadata_type_v<T> || std::is_arithmetic_v<std::decay_t<T>>,
+    bool
+    >
+copyToByteString(const T& t, ByteString& bs) {
+    bs.append((uint8_t*)&t, sizeof(t));
     return true;
 }
 
-bool copyToByteString(const std::string *s, ByteString&bs) {
-    if (s->size() > std::numeric_limits<index_size_t>::max()) return false;
-    index_size_t size = s->size();
-    if (!copyToByteString(&size, bs)) return false;
-    bs.append((uint8_t*)s->c_str());
-    return true;
+// pairs handled here
+template <typename A, typename B>
+bool copyToByteString(const std::pair<A, B>& p, ByteString& bs) {
+    return copyToByteString(p.first, bs) && copyToByteString(p.second, bs);
 }
 
-bool copyToByteString(const Data *d, ByteString& bs) {
-    if (d->size() > std::numeric_limits<index_size_t>::max()) return false;
-    index_size_t size = d->size();
-    if (!copyToByteString(&size, bs)) return false;
-    for (const auto &[name, datum2] : *d) {
-        if (!copyToByteString(&name, bs) || !copyToByteString(datum2, bs))
-            return false;
+// containers
+template <template <typename ...> class V, typename... Args>
+bool copyToByteString(const V<Args...>& v, ByteString& bs) {
+    if (v.size() > std::numeric_limits<index_size_t>::max()) return false;
+    index_size_t size = v.size();
+    if (!copyToByteString(size, bs)) return false;
+    if constexpr (std::is_same_v<std::decay_t<V<Args...>>, std::string>) {
+        bs.append((uint8_t*)v.c_str());
+    }  else /* constexpr */ {
+        for (const auto &d : v) { // handles std::vector and std::map
+            if (!copyToByteString(d, bs)) return false;
+        }
     }
     return true;
 }
 
-#ifdef METADATA_TESTING
-
-bool copyToByteString(const std::vector<Datum> *v, ByteString& bs) {
-    if (v->size() > std::numeric_limits<index_size_t>::max()) return false;
-    index_size_t size = v->size();
-    if (!copyToByteString(&size, bs)) return false;
-    for (index_size_t i = 0; i < size; ++i) {
-        if (!copyToByteString((*v)[i], bs)) return false;
+// simple struct data (use structured binding to extract members)
+template <typename T>
+std::enable_if_t<
+    is_structural_metadata_type_v<T>,
+    bool
+    >
+copyToByteString(const T& t, ByteString& bs) {
+    using type = std::decay_t<T>;
+    if constexpr(is_braces_constructible<type, any_type, any_type, any_type, any_type>{}) {
+        const auto& [e1, e2, e3, e4] = t;
+        return copyToByteString(e1, bs)
+            && copyToByteString(e2, bs)
+            && copyToByteString(e3, bs)
+            && copyToByteString(e4, bs);
+    } else if constexpr(is_braces_constructible<type, any_type, any_type, any_type>{}) {
+        const auto& [e1, e2, e3] = t;
+        return copyToByteString(e1, bs)
+            && copyToByteString(e2, bs)
+            && copyToByteString(e3, bs);
+    } else if constexpr(is_braces_constructible<type, any_type, any_type>{}) {
+        const auto& [e1, e2] = t;
+        return copyToByteString(e1, bs)
+            && copyToByteString(e2, bs);
+    } else if constexpr(is_braces_constructible<type, any_type>{}) {
+        const auto& [e1] = t;
+        return copyToByteString(e1, bs);
+    } else {
+        return false;
     }
-    return true;
 }
 
-bool copyToByteString(const std::pair<Datum, Datum> *p, ByteString& bs) {
-    return copyToByteString(p->first, bs) && copyToByteString(p->second, bs);
-}
-
-#endif // METADATA_TESTING
-
-// Now the actual code to use.
+// Datum
 bool copyToByteString(const Datum& datum, ByteString &bs) {
     bool success = false;
     return metadata_types::apply([&bs, &success](auto ptr) {
              // save type
              const type_size_t type = type_as_value<decltype(*ptr)>;
-             if (!copyToByteString(&type, bs)) return;
+             if (!copyToByteString(type, bs)) return;
 
              // get current location
              const size_t idx = bs.size();
 
              // save size (replaced later)
              datum_size_t datum_size = 0;
-             if (!copyToByteString(&datum_size, bs)) return;
+             if (!copyToByteString(datum_size, bs)) return;
 
              // copy data
-             if (!copyToByteString(ptr, bs)) return;
+             if (!copyToByteString(*ptr, bs)) return;
 
              // save correct size
              const size_t diff = bs.size() - idx - sizeof(datum_size);
@@ -487,129 +622,239 @@ bool copyToByteString(const Datum& datum, ByteString &bs) {
  * Obtaining the Datum back from ByteString
  */
 
-// forward declaration
-Datum datumFromByteString(const ByteString& bs, size_t& idx);
+// A container that lists all the unknown types found during parsing.
+using ByteStringUnknowns = std::vector<type_size_t>;
 
-template <typename T, typename = std::enable_if_t<
+// forward decl for recursion - do not remove.
+bool copyFromByteString(Datum *datum, const ByteString &bs, size_t& idx,
+        ByteStringUnknowns *unknowns);
+
+template <template <typename ...> class V, typename... Args>
+bool copyFromByteString(V<Args...> *v, const ByteString& bs, size_t& idx,
+        ByteStringUnknowns *unknowns);
+
+// primitive
+template <typename T>
+std::enable_if_t<
         is_primitive_metadata_type_v<T> ||
-        std::is_arithmetic_v<std::decay_t<T>>
-        >>
-bool copyFromByteString(T *dest, const ByteString& bs, size_t& idx) {
+        std::is_arithmetic_v<std::decay_t<T>>,
+        bool
+        >
+copyFromByteString(T *dest, const ByteString& bs, size_t& idx,
+        ByteStringUnknowns *unknowns __unused) {
     if (idx + sizeof(T) > bs.size()) return false;
     bs.copy((uint8_t*)dest, sizeof(T), idx);
     idx += sizeof(T);
     return true;
 }
 
-bool copyFromByteString(std::string *s, const ByteString& bs, size_t& idx) {
+// pairs
+template <typename A, typename B>
+bool copyFromByteString(std::pair<A, B>* p, const ByteString& bs, size_t& idx,
+        ByteStringUnknowns *unknowns) {
+    return copyFromByteString(&p->first, bs, idx, unknowns)
+            && copyFromByteString(&p->second, bs, idx, unknowns);
+}
+
+// containers
+template <template <typename ...> class V, typename... Args>
+bool copyFromByteString(V<Args...> *v, const ByteString& bs, size_t& idx,
+        ByteStringUnknowns *unknowns) {
     index_size_t size;
-    if (!copyFromByteString(&size, bs, idx)) return false;
-    if (idx + size > bs.size()) return false;
-    s->resize(size);
-    for (index_size_t i = 0; i < size; ++i) {
-        (*s)[i] = bs[idx++];
+    if (!copyFromByteString(&size, bs, idx, unknowns)) return false;
+
+    if constexpr (std::is_same_v<std::decay_t<V<Args...>>, std::string>) {
+        if (size > bs.size() - idx) return false;
+        v->resize(size);
+        for (index_size_t i = 0; i < size; ++i) {
+            (*v)[i] = bs[idx++];
+        }
+    } else if constexpr (is_specialization_v<std::decay_t<V<Args...>>, std::vector>) {
+        for (index_size_t i = 0; i < size; ++i) {
+            std::decay_t<decltype(*v->begin())> value{};
+            if (!copyFromByteString(&value, bs, idx, unknowns)) {
+                return false;
+            }
+            if constexpr (std::is_same_v<std::decay_t<decltype(value)>, Datum>) {
+                if (!value.has_value()) {
+                    continue;  // ignore empty datum values in a vector.
+                }
+            }
+            v->emplace_back(std::move(value));
+        }
+    } else if constexpr (is_specialization_v<std::decay_t<V<Args...>>, std::map>) {
+        for (index_size_t i = 0; i < size; ++i) {
+            // we can't directly use pair because there may be internal const decls.
+            std::decay_t<decltype(v->begin()->first)> key{};
+            std::decay_t<decltype(v->begin()->second)> value{};
+            if (!copyFromByteString(&key, bs, idx, unknowns) ||
+                    !copyFromByteString(&value, bs, idx, unknowns)) {
+                return false;
+            }
+            if constexpr (std::is_same_v<std::decay_t<decltype(value)>, Datum>) {
+                if (!value.has_value()) {
+                    continue;  // ignore empty datum values in a map.
+                }
+            }
+            v->emplace(std::move(key), std::move(value));
+        }
+    } else /* constexpr */ {
+        for (index_size_t i = 0; i < size; ++i) {
+            std::decay_t<decltype(*v->begin())> value{};
+            if (!copyFromByteString(&value, bs, idx, unknowns)) {
+                return false;
+            }
+            v->emplace(std::move(value));
+        }
     }
     return true;
 }
 
-bool copyFromByteString(Data *d, const ByteString& bs, size_t& idx) {
-    index_size_t size;
-    if (!copyFromByteString(&size, bs, idx)) return false;
-    for (index_size_t i = 0; i < size; ++i) {
-        std::string s;
-        if (!copyFromByteString(&s, bs, idx)) return false;
-        Datum value = datumFromByteString(bs, idx);
-        if (!value.has_value()) return false;
-        (*d)[s] = std::move(value);
+// simple structs (use structured binding to extract members)
+template <typename T>
+typename std::enable_if_t<is_structural_metadata_type_v<T>, bool>
+copyFromByteString(T *t, const ByteString& bs, size_t& idx,
+        ByteStringUnknowns *unknowns) {
+    using type = std::decay_t<T>;
+    if constexpr(is_braces_constructible<type, any_type, any_type, any_type, any_type>{}) {
+        auto& [e1, e2, e3, e4] =  *t;
+        return copyFromByteString(&e1, bs, idx, unknowns)
+            && copyFromByteString(&e2, bs, idx, unknowns)
+            && copyFromByteString(&e3, bs, idx, unknowns)
+            && copyFromByteString(&e4, bs, idx, unknowns);
+    } else if constexpr(is_braces_constructible<type, any_type, any_type, any_type>{}) {
+        auto& [e1, e2, e3] =  *t;
+        return copyFromByteString(&e1, bs, idx, unknowns)
+            && copyFromByteString(&e2, bs, idx, unknowns)
+            && copyFromByteString(&e3, bs, idx, unknowns);
+    } else if constexpr(is_braces_constructible<type, any_type, any_type>{}) {
+        auto& [e1, e2] =  *t;
+        return copyFromByteString(&e1, bs, idx, unknowns)
+            && copyFromByteString(&e2, bs, idx, unknowns);
+    } else if constexpr(is_braces_constructible<type, any_type>{}) {
+        auto& [e1] =  *t;
+        return copyFromByteString(&e1, bs, idx, unknowns);
+    } else {
+        return false;
     }
-    return true;
 }
 
 // TODO: consider a more elegant implementation, e.g. std::variant visit.
 // perhaps using integer sequences.
-Datum datumFromByteString(const ByteString &bs, size_t& idx) {
+bool copyFromByteString(Datum *datum, const ByteString &bs, size_t& idx,
+        ByteStringUnknowns *unknowns) {
     type_size_t type;
-    if (!copyFromByteString(&type, bs, idx)) return {};
+    if (!copyFromByteString(&type, bs, idx, unknowns)) return false;
 
     datum_size_t datum_size;
-    if (!copyFromByteString(&datum_size, bs, idx)) return {};
-    if (datum_size > bs.size() - idx) return {};
+    if (!copyFromByteString(&datum_size, bs, idx, unknowns)) return false;
+    if (datum_size > bs.size() - idx) return false;
     const size_t finalIdx = idx + datum_size; // TODO: always check this
 
     switch (type) {
     case type_as_value<int32_t>: {
         int32_t i32;
-        if (!copyFromByteString(&i32, bs, idx)) return {};
-        return i32;
+        if (!copyFromByteString(&i32, bs, idx, unknowns)) return false;
+        *datum = i32;
+        return true;
     }
     case type_as_value<int64_t>: {
         int64_t i64;
-        if (!copyFromByteString(&i64, bs, idx)) return {};
-        return i64;
+        if (!copyFromByteString(&i64, bs, idx, unknowns)) return false;
+        *datum = i64;
+        return true;
     }
     case type_as_value<float>: {
         float f;
-        if (!copyFromByteString(&f, bs, idx)) return {};
-        return f;
+        if (!copyFromByteString(&f, bs, idx, unknowns)) return false;
+        *datum = f;
+        return true;
     }
     case type_as_value<double>: {
         double d;
-        if (!copyFromByteString(&d, bs, idx)) return {};
-        return d;
+        if (!copyFromByteString(&d, bs, idx, unknowns)) return false;
+        *datum = d;
+        return true;
     }
     case type_as_value<std::string>: {
         std::string s;
-        if (!copyFromByteString(&s, bs, idx)) return {};
-        return s;
+        if (!copyFromByteString(&s, bs, idx, unknowns)) return false;
+        *datum = std::move(s);
+        return true;
     }
     case type_as_value<Data>: {
         Data d;
-        if (!copyFromByteString(&d, bs, idx)) return {};
-        return d;
+        if (!copyFromByteString(&d, bs, idx, unknowns)) return false;
+        *datum = std::move(d);
+        return true;
     }
 #ifdef METADATA_TESTING
     case type_as_value<std::vector<Datum>>: {
-        index_size_t size;
-        if (!copyFromByteString(&size, bs, idx)) return {};
-        std::vector<Datum> v(size);
-        for (index_size_t i = 0; i < size; ++i) {
-            Datum d = datumFromByteString(bs, idx);
-            if (!d.has_value()) return {};
-            v[i] = std::move(d);
-        }
-        return v;
+        std::vector<Datum> v;
+        if (!copyFromByteString(&v, bs, idx, unknowns)) return false;
+        *datum =std::move(v);
+        return true;
     }
     case type_as_value<std::pair<Datum, Datum>>: {
-        Datum d1 = datumFromByteString(bs, idx);
-        if (!d1.has_value()) return {};
-        Datum d2 = datumFromByteString(bs, idx);
-        if (!d2.has_value()) return {};
-        return std::make_pair(std::move(d1), std::move(d2));
+        std::pair<Datum, Datum> p;
+        if (!copyFromByteString(&p, bs, idx, unknowns)) return false;
+        *datum = std::move(p);
+        return true;
+    }
+    case type_as_value<std::vector<std::vector<std::pair<std::string, short>>>>: {
+        std::vector<std::vector<std::pair<std::string, short>>> vvp;
+        if (!copyFromByteString(&vvp, bs, idx, unknowns)) return false;
+        *datum = std::move(vvp);
+        return true;
+    }
+    case type_as_value<Arbitrary>: {
+        Arbitrary a{};
+        if (!copyFromByteString(&a, bs, idx, unknowns)) return false;
+        *datum = std::move(a);
+        return true;
     }
     case type_as_value<MoveCount>: {
         MoveCount mc;
-        if (!copyFromByteString(&mc, bs, idx)) return {};
-        return mc;
+        if (!copyFromByteString(&mc, bs, idx, unknowns)) return false;
+        *datum = std::move(mc);
+        return true;
     }
 #endif
     case 0: // This is excluded to have compile failure. We do not allow undefined types.
     default:
         idx = finalIdx; // skip unknown type.
-        return {};
+        if (unknowns != nullptr) {
+            unknowns->push_back(type);
+            return true;  // allow further recursion.
+        }
+        return false;
     }
 }
 
 // Handy helpers - these are the most efficient ways to parcel Data.
-Data dataFromByteString(const ByteString &bs) {
+/**
+ * Returns the Data map from a byte string.
+ *
+ * If unknowns is nullptr, then any unknown entries during parsing will cause
+ * an empty map to be returned.
+ *
+ * If unknowns is non-null, then it contains all of the unknown types
+ * encountered during parsing, and a partial map will be returned excluding all
+ * unknown types encountered.
+ */
+Data dataFromByteString(const ByteString &bs,
+        ByteStringUnknowns *unknowns = nullptr) {
     Data d;
     size_t idx = 0;
-    copyFromByteString(&d, bs, idx);
+    if (!copyFromByteString(&d, bs, idx, unknowns)) {
+        return {};
+    }
     return d; // copy elision
 }
 
 ByteString byteStringFromData(const Data &data) {
     ByteString bs;
-    copyToByteString(&data, bs);
+    copyToByteString(data, bs);
     return bs; // copy elision
 }
 

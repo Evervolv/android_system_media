@@ -36,10 +36,42 @@ inline const Key<std::string> MY_NAME_IS("my_name_is");
 inline constexpr CKey<Data> TABLE("table");
 
 #ifdef METADATA_TESTING
+
+// Validate recursive typing on "Datum".
 inline constexpr CKey<std::vector<Datum>> VECTOR("vector");
 inline constexpr CKey<std::pair<Datum, Datum>> PAIR("pair");
+
+// Validate that we move instead of copy.
 inline constexpr CKey<MoveCount> MOVE_COUNT("MoveCount");
+
+// Validate recursive container support.
+inline constexpr CKey<std::vector<std::vector<std::pair<std::string, short>>>> FUNKY("funky");
+
+// Validate structured binding parceling.
+inline constexpr CKey<Arbitrary> ARBITRARY("arbitrary");
 #endif
+
+std::string toString(const ByteString &bs) {
+    std::stringstream ss;
+    ss << "{\n" << std::hex;
+    if (bs.size() > 0) {
+        for (size_t i = 0; ; ++i) {
+            if ((i & 7) == 0) {
+                ss << "  ";
+            }
+            ss << "0x" <<  std::setfill('0') << std::setw(2) << (unsigned)bs[i];
+            if (i == bs.size() - 1) {
+                break;
+            } else if ((i & 7) == 7) {
+                ss << ",\n";
+            } else {
+                ss << ", ";
+            }
+        }
+    }
+    ss << "\n}\n";
+    return ss.str();
+}
 
 TEST(metadata_tests, basic_datum) {
     Datum d;
@@ -120,7 +152,8 @@ TEST(metadata_tests, basic_datum) {
     ASSERT_TRUE(copyToByteString(mc, bs));
     // deserialize
     size_t idx = 0;
-    Datum parceled = datumFromByteString(bs, idx);
+    Datum parceled;
+    ASSERT_TRUE(copyFromByteString(&parceled, bs, idx, nullptr /* unknowns */));
 
     // everything OK with the received data?
     ASSERT_EQ(bs.size(), idx);          // no data left over.
@@ -159,16 +192,8 @@ TEST(metadata_tests, basic_data) {
     ASSERT_EQ("neo", d[MY_NAME_IS]);
     ASSERT_EQ("spot", d[ITS_NAME_IS]);
 
-    // Try round-trip conversion to a ByteString.
-    ByteString bs;
-    copyToByteString(d, bs);
-    size_t index = 0;
-    Datum datum = datumFromByteString(bs, index);
-
-    ASSERT_TRUE(datum.has_value());
-
-    // Check that we got a valid Data table back.
-    Data data = *std::any_cast<Data>(&datum);
+    ByteString bs = byteStringFromData(d);
+    Data data = dataFromByteString(bs);
     ASSERT_EQ((size_t)8, data.size());
 
     ASSERT_EQ(1, std::any_cast<int32_t>(data["int32"]));
@@ -219,14 +244,22 @@ TEST(metadata_tests, complex_data) {
 #ifdef METADATA_TESTING
     big[VECTOR] = std::vector<Datum>{small, small};
     big[PAIR] = std::make_pair<Datum, Datum>(small, small);
-    ASSERT_EQ(1, big[TABLE][MOVE_COUNT].mCopyCount); // one copy done.
+    ASSERT_EQ(1, big[TABLE][MOVE_COUNT].mCopyCount); // one copy done for small.
+
+    big[FUNKY] = std::vector<std::vector<std::pair<std::string, short>>>{
+        {{"a", 1}, {"b", 2}},
+        {{"c", 3}, {"d", 4}},
+    };
+
+    // struct Arbitrary { int i0; std::vector<int> v1; std::pair<int, int> p2; };
+    big[ARBITRARY] = Arbitrary{0, {1, 2, 3}, {4, 5}};
 #endif
 
     // Try round-trip conversion to a ByteString.
     ByteString bs = byteStringFromData(big);
     Data data = dataFromByteString(bs);
 #ifdef METADATA_TESTING
-    ASSERT_EQ((size_t)3, data.size());
+    ASSERT_EQ((size_t)5, data.size());
 #else
     ASSERT_EQ((size_t)1, data.size());
 #endif
@@ -239,5 +272,93 @@ TEST(metadata_tests, complex_data) {
     ASSERT_EQ("abc", std::any_cast<Data>(data[VECTOR][1])[MY_NAME_IS]);
     ASSERT_EQ("abc", std::any_cast<Data>(data[PAIR].first)[MY_NAME_IS]);
     ASSERT_EQ(1, data[TABLE][MOVE_COUNT].mCopyCount); // no additional copies.
+
+    auto funky = data[FUNKY];
+    ASSERT_EQ("a", funky[0][0].first);
+    ASSERT_EQ(4, funky[1][1].second);
+
+    auto arbitrary = data[ARBITRARY];
+    ASSERT_EQ(0, arbitrary.i0);
+    ASSERT_EQ(2, arbitrary.v1[1]);
+    ASSERT_EQ(4, arbitrary.p2.first);
 #endif
 }
+
+// DO NOT CHANGE THIS after R, but add a new test.
+TEST(metadata_tests, compatibility_R) {
+    Data d;
+    d.emplace("i32", (int32_t)1);
+    d.emplace("i64", (int64_t)2);
+    d.emplace("float", (float)3.1f);
+    d.emplace("double", (double)4.11);
+    Data s;
+    s.emplace("string", "hello");
+    d.emplace("data", s);
+
+    ByteString bs = byteStringFromData(d);
+    ALOGD("%s", toString(bs).c_str());
+
+    // Since we use a map instead of a hashmap
+    // layout order of elements is precisely defined.
+    ByteString reference = {
+        0x05, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00,
+        0x64, 0x61, 0x74, 0x61, 0x06, 0x00, 0x00, 0x00,
+        0x1f, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+        0x06, 0x00, 0x00, 0x00, 0x73, 0x74, 0x72, 0x69,
+        0x6e, 0x67, 0x05, 0x00, 0x00, 0x00, 0x09, 0x00,
+        0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x68, 0x65,
+        0x6c, 0x6c, 0x6f, 0x06, 0x00, 0x00, 0x00, 0x64,
+        0x6f, 0x75, 0x62, 0x6c, 0x65, 0x04, 0x00, 0x00,
+        0x00, 0x08, 0x00, 0x00, 0x00, 0x71, 0x3d, 0x0a,
+        0xd7, 0xa3, 0x70, 0x10, 0x40, 0x05, 0x00, 0x00,
+        0x00, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x03, 0x00,
+        0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x66, 0x66,
+        0x46, 0x40, 0x03, 0x00, 0x00, 0x00, 0x69, 0x33,
+        0x32, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
+        0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00,
+        0x00, 0x69, 0x36, 0x34, 0x02, 0x00, 0x00, 0x00,
+        0x08, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00
+    };
+    ASSERT_EQ(reference, bs);
+
+    Data decoded = dataFromByteString(bs);
+
+    // TODO: data equality.
+    // ASSERT_EQ(decoded, d);
+
+    ASSERT_EQ(1, std::any_cast<int32_t>(decoded["i32"]));
+    ASSERT_EQ(2, std::any_cast<int64_t>(decoded["i64"]));
+    ASSERT_EQ(3.1f, std::any_cast<float>(decoded["float"]));
+    ASSERT_EQ(4.11, std::any_cast<double>(decoded["double"]));
+    Data decoded_s = std::any_cast<Data>(decoded["data"]);
+
+    ASSERT_EQ("hello", std::any_cast<std::string>(s["string"]));
+
+    {
+        ByteString unknownData = reference;
+        unknownData[12] = 0xff;
+        Data decoded2 = dataFromByteString(unknownData);
+        ASSERT_EQ((size_t)0, decoded2.size());
+
+        ByteStringUnknowns unknowns;
+        Data decoded3 = dataFromByteString(unknownData, &unknowns);
+        ASSERT_EQ((size_t)4, decoded3.size());
+        ASSERT_EQ((size_t)1, unknowns.size());
+        ASSERT_EQ((unsigned)0xff, unknowns[0]);
+    }
+
+    {
+        ByteString unknownDouble = reference;
+        ASSERT_EQ(0x4, unknownDouble[0x3d]);
+        unknownDouble[0x3d] = 0xfe;
+        Data decoded2 = dataFromByteString(unknownDouble);
+        ASSERT_EQ((size_t)0, decoded2.size());
+
+        ByteStringUnknowns unknowns;
+        Data decoded3 = dataFromByteString(unknownDouble, &unknowns);
+        ASSERT_EQ((size_t)4, decoded3.size());
+        ASSERT_EQ((size_t)1, unknowns.size());
+        ASSERT_EQ((unsigned)0xfe, unknowns[0]);
+    }
+};
