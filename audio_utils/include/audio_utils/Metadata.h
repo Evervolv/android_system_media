@@ -22,6 +22,7 @@
 #include <any>
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
 /**
@@ -59,20 +60,17 @@
  *
  * 1) Add the new type to the END of the metadata_types lists below.
  *
- * 2) Update the copyFromByteString() code, since that isn't automatically
- * generated (the switch is faster for speed).
- *
- * 3) The new type can be a primitive, or make use of containers std::map, std::vector,
+ * 2) The new type can be a primitive, or make use of containers std::map, std::vector,
  * std::pair, or be simple structs (see below).
  *
- * 4) Simple structs contain no pointers and all public data. The members can be based
+ * 3) Simple structs contain no pointers and all public data. The members can be based
  * on existing types.
  *   a) If trivially copyable (packed) primitive data,
  *      add to primitive_metadata_types.
  *   b) If the struct requires member-wise parceling, add to structural_metadata_types
  *      (current limit is 4 members).
  *
- * 5) The type system is recursive.
+ * 4) The type system is recursive.
  *
  * Design notes:
  * 1) Tuple is intentionally not implemented as it isn't that readable.  This can
@@ -98,6 +96,11 @@ struct is_specialization<Ref<Args...>, Ref>: std::true_type {};
 
 template <typename Test, template <typename...> class Ref>
 inline constexpr bool is_specialization_v = is_specialization<Test, Ref>::value;
+
+// For static assert(false) we need a template version to avoid early failure.
+// See: https://stackoverflow.com/questions/51523965/template-dependent-false
+template <typename T>
+inline constexpr bool dependent_false_v = false;
 
 // Determine the number of arguments required for structured binding.
 // See the discussion here and follow the links:
@@ -140,6 +143,10 @@ struct compound_type {
     inline static constexpr bool contains_v = type_index<T, Ts...>() >= 0;
     template <typename T>
     inline static constexpr ssize_t index_of() { return type_index<T, Ts...>(); }
+
+    // create a tupe equivalent of the compound type. This is useful for
+    // finding the nth type by std::tuple_element
+    using tuple_t = std::tuple<Ts...>;
 
     /**
      * Applies function f to a datum pointer a.
@@ -568,26 +575,28 @@ std::enable_if_t<
     >
 copyToByteString(const T& t, ByteString& bs) {
     using type = std::decay_t<T>;
-    if constexpr(is_braces_constructible<type, any_type, any_type, any_type, any_type>{}) {
+    if constexpr (is_braces_constructible<type, any_type, any_type, any_type, any_type>{}) {
         const auto& [e1, e2, e3, e4] = t;
         return copyToByteString(e1, bs)
             && copyToByteString(e2, bs)
             && copyToByteString(e3, bs)
             && copyToByteString(e4, bs);
-    } else if constexpr(is_braces_constructible<type, any_type, any_type, any_type>{}) {
+    } else if constexpr (is_braces_constructible<type, any_type, any_type, any_type>{}) {
         const auto& [e1, e2, e3] = t;
         return copyToByteString(e1, bs)
             && copyToByteString(e2, bs)
             && copyToByteString(e3, bs);
-    } else if constexpr(is_braces_constructible<type, any_type, any_type>{}) {
+    } else if constexpr (is_braces_constructible<type, any_type, any_type>{}) {
         const auto& [e1, e2] = t;
         return copyToByteString(e1, bs)
             && copyToByteString(e2, bs);
     } else if constexpr(is_braces_constructible<type, any_type>{}) {
         const auto& [e1] = t;
         return copyToByteString(e1, bs);
-    } else {
-        return false;
+    } else if constexpr (is_braces_constructible<type>{}) {
+        return true; // like std::monostate - no members
+    } else /* constexpr */ {
+        static_assert(dependent_false_v<T>);
     }
 }
 
@@ -716,31 +725,74 @@ typename std::enable_if_t<is_structural_metadata_type_v<T>, bool>
 copyFromByteString(T *t, const ByteString& bs, size_t& idx,
         ByteStringUnknowns *unknowns) {
     using type = std::decay_t<T>;
-    if constexpr(is_braces_constructible<type, any_type, any_type, any_type, any_type>{}) {
+    if constexpr (is_braces_constructible<type, any_type, any_type, any_type, any_type>{}) {
         auto& [e1, e2, e3, e4] =  *t;
         return copyFromByteString(&e1, bs, idx, unknowns)
             && copyFromByteString(&e2, bs, idx, unknowns)
             && copyFromByteString(&e3, bs, idx, unknowns)
             && copyFromByteString(&e4, bs, idx, unknowns);
-    } else if constexpr(is_braces_constructible<type, any_type, any_type, any_type>{}) {
+    } else if constexpr (is_braces_constructible<type, any_type, any_type, any_type>{}) {
         auto& [e1, e2, e3] =  *t;
         return copyFromByteString(&e1, bs, idx, unknowns)
             && copyFromByteString(&e2, bs, idx, unknowns)
             && copyFromByteString(&e3, bs, idx, unknowns);
-    } else if constexpr(is_braces_constructible<type, any_type, any_type>{}) {
+    } else if constexpr (is_braces_constructible<type, any_type, any_type>{}) {
         auto& [e1, e2] =  *t;
         return copyFromByteString(&e1, bs, idx, unknowns)
             && copyFromByteString(&e2, bs, idx, unknowns);
-    } else if constexpr(is_braces_constructible<type, any_type>{}) {
+    } else if constexpr (is_braces_constructible<type, any_type>{}) {
         auto& [e1] =  *t;
         return copyFromByteString(&e1, bs, idx, unknowns);
-    } else {
-        return false;
+    } else if constexpr (is_braces_constructible<type>{}) {
+        return true; // like std::monostate - no members
+    } else /* constexpr */ {
+        static_assert(dependent_false_v<T>);
     }
 }
 
-// TODO: consider a more elegant implementation, e.g. std::variant visit.
-// perhaps using integer sequences.
+namespace tedious_details {
+//
+// We build a function table at compile time to lookup the proper copyFromByteString method.
+// See:
+// https://stackoverflow.com/questions/36785345/void-to-the-nth-element-of-stdtuple-at-runtime
+// Constant time implementation of std::visit (variant)
+
+template <typename CompoundT, size_t Index>
+bool copyFromByteString(Datum *datum, const ByteString &bs, size_t &idx, size_t endIdx,
+        ByteStringUnknowns *unknowns) {
+   using T = std::tuple_element_t<Index, typename CompoundT::tuple_t>;
+   T value;
+   if (!android::audio_utils::metadata::copyFromByteString(
+           &value, bs, idx, unknowns)) return false;  // have we parsed correctly?
+   if (idx != endIdx) return false;  // have we consumed the correct number of bytes?
+   *datum = std::move(value);
+   return true;
+}
+
+template <typename CompoundT, size_t... Indexes>
+constexpr bool copyFromByteString(Datum *datum, const ByteString &bs,
+        size_t &idx, size_t endIdx, ByteStringUnknowns *unknowns,
+        size_t typeIndex, std::index_sequence<Indexes...>)
+{
+    using function_type =
+            bool (*)(Datum*, const ByteString&, size_t&, size_t, ByteStringUnknowns*);
+    function_type constexpr ptrs[] = {
+        &copyFromByteString<CompoundT, Indexes>...
+    };
+    return ptrs[typeIndex](datum, bs, idx, endIdx, unknowns);
+}
+
+template <typename CompoundT>
+__attribute__((noinline))
+constexpr bool copyFromByteString(Datum *datum, const ByteString &bs,
+        size_t &idx, size_t endIdx, ByteStringUnknowns *unknowns, size_t typeIndex) {
+  return copyFromByteString<CompoundT>(
+          datum, bs, idx, endIdx, unknowns,
+          typeIndex, std::make_index_sequence<CompoundT::size_v>());
+}
+
+} // namespace tedious_details
+
 bool copyFromByteString(Datum *datum, const ByteString &bs, size_t& idx,
         ByteStringUnknowns *unknowns) {
     type_size_t type;
@@ -749,86 +801,21 @@ bool copyFromByteString(Datum *datum, const ByteString &bs, size_t& idx,
     datum_size_t datum_size;
     if (!copyFromByteString(&datum_size, bs, idx, unknowns)) return false;
     if (datum_size > bs.size() - idx) return false;
-    const size_t finalIdx = idx + datum_size; // TODO: always check this
+    const size_t endIdx = idx + datum_size;
 
-    switch (type) {
-    case type_as_value<int32_t>: {
-        int32_t i32;
-        if (!copyFromByteString(&i32, bs, idx, unknowns)) return false;
-        *datum = i32;
-        return true;
-    }
-    case type_as_value<int64_t>: {
-        int64_t i64;
-        if (!copyFromByteString(&i64, bs, idx, unknowns)) return false;
-        *datum = i64;
-        return true;
-    }
-    case type_as_value<float>: {
-        float f;
-        if (!copyFromByteString(&f, bs, idx, unknowns)) return false;
-        *datum = f;
-        return true;
-    }
-    case type_as_value<double>: {
-        double d;
-        if (!copyFromByteString(&d, bs, idx, unknowns)) return false;
-        *datum = d;
-        return true;
-    }
-    case type_as_value<std::string>: {
-        std::string s;
-        if (!copyFromByteString(&s, bs, idx, unknowns)) return false;
-        *datum = std::move(s);
-        return true;
-    }
-    case type_as_value<Data>: {
-        Data d;
-        if (!copyFromByteString(&d, bs, idx, unknowns)) return false;
-        *datum = std::move(d);
-        return true;
-    }
-#ifdef METADATA_TESTING
-    case type_as_value<std::vector<Datum>>: {
-        std::vector<Datum> v;
-        if (!copyFromByteString(&v, bs, idx, unknowns)) return false;
-        *datum =std::move(v);
-        return true;
-    }
-    case type_as_value<std::pair<Datum, Datum>>: {
-        std::pair<Datum, Datum> p;
-        if (!copyFromByteString(&p, bs, idx, unknowns)) return false;
-        *datum = std::move(p);
-        return true;
-    }
-    case type_as_value<std::vector<std::vector<std::pair<std::string, short>>>>: {
-        std::vector<std::vector<std::pair<std::string, short>>> vvp;
-        if (!copyFromByteString(&vvp, bs, idx, unknowns)) return false;
-        *datum = std::move(vvp);
-        return true;
-    }
-    case type_as_value<Arbitrary>: {
-        Arbitrary a{};
-        if (!copyFromByteString(&a, bs, idx, unknowns)) return false;
-        *datum = std::move(a);
-        return true;
-    }
-    case type_as_value<MoveCount>: {
-        MoveCount mc;
-        if (!copyFromByteString(&mc, bs, idx, unknowns)) return false;
-        *datum = std::move(mc);
-        return true;
-    }
-#endif
-    case 0: // This is excluded to have compile failure. We do not allow undefined types.
-    default:
-        idx = finalIdx; // skip unknown type.
+    if (type == 0 || type > metadata_types::size_v) {
+        idx = endIdx; // skip unrecognized type.
         if (unknowns != nullptr) {
             unknowns->push_back(type);
             return true;  // allow further recursion.
         }
         return false;
     }
+
+    // use special trick to instantiate all the types for copyFromByteString
+    // in a table and find the right method from table lookup.
+    return tedious_details::copyFromByteString<metadata_types>(
+            datum, bs, idx, endIdx, unknowns, type - 1);
 }
 
 // Handy helpers - these are the most efficient ways to parcel Data.
