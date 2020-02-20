@@ -43,11 +43,6 @@ int audio_utils_fifo_index::wake(int op, int waiters)
     return sys_futex(&mIndex, op, waiters, NULL, NULL, 0);
 }
 
-uint32_t audio_utils_fifo_index::loadConsume()
-{
-    return atomic_load_explicit(&mIndex, std::memory_order_consume);
-}
-
 ////
 
 RefIndexDeferredStoreReleaseDeferredWake::RefIndexDeferredStoreReleaseDeferredWake(
