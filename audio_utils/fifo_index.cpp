@@ -22,12 +22,25 @@
 // These are not implemented within <audio_utils/fifo_index.h>
 // so that we don't expose futex.
 
+// FIXME should inline these, so that writer_T can also inline it
+
+uint32_t audio_utils_fifo_index::loadSingleThreaded()
+{
+    // TODO Should be a read from simple non-atomic variable
+    return atomic_load_explicit(&mIndex, std::memory_order_relaxed);
+}
+
 uint32_t audio_utils_fifo_index::loadAcquire()
 {
     return atomic_load_explicit(&mIndex, std::memory_order_acquire);
 }
 
-// FIXME should inline this, so that writer_T can also inline it
+void audio_utils_fifo_index::storeSingleThreaded(uint32_t value)
+{
+    // TODO Should be a write to simple non-atomic variable
+    atomic_store_explicit(&mIndex, value, std::memory_order_relaxed);
+}
+
 void audio_utils_fifo_index::storeRelease(uint32_t value)
 {
     atomic_store_explicit(&mIndex, value, std::memory_order_release);
