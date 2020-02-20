@@ -17,7 +17,6 @@
 #ifndef ANDROID_AUDIO_FIFO_H
 #define ANDROID_AUDIO_FIFO_H
 
-#include <atomic>
 #include <stdlib.h>
 #include <audio_utils/fifo_index.h>
 
