@@ -25,13 +25,13 @@
 #error C API is no longer supported
 #endif
 
-/** Indicates whether an index is also used for synchronization. */
+/** Indicates whether index is multi-thread safe, and the synchronization technique. */
 enum audio_utils_fifo_sync {
-    /** Index is not also used for synchronization; timeouts are done via clock_nanosleep(). */
+    /** Index is multi-thread safe. Synchronization is by polling, timeouts by clock_nanosleep(). */
     AUDIO_UTILS_FIFO_SYNC_SLEEP,
-    /** Index is also used for synchronization as futex, and is mapped by one process. */
+    /** Index is multi-thread safe. Synchronization is by futex mapped in one process. */
     AUDIO_UTILS_FIFO_SYNC_PRIVATE,
-    /** Index is also used for synchronization as futex, and is mapped by one or more processes. */
+    /** Index is multi-thread safe. Synchronization is by futex mapped in one or more processes. */
     AUDIO_UTILS_FIFO_SYNC_SHARED,
 };
 

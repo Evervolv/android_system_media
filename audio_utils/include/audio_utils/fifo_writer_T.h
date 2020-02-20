@@ -69,7 +69,8 @@ public:
     }
 
     /**
-     * Commit all previous write and write1 so that they are observable by reader(s).
+     * Commit all previous write and write1 so that they are observable by reader(s),
+     * with memory order 'release'.
      */
     void storeRelease() {
         mWriterRear.storeRelease(mLocalRear);
