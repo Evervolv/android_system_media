@@ -1513,6 +1513,50 @@ struct audio_microphone_characteristic_t {
     struct audio_microphone_coordinate orientation;
 };
 
+// AUDIO_TIMESTRETCH_SPEED_MIN and AUDIO_TIMESTRETCH_SPEED_MAX define the min and max time stretch
+// speeds supported by the system. These are enforced by the system and values outside this range
+// will result in a runtime error.
+// Depending on the AudioPlaybackRate::mStretchMode, the effective limits might be narrower than
+// the ones specified here
+// AUDIO_TIMESTRETCH_SPEED_MIN_DELTA is the minimum absolute speed difference that might trigger a
+// parameter update
+#define AUDIO_TIMESTRETCH_SPEED_MIN    0.01f
+#define AUDIO_TIMESTRETCH_SPEED_MAX    20.0f
+#define AUDIO_TIMESTRETCH_SPEED_NORMAL 1.0f
+#define AUDIO_TIMESTRETCH_SPEED_MIN_DELTA 0.0001f
+
+// AUDIO_TIMESTRETCH_PITCH_MIN and AUDIO_TIMESTRETCH_PITCH_MAX define the min and max time stretch
+// pitch shifting supported by the system. These are not enforced by the system and values
+// outside this range might result in a pitch different than the one requested.
+// Depending on the AudioPlaybackRate::mStretchMode, the effective limits might be narrower than
+// the ones specified here.
+// AUDIO_TIMESTRETCH_PITCH_MIN_DELTA is the minimum absolute pitch difference that might trigger a
+// parameter update
+#define AUDIO_TIMESTRETCH_PITCH_MIN    0.25f
+#define AUDIO_TIMESTRETCH_PITCH_MAX    4.0f
+#define AUDIO_TIMESTRETCH_PITCH_NORMAL 1.0f
+#define AUDIO_TIMESTRETCH_PITCH_MIN_DELTA 0.0001f
+
+//Limits for AUDIO_TIMESTRETCH_STRETCH_SPEECH mode
+#define TIMESTRETCH_SONIC_SPEED_MIN 0.1f
+#define TIMESTRETCH_SONIC_SPEED_MAX 6.0f
+
+struct audio_playback_rate {
+    float mSpeed;
+    float mPitch;
+    audio_timestretch_stretch_mode_t  mStretchMode;
+    audio_timestretch_fallback_mode_t mFallbackMode;
+};
+
+typedef struct audio_playback_rate audio_playback_rate_t;
+
+static const audio_playback_rate_t AUDIO_PLAYBACK_RATE_INITIALIZER = {
+    /* .mSpeed = */ AUDIO_TIMESTRETCH_SPEED_NORMAL,
+    /* .mPitch = */ AUDIO_TIMESTRETCH_PITCH_NORMAL,
+    /* .mStretchMode = */ AUDIO_TIMESTRETCH_STRETCH_DEFAULT,
+    /* .mFallbackMode = */ AUDIO_TIMESTRETCH_FALLBACK_FAIL
+};
+
 __END_DECLS
 
 /**

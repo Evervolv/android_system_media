@@ -499,6 +499,29 @@ typedef enum {
     MIC_DIRECTION_BACK = 2,
     MIC_DIRECTION_EXTERNAL = 3,
 } audio_microphone_direction_t;
+
+typedef enum {
+    AUDIO_DUAL_MONO_MODE_OFF = 0,
+    AUDIO_DUAL_MONO_MODE_LR = 1,
+    AUDIO_DUAL_MONO_MODE_LL = 2,
+    AUDIO_DUAL_MONO_MODE_RR = 3,
+} audio_dual_mono_mode_t;
+
+typedef enum {
+    AUDIO_TIMESTRETCH_STRETCH_DEFAULT = 0,
+    AUDIO_TIMESTRETCH_STRETCH_SPEECH = 1,
+} audio_timestretch_stretch_mode_t;
+
+typedef enum {
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_TIMESTRETCH_FALLBACK_CUT_REPEAT = -1, // (framework only) for speed <1.0 will truncate
+                                                // frames, for speed > 1.0 will repeat frames
+    AUDIO_TIMESTRETCH_FALLBACK_DEFAULT    = 0,  // (framework only) system determines behavior
+#endif
+    AUDIO_TIMESTRETCH_FALLBACK_MUTE           = 1,  // set all processed frames to zero
+    AUDIO_TIMESTRETCH_FALLBACK_FAIL           = 2,  // stop processing and indicate an error
+} audio_timestretch_fallback_mode_t;
+
 #ifdef __cplusplus
 }
 #endif
