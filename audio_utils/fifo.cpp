@@ -31,13 +31,14 @@
 #include <utils/Errors.h>
 
 audio_utils_fifo_base::audio_utils_fifo_base(uint32_t frameCount,
-        audio_utils_fifo_index& writerRear, audio_utils_fifo_index *throttleFront)
+        audio_utils_fifo_index& writerRear, audio_utils_fifo_index *throttleFront,
+        audio_utils_fifo_sync sync)
         __attribute__((no_sanitize("integer"))) :
     mFrameCount(frameCount), mFrameCountP2(roundup(frameCount)),
     mFudgeFactor(mFrameCountP2 - mFrameCount),
     // FIXME need an API to configure the sync types
-    mWriterRear(writerRear), mWriterRearSync(AUDIO_UTILS_FIFO_SYNC_SHARED),
-    mThrottleFront(throttleFront), mThrottleFrontSync(AUDIO_UTILS_FIFO_SYNC_SHARED),
+    mWriterRear(writerRear), mWriterRearSync(sync),
+    mThrottleFront(throttleFront), mThrottleFrontSync(sync),
     mIsShutdown(false)
 {
     // actual upper bound on frameCount will depend on the frame size
@@ -130,7 +131,7 @@ void audio_utils_fifo_base::shutdown() const
 audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
         audio_utils_fifo_index& writerRear, audio_utils_fifo_index *throttleFront)
         __attribute__((no_sanitize("integer"))) :
-    audio_utils_fifo_base(frameCount, writerRear, throttleFront),
+    audio_utils_fifo_base(frameCount, writerRear, throttleFront, AUDIO_UTILS_FIFO_SYNC_SHARED),
     mFrameSize(frameSize), mBuffer(buffer)
 {
     // maximum value of frameCount * frameSize is INT32_MAX (2^31 - 1), not 2^31, because we need to
@@ -140,10 +141,11 @@ audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void
 }
 
 audio_utils_fifo::audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
-        bool throttlesWriter) :
+        bool throttlesWriter, audio_utils_fifo_sync sync) :
     audio_utils_fifo(frameCount, frameSize, buffer, mSingleProcessSharedRear,
         throttlesWriter ?  &mSingleProcessSharedFront : NULL)
 {
+    LOG_ALWAYS_FATAL_IF(sync == AUDIO_UTILS_FIFO_SYNC_SHARED);
 }
 
 audio_utils_fifo::~audio_utils_fifo()

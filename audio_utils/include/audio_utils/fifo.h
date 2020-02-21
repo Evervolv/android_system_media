@@ -66,9 +66,12 @@ protected:
      *  \param writerRear    Writer's rear index.  Passed by reference because it must be non-NULL.
      *  \param throttleFront Pointer to the front index of at most one reader that throttles the
      *                       writer, or NULL for no throttling.
+     *  \param sync          Index synchronization, defaults to AUDIO_UTILS_FIFO_SYNC_SHARED but can
+     *                       also be any other value.
      */
     audio_utils_fifo_base(uint32_t frameCount, audio_utils_fifo_index& writerRear,
-            audio_utils_fifo_index *throttleFront = NULL);
+            audio_utils_fifo_index *throttleFront = NULL,
+            audio_utils_fifo_sync sync = AUDIO_UTILS_FIFO_SYNC_SHARED);
     /*virtual*/ ~audio_utils_fifo_base();
 
     /** Return a new index as the sum of a validated index and a specified increment.
@@ -147,6 +150,7 @@ public:
 
     /**
      * Construct a FIFO object: multi-process.
+     * Index synchronization is not configurable; it is always AUDIO_UTILS_FIFO_SYNC_SHARED.
      *
      *  \param frameCount  Maximum usable frames to be stored in the FIFO > 0 && <= INT32_MAX,
      *                     aka "capacity".
@@ -172,9 +176,13 @@ public:
      *                     \p frameSize * \p frameCount <= INT32_MAX.
      *  \param buffer      Pointer to a non-NULL caller-allocated buffer of \p frameCount frames.
      *  \param throttlesWriter Whether there is one reader that throttles the writer.
+     *  \param sync        Index synchronization, defaults to AUDIO_UTILS_FIFO_SYNC_PRIVATE but can
+     *                     also be AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED or AUDIO_UTILS_FIFO_SYNC_SLEEP.
+     *                     AUDIO_UTILS_FIFO_SYNC_SHARED is not permitted.
      */
     audio_utils_fifo(uint32_t frameCount, uint32_t frameSize, void *buffer,
-            bool throttlesWriter = true);
+            bool throttlesWriter = true,
+            audio_utils_fifo_sync sync = AUDIO_UTILS_FIFO_SYNC_PRIVATE);
 
     /*virtual*/ ~audio_utils_fifo();
 
