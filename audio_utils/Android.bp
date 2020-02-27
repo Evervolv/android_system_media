@@ -12,6 +12,13 @@ cc_defaults {
     ],
 }
 
+cc_library_headers {
+    name: "libaudioutils_headers",
+    host_supported: true,
+    vendor_available: true,
+    export_include_dirs: ["include"],
+}
+
 cc_library {
     name: "libaudioutils",
     vendor_available: true,

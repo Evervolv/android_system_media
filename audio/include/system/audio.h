@@ -308,13 +308,16 @@ typedef struct {
     uint32_t bit_width;
     uint32_t offload_buffer_size;       // offload fragment size
     audio_usage_t usage;
+    audio_encapsulation_mode_t encapsulation_mode;  // version 0.2:
+    int32_t content_id;                 // version 0.2: content id from tuner hal (0 if none)
+    int32_t sync_id;                    // version 0.2: sync id from tuner hal (0 if none)
 } __attribute__((aligned(8))) audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
             ((((maj) & 0xff) << 8) | ((min) & 0xff))
 
-#define AUDIO_OFFLOAD_INFO_VERSION_0_1 AUDIO_MAKE_OFFLOAD_INFO_VERSION(0, 1)
-#define AUDIO_OFFLOAD_INFO_VERSION_CURRENT AUDIO_OFFLOAD_INFO_VERSION_0_1
+#define AUDIO_OFFLOAD_INFO_VERSION_0_2 AUDIO_MAKE_OFFLOAD_INFO_VERSION(0, 2)
+#define AUDIO_OFFLOAD_INFO_VERSION_CURRENT AUDIO_OFFLOAD_INFO_VERSION_0_2
 
 static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .version = */ AUDIO_OFFLOAD_INFO_VERSION_CURRENT,
@@ -329,7 +332,10 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .is_streaming = */ false,
     /* .bit_width = */ 16,
     /* .offload_buffer_size = */ 0,
-    /* .usage = */ AUDIO_USAGE_UNKNOWN
+    /* .usage = */ AUDIO_USAGE_UNKNOWN,
+    /* .encapsulation_mode = */ AUDIO_ENCAPSULATION_MODE_NONE,
+    /* .content_id = */ 0,
+    /* .sync_id = */ 0,
 };
 
 /* common audio stream configuration parameters
@@ -363,7 +369,10 @@ static const audio_config_t AUDIO_CONFIG_INITIALIZER = {
         /* .is_streaming = */ false,
         /* .bit_width = */ 16,
         /* .offload_buffer_size = */ 0,
-        /* .usage = */ AUDIO_USAGE_UNKNOWN
+        /* .usage = */ AUDIO_USAGE_UNKNOWN,
+        /* .encapsulation_mode = */ AUDIO_ENCAPSULATION_MODE_NONE,
+        /* .content_id = */ 0,
+        /* .sync_id = */ 0,
     },
     /* .frame_count = */ 0,
 };
@@ -1511,6 +1520,50 @@ struct audio_microphone_characteristic_t {
     float frequency_responses[2][AUDIO_MICROPHONE_MAX_FREQUENCY_RESPONSES];
     struct audio_microphone_coordinate geometric_location;
     struct audio_microphone_coordinate orientation;
+};
+
+// AUDIO_TIMESTRETCH_SPEED_MIN and AUDIO_TIMESTRETCH_SPEED_MAX define the min and max time stretch
+// speeds supported by the system. These are enforced by the system and values outside this range
+// will result in a runtime error.
+// Depending on the AudioPlaybackRate::mStretchMode, the effective limits might be narrower than
+// the ones specified here
+// AUDIO_TIMESTRETCH_SPEED_MIN_DELTA is the minimum absolute speed difference that might trigger a
+// parameter update
+#define AUDIO_TIMESTRETCH_SPEED_MIN    0.01f
+#define AUDIO_TIMESTRETCH_SPEED_MAX    20.0f
+#define AUDIO_TIMESTRETCH_SPEED_NORMAL 1.0f
+#define AUDIO_TIMESTRETCH_SPEED_MIN_DELTA 0.0001f
+
+// AUDIO_TIMESTRETCH_PITCH_MIN and AUDIO_TIMESTRETCH_PITCH_MAX define the min and max time stretch
+// pitch shifting supported by the system. These are not enforced by the system and values
+// outside this range might result in a pitch different than the one requested.
+// Depending on the AudioPlaybackRate::mStretchMode, the effective limits might be narrower than
+// the ones specified here.
+// AUDIO_TIMESTRETCH_PITCH_MIN_DELTA is the minimum absolute pitch difference that might trigger a
+// parameter update
+#define AUDIO_TIMESTRETCH_PITCH_MIN    0.25f
+#define AUDIO_TIMESTRETCH_PITCH_MAX    4.0f
+#define AUDIO_TIMESTRETCH_PITCH_NORMAL 1.0f
+#define AUDIO_TIMESTRETCH_PITCH_MIN_DELTA 0.0001f
+
+//Limits for AUDIO_TIMESTRETCH_STRETCH_SPEECH mode
+#define TIMESTRETCH_SONIC_SPEED_MIN 0.1f
+#define TIMESTRETCH_SONIC_SPEED_MAX 6.0f
+
+struct audio_playback_rate {
+    float mSpeed;
+    float mPitch;
+    audio_timestretch_stretch_mode_t  mStretchMode;
+    audio_timestretch_fallback_mode_t mFallbackMode;
+};
+
+typedef struct audio_playback_rate audio_playback_rate_t;
+
+static const audio_playback_rate_t AUDIO_PLAYBACK_RATE_INITIALIZER = {
+    /* .mSpeed = */ AUDIO_TIMESTRETCH_SPEED_NORMAL,
+    /* .mPitch = */ AUDIO_TIMESTRETCH_PITCH_NORMAL,
+    /* .mStretchMode = */ AUDIO_TIMESTRETCH_STRETCH_DEFAULT,
+    /* .mFallbackMode = */ AUDIO_TIMESTRETCH_FALLBACK_FAIL
 };
 
 __END_DECLS
