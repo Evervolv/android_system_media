@@ -76,9 +76,6 @@ public:
      */
     int wake(int op, int waiters = 1);
 
-    // specialized use only, prefer loadAcquire in most cases
-    uint32_t loadConsume();
-
 private:
     // Linux futex is 32 bits regardless of platform.
     // It would make more sense to declare this as atomic_uint32_t, but there is no such type name.
