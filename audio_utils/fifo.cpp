@@ -417,7 +417,7 @@ audio_utils_fifo_reader::audio_utils_fifo_reader(audio_utils_fifo& fifo, bool th
     // current value of writer's rear.  This avoids an immediate -EOVERFLOW (overrun) in the case
     // where reader starts out more than one buffer behind writer.  The initial catch-up does not
     // contribute towards the totalLost, totalFlushed, or totalReleased counters.
-    mLocalFront(throttlesWriter ? 0 : mFifo.mWriterRear.loadConsume()),
+    mLocalFront(throttlesWriter ? 0 : mFifo.mWriterRear.loadAcquire()),
 
     mThrottleFront(throttlesWriter ? mFifo.mThrottleFront : NULL),
     mFlush(flush),
