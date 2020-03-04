@@ -369,3 +369,20 @@ cc_test {
         },
     }
 }
+
+cc_test {
+    name: "spdif_tests",
+
+    shared_libs: [
+        "libaudioutils",
+        "libaudiospdif",
+        "liblog",
+        "libcutils",
+    ],
+    srcs: ["spdif_tests.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+}
+
