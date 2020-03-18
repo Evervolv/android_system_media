@@ -18350,8 +18350,9 @@ JPEG format,<wbr/> any resolution.<wbr/></li>
 <li>One Jpeg ImageReader,<wbr/> any resolution: the camera device is
    allowed to slow down JPEG output speed by 50% if there is any ongoing offline
    session.<wbr/></li>
-<li>One ImageWriter surface of private format,<wbr/> any resolution if the device supports
-   PRIVATE_<wbr/>REPROCESSING capability</li>
+<li>If the device supports PRIVATE_<wbr/>REPROCESSING,<wbr/> one pair of ImageWriter/<wbr/>ImageReader
+   surfaces of private format,<wbr/> with the same resolution that is larger or equal to
+   the JPEG ImageReader resolution above.<wbr/></li>
 </ol>
 </li>
 <li>Alternatively,<wbr/> the active camera session above can be replaced by an legacy
@@ -23227,7 +23228,7 @@ than maximum raw value supported,<wbr/> i.<wbr/>e.<wbr/> 2^(sensor bits per pixe
                     <span class="entry_type_enum_notes"><p>Timestamps from <a href="#dynamic_android.sensor.timestamp">android.<wbr/>sensor.<wbr/>timestamp</a> are in nanoseconds and monotonic,<wbr/> but can
 not be compared to timestamps from other subsystems (e.<wbr/>g.<wbr/> accelerometer,<wbr/> gyro etc.<wbr/>),<wbr/>
 or other instances of the same or different camera devices in the same system with
-accuracy.<wbr/> However,<wbr/> the timestamps are roughly in the same timebase as 
+accuracy.<wbr/> However,<wbr/> the timestamps are roughly in the same timebase as
 <a href="https://developer.android.com/reference/android/os/SystemClock.html#uptimeMillis">SystemClock#uptimeMillis</a>.<wbr/>  The accuracy is sufficient for tasks
 like A/<wbr/>V synchronization for video recording,<wbr/> at least,<wbr/> and the timestamps can be
 directly used together with timestamps from the audio subsystem for that task.<wbr/></p>
