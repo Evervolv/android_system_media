@@ -5842,8 +5842,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                   1. One Jpeg ImageReader, any resolution: the camera device is
                      allowed to slow down JPEG output speed by 50% if there is any ongoing offline
                      session.
-                  1. One ImageWriter surface of private format, any resolution if the device supports
-                     PRIVATE_REPROCESSING capability
+                  1. If the device supports PRIVATE_REPROCESSING, one pair of ImageWriter/ImageReader
+                     surfaces of private format, with the same resolution that is larger or equal to
+                     the JPEG ImageReader resolution above.
               * Alternatively, the active camera session above can be replaced by an legacy
               {@link android.hardware.Camera Camera} with the following parameter settings:
                   1. Preview size up to 1920 width
@@ -7854,7 +7855,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 Timestamps from android.sensor.timestamp are in nanoseconds and monotonic, but can
                 not be compared to timestamps from other subsystems (e.g. accelerometer, gyro etc.),
                 or other instances of the same or different camera devices in the same system with
-                accuracy. However, the timestamps are roughly in the same timebase as 
+                accuracy. However, the timestamps are roughly in the same timebase as
                 {@link android.os.SystemClock#uptimeMillis}.  The accuracy is sufficient for tasks
                 like A/V synchronization for video recording, at least, and the timestamps can be
                 directly used together with timestamps from the audio subsystem for that task.
