@@ -309,8 +309,8 @@ typedef enum camera_metadata_tag {
                                                       // enum[]       | ndk_public   | HIDL v3.4
     ANDROID_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP,
                                                       // int32        | ndk_public   | HIDL v3.4
-    ANDROID_SCALER_AVAILABLE_ROTATE_AND_CROP_MODES,   // byte[]       | public       | HIDL v3.5
-    ANDROID_SCALER_ROTATE_AND_CROP,                   // enum         | public       | HIDL v3.5
+    ANDROID_SCALER_AVAILABLE_ROTATE_AND_CROP_MODES,   // byte[]       | hidden       | HIDL v3.5
+    ANDROID_SCALER_ROTATE_AND_CROP,                   // enum         | hidden       | HIDL v3.5
     ANDROID_SCALER_END,
 
     ANDROID_SENSOR_EXPOSURE_TIME =                    // int64        | public       | HIDL v3.2
