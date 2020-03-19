@@ -7363,7 +7363,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           </hal_details>
         </entry>
 
-        <entry name="availableRotateAndCropModes" type="byte" visibility="public"
+        <entry name="availableRotateAndCropModes" type="byte" visibility="hidden"
                type_notes="list of enums" container="array" typedef="enumList"
                hal_version="3.5">
           <array>
@@ -7376,14 +7376,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>
             This entry lists the valid modes for android.scaler.rotateAndCrop for this camera device.
 
-            Starting with API level 30, all devices will list at least `ROTATE_AND_CROP_NONE`.
+            Starting at some future API level, all devices will list at least `ROTATE_AND_CROP_NONE`.
             Devices with support for rotate-and-crop will additionally list at least
             `ROTATE_AND_CROP_AUTO` and `ROTATE_AND_CROP_90`.
           </details>
         </entry>
       </static>
       <controls>
-        <entry name="rotateAndCrop" type="byte" visibility="public" enum="true"
+        <entry name="rotateAndCrop" type="byte" visibility="hidden" enum="true"
                hal_version="3.5">
           <enum>
             <value>NONE
@@ -7495,6 +7495,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             * 1280x720 stream: top-left: `(711, 375)` on active array, size: `(1280, 720)`, upscaled 1.71x from sensor pixels
           </details>
           <hal_details>
+            Not ready for use in Android 11.
+
             ROTATE_AND_CROP_AUTO will never be sent to the HAL, though it must be set as the default
             value in all the capture request templates by the HAL.  The camera service will
             translate AUTO to a specific rotation value based on the current application's
