@@ -7334,6 +7334,35 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           (it is synthetic and will not be available at the HAL layer).
           </hal_details>
         </entry>
+        <entry name="mandatoryConcurrentStreamCombinations" type="int32" visibility="java_public"
+          synthetic="true" container="array" typedef="mandatoryStreamCombination">
+          <array>
+            <size>n</size>
+          </array>
+          <description>
+          An array of mandatory concurrent stream combinations.
+          This is an app-readable conversion of the concurrent mandatory stream combination
+          {@link android.hardware.camera2.CameraDevice#createCaptureSession tables}.
+          </description>
+          <details>
+          The array of
+          {@link android.hardware.camera2.params.MandatoryStreamCombination combinations} is
+          generated according to the documented
+          {@link android.hardware.camera2.CameraDevice#createCaptureSession guideline} for each
+          device which has its Id present in the set returned by
+          {@link android.hardware.camera2.CameraManager#getConcurrentCameraIds}.
+          Clients can use the array as a quick reference to find an appropriate camera stream
+          combination.
+          The mandatory stream combination array will be {@code null} in case the device is not a
+          part of at least one set of combinations returned by
+          {@link android.hardware.camera2.CameraManager#getConcurrentCameraIds}.
+          </details>
+          <hal_details>
+          Do not set this property directly
+          (it is synthetic and will not be available at the HAL layer).
+          </hal_details>
+        </entry>
+
         <entry name="availableRotateAndCropModes" type="byte" visibility="public"
                type_notes="list of enums" container="array" typedef="enumList"
                hal_version="3.5">
