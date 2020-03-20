@@ -851,9 +851,6 @@ ByteString byteStringFromData(const Data &data) {
 
 // C API (see C++ API above for details)
 
-// TOOO: use C Generics
-// https://en.cppreference.com/w/c/language/generic
-
 /** \cond */
 __BEGIN_DECLS
 /** \endcond */
@@ -863,17 +860,236 @@ typedef struct audio_metadata_t audio_metadata_t;
 /**
  * \brief Creates a metadata object
  *
- * \return the metadata object or NULL on failure.
+ * \return the metadata object or NULL on failure. Caller must call
+ *         audio_metadata_destroy to free memory.
  */
 audio_metadata_t *audio_metadata_create();
 
+/**
+ * \brief Put key value pair where the value type is int32_t to audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the element to be put.
+ * \param value            the value of the element to be put.
+ * \return 0 if the key value pair is put successfully into the audio metadata.
+ *         -EINVAL if metadata or key is null.
+ */
+int audio_metadata_put_int32(audio_metadata_t *metadata, const char *key, int32_t value);
 
 /**
- * \brief Destroys the metadata object.
+ * \brief Put key value pair where the value type is int64_t to audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the element to be put.
+ * \param value            the value of the element to be put.
+ * \return 0 if the key value pair is put successfully into the audio metadata.
+ *         -EINVAL if metadata or key is null.
+ */
+int audio_metadata_put_int64(audio_metadata_t *metadata, const char *key, int64_t value);
+
+/**
+ * \brief Put key value pair where the value type is float to audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the element to be put.
+ * \param value            the value of the element to be put.
+ * \return 0 if the key value pair is put successfully into the audio metadata.
+ *         -EINVAL if metadata or key is null.
+ */
+int audio_metadata_put_float(audio_metadata_t *metadata, const char *key, float value);
+
+/**
+ * \brief Put key value pair where the value type is double to audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the element to be put.
+ * \param value            the value of the element to be put.
+ * \return 0 if the key value pair is put successfully into the audio metadata.
+ *         -EINVAL if metadata or key is null.
+ */
+int audio_metadata_put_double(audio_metadata_t *metadata, const char *key, double value);
+
+/**
+ * \brief Put key value pair where the value type is `const char *` to audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the element to be put.
+ * \param value            the value of the element to be put.
+ * \return 0 if the key value pair is put successfully into the audio metadata.
+ *         -EINVAL if metadata, key or value is null.
+ */
+int audio_metadata_put_string(audio_metadata_t *metadata, const char *key, const char *value);
+
+/**
+ * \brief Put key value pair where the value type is audio_metadata_t to audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the element to be put.
+ * \param value            the value of the element to be put.
+ * \return 0 if the key value pair is put successfully into the audio metadata.
+ *         -EINVAL if metadata, key or value is null.
+ */
+int audio_metadata_put_data(audio_metadata_t *metadata, const char *key, audio_metadata_t *value);
+
+/**
+ * \brief The type is not allowed in audio metadata. Only log the key and return -EINVAL here.
+ */
+int audio_metadata_put_unknown(audio_metadata_t *metadata, const char *key, const void *value);
+
+// use C Generics to provide interfaces for put/get functions
+// See: https://en.cppreference.com/w/c/language/generic
+
+/**
+ * A generic interface to put key value pair into the audio metadata.
+ */
+#define audio_metadata_put(metadata, key, value) _Generic((value), \
+    int32_t: audio_metadata_put_int32,                             \
+    int64_t: audio_metadata_put_int64,                             \
+    float: audio_metadata_put_float,                               \
+    double: audio_metadata_put_double,                             \
+    const char*: audio_metadata_put_string,                        \
+    audio_metadata_t*: audio_metadata_put_data,                    \
+    default: audio_metadata_put_unknown                            \
+    )(metadata, key, value)
+
+/**
+ * \brief Get mapped value whose type is int32_t by a given key from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key value to get value.
+ * \param value            the mapped value to be written.
+ * \return -EINVAL when 1) metadata is null, 2) key is null, or 3) value is null.
+ *         -ENOENT when 1) key is found in the audio metadata,
+ *                      2) the type of mapped value is not int32_t.
+ *         0 if successfully find the mapped value.
+ */
+int audio_metadata_get_int32(audio_metadata_t *metadata, const char *key, int32_t *value);
+
+/**
+ * \brief Get mapped value whose type is int64_t by a given key from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key value to get value.
+ * \param value            the mapped value to be written.
+ * \return -EINVAL when 1) metadata is null, 2) key is null, or 3) value is null.
+ *         -ENOENT when 1) key is found in the audio metadata,
+ *                      2) the type of mapped value is not int32_t.
+ *         0 if successfully find the mapped value.
+ */
+int audio_metadata_get_int64(audio_metadata_t *metadata, const char *key, int64_t *value);
+
+/**
+ * \brief Get mapped value whose type is float by a given key from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key value to get value.
+ * \param value            the mapped value to be written.
+ * \return -EINVAL when 1) metadata is null, 2) key is null, or 3) value is null.
+ *         -ENOENT when 1) key is found in the audio metadata,
+ *                      2) the type of mapped value is not float.
+ *         0 if successfully find the mapped value.
+ */
+int audio_metadata_get_float(audio_metadata_t *metadata, const char *key, float *value);
+
+/**
+ * \brief Get mapped value whose type is double by a given key from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key value to get value.
+ * \param value            the mapped value to be written.
+ * \return -EINVAL when 1) metadata is null, 2) key is null, or 3) value is null.
+ *         -ENOENT when 1) key is found in the audio metadata,
+ *                      2) the type of mapped value is not double.
+ *         0 if successfully find the mapped value.
+ */
+int audio_metadata_get_double(audio_metadata_t *metadata, const char *key, double *value);
+
+/**
+ * \brief Get mapped value whose type is std::string by a given key from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key value to get value.
+ * \param value            the mapped value to be written. The memory will be allocated in the
+ *                         function, which must be freed by caller.
+ * \return -EINVAL when 1) metadata is null, 2) key is null, or 3) value is null.
+ *         -ENOENT when 1) key is found in the audio metadata,
+ *                      2) the type of mapped value is not std::string.
+ *         -ENOMEM when fails allocating memory for value.
+ *         0 if successfully find the mapped value.
+ */
+int audio_metadata_get_string(audio_metadata_t *metadata, const char *key, char **value);
+
+/**
+ * \brief Get mapped value whose type is audio_metadata_t by a given key from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key value to get value.
+ * \param value            the mapped value to be written. The memory will be allocated in the
+ *                         function, which should be free by caller via audio_metadata_destroy.
+ * \return -EINVAL when 1) metadata is null, 2) key is null, or 3) value is null.
+ *         -ENOENT when 1) key is found in the audio metadata,
+ *                      2) the type of mapped value is not audio_utils::metadata::Data.
+ *         -ENOMEM when fails allocating memory for value.
+ *         0 if successfully find the mapped value.
+ */
+int audio_metadata_get_data(audio_metadata_t *metadata, const char *key, audio_metadata_t **value);
+
+/**
+ * \brief The data type is not allowed in audio metadata. Only log the key and return -EINVAL here.
+ */
+int audio_metadata_get_unknown(audio_metadata_t *metadata, const char *key, void *value);
+
+/**
+ * A generic interface to get mapped value by a given key from audio metadata. The value object
+ * will remain the same if the key is not found in the audio metadata.
+ */
+#define audio_metadata_get(metadata, key, value) _Generic((value), \
+    int32_t*: audio_metadata_get_int32,                            \
+    int64_t*: audio_metadata_get_int64,                            \
+    float*: audio_metadata_get_float,                              \
+    double*: audio_metadata_get_double,                            \
+    char**: audio_metadata_get_string,                             \
+    audio_metadata_t**: audio_metadata_get_data,                   \
+    default: audio_metadata_get_unknown                            \
+    )(metadata, key, value)
+
+/**
+ * \brief Remove item from audio metadata.
+ *
+ * \param metadata         the audio metadata object.
+ * \param key              the key of the item that is going to be removed.
+ * \return -EINVAL if metadata or key is null. Otherwise, return the number of elements erased.
+ */
+ssize_t audio_metadata_erase(audio_metadata_t *metadata, const char *key);
+
+/**
+ * \brief Destroys the metadata object
  *
  * \param metadata         object returned by create, if NULL nothing happens.
  */
 void audio_metadata_destroy(audio_metadata_t *metadata);
+
+/**
+ * \brief Unpack byte string into a given audio metadata
+ *
+ * \param byteString       a byte string that contains data to convert to audio metadata.
+ * \param length           the length of the byte string
+ * \return the audio metadata object that contains the converted data. Caller must call
+ *         audio_metadata_destroy to free the memory.
+ */
+audio_metadata_t *audio_metadata_from_byte_string(const uint8_t *byteString, size_t length);
+
+/**
+ * \brief Pack the audio metadata into a byte string
+ *
+ * \param metadata         the audio metadata object to be converted.
+ * \param byteString       the buffer to write data to. The memory will be allocated
+ *                         in the function, which must be freed by caller via free().
+ * \return -EINVAL if metadata or byteString is null.
+ *         -ENOMEM if fails to allocate memory for byte string.
+ *         The length of the byte string.
+ */
+ssize_t byte_string_from_audio_metadata(audio_metadata_t *metadata, uint8_t **byteString);
 
 /** \cond */
 __END_DECLS
