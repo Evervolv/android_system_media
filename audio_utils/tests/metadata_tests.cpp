@@ -21,8 +21,10 @@
 
 #include <audio_utils/Metadata.h>
 #include <gtest/gtest.h>
-#include <iostream>
 #include <log/log.h>
+
+#include <error.h>
+#include <iostream>
 
 using namespace android::audio_utils::metadata;
 
@@ -361,4 +363,79 @@ TEST(metadata_tests, compatibility_R) {
         ASSERT_EQ((size_t)1, unknowns.size());
         ASSERT_EQ((unsigned)0xfe, unknowns[0]);
     }
+};
+
+// Test C API
+TEST(metadata_tests, c) {
+    audio_metadata_t *metadata = audio_metadata_create();
+    Data d;
+    d.emplace("i32", (int32_t)1);
+    d.emplace("i64", (int64_t)2);
+    d.emplace("float", (float)3.1f);
+    d.emplace("double", (double)4.11);
+    Data s;
+    s.emplace("string", "hello");
+    d.emplace("data", s);
+
+    audio_metadata_put(metadata, "i32", (int32_t)1);
+    audio_metadata_put(metadata, "i64", (int64_t)2);
+    audio_metadata_put(metadata, "float", (float)3.1f);
+    audio_metadata_put(metadata, "double", (double)4.11);
+    audio_metadata_t *data = audio_metadata_create();
+    audio_metadata_put(data, "string", "hello");
+    audio_metadata_put(metadata, "data", data);
+    audio_metadata_destroy(data);
+
+    int32_t i32Val;
+    int64_t i64Val;
+    float floatVal;
+    double doubleVal;
+    char *strVal = nullptr;
+    audio_metadata_t *dataVal = nullptr;
+    ASSERT_EQ(0, audio_metadata_get(metadata, "i32", &i32Val));
+    ASSERT_EQ(1, i32Val);
+    ASSERT_EQ(0, audio_metadata_get(metadata, "i64", &i64Val));
+    ASSERT_EQ(2, i64Val);
+    ASSERT_EQ(0, audio_metadata_get(metadata, "float", &floatVal));
+    ASSERT_EQ(3.1f, floatVal);
+    ASSERT_EQ(0, audio_metadata_get(metadata, "double", &doubleVal));
+    ASSERT_EQ(4.11, doubleVal);
+    ASSERT_EQ(0, audio_metadata_get(metadata, "data", &dataVal));
+    ASSERT_NE(dataVal, nullptr);
+    ASSERT_EQ(0, audio_metadata_get(dataVal, "string", &strVal));
+    ASSERT_EQ(0, strcmp("hello", strVal));
+    free(strVal);
+    audio_metadata_destroy(dataVal);
+    dataVal = nullptr;
+    ASSERT_EQ(-ENOENT, audio_metadata_get(metadata, "non_exist_key", &i32Val));
+    audio_metadata_t *nullMetadata = nullptr;
+    ASSERT_EQ(-EINVAL, audio_metadata_get(nullMetadata, "i32", &i32Val));
+    char *nullKey = nullptr;
+    ASSERT_EQ(-EINVAL, audio_metadata_get(metadata, nullKey, &i32Val));
+    int *nullI32Val = nullptr;
+    ASSERT_EQ(-EINVAL, audio_metadata_get(metadata, "i32", nullI32Val));
+
+    uint8_t *bs = nullptr;
+    size_t length = byte_string_from_audio_metadata(metadata, &bs);
+    ASSERT_EQ(byteStringFromData(d).size(), ByteString(bs, length).size());
+    audio_metadata_t *metadataFromBs = audio_metadata_from_byte_string(bs, length);
+    free(bs);
+    bs = nullptr;
+    length = byte_string_from_audio_metadata(metadataFromBs, &bs);
+    ASSERT_EQ(byteStringFromData(d), ByteString(bs, length));
+    free(bs);
+    bs = nullptr;
+    audio_metadata_destroy(metadataFromBs);
+    ASSERT_EQ(-EINVAL, byte_string_from_audio_metadata(nullMetadata, &bs));
+    uint8_t **nullBs = nullptr;
+    ASSERT_EQ(-EINVAL, byte_string_from_audio_metadata(metadata, nullBs));
+
+    ASSERT_EQ(1, audio_metadata_erase(metadata, "data"));
+    audio_metadata_get(metadata, "data", dataVal);
+    ASSERT_EQ(nullptr, dataVal);
+    ASSERT_EQ(0, audio_metadata_erase(metadata, "data"));
+    ASSERT_EQ(-EINVAL, audio_metadata_erase(nullMetadata, "key"));
+    ASSERT_EQ(-EINVAL, audio_metadata_erase(metadata, nullKey));
+
+    audio_metadata_destroy(metadata);
 };
