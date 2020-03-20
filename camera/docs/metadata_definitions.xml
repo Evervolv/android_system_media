@@ -5973,6 +5973,18 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * The device supports PRIVATE_REPROCESSING capability
           * The device's maximal JPEG resolution can reach 30 FPS min frame duration
           * The device does not support HAL based ZSL (android.control.enableZsl)
+
+          For devices which support SYSTEM_CAMERA and LOGICAL_MULTI_CAMERA capabilities:
+
+          Hidden physical camera ids[1] must not be be shared[2] between public camera devices
+          and camera devices advertising SYSTEM_CAMERA capability.
+
+          [1] - Camera device ids which are advertised in the
+                ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS list, and not available through
+                ICameraProvider.getCameraIdList().
+
+          [2] - The ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS lists, must not have common
+                camera ids.
           </hal_details>
         </entry>
         <entry name="availableRequestKeys" type="int32" visibility="ndk_public"
