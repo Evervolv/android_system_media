@@ -38,6 +38,7 @@ cc_library {
         "fifo_writer_T.cpp",
         "format.c",
         "limiter.c",
+        "Metadata.cpp",
         "minifloat.c",
         "mono_blend.cpp",
         "power.cpp",
