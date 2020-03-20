@@ -56,6 +56,7 @@ int audio_metadata_put_float(audio_metadata_t *metadata, const char *key, float 
 
 int audio_metadata_put_double(audio_metadata_t *metadata, const char *key, double value) {
     if (metadata == nullptr || key == nullptr) {
+        return -EINVAL;
     }
     reinterpret_cast<Data *>(metadata)->emplace(key, value);
     return 0;
