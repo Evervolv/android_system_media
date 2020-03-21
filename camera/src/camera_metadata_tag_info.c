@@ -234,12 +234,14 @@ static tag_info_t android_control[ANDROID_CONTROL_END -
     { "enableZsl",                     TYPE_BYTE   },
     [ ANDROID_CONTROL_AF_SCENE_CHANGE - ANDROID_CONTROL_START ] =
     { "afSceneChange",                 TYPE_BYTE   },
-    [ ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES - ANDROID_CONTROL_START ] =
-    { "availableBokehMaxSizes",        TYPE_INT32  },
-    [ ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES - ANDROID_CONTROL_START ] =
-    { "availableBokehZoomRatioRanges", TYPE_FLOAT  },
-    [ ANDROID_CONTROL_BOKEH_MODE - ANDROID_CONTROL_START ] =
-    { "bokehMode",                     TYPE_BYTE   },
+    [ ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_MAX_SIZES - ANDROID_CONTROL_START ] =
+    { "availableExtendedSceneModeMaxSizes",
+                                        TYPE_INT32  },
+    [ ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_ZOOM_RATIO_RANGES - ANDROID_CONTROL_START ] =
+    { "availableExtendedSceneModeZoomRatioRanges",
+                                        TYPE_FLOAT  },
+    [ ANDROID_CONTROL_EXTENDED_SCENE_MODE - ANDROID_CONTROL_START ] =
+    { "extendedSceneMode",             TYPE_BYTE   },
     [ ANDROID_CONTROL_ZOOM_RATIO_RANGE - ANDROID_CONTROL_START ] =
     { "zoomRatioRange",                TYPE_FLOAT  },
     [ ANDROID_CONTROL_ZOOM_RATIO - ANDROID_CONTROL_START ] =
@@ -1208,6 +1210,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "OFF_KEEP_STATE";
                     ret = 0;
                     break;
+                case ANDROID_CONTROL_MODE_USE_EXTENDED_SCENE_MODE:
+                    msg = "USE_EXTENDED_SCENE_MODE";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
@@ -1526,24 +1532,28 @@ int camera_metadata_enum_snprint(uint32_t tag,
             }
             break;
         }
-        case ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES: {
+        case ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_MAX_SIZES: {
             break;
         }
-        case ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES: {
+        case ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_ZOOM_RATIO_RANGES: {
             break;
         }
-        case ANDROID_CONTROL_BOKEH_MODE: {
+        case ANDROID_CONTROL_EXTENDED_SCENE_MODE: {
             switch (value) {
-                case ANDROID_CONTROL_BOKEH_MODE_OFF:
-                    msg = "OFF";
+                case ANDROID_CONTROL_EXTENDED_SCENE_MODE_DISABLED:
+                    msg = "DISABLED";
                     ret = 0;
                     break;
-                case ANDROID_CONTROL_BOKEH_MODE_STILL_CAPTURE:
-                    msg = "STILL_CAPTURE";
+                case ANDROID_CONTROL_EXTENDED_SCENE_MODE_BOKEH_STILL_CAPTURE:
+                    msg = "BOKEH_STILL_CAPTURE";
                     ret = 0;
                     break;
-                case ANDROID_CONTROL_BOKEH_MODE_CONTINUOUS:
-                    msg = "CONTINUOUS";
+                case ANDROID_CONTROL_EXTENDED_SCENE_MODE_BOKEH_CONTINUOUS:
+                    msg = "BOKEH_CONTINUOUS";
+                    ret = 0;
+                    break;
+                case ANDROID_CONTROL_EXTENDED_SCENE_MODE_VENDOR_START:
+                    msg = "VENDOR_START";
                     ret = 0;
                     break;
                 default:
@@ -3565,6 +3575,12 @@ int camera_metadata_enum_value(uint32_t tag,
                     ret = 0;
                     break;
                 }
+                enumName = "USE_EXTENDED_SCENE_MODE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_MODE_USE_EXTENDED_SCENE_MODE;
+                    ret = 0;
+                    break;
+                }
             break;
         }
         case ANDROID_CONTROL_SCENE_MODE: {
@@ -3942,28 +3958,34 @@ int camera_metadata_enum_value(uint32_t tag,
                 }
             break;
         }
-        case ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES: {
+        case ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_MAX_SIZES: {
             break;
         }
-        case ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES: {
+        case ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_ZOOM_RATIO_RANGES: {
             break;
         }
-        case ANDROID_CONTROL_BOKEH_MODE: {
-                enumName = "OFF";
+        case ANDROID_CONTROL_EXTENDED_SCENE_MODE: {
+                enumName = "DISABLED";
                 if (strncmp(name, enumName, size) == 0) {
-                    *value = ANDROID_CONTROL_BOKEH_MODE_OFF;
+                    *value = ANDROID_CONTROL_EXTENDED_SCENE_MODE_DISABLED;
                     ret = 0;
                     break;
                 }
-                enumName = "STILL_CAPTURE";
+                enumName = "BOKEH_STILL_CAPTURE";
                 if (strncmp(name, enumName, size) == 0) {
-                    *value = ANDROID_CONTROL_BOKEH_MODE_STILL_CAPTURE;
+                    *value = ANDROID_CONTROL_EXTENDED_SCENE_MODE_BOKEH_STILL_CAPTURE;
                     ret = 0;
                     break;
                 }
-                enumName = "CONTINUOUS";
+                enumName = "BOKEH_CONTINUOUS";
                 if (strncmp(name, enumName, size) == 0) {
-                    *value = ANDROID_CONTROL_BOKEH_MODE_CONTINUOUS;
+                    *value = ANDROID_CONTROL_EXTENDED_SCENE_MODE_BOKEH_CONTINUOUS;
+                    ret = 0;
+                    break;
+                }
+                enumName = "VENDOR_START";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_EXTENDED_SCENE_MODE_VENDOR_START;
                     ret = 0;
                     break;
                 }
