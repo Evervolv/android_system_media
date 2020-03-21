@@ -18515,6 +18515,14 @@ size as the picture size if:</p>
 <li>The device's maximal JPEG resolution can reach 30 FPS min frame duration</li>
 <li>The device does not support HAL based ZSL (<a href="#controls_android.control.enableZsl">android.<wbr/>control.<wbr/>enable<wbr/>Zsl</a>)</li>
 </ul>
+<p>For devices which support SYSTEM_<wbr/>CAMERA and LOGICAL_<wbr/>MULTI_<wbr/>CAMERA capabilities:</p>
+<p>Hidden physical camera ids[1] must not be be shared[2] between public camera devices
+and camera devices advertising SYSTEM_<wbr/>CAMERA capability.<wbr/></p>
+<p>[1] - Camera device ids which are advertised in the
+      ANDROID_<wbr/>LOGICAL_<wbr/>MULTI_<wbr/>CAMERA_<wbr/>PHYSICAL_<wbr/>IDS list,<wbr/> and not available through
+      ICamera<wbr/>Provider.<wbr/>get<wbr/>Camera<wbr/>Id<wbr/>List().<wbr/></p>
+<p>[2] - The ANDROID_<wbr/>LOGICAL_<wbr/>MULTI_<wbr/>CAMERA_<wbr/>PHYSICAL_<wbr/>IDS lists,<wbr/> must not have common
+      camera ids.<wbr/></p>
             </td>
           </tr>
 
