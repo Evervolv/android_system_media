@@ -194,7 +194,7 @@
             <li
             ><a href="#controls_android.control.enableZsl">android.control.enableZsl</a></li>
             <li
-            ><a href="#controls_android.control.bokehMode">android.control.bokehMode</a></li>
+            ><a href="#controls_android.control.extendedSceneMode">android.control.extendedSceneMode</a></li>
             <li
             ><a href="#controls_android.control.zoomRatio">android.control.zoomRatio</a></li>
           </ul>
@@ -243,11 +243,11 @@
             <li
             ><a href="#static_android.control.postRawSensitivityBoostRange">android.control.postRawSensitivityBoostRange</a></li>
             <li
-            ><a href="#static_android.control.availableBokehMaxSizes">android.control.availableBokehMaxSizes</a></li>
+            ><a href="#static_android.control.availableExtendedSceneModeMaxSizes">android.control.availableExtendedSceneModeMaxSizes</a></li>
             <li
-            ><a href="#static_android.control.availableBokehZoomRatioRanges">android.control.availableBokehZoomRatioRanges</a></li>
+            ><a href="#static_android.control.availableExtendedSceneModeZoomRatioRanges">android.control.availableExtendedSceneModeZoomRatioRanges</a></li>
             <li
-            ><a href="#static_android.control.availableBokehCapabilities">android.control.availableBokehCapabilities</a></li>
+            ><a href="#static_android.control.availableExtendedSceneModeCapabilities">android.control.availableExtendedSceneModeCapabilities</a></li>
             <li
             ><a href="#static_android.control.zoomRatioRange">android.control.zoomRatioRange</a></li>
           </ul>
@@ -310,7 +310,7 @@
             <li
             ><a href="#dynamic_android.control.afSceneChange">android.control.afSceneChange</a></li>
             <li
-            ><a href="#dynamic_android.control.bokehMode">android.control.bokehMode</a></li>
+            ><a href="#dynamic_android.control.extendedSceneMode">android.control.extendedSceneMode</a></li>
             <li
             ><a href="#dynamic_android.control.zoomRatio">android.control.zoomRatio</a></li>
           </ul>
@@ -4040,7 +4040,8 @@ those settings while USE_<wbr/>SCENE_<wbr/>MODE is active (except for
 FACE_<wbr/>PRIORITY scene mode).<wbr/> Other control entries are still active.<wbr/>
 This setting can only be used if scene mode is supported (i.<wbr/>e.<wbr/>
 <a href="#static_android.control.availableSceneModes">android.<wbr/>control.<wbr/>available<wbr/>Scene<wbr/>Modes</a>
-contain some modes other than DISABLED).<wbr/></p></span>
+contain some modes other than DISABLED).<wbr/></p>
+<p>For extended scene modes such as BOKEH,<wbr/> please use USE_<wbr/>EXTENDED_<wbr/>SCENE_<wbr/>MODE instead.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">OFF_KEEP_STATE (v3.2)</span>
@@ -4053,6 +4054,18 @@ values set from a request with AUTO,<wbr/> OFF,<wbr/> or
 USE_<wbr/>SCENE_<wbr/>MODE,<wbr/> and any statistics or state updates
 collected from manual captures with OFF_<wbr/>KEEP_<wbr/>STATE will be
 discarded by the camera device.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">USE_EXTENDED_SCENE_MODE (v3.5)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>Use a specific extended scene mode.<wbr/></p>
+<p>When extended scene mode is on,<wbr/> the camera device may override certain control
+parameters,<wbr/> such as targetFpsRange,<wbr/> AE,<wbr/> AWB,<wbr/> and AF modes,<wbr/> to achieve best power and
+quality tradeoffs.<wbr/> Only the mandatory stream combinations of LIMITED hardware level
+are guaranteed.<wbr/></p>
+<p>This setting can only be used if extended scene mode is supported (i.<wbr/>e.<wbr/>
+android.<wbr/>control.<wbr/>available<wbr/>Extended<wbr/>Scene<wbr/>Modes
+contains some modes other than DISABLED).<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -4091,10 +4104,10 @@ by the camera device is disabled.<wbr/> The application must set the fields for
 capture parameters itself.<wbr/></p>
 <p>When set to AUTO,<wbr/> the individual algorithm controls in
 android.<wbr/>control.<wbr/>* are in effect,<wbr/> such as <a href="#controls_android.control.afMode">android.<wbr/>control.<wbr/>af<wbr/>Mode</a>.<wbr/></p>
-<p>When set to USE_<wbr/>SCENE_<wbr/>MODE,<wbr/> the individual controls in
+<p>When set to USE_<wbr/>SCENE_<wbr/>MODE or USE_<wbr/>EXTENDED_<wbr/>SCENE_<wbr/>MODE,<wbr/> the individual controls in
 android.<wbr/>control.<wbr/>* are mostly disabled,<wbr/> and the camera device
-implements one of the scene mode settings (such as ACTION,<wbr/>
-SUNSET,<wbr/> or PARTY) as it wishes.<wbr/> The camera device scene mode
+implements one of the scene mode or extended scene mode settings (such as ACTION,<wbr/>
+SUNSET,<wbr/> PARTY,<wbr/> or BOKEH) as it wishes.<wbr/> The camera device scene mode
 3A settings are provided by <a href="https://developer.android.com/reference/android/hardware/camera2/CaptureResult.html">capture results</a>.<wbr/></p>
 <p>When set to OFF_<wbr/>KEEP_<wbr/>STATE,<wbr/> it is similar to OFF mode,<wbr/> the only difference
 is that this frame will not be used by camera device background 3A statistics
@@ -4696,10 +4709,10 @@ capture intent.<wbr/></p>
            <!-- end of entry -->
         
                 
-          <tr class="entry" id="controls_android.control.bokehMode">
+          <tr class="entry" id="controls_android.control.extendedSceneMode">
             <td class="entry_name
              " rowspan="3">
-              android.<wbr/>control.<wbr/>bokeh<wbr/>Mode
+              android.<wbr/>control.<wbr/>extended<wbr/>Scene<wbr/>Mode
             </td>
             <td class="entry_type">
                 <span class="entry_type_name entry_type_name_enum">byte</span>
@@ -4712,29 +4725,36 @@ capture intent.<wbr/></p>
 
                 <ul class="entry_type_enum">
                   <li>
-                    <span class="entry_type_enum_name">OFF (v3.5)</span>
-                    <span class="entry_type_enum_notes"><p>Bokeh mode is disabled.<wbr/></p></span>
+                    <span class="entry_type_enum_name">DISABLED (v3.5)</span>
+                    <span class="entry_type_enum_value">0</span>
+                    <span class="entry_type_enum_notes"><p>Extended scene mode is disabled.<wbr/></p></span>
                   </li>
                   <li>
-                    <span class="entry_type_enum_name">STILL_CAPTURE (v3.5)</span>
+                    <span class="entry_type_enum_name">BOKEH_STILL_CAPTURE (v3.5)</span>
                     <span class="entry_type_enum_notes"><p>High quality bokeh mode is enabled for all non-raw streams (including YUV,<wbr/>
 JPEG,<wbr/> and IMPLEMENTATION_<wbr/>DEFINED) when capture intent is STILL_<wbr/>CAPTURE.<wbr/> Due to the
 extra image processing,<wbr/> this mode may introduce additional stall to non-raw streams.<wbr/>
 This mode should be used in high quality still capture use case.<wbr/></p></span>
                   </li>
                   <li>
-                    <span class="entry_type_enum_name">CONTINUOUS (v3.5)</span>
+                    <span class="entry_type_enum_name">BOKEH_CONTINUOUS (v3.5)</span>
                     <span class="entry_type_enum_notes"><p>Bokeh effect must not slow down capture rate relative to sensor raw output,<wbr/>
 and the effect is applied to all processed streams no larger than the maximum
 streaming dimension.<wbr/> This mode should be used if performance and power are a
 priority,<wbr/> such as video recording.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">VENDOR_START (v3.5)</span>
+                    <span class="entry_type_enum_hidden">[hidden]</span>
+                    <span class="entry_type_enum_value">0x40</span>
+                    <span class="entry_type_enum_notes"><p>Vendor defined extended scene modes.<wbr/> These depend on vendor implementation.<wbr/></p></span>
                   </li>
                 </ul>
 
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Whether bokeh mode is enabled for a particular capture request.<wbr/></p>
+              <p>Whether extended scene mode is enabled for a particular capture request.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -4758,32 +4778,28 @@ priority,<wbr/> such as video recording.<wbr/></p></span>
             <td class="entry_details" colspan="6">
               <p>With bokeh mode,<wbr/> the camera device may blur out the parts of scene that are not in
 focus,<wbr/> creating a bokeh (or shallow depth of field) effect for people or objects.<wbr/></p>
-<p>When set to STILL_<wbr/>CAPTURE bokeh mode with STILL_<wbr/>CAPTURE capture intent,<wbr/> due to the extra
+<p>When set to BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode with STILL_<wbr/>CAPTURE capture intent,<wbr/> due to the extra
 processing needed for high quality bokeh effect,<wbr/> the stall may be longer than when
 capture intent is not STILL_<wbr/>CAPTURE.<wbr/></p>
-<p>When set to STILL_<wbr/>CAPTURE bokeh mode with PREVIEW capture intent,<wbr/></p>
+<p>When set to BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode with PREVIEW capture intent,<wbr/></p>
 <ul>
 <li>If the camera device has BURST_<wbr/>CAPTURE capability,<wbr/> the frame rate requirement of
 BURST_<wbr/>CAPTURE must still be met.<wbr/></li>
-<li>All streams not larger than the maximum streaming dimension for STILL_<wbr/>CAPTURE mode
-(queried via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#CONTROL_AVAILABLE_BOKEH_CAPABILITIES">Camera<wbr/>Characteristics#CONTROL_<wbr/>AVAILABLE_<wbr/>BOKEH_<wbr/>CAPABILITIES</a>)
+<li>All streams not larger than the maximum streaming dimension for BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode
+(queried via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES">Camera<wbr/>Characteristics#CONTROL_<wbr/>AVAILABLE_<wbr/>EXTENDED_<wbr/>SCENE_<wbr/>MODE_<wbr/>CAPABILITIES</a>)
 will have preview bokeh effect applied.<wbr/></li>
 </ul>
-<p>When set to CONTINUOUS mode,<wbr/> configured streams dimension should not exceed this mode's
+<p>When set to BOKEH_<wbr/>CONTINUOUS mode,<wbr/> configured streams dimension should not exceed this mode's
 maximum streaming dimension in order to have bokeh effect applied.<wbr/> Bokeh effect may not
 be available for streams larger than the maximum streaming dimension.<wbr/></p>
-<p>Switching between different bokeh modes may involve reconfiguration of the camera
+<p>Switching between different extended scene modes may involve reconfiguration of the camera
 pipeline,<wbr/> resulting in long latency.<wbr/> The application should check this key against the
 available session keys queried via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableSessionKeys">CameraCharacteristics#getAvailableSessionKeys</a>.<wbr/></p>
-<p>When bokeh mode is on,<wbr/> the camera device may override certain control parameters,<wbr/> such as
-reduce frame rate or use face priority scene mode,<wbr/> to achieve best power and quality
-tradeoffs.<wbr/> When turned on,<wbr/> AE,<wbr/> AWB,<wbr/> and AF run in auto modes,<wbr/> and only the mandatory
-stream combinations of LIMITED hardware level are guaranteed.<wbr/></p>
 <p>For a logical multi-camera,<wbr/> bokeh may be implemented by stereo vision from sub-cameras
 with different field of view.<wbr/> As a result,<wbr/> when bokeh mode is enabled,<wbr/> the camera device
-may override <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>,<wbr/> and the field of view will be smaller than when
-bokeh mode is off.<wbr/></p>
+may override <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> or <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> and the field of
+view may be smaller than when bokeh mode is off.<wbr/></p>
             </td>
           </tr>
 
@@ -6303,10 +6319,10 @@ any of RAW output formats.<wbr/></p>
            <!-- end of entry -->
         
                 
-          <tr class="entry" id="static_android.control.availableBokehMaxSizes">
+          <tr class="entry" id="static_android.control.availableExtendedSceneModeMaxSizes">
             <td class="entry_name
              " rowspan="5">
-              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Max<wbr/>Sizes
+              android.<wbr/>control.<wbr/>available<wbr/>Extended<wbr/>Scene<wbr/>Mode<wbr/>Max<wbr/>Sizes
             </td>
             <td class="entry_type">
                 <span class="entry_type_name">int32</span>
@@ -6321,14 +6337,15 @@ any of RAW output formats.<wbr/></p>
               <span class="entry_type_hwlevel">[limited] </span>
 
 
-                <div class="entry_type_notes">List of bokeh modes and the corresponding max streaming sizes.<wbr/></div>
+                <div class="entry_type_notes">List of extended scene modes and the corresponding max streaming sizes.<wbr/></div>
 
 
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>The list of bokeh modes for <a href="#controls_android.control.bokehMode">android.<wbr/>control.<wbr/>bokeh<wbr/>Mode</a> that are supported by this camera
-device,<wbr/> and each bokeh mode's maximum streaming (non-stall) size with bokeh effect.<wbr/></p>
+              <p>The list of extended scene modes for <a href="#controls_android.control.extendedSceneMode">android.<wbr/>control.<wbr/>extended<wbr/>Scene<wbr/>Mode</a> that are supported
+by this camera device,<wbr/> and each extended scene mode's maximum streaming (non-stall) size
+with  effect.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -6351,21 +6368,21 @@ device,<wbr/> and each bokeh mode's maximum streaming (non-stall) size with boke
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>For OFF mode,<wbr/> the camera behaves normally with no bokeh effect.<wbr/></p>
-<p>For STILL_<wbr/>CAPTURE mode,<wbr/> the maximum streaming dimension specifies the limit under which
-bokeh is effective when capture intent is PREVIEW.<wbr/> Note that when capture intent is
-PREVIEW,<wbr/> the bokeh effect may not be as high quality compared to STILL_<wbr/>CAPTURE intent
-in order to maintain reasonable frame rate.<wbr/> The maximum streaming dimension must be one
-of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions in availableStreamConfigurations,<wbr/> or (0,<wbr/> 0)
-if preview bokeh is not supported.<wbr/> If the application configures a stream larger than
-the maximum streaming dimension,<wbr/> bokeh effect may not be applied for this stream for
-PREVIEW intent.<wbr/></p>
-<p>For CONTINUOUS mode,<wbr/> the maximum streaming dimension specifies the limit under which
-bokeh is effective.<wbr/> This dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions
-in availableStreamConfigurations,<wbr/> and if the sensor maximum resolution is larger than or
-equal to 1080p,<wbr/> the maximum streaming dimension must be at least 1080p.<wbr/> If the
-application configures a stream with larger dimension,<wbr/> the stream may not have bokeh
-effect applied.<wbr/></p>
+              <p>For DISABLED mode,<wbr/> the camera behaves normally with no extended scene mode enabled.<wbr/></p>
+<p>For BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode,<wbr/> the maximum streaming dimension specifies the limit
+under which bokeh is effective when capture intent is PREVIEW.<wbr/> Note that when capture
+intent is PREVIEW,<wbr/> the bokeh effect may not be as high in quality compared to
+STILL_<wbr/>CAPTURE intent in order to maintain reasonable frame rate.<wbr/> The maximum streaming
+dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions in
+availableStreamConfigurations,<wbr/> or (0,<wbr/> 0) if preview bokeh is not supported.<wbr/> If the
+application configures a stream larger than the maximum streaming dimension,<wbr/> bokeh
+effect may not be applied for this stream for PREVIEW intent.<wbr/></p>
+<p>For BOKEH_<wbr/>CONTINUOUS mode,<wbr/> the maximum streaming dimension specifies the limit under
+which bokeh is effective.<wbr/> This dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE
+resolutions in availableStreamConfigurations,<wbr/> and if the sensor maximum resolution is
+larger than or equal to 1080p,<wbr/> the maximum streaming dimension must be at least 1080p.<wbr/>
+If the application configures a stream with larger dimension,<wbr/> the stream may not have
+bokeh effect applied.<wbr/></p>
             </td>
           </tr>
 
@@ -6374,13 +6391,10 @@ effect applied.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>For available bokeh modes,<wbr/> OFF will always be listed.<wbr/> Unlike other controls with FAST
-and HIGH_<wbr/>QUALITY modes,<wbr/> where FAST and HIGH_<wbr/>QUALITY must both be supported,<wbr/> the camera
-device isn't required to support both STILL_<wbr/>CAPTURE and CONTINUOUS bokeh modes if one
-of them is supported.<wbr/></p>
-<p>HAL must support either STILL_<wbr/>CAPTURE,<wbr/> or CONTINUOUS,<wbr/> or both if bokehMode control is
-available on the camera device.<wbr/> For OFF mode,<wbr/> the maximum streaming resolution must be
-set to (0,<wbr/> 0).<wbr/></p>
+              <p>For available extended scene modes,<wbr/> DISABLED will always be listed.<wbr/></p>
+<p>HAL must support at list one non-OFF extended scene mode if extendedSceneMode control is
+available on the camera device.<wbr/> For DISABLED mode,<wbr/> the maximum streaming resolution must
+be set to (0,<wbr/> 0).<wbr/></p>
             </td>
           </tr>
 
@@ -6388,10 +6402,10 @@ set to (0,<wbr/> 0).<wbr/></p>
            <!-- end of entry -->
         
                 
-          <tr class="entry" id="static_android.control.availableBokehZoomRatioRanges">
+          <tr class="entry" id="static_android.control.availableExtendedSceneModeZoomRatioRanges">
             <td class="entry_name
              " rowspan="3">
-              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Zoom<wbr/>Ratio<wbr/>Ranges
+              android.<wbr/>control.<wbr/>available<wbr/>Extended<wbr/>Scene<wbr/>Mode<wbr/>Zoom<wbr/>Ratio<wbr/>Ranges
             </td>
             <td class="entry_type">
                 <span class="entry_type_name">float</span>
@@ -6406,13 +6420,13 @@ set to (0,<wbr/> 0).<wbr/></p>
               <span class="entry_type_hwlevel">[limited] </span>
 
 
-                <div class="entry_type_notes">Zoom ranges for all supported non-OFF bokeh modes.<wbr/></div>
+                <div class="entry_type_notes">Zoom ranges for all supported non-OFF extended scene modes.<wbr/></div>
 
 
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>The ranges of supported zoom ratio for non-OFF <a href="#controls_android.control.bokehMode">android.<wbr/>control.<wbr/>bokeh<wbr/>Mode</a>.<wbr/></p>
+              <p>The ranges of supported zoom ratio for non-DISABLED <a href="#controls_android.control.extendedSceneMode">android.<wbr/>control.<wbr/>extended<wbr/>Scene<wbr/>Mode</a>.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -6435,10 +6449,10 @@ set to (0,<wbr/> 0).<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>When bokeh mode is enabled,<wbr/> the camera device may have limited range of zoom ratios
-compared to when bokeh mode is disabled.<wbr/> This tag lists the zoom ratio ranges for all
-supported non-OFF bokeh modes,<wbr/> in the same order as in
-<a href="#static_android.control.availableBokehCapabilities">android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Capabilities</a>.<wbr/></p>
+              <p>When extended scene mode is set,<wbr/> the camera device may have limited range of zoom ratios
+compared to when extended scene mode is DISABLED.<wbr/> This tag lists the zoom ratio ranges
+for all supported non-DISABLED extended scene modes,<wbr/> in the same order as in
+android.<wbr/>control.<wbr/>available<wbr/>Extended.<wbr/></p>
 <p>Range [1.<wbr/>0,<wbr/> 1.<wbr/>0] means that no zoom (optical or digital) is supported.<wbr/></p>
             </td>
           </tr>
@@ -6448,10 +6462,10 @@ supported non-OFF bokeh modes,<wbr/> in the same order as in
            <!-- end of entry -->
         
                 
-          <tr class="entry" id="static_android.control.availableBokehCapabilities">
+          <tr class="entry" id="static_android.control.availableExtendedSceneModeCapabilities">
             <td class="entry_name
              " rowspan="3">
-              android.<wbr/>control.<wbr/>available<wbr/>Bokeh<wbr/>Capabilities
+              android.<wbr/>control.<wbr/>available<wbr/>Extended<wbr/>Scene<wbr/>Mode<wbr/>Capabilities
             </td>
             <td class="entry_type">
                 <span class="entry_type_name">int32</span>
@@ -6471,9 +6485,9 @@ supported non-OFF bokeh modes,<wbr/> in the same order as in
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>The list of bokeh modes for <a href="#controls_android.control.bokehMode">android.<wbr/>control.<wbr/>bokeh<wbr/>Mode</a> that are supported by
-this camera device,<wbr/> and each bokeh mode's capabilities such as maximum streaming size
-with bokeh effect,<wbr/> and supported zoom ratio ranges.<wbr/></p>
+              <p>The list of extended scene modes for <a href="#controls_android.control.extendedSceneMode">android.<wbr/>control.<wbr/>extended<wbr/>Scene<wbr/>Mode</a> that
+are supported by this camera device,<wbr/> and each extended scene mode's capabilities such
+as maximum streaming size,<wbr/> and supported zoom ratio ranges.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -6495,24 +6509,24 @@ with bokeh effect,<wbr/> and supported zoom ratio ranges.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>For OFF mode,<wbr/> the camera behaves normally with no bokeh effect.<wbr/></p>
-<p>For STILL_<wbr/>CAPTURE mode,<wbr/> the maximum streaming dimension specifies the limit under which
-bokeh is effective when capture intent is PREVIEW.<wbr/> Note that when capture intent is
-PREVIEW,<wbr/> the bokeh effect may not be as high quality compared to STILL_<wbr/>CAPTURE intent
-in order to maintain reasonable frame rate.<wbr/> The maximum streaming dimension must be one
-of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions in availableStreamConfigurations,<wbr/> or (0,<wbr/> 0)
-if preview bokeh is not supported.<wbr/> If the application configures a stream larger than
-the maximum streaming dimension,<wbr/> bokeh effect may not be applied for this stream for
-PREVIEW intent.<wbr/></p>
-<p>For CONTINUOUS mode,<wbr/> the maximum streaming dimension specifies the limit under which
-bokeh is effective.<wbr/> This dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions
-in availableStreamConfigurations,<wbr/> and if the sensor maximum resolution is larger than or
-equal to 1080p,<wbr/> the maximum streaming dimension must be at least 1080p.<wbr/> If the
-application configures a stream with larger dimension,<wbr/> the stream may not have bokeh
-effect applied.<wbr/></p>
-<p>When bokeh mode is enabled,<wbr/> the camera device may have limited range of zoom ratios
-compared to when bokeh mode is disabled.<wbr/> availableBokehCapabilities lists the zoom
-ranges for all supported bokeh modes.<wbr/> A range of (1.<wbr/>0,<wbr/> 1.<wbr/>0) means that no zoom
+              <p>For DISABLED mode,<wbr/> the camera behaves normally with no extended scene mdoe enabled.<wbr/></p>
+<p>For BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode,<wbr/> the maximum streaming dimension specifies the limit
+under which bokeh is effective when capture intent is PREVIEW.<wbr/> Note that when capture
+intent is PREVIEW,<wbr/> the bokeh effect may not be as high quality compared to STILL_<wbr/>CAPTURE
+intent in order to maintain reasonable frame rate.<wbr/> The maximum streaming dimension must
+be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE resolutions in availableStreamConfigurations,<wbr/> or
+(0,<wbr/> 0) if preview bokeh is not supported.<wbr/> If the application configures a stream
+larger than the maximum streaming dimension,<wbr/> bokeh effect may not be applied for this
+stream for PREVIEW intent.<wbr/></p>
+<p>For BOKEH_<wbr/>CONTINUOUS mode,<wbr/> the maximum streaming dimension specifies the limit under
+which bokeh is effective.<wbr/> This dimension must be one of the YUV_<wbr/>420_<wbr/>888 or PRIVATE
+resolutions in availableStreamConfigurations,<wbr/> and if the sensor maximum resolution is
+larger than or equal to 1080p,<wbr/> the maximum streaming dimension must be at least 1080p.<wbr/>
+If the application configures a stream with larger dimension,<wbr/> the stream may not have
+bokeh effect applied.<wbr/></p>
+<p>When extended scene mode is set,<wbr/> the camera device may have limited range of zoom ratios
+compared to when the mode is DISABLED.<wbr/> availableExtendedSceneModeCapabilities lists the
+zoom ranges for all supported extended modes.<wbr/> A range of (1.<wbr/>0,<wbr/> 1.<wbr/>0) means that no zoom
 (optical or digital) is supported.<wbr/></p>
             </td>
           </tr>
@@ -9557,7 +9571,8 @@ those settings while USE_<wbr/>SCENE_<wbr/>MODE is active (except for
 FACE_<wbr/>PRIORITY scene mode).<wbr/> Other control entries are still active.<wbr/>
 This setting can only be used if scene mode is supported (i.<wbr/>e.<wbr/>
 <a href="#static_android.control.availableSceneModes">android.<wbr/>control.<wbr/>available<wbr/>Scene<wbr/>Modes</a>
-contain some modes other than DISABLED).<wbr/></p></span>
+contain some modes other than DISABLED).<wbr/></p>
+<p>For extended scene modes such as BOKEH,<wbr/> please use USE_<wbr/>EXTENDED_<wbr/>SCENE_<wbr/>MODE instead.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">OFF_KEEP_STATE (v3.2)</span>
@@ -9570,6 +9585,18 @@ values set from a request with AUTO,<wbr/> OFF,<wbr/> or
 USE_<wbr/>SCENE_<wbr/>MODE,<wbr/> and any statistics or state updates
 collected from manual captures with OFF_<wbr/>KEEP_<wbr/>STATE will be
 discarded by the camera device.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">USE_EXTENDED_SCENE_MODE (v3.5)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>Use a specific extended scene mode.<wbr/></p>
+<p>When extended scene mode is on,<wbr/> the camera device may override certain control
+parameters,<wbr/> such as targetFpsRange,<wbr/> AE,<wbr/> AWB,<wbr/> and AF modes,<wbr/> to achieve best power and
+quality tradeoffs.<wbr/> Only the mandatory stream combinations of LIMITED hardware level
+are guaranteed.<wbr/></p>
+<p>This setting can only be used if extended scene mode is supported (i.<wbr/>e.<wbr/>
+android.<wbr/>control.<wbr/>available<wbr/>Extended<wbr/>Scene<wbr/>Modes
+contains some modes other than DISABLED).<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -9608,10 +9635,10 @@ by the camera device is disabled.<wbr/> The application must set the fields for
 capture parameters itself.<wbr/></p>
 <p>When set to AUTO,<wbr/> the individual algorithm controls in
 android.<wbr/>control.<wbr/>* are in effect,<wbr/> such as <a href="#controls_android.control.afMode">android.<wbr/>control.<wbr/>af<wbr/>Mode</a>.<wbr/></p>
-<p>When set to USE_<wbr/>SCENE_<wbr/>MODE,<wbr/> the individual controls in
+<p>When set to USE_<wbr/>SCENE_<wbr/>MODE or USE_<wbr/>EXTENDED_<wbr/>SCENE_<wbr/>MODE,<wbr/> the individual controls in
 android.<wbr/>control.<wbr/>* are mostly disabled,<wbr/> and the camera device
-implements one of the scene mode settings (such as ACTION,<wbr/>
-SUNSET,<wbr/> or PARTY) as it wishes.<wbr/> The camera device scene mode
+implements one of the scene mode or extended scene mode settings (such as ACTION,<wbr/>
+SUNSET,<wbr/> PARTY,<wbr/> or BOKEH) as it wishes.<wbr/> The camera device scene mode
 3A settings are provided by <a href="https://developer.android.com/reference/android/hardware/camera2/CaptureResult.html">capture results</a>.<wbr/></p>
 <p>When set to OFF_<wbr/>KEEP_<wbr/>STATE,<wbr/> it is similar to OFF mode,<wbr/> the only difference
 is that this frame will not be used by camera device background 3A statistics
@@ -10278,10 +10305,10 @@ to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus 
            <!-- end of entry -->
         
                 
-          <tr class="entry" id="dynamic_android.control.bokehMode">
+          <tr class="entry" id="dynamic_android.control.extendedSceneMode">
             <td class="entry_name
              " rowspan="3">
-              android.<wbr/>control.<wbr/>bokeh<wbr/>Mode
+              android.<wbr/>control.<wbr/>extended<wbr/>Scene<wbr/>Mode
             </td>
             <td class="entry_type">
                 <span class="entry_type_name entry_type_name_enum">byte</span>
@@ -10294,29 +10321,36 @@ to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus 
 
                 <ul class="entry_type_enum">
                   <li>
-                    <span class="entry_type_enum_name">OFF (v3.5)</span>
-                    <span class="entry_type_enum_notes"><p>Bokeh mode is disabled.<wbr/></p></span>
+                    <span class="entry_type_enum_name">DISABLED (v3.5)</span>
+                    <span class="entry_type_enum_value">0</span>
+                    <span class="entry_type_enum_notes"><p>Extended scene mode is disabled.<wbr/></p></span>
                   </li>
                   <li>
-                    <span class="entry_type_enum_name">STILL_CAPTURE (v3.5)</span>
+                    <span class="entry_type_enum_name">BOKEH_STILL_CAPTURE (v3.5)</span>
                     <span class="entry_type_enum_notes"><p>High quality bokeh mode is enabled for all non-raw streams (including YUV,<wbr/>
 JPEG,<wbr/> and IMPLEMENTATION_<wbr/>DEFINED) when capture intent is STILL_<wbr/>CAPTURE.<wbr/> Due to the
 extra image processing,<wbr/> this mode may introduce additional stall to non-raw streams.<wbr/>
 This mode should be used in high quality still capture use case.<wbr/></p></span>
                   </li>
                   <li>
-                    <span class="entry_type_enum_name">CONTINUOUS (v3.5)</span>
+                    <span class="entry_type_enum_name">BOKEH_CONTINUOUS (v3.5)</span>
                     <span class="entry_type_enum_notes"><p>Bokeh effect must not slow down capture rate relative to sensor raw output,<wbr/>
 and the effect is applied to all processed streams no larger than the maximum
 streaming dimension.<wbr/> This mode should be used if performance and power are a
 priority,<wbr/> such as video recording.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">VENDOR_START (v3.5)</span>
+                    <span class="entry_type_enum_hidden">[hidden]</span>
+                    <span class="entry_type_enum_value">0x40</span>
+                    <span class="entry_type_enum_notes"><p>Vendor defined extended scene modes.<wbr/> These depend on vendor implementation.<wbr/></p></span>
                   </li>
                 </ul>
 
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Whether bokeh mode is enabled for a particular capture request.<wbr/></p>
+              <p>Whether extended scene mode is enabled for a particular capture request.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -10340,32 +10374,28 @@ priority,<wbr/> such as video recording.<wbr/></p></span>
             <td class="entry_details" colspan="6">
               <p>With bokeh mode,<wbr/> the camera device may blur out the parts of scene that are not in
 focus,<wbr/> creating a bokeh (or shallow depth of field) effect for people or objects.<wbr/></p>
-<p>When set to STILL_<wbr/>CAPTURE bokeh mode with STILL_<wbr/>CAPTURE capture intent,<wbr/> due to the extra
+<p>When set to BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode with STILL_<wbr/>CAPTURE capture intent,<wbr/> due to the extra
 processing needed for high quality bokeh effect,<wbr/> the stall may be longer than when
 capture intent is not STILL_<wbr/>CAPTURE.<wbr/></p>
-<p>When set to STILL_<wbr/>CAPTURE bokeh mode with PREVIEW capture intent,<wbr/></p>
+<p>When set to BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode with PREVIEW capture intent,<wbr/></p>
 <ul>
 <li>If the camera device has BURST_<wbr/>CAPTURE capability,<wbr/> the frame rate requirement of
 BURST_<wbr/>CAPTURE must still be met.<wbr/></li>
-<li>All streams not larger than the maximum streaming dimension for STILL_<wbr/>CAPTURE mode
-(queried via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#CONTROL_AVAILABLE_BOKEH_CAPABILITIES">Camera<wbr/>Characteristics#CONTROL_<wbr/>AVAILABLE_<wbr/>BOKEH_<wbr/>CAPABILITIES</a>)
+<li>All streams not larger than the maximum streaming dimension for BOKEH_<wbr/>STILL_<wbr/>CAPTURE mode
+(queried via <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES">Camera<wbr/>Characteristics#CONTROL_<wbr/>AVAILABLE_<wbr/>EXTENDED_<wbr/>SCENE_<wbr/>MODE_<wbr/>CAPABILITIES</a>)
 will have preview bokeh effect applied.<wbr/></li>
 </ul>
-<p>When set to CONTINUOUS mode,<wbr/> configured streams dimension should not exceed this mode's
+<p>When set to BOKEH_<wbr/>CONTINUOUS mode,<wbr/> configured streams dimension should not exceed this mode's
 maximum streaming dimension in order to have bokeh effect applied.<wbr/> Bokeh effect may not
 be available for streams larger than the maximum streaming dimension.<wbr/></p>
-<p>Switching between different bokeh modes may involve reconfiguration of the camera
+<p>Switching between different extended scene modes may involve reconfiguration of the camera
 pipeline,<wbr/> resulting in long latency.<wbr/> The application should check this key against the
 available session keys queried via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableSessionKeys">CameraCharacteristics#getAvailableSessionKeys</a>.<wbr/></p>
-<p>When bokeh mode is on,<wbr/> the camera device may override certain control parameters,<wbr/> such as
-reduce frame rate or use face priority scene mode,<wbr/> to achieve best power and quality
-tradeoffs.<wbr/> When turned on,<wbr/> AE,<wbr/> AWB,<wbr/> and AF run in auto modes,<wbr/> and only the mandatory
-stream combinations of LIMITED hardware level are guaranteed.<wbr/></p>
 <p>For a logical multi-camera,<wbr/> bokeh may be implemented by stereo vision from sub-cameras
 with different field of view.<wbr/> As a result,<wbr/> when bokeh mode is enabled,<wbr/> the camera device
-may override <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>,<wbr/> and the field of view will be smaller than when
-bokeh mode is off.<wbr/></p>
+may override <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> or <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> and the field of
+view may be smaller than when bokeh mode is off.<wbr/></p>
             </td>
           </tr>
 
@@ -18515,6 +18545,14 @@ size as the picture size if:</p>
 <li>The device's maximal JPEG resolution can reach 30 FPS min frame duration</li>
 <li>The device does not support HAL based ZSL (<a href="#controls_android.control.enableZsl">android.<wbr/>control.<wbr/>enable<wbr/>Zsl</a>)</li>
 </ul>
+<p>For devices which support SYSTEM_<wbr/>CAMERA and LOGICAL_<wbr/>MULTI_<wbr/>CAMERA capabilities:</p>
+<p>Hidden physical camera ids[1] must not be be shared[2] between public camera devices
+and camera devices advertising SYSTEM_<wbr/>CAMERA capability.<wbr/></p>
+<p>[1] - Camera device ids which are advertised in the
+      ANDROID_<wbr/>LOGICAL_<wbr/>MULTI_<wbr/>CAMERA_<wbr/>PHYSICAL_<wbr/>IDS list,<wbr/> and not available through
+      ICamera<wbr/>Provider.<wbr/>get<wbr/>Camera<wbr/>Id<wbr/>List().<wbr/></p>
+<p>[2] - The ANDROID_<wbr/>LOGICAL_<wbr/>MULTI_<wbr/>CAMERA_<wbr/>PHYSICAL_<wbr/>IDS lists,<wbr/> must not have common
+      camera ids.<wbr/></p>
             </td>
           </tr>
 

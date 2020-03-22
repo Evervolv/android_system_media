@@ -1614,7 +1614,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             FACE_PRIORITY scene mode). Other control entries are still active.
             This setting can only be used if scene mode is supported (i.e.
             android.control.availableSceneModes
-            contain some modes other than DISABLED).</notes></value>
+            contain some modes other than DISABLED).
+
+            For extended scene modes such as BOKEH, please use USE_EXTENDED_SCENE_MODE instead.
+            </notes></value>
             <value optional="true">OFF_KEEP_STATE
             <notes>Same as OFF mode, except that this capture will not be
             used by camera device background auto-exposure, auto-white balance and
@@ -1626,6 +1629,17 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             collected from manual captures with OFF_KEEP_STATE will be
             discarded by the camera device.
             </notes></value>
+            <value optional="true" hal_version="3.5">USE_EXTENDED_SCENE_MODE
+            <notes>Use a specific extended scene mode.
+
+            When extended scene mode is on, the camera device may override certain control
+            parameters, such as targetFpsRange, AE, AWB, and AF modes, to achieve best power and
+            quality tradeoffs. Only the mandatory stream combinations of LIMITED hardware level
+            are guaranteed.
+
+            This setting can only be used if extended scene mode is supported (i.e.
+            android.control.availableExtendedSceneModes
+            contains some modes other than DISABLED).</notes></value>
           </enum>
           <description>Overall mode of 3A (auto-exposure, auto-white-balance, auto-focus) control
           routines.</description>
@@ -1638,10 +1652,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           When set to AUTO, the individual algorithm controls in
           android.control.* are in effect, such as android.control.afMode.
 
-          When set to USE_SCENE_MODE, the individual controls in
+          When set to USE_SCENE_MODE or USE_EXTENDED_SCENE_MODE, the individual controls in
           android.control.* are mostly disabled, and the camera device
-          implements one of the scene mode settings (such as ACTION,
-          SUNSET, or PARTY) as it wishes. The camera device scene mode
+          implements one of the scene mode or extended scene mode settings (such as ACTION,
+          SUNSET, PARTY, or BOKEH) as it wishes. The camera device scene mode
           3A settings are provided by {@link
           android.hardware.camera2.CaptureResult|ACameraCaptureSession_captureCallback_result
           capture results}.
@@ -3045,166 +3059,164 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         </entry>
       </dynamic>
       <static>
-        <entry name="availableBokehMaxSizes" type="int32"
+        <entry name="availableExtendedSceneModeMaxSizes" type="int32"
                visibility="ndk_public" optional="true"
-               type_notes="List of bokeh modes and the corresponding max streaming sizes."
+               type_notes="List of extended scene modes and the corresponding max streaming sizes."
                container="array" hwlevel="limited" hal_version="3.5">
           <array>
             <size>3</size>
             <size>n</size>
           </array>
           <description>
-          The list of bokeh modes for android.control.bokehMode that are supported by this camera
-          device, and each bokeh mode's maximum streaming (non-stall) size with bokeh effect.
+          The list of extended scene modes for android.control.extendedSceneMode that are supported
+          by this camera device, and each extended scene mode's maximum streaming (non-stall) size
+          with  effect.
           </description>
           <units>(mode, width, height)</units>
           <details>
-            For OFF mode, the camera behaves normally with no bokeh effect.
+            For DISABLED mode, the camera behaves normally with no extended scene mode enabled.
 
-            For STILL_CAPTURE mode, the maximum streaming dimension specifies the limit under which
-            bokeh is effective when capture intent is PREVIEW. Note that when capture intent is
-            PREVIEW, the bokeh effect may not be as high quality compared to STILL_CAPTURE intent
-            in order to maintain reasonable frame rate. The maximum streaming dimension must be one
-            of the YUV_420_888 or PRIVATE resolutions in availableStreamConfigurations, or (0, 0)
-            if preview bokeh is not supported. If the application configures a stream larger than
-            the maximum streaming dimension, bokeh effect may not be applied for this stream for
-            PREVIEW intent.
+            For BOKEH_STILL_CAPTURE mode, the maximum streaming dimension specifies the limit
+            under which bokeh is effective when capture intent is PREVIEW. Note that when capture
+            intent is PREVIEW, the bokeh effect may not be as high in quality compared to
+            STILL_CAPTURE intent in order to maintain reasonable frame rate. The maximum streaming
+            dimension must be one of the YUV_420_888 or PRIVATE resolutions in
+            availableStreamConfigurations, or (0, 0) if preview bokeh is not supported. If the
+            application configures a stream larger than the maximum streaming dimension, bokeh
+            effect may not be applied for this stream for PREVIEW intent.
 
-            For CONTINUOUS mode, the maximum streaming dimension specifies the limit under which
-            bokeh is effective. This dimension must be one of the YUV_420_888 or PRIVATE resolutions
-            in availableStreamConfigurations, and if the sensor maximum resolution is larger than or
-            equal to 1080p, the maximum streaming dimension must be at least 1080p. If the
-            application configures a stream with larger dimension, the stream may not have bokeh
-            effect applied.
+            For BOKEH_CONTINUOUS mode, the maximum streaming dimension specifies the limit under
+            which bokeh is effective. This dimension must be one of the YUV_420_888 or PRIVATE
+            resolutions in availableStreamConfigurations, and if the sensor maximum resolution is
+            larger than or equal to 1080p, the maximum streaming dimension must be at least 1080p.
+            If the application configures a stream with larger dimension, the stream may not have
+            bokeh effect applied.
           </details>
           <hal_details>
-            For available bokeh modes, OFF will always be listed. Unlike other controls with FAST
-            and HIGH_QUALITY modes, where FAST and HIGH_QUALITY must both be supported, the camera
-            device isn't required to support both STILL_CAPTURE and CONTINUOUS bokeh modes if one
-            of them is supported.
+            For available extended scene modes, DISABLED will always be listed.
 
-            HAL must support either STILL_CAPTURE, or CONTINUOUS, or both if bokehMode control is
-            available on the camera device. For OFF mode, the maximum streaming resolution must be
-            set to (0, 0).
+            HAL must support at list one non-OFF extended scene mode if extendedSceneMode control is
+            available on the camera device. For DISABLED mode, the maximum streaming resolution must
+            be set to (0, 0).
           </hal_details>
         </entry>
-        <entry name="availableBokehZoomRatioRanges" type="float"
+        <entry name="availableExtendedSceneModeZoomRatioRanges" type="float"
                visibility="ndk_public" optional="true"
-               type_notes="Zoom ranges for all supported non-OFF bokeh modes."
+               type_notes="Zoom ranges for all supported non-OFF extended scene modes."
                container="array" hwlevel="limited" hal_version="3.5">
           <array>
             <size>2</size>
             <size>n</size>
           </array>
           <description>
-          The ranges of supported zoom ratio for non-OFF android.control.bokehMode.
+          The ranges of supported zoom ratio for non-DISABLED android.control.extendedSceneMode.
           </description>
           <units>(minZoom, maxZoom)</units>
           <details>
-            When bokeh mode is enabled, the camera device may have limited range of zoom ratios
-            compared to when bokeh mode is disabled. This tag lists the zoom ratio ranges for all
-            supported non-OFF bokeh modes, in the same order as in
-            android.control.availableBokehCapabilities.
+            When extended scene mode is set, the camera device may have limited range of zoom ratios
+            compared to when extended scene mode is DISABLED. This tag lists the zoom ratio ranges
+            for all supported non-DISABLED extended scene modes, in the same order as in
+            android.control.availableExtended.
 
             Range [1.0, 1.0] means that no zoom (optical or digital) is supported.
           </details>
         </entry>
-        <entry name="availableBokehCapabilities" type="int32" visibility="public" synthetic="true"
-               container="array" typedef="capability" hal_version="3.5">
+        <entry name="availableExtendedSceneModeCapabilities" type="int32" visibility="public"
+               synthetic="true" container="array" typedef="capability" hal_version="3.5">
           <array>
             <size>n</size>
           </array>
-          <description>The list of bokeh modes for android.control.bokehMode that are supported by
-            this camera device, and each bokeh mode's capabilities such as maximum streaming size
-            with bokeh effect, and supported zoom ratio ranges.</description>
+          <description>The list of extended scene modes for android.control.extendedSceneMode that
+            are supported by this camera device, and each extended scene mode's capabilities such
+            as maximum streaming size, and supported zoom ratio ranges.</description>
           <details>
-            For OFF mode, the camera behaves normally with no bokeh effect.
+            For DISABLED mode, the camera behaves normally with no extended scene mdoe enabled.
 
-            For STILL_CAPTURE mode, the maximum streaming dimension specifies the limit under which
-            bokeh is effective when capture intent is PREVIEW. Note that when capture intent is
-            PREVIEW, the bokeh effect may not be as high quality compared to STILL_CAPTURE intent
-            in order to maintain reasonable frame rate. The maximum streaming dimension must be one
-            of the YUV_420_888 or PRIVATE resolutions in availableStreamConfigurations, or (0, 0)
-            if preview bokeh is not supported. If the application configures a stream larger than
-            the maximum streaming dimension, bokeh effect may not be applied for this stream for
-            PREVIEW intent.
+            For BOKEH_STILL_CAPTURE mode, the maximum streaming dimension specifies the limit
+            under which bokeh is effective when capture intent is PREVIEW. Note that when capture
+            intent is PREVIEW, the bokeh effect may not be as high quality compared to STILL_CAPTURE
+            intent in order to maintain reasonable frame rate. The maximum streaming dimension must
+            be one of the YUV_420_888 or PRIVATE resolutions in availableStreamConfigurations, or
+            (0, 0) if preview bokeh is not supported. If the application configures a stream
+            larger than the maximum streaming dimension, bokeh effect may not be applied for this
+            stream for PREVIEW intent.
 
-            For CONTINUOUS mode, the maximum streaming dimension specifies the limit under which
-            bokeh is effective. This dimension must be one of the YUV_420_888 or PRIVATE resolutions
-            in availableStreamConfigurations, and if the sensor maximum resolution is larger than or
-            equal to 1080p, the maximum streaming dimension must be at least 1080p. If the
-            application configures a stream with larger dimension, the stream may not have bokeh
-            effect applied.
+            For BOKEH_CONTINUOUS mode, the maximum streaming dimension specifies the limit under
+            which bokeh is effective. This dimension must be one of the YUV_420_888 or PRIVATE
+            resolutions in availableStreamConfigurations, and if the sensor maximum resolution is
+            larger than or equal to 1080p, the maximum streaming dimension must be at least 1080p.
+            If the application configures a stream with larger dimension, the stream may not have
+            bokeh effect applied.
 
-            When bokeh mode is enabled, the camera device may have limited range of zoom ratios
-            compared to when bokeh mode is disabled. availableBokehCapabilities lists the zoom
-            ranges for all supported bokeh modes. A range of (1.0, 1.0) means that no zoom
+            When extended scene mode is set, the camera device may have limited range of zoom ratios
+            compared to when the mode is DISABLED. availableExtendedSceneModeCapabilities lists the
+            zoom ranges for all supported extended modes. A range of (1.0, 1.0) means that no zoom
             (optical or digital) is supported.
           </details>
         </entry>
       </static>
       <controls>
-        <entry name="bokehMode" type="byte" visibility="public" optional="true"
+        <entry name="extendedSceneMode" type="byte" visibility="public" optional="true"
             enum="true" hal_version="3.5">
           <enum>
-            <value>OFF
-            <notes>Bokeh mode is disabled.</notes></value>
-            <value>STILL_CAPTURE
+            <value id="0">DISABLED
+            <notes>Extended scene mode is disabled.</notes></value>
+            <value>BOKEH_STILL_CAPTURE
               <notes>High quality bokeh mode is enabled for all non-raw streams (including YUV,
               JPEG, and IMPLEMENTATION_DEFINED) when capture intent is STILL_CAPTURE. Due to the
               extra image processing, this mode may introduce additional stall to non-raw streams.
               This mode should be used in high quality still capture use case.
               </notes>
             </value>
-            <value>CONTINUOUS
+            <value>BOKEH_CONTINUOUS
               <notes>Bokeh effect must not slow down capture rate relative to sensor raw output,
               and the effect is applied to all processed streams no larger than the maximum
               streaming dimension. This mode should be used if performance and power are a
               priority, such as video recording.
               </notes>
             </value>
+            <value hidden="true" id="0x40">VENDOR_START
+              <notes>
+                Vendor defined extended scene modes. These depend on vendor implementation.
+              </notes>
+            </value>
           </enum>
-          <description>Whether bokeh mode is enabled for a particular capture request.
+          <description>Whether extended scene mode is enabled for a particular capture request.
           </description>
           <details>
           With bokeh mode, the camera device may blur out the parts of scene that are not in
           focus, creating a bokeh (or shallow depth of field) effect for people or objects.
 
-          When set to STILL_CAPTURE bokeh mode with STILL_CAPTURE capture intent, due to the extra
+          When set to BOKEH_STILL_CAPTURE mode with STILL_CAPTURE capture intent, due to the extra
           processing needed for high quality bokeh effect, the stall may be longer than when
           capture intent is not STILL_CAPTURE.
 
-          When set to STILL_CAPTURE bokeh mode with PREVIEW capture intent,
+          When set to BOKEH_STILL_CAPTURE mode with PREVIEW capture intent,
 
           * If the camera device has BURST_CAPTURE capability, the frame rate requirement of
           BURST_CAPTURE must still be met.
-          * All streams not larger than the maximum streaming dimension for STILL_CAPTURE mode
-          (queried via {@link android.hardware.camera2.CameraCharacteristics#CONTROL_AVAILABLE_BOKEH_CAPABILITIES|ACAMERA_CONTROL_AVAILABLE_BOKEH_CAPABILITIES})
+          * All streams not larger than the maximum streaming dimension for BOKEH_STILL_CAPTURE mode
+          (queried via {@link android.hardware.camera2.CameraCharacteristics#CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES|ACAMERA_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES})
           will have preview bokeh effect applied.
 
-          When set to CONTINUOUS mode, configured streams dimension should not exceed this mode's
+          When set to BOKEH_CONTINUOUS mode, configured streams dimension should not exceed this mode's
           maximum streaming dimension in order to have bokeh effect applied. Bokeh effect may not
           be available for streams larger than the maximum streaming dimension.
 
-          Switching between different bokeh modes may involve reconfiguration of the camera
+          Switching between different extended scene modes may involve reconfiguration of the camera
           pipeline, resulting in long latency. The application should check this key against the
           available session keys queried via
           {@link android.hardware.camera2.CameraCharacteristics#getAvailableSessionKeys|ACameraManager_getCameraCharacteristics}.
 
-          When bokeh mode is on, the camera device may override certain control parameters, such as
-          reduce frame rate or use face priority scene mode, to achieve best power and quality
-          tradeoffs. When turned on, AE, AWB, and AF run in auto modes, and only the mandatory
-          stream combinations of LIMITED hardware level are guaranteed.
-
           For a logical multi-camera, bokeh may be implemented by stereo vision from sub-cameras
           with different field of view. As a result, when bokeh mode is enabled, the camera device
-          may override android.scaler.cropRegion, and the field of view will be smaller than when
-          bokeh mode is off.
+          may override android.scaler.cropRegion or android.control.zoomRatio, and the field of
+          view may be smaller than when bokeh mode is off.
           </details>
         </entry>
       </controls>
       <dynamic>
-        <clone entry="android.control.bokehMode" kind="controls">
+        <clone entry="android.control.extendedSceneMode" kind="controls">
         </clone>
       </dynamic>
       <static>
@@ -5974,6 +5986,18 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * The device supports PRIVATE_REPROCESSING capability
           * The device's maximal JPEG resolution can reach 30 FPS min frame duration
           * The device does not support HAL based ZSL (android.control.enableZsl)
+
+          For devices which support SYSTEM_CAMERA and LOGICAL_MULTI_CAMERA capabilities:
+
+          Hidden physical camera ids[1] must not be be shared[2] between public camera devices
+          and camera devices advertising SYSTEM_CAMERA capability.
+
+          [1] - Camera device ids which are advertised in the
+                ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS list, and not available through
+                ICameraProvider.getCameraIdList().
+
+          [2] - The ANDROID_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS lists, must not have common
+                camera ids.
           </hal_details>
         </entry>
         <entry name="availableRequestKeys" type="int32" visibility="ndk_public"

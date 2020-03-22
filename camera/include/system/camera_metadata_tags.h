@@ -174,9 +174,11 @@ typedef enum camera_metadata_tag {
     ANDROID_CONTROL_POST_RAW_SENSITIVITY_BOOST,       // int32        | public       | HIDL v3.2
     ANDROID_CONTROL_ENABLE_ZSL,                       // enum         | public       | HIDL v3.2
     ANDROID_CONTROL_AF_SCENE_CHANGE,                  // enum         | public       | HIDL v3.3
-    ANDROID_CONTROL_AVAILABLE_BOKEH_MAX_SIZES,        // int32[]      | ndk_public   | HIDL v3.5
-    ANDROID_CONTROL_AVAILABLE_BOKEH_ZOOM_RATIO_RANGES,// float[]      | ndk_public   | HIDL v3.5
-    ANDROID_CONTROL_BOKEH_MODE,                       // enum         | public       | HIDL v3.5
+    ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_MAX_SIZES,
+                                                      // int32[]      | ndk_public   | HIDL v3.5
+    ANDROID_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_ZOOM_RATIO_RANGES,
+                                                      // float[]      | ndk_public   | HIDL v3.5
+    ANDROID_CONTROL_EXTENDED_SCENE_MODE,              // enum         | public       | HIDL v3.5
     ANDROID_CONTROL_ZOOM_RATIO_RANGE,                 // float[]      | public       | HIDL v3.5
     ANDROID_CONTROL_ZOOM_RATIO,                       // float        | public       | HIDL v3.5
     ANDROID_CONTROL_END,
@@ -602,6 +604,7 @@ typedef enum camera_metadata_enum_android_control_mode {
     ANDROID_CONTROL_MODE_AUTO                                       , // HIDL v3.2
     ANDROID_CONTROL_MODE_USE_SCENE_MODE                             , // HIDL v3.2
     ANDROID_CONTROL_MODE_OFF_KEEP_STATE                             , // HIDL v3.2
+    ANDROID_CONTROL_MODE_USE_EXTENDED_SCENE_MODE                    , // HIDL v3.5
 } camera_metadata_enum_android_control_mode_t;
 
 // ANDROID_CONTROL_SCENE_MODE
@@ -689,12 +692,13 @@ typedef enum camera_metadata_enum_android_control_af_scene_change {
     ANDROID_CONTROL_AF_SCENE_CHANGE_DETECTED                        , // HIDL v3.3
 } camera_metadata_enum_android_control_af_scene_change_t;
 
-// ANDROID_CONTROL_BOKEH_MODE
-typedef enum camera_metadata_enum_android_control_bokeh_mode {
-    ANDROID_CONTROL_BOKEH_MODE_OFF                                  , // HIDL v3.5
-    ANDROID_CONTROL_BOKEH_MODE_STILL_CAPTURE                        , // HIDL v3.5
-    ANDROID_CONTROL_BOKEH_MODE_CONTINUOUS                           , // HIDL v3.5
-} camera_metadata_enum_android_control_bokeh_mode_t;
+// ANDROID_CONTROL_EXTENDED_SCENE_MODE
+typedef enum camera_metadata_enum_android_control_extended_scene_mode {
+    ANDROID_CONTROL_EXTENDED_SCENE_MODE_DISABLED                     = 0, // HIDL v3.5
+    ANDROID_CONTROL_EXTENDED_SCENE_MODE_BOKEH_STILL_CAPTURE         , // HIDL v3.5
+    ANDROID_CONTROL_EXTENDED_SCENE_MODE_BOKEH_CONTINUOUS            , // HIDL v3.5
+    ANDROID_CONTROL_EXTENDED_SCENE_MODE_VENDOR_START                 = 0x40, // HIDL v3.5
+} camera_metadata_enum_android_control_extended_scene_mode_t;
 
 
 // ANDROID_DEMOSAIC_MODE
