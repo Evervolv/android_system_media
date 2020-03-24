@@ -3229,7 +3229,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <description>
           Minimum and maximum zoom ratios supported by this camera device.
           </description>
-          <units>A pair of zoom ratio in floating points: (minZoom, maxZoom)</units>
+          <units>A pair of zoom ratio in floating-points: (minZoom, maxZoom)</units>
           <range>
             maxZoom >= 1.0 >= minZoom
           </range>
@@ -3268,30 +3268,58 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             crop to achieve aspect ratios different than the native camera sensor.
 
             By using this control, the application gains a simpler way to control zoom, which can
-            be a combination of optical and digital zoom. More specifically, for a logical
-            multi-camera with more than one focal length, using a floating point zoom ratio offers
-            more zoom precision when a telephoto lens is used, as well as allowing zoom ratio of
-            less than 1.0 to zoom out to a wide field of view.
+            be a combination of optical and digital zoom. For example, a multi-camera system may
+            contain more than one lens with different focal lengths, and the user can use optical
+            zoom by switching between lenses. Using zoomRatio has benefits in the scenarios below:
+            * Zooming in from a wide-angle lens to a telephoto lens: A floating-point ratio provides
+              better precision compared to an integer value of android.scaler.cropRegion.
+            * Zooming out from a wide lens to an ultrawide lens: zoomRatio supports zoom-out whereas
+              android.scaler.cropRegion doesn't.
 
-            Note that the coordinate system of cropRegion, AE/AWB/AF regions, and faces now changes
-            to the effective after-zoom field-of-view represented by rectangle of (0, 0,
-            activeArrayWidth, activeArrayHeight).
+            To illustrate, here are several scenarios of different zoom ratios, crop regions,
+            and output streams, for a hypothetical camera device with an active array of size
+            `(2000,1500)`.
 
-            For example, if android.sensor.info.activeArraySize is 4032*3024, and the preview stream
-            is configured to the same 4:3 aspect ratio, the application can achieve 2.0x zoom in
-            one of two ways:
+            * Camera Configuration:
+                * Active array size: `2000x1500` (3 MP, 4:3 aspect ratio)
+                * Output stream #1: `640x480` (VGA, 4:3 aspect ratio)
+                * Output stream #2: `1280x720` (720p, 16:9 aspect ratio)
+            * Case #1: 4:3 crop region with 2.0x zoom ratio
+                * Zoomed field of view: 1/4 of original field of view
+                * Crop region: `Rect(0, 0, 2000, 1500) // (left, top, right, bottom)` (post zoom)
+            * ![4:3 aspect ratio crop diagram](android.control.zoomRatio/zoom-ratio-2-crop-43.png)
+                * `640x480` stream source area: `(0, 0, 2000, 1500)` (equal to crop region)
+                * `1280x720` stream source area: `(0, 187, 2000, 1312)` (letterboxed)
+            * Case #2: 16:9 crop region with 2.0x zoom.
+                * Zoomed field of view: 1/4 of original field of view
+                * Crop region: `Rect(0, 187, 2000, 1312)`
+                * ![16:9 aspect ratio crop diagram](android.control.zoomRatio/zoom-ratio-2-crop-169.png)
+                * `640x480` stream source area: `(250, 187, 1750, 1312)` (pillarboxed)
+                * `1280x720` stream source area: `(0, 187, 2000, 1312)` (equal to crop region)
+            * Case #3: 1:1 crop region with 0.5x zoom out to ultrawide lens.
+                * Zoomed field of view: 4x of original field of view (switched from wide lens to ultrawide lens)
+                * Crop region: `Rect(250, 0, 1750, 1500)`
+                * ![1:1 aspect ratio crop diagram](android.control.zoomRatio/zoom-ratio-0.5-crop-11.png)
+                * `640x480` stream source area: `(250, 187, 1750, 1312)` (letterboxed)
+                * `1280x720` stream source area: `(250, 328, 1750, 1172)` (letterboxed)
 
-            * zoomRatio = 2.0, scaler.cropRegion = (0, 0, 4032, 3024)
-            * zoomRatio = 1.0 (default), scaler.cropRegion = (1008, 756, 3024, 2268)
+            As seen from the graphs above, the coordinate system of cropRegion now changes to the
+            effective after-zoom field-of-view, and is represented by the rectangle of (0, 0,
+            activeArrayWith, activeArrayHeight). The same applies to AE/AWB/AF regions, and faces.
+            This coordinate system change isn't applicable to RAW capture and its related
+            metadata such as intrinsicCalibration and lensShadingMap.
 
-            If the application intends to set aeRegions to be top-left quarter of the preview
-            field-of-view, the android.control.aeRegions should be set to (0, 0, 2016, 1512) with
+            Using the same hypothetical example above, and assuming output stream #1 (640x480) is
+            the viewfinder stream, the application can achieve 2.0x zoom in one of two ways:
+
+            * zoomRatio = 2.0, scaler.cropRegion = (0, 0, 2000, 1500)
+            * zoomRatio = 1.0 (default), scaler.cropRegion = (500, 375, 1500, 1125)
+
+            If the application intends to set aeRegions to be top-left quarter of the viewfinder
+            field-of-view, the android.control.aeRegions should be set to (0, 0, 1000, 750) with
             zoomRatio set to 2.0. Alternatively, the application can set aeRegions to the equivalent
-            region of (1008, 756, 2016, 1512) for zoomRatio of 1.0. If the application doesn't
+            region of (500, 375, 1000, 750) for zoomRatio of 1.0. If the application doesn't
             explicitly set android.control.zoomRatio, its value defaults to 1.0.
-
-            This coordinate system change isn't applicable to RAW capture and its related metadata
-            such as intrinsicCalibration and lensShadingMap.
 
             One limitation of controlling zoom using zoomRatio is that the android.scaler.cropRegion
             must only be used for letterboxing or pillarboxing of the sensor active array, and no
@@ -3954,7 +3982,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           While the focal length is still changing, android.lens.state will
           be set to MOVING.
 
-          Optical zoom will not be supported on most devices.
+          Optical zoom via this control will not be supported on most devices. Starting from API
+          level 30, the camera device may combine optical and digital zoom through the
+          android.control.zoomRatio control.
           </details>
           <hal_details>
           For a logical camera device supporting both optical and digital zoom, if focalLength and
