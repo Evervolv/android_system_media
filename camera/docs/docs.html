@@ -4855,27 +4855,66 @@ application can now choose to use this tag to specify the desired zoom level.<wb
 <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> can still be used to specify the horizontal or vertical
 crop to achieve aspect ratios different than the native camera sensor.<wbr/></p>
 <p>By using this control,<wbr/> the application gains a simpler way to control zoom,<wbr/> which can
-be a combination of optical and digital zoom.<wbr/> More specifically,<wbr/> for a logical
-multi-camera with more than one focal length,<wbr/> using a floating point zoom ratio offers
-more zoom precision when a telephoto lens is used,<wbr/> as well as allowing zoom ratio of
-less than 1.<wbr/>0 to zoom out to a wide field of view.<wbr/></p>
-<p>Note that the coordinate system of cropRegion,<wbr/> AE/<wbr/>AWB/<wbr/>AF regions,<wbr/> and faces now changes
-to the effective after-zoom field-of-view represented by rectangle of (0,<wbr/> 0,<wbr/>
-activeArrayWidth,<wbr/> activeArrayHeight).<wbr/></p>
-<p>For example,<wbr/> if <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> is 4032*3024,<wbr/> and the preview stream
-is configured to the same 4:3 aspect ratio,<wbr/> the application can achieve 2.<wbr/>0x zoom in
-one of two ways:</p>
+be a combination of optical and digital zoom.<wbr/> For example,<wbr/> a multi-camera system may
+contain more than one lens with different focal lengths,<wbr/> and the user can use optical
+zoom by switching between lenses.<wbr/> Using zoomRatio has benefits in the scenarios below:
+<em> Zooming in from a wide-angle lens to a telephoto lens: A floating-point ratio provides
+  better precision compared to an integer value of <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>.<wbr/>
+</em> Zooming out from a wide lens to an ultrawide lens: zoomRatio supports zoom-out whereas
+  <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> doesn't.<wbr/></p>
+<p>To illustrate,<wbr/> here are several scenarios of different zoom ratios,<wbr/> crop regions,<wbr/>
+and output streams,<wbr/> for a hypothetical camera device with an active array of size
+<code>(2000,<wbr/>1500)</code>.<wbr/></p>
 <ul>
-<li>zoomRatio = 2.<wbr/>0,<wbr/> scaler.<wbr/>cropRegion = (0,<wbr/> 0,<wbr/> 4032,<wbr/> 3024)</li>
-<li>zoomRatio = 1.<wbr/>0 (default),<wbr/> scaler.<wbr/>cropRegion = (1008,<wbr/> 756,<wbr/> 3024,<wbr/> 2268)</li>
+<li>Camera Configuration:<ul>
+<li>Active array size: <code>2000x1500</code> (3 MP,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #1: <code>640x480</code> (VGA,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #2: <code>1280x720</code> (720p,<wbr/> 16:9 aspect ratio)</li>
 </ul>
-<p>If the application intends to set aeRegions to be top-left quarter of the preview
-field-of-view,<wbr/> the <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a> should be set to (0,<wbr/> 0,<wbr/> 2016,<wbr/> 1512) with
+</li>
+<li>Case #1: 4:3 crop region with 2.<wbr/>0x zoom ratio<ul>
+<li>Zoomed field of view: 1/<wbr/>4 of original field of view</li>
+<li>Crop region: <code>Rect(0,<wbr/> 0,<wbr/> 2000,<wbr/> 1500) //<wbr/> (left,<wbr/> top,<wbr/> right,<wbr/> bottom)</code> (post zoom)</li>
+</ul>
+</li>
+<li><img alt="4:3 aspect ratio crop diagram" src="images/camera2/metadata/android.control.zoomRatio/zoom-ratio-2-crop-43.png"/><ul>
+<li><code>640x480</code> stream source area: <code>(0,<wbr/> 0,<wbr/> 2000,<wbr/> 1500)</code> (equal to crop region)</li>
+<li><code>1280x720</code> stream source area: <code>(0,<wbr/> 187,<wbr/> 2000,<wbr/> 1312)</code> (letterboxed)</li>
+</ul>
+</li>
+<li>Case #2: 16:9 crop region with 2.<wbr/>0x zoom.<wbr/><ul>
+<li>Zoomed field of view: 1/<wbr/>4 of original field of view</li>
+<li>Crop region: <code>Rect(0,<wbr/> 187,<wbr/> 2000,<wbr/> 1312)</code></li>
+<li><img alt="16:9 aspect ratio crop diagram" src="images/camera2/metadata/android.control.zoomRatio/zoom-ratio-2-crop-169.png"/></li>
+<li><code>640x480</code> stream source area: <code>(250,<wbr/> 187,<wbr/> 1750,<wbr/> 1312)</code> (pillarboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(0,<wbr/> 187,<wbr/> 2000,<wbr/> 1312)</code> (equal to crop region)</li>
+</ul>
+</li>
+<li>Case #3: 1:1 crop region with 0.<wbr/>5x zoom out to ultrawide lens.<wbr/><ul>
+<li>Zoomed field of view: 4x of original field of view (switched from wide lens to ultrawide lens)</li>
+<li>Crop region: <code>Rect(250,<wbr/> 0,<wbr/> 1750,<wbr/> 1500)</code></li>
+<li><img alt="1:1 aspect ratio crop diagram" src="images/camera2/metadata/android.control.zoomRatio/zoom-ratio-0.5-crop-11.png"/></li>
+<li><code>640x480</code> stream source area: <code>(250,<wbr/> 187,<wbr/> 1750,<wbr/> 1312)</code> (letterboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(250,<wbr/> 328,<wbr/> 1750,<wbr/> 1172)</code> (letterboxed)</li>
+</ul>
+</li>
+</ul>
+<p>As seen from the graphs above,<wbr/> the coordinate system of cropRegion now changes to the
+effective after-zoom field-of-view,<wbr/> and is represented by the rectangle of (0,<wbr/> 0,<wbr/>
+activeArrayWith,<wbr/> activeArrayHeight).<wbr/> The same applies to AE/<wbr/>AWB/<wbr/>AF regions,<wbr/> and faces.<wbr/>
+This coordinate system change isn't applicable to RAW capture and its related
+metadata such as intrinsicCalibration and lensShadingMap.<wbr/></p>
+<p>Using the same hypothetical example above,<wbr/> and assuming output stream #1 (640x480) is
+the viewfinder stream,<wbr/> the application can achieve 2.<wbr/>0x zoom in one of two ways:</p>
+<ul>
+<li>zoomRatio = 2.<wbr/>0,<wbr/> scaler.<wbr/>cropRegion = (0,<wbr/> 0,<wbr/> 2000,<wbr/> 1500)</li>
+<li>zoomRatio = 1.<wbr/>0 (default),<wbr/> scaler.<wbr/>cropRegion = (500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125)</li>
+</ul>
+<p>If the application intends to set aeRegions to be top-left quarter of the viewfinder
+field-of-view,<wbr/> the <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a> should be set to (0,<wbr/> 0,<wbr/> 1000,<wbr/> 750) with
 zoomRatio set to 2.<wbr/>0.<wbr/> Alternatively,<wbr/> the application can set aeRegions to the equivalent
-region of (1008,<wbr/> 756,<wbr/> 2016,<wbr/> 1512) for zoomRatio of 1.<wbr/>0.<wbr/> If the application doesn't
+region of (500,<wbr/> 375,<wbr/> 1000,<wbr/> 750) for zoomRatio of 1.<wbr/>0.<wbr/> If the application doesn't
 explicitly set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> its value defaults to 1.<wbr/>0.<wbr/></p>
-<p>This coordinate system change isn't applicable to RAW capture and its related metadata
-such as intrinsicCalibration and lensShadingMap.<wbr/></p>
 <p>One limitation of controlling zoom using zoomRatio is that the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
 must only be used for letterboxing or pillarboxing of the sensor active array,<wbr/> and no
 FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/></p>
@@ -6564,7 +6603,7 @@ zoom ranges for all supported extended modes.<wbr/> A range of (1.<wbr/>0,<wbr/>
             </td>
 
             <td class="entry_units">
-              A pair of zoom ratio in floating points: (minZoom,<wbr/> maxZoom)
+              A pair of zoom ratio in floating-points: (minZoom,<wbr/> maxZoom)
             </td>
 
             <td class="entry_range">
@@ -10451,27 +10490,66 @@ application can now choose to use this tag to specify the desired zoom level.<wb
 <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> can still be used to specify the horizontal or vertical
 crop to achieve aspect ratios different than the native camera sensor.<wbr/></p>
 <p>By using this control,<wbr/> the application gains a simpler way to control zoom,<wbr/> which can
-be a combination of optical and digital zoom.<wbr/> More specifically,<wbr/> for a logical
-multi-camera with more than one focal length,<wbr/> using a floating point zoom ratio offers
-more zoom precision when a telephoto lens is used,<wbr/> as well as allowing zoom ratio of
-less than 1.<wbr/>0 to zoom out to a wide field of view.<wbr/></p>
-<p>Note that the coordinate system of cropRegion,<wbr/> AE/<wbr/>AWB/<wbr/>AF regions,<wbr/> and faces now changes
-to the effective after-zoom field-of-view represented by rectangle of (0,<wbr/> 0,<wbr/>
-activeArrayWidth,<wbr/> activeArrayHeight).<wbr/></p>
-<p>For example,<wbr/> if <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a> is 4032*3024,<wbr/> and the preview stream
-is configured to the same 4:3 aspect ratio,<wbr/> the application can achieve 2.<wbr/>0x zoom in
-one of two ways:</p>
+be a combination of optical and digital zoom.<wbr/> For example,<wbr/> a multi-camera system may
+contain more than one lens with different focal lengths,<wbr/> and the user can use optical
+zoom by switching between lenses.<wbr/> Using zoomRatio has benefits in the scenarios below:
+<em> Zooming in from a wide-angle lens to a telephoto lens: A floating-point ratio provides
+  better precision compared to an integer value of <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>.<wbr/>
+</em> Zooming out from a wide lens to an ultrawide lens: zoomRatio supports zoom-out whereas
+  <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> doesn't.<wbr/></p>
+<p>To illustrate,<wbr/> here are several scenarios of different zoom ratios,<wbr/> crop regions,<wbr/>
+and output streams,<wbr/> for a hypothetical camera device with an active array of size
+<code>(2000,<wbr/>1500)</code>.<wbr/></p>
 <ul>
-<li>zoomRatio = 2.<wbr/>0,<wbr/> scaler.<wbr/>cropRegion = (0,<wbr/> 0,<wbr/> 4032,<wbr/> 3024)</li>
-<li>zoomRatio = 1.<wbr/>0 (default),<wbr/> scaler.<wbr/>cropRegion = (1008,<wbr/> 756,<wbr/> 3024,<wbr/> 2268)</li>
+<li>Camera Configuration:<ul>
+<li>Active array size: <code>2000x1500</code> (3 MP,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #1: <code>640x480</code> (VGA,<wbr/> 4:3 aspect ratio)</li>
+<li>Output stream #2: <code>1280x720</code> (720p,<wbr/> 16:9 aspect ratio)</li>
 </ul>
-<p>If the application intends to set aeRegions to be top-left quarter of the preview
-field-of-view,<wbr/> the <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a> should be set to (0,<wbr/> 0,<wbr/> 2016,<wbr/> 1512) with
+</li>
+<li>Case #1: 4:3 crop region with 2.<wbr/>0x zoom ratio<ul>
+<li>Zoomed field of view: 1/<wbr/>4 of original field of view</li>
+<li>Crop region: <code>Rect(0,<wbr/> 0,<wbr/> 2000,<wbr/> 1500) //<wbr/> (left,<wbr/> top,<wbr/> right,<wbr/> bottom)</code> (post zoom)</li>
+</ul>
+</li>
+<li><img alt="4:3 aspect ratio crop diagram" src="images/camera2/metadata/android.control.zoomRatio/zoom-ratio-2-crop-43.png"/><ul>
+<li><code>640x480</code> stream source area: <code>(0,<wbr/> 0,<wbr/> 2000,<wbr/> 1500)</code> (equal to crop region)</li>
+<li><code>1280x720</code> stream source area: <code>(0,<wbr/> 187,<wbr/> 2000,<wbr/> 1312)</code> (letterboxed)</li>
+</ul>
+</li>
+<li>Case #2: 16:9 crop region with 2.<wbr/>0x zoom.<wbr/><ul>
+<li>Zoomed field of view: 1/<wbr/>4 of original field of view</li>
+<li>Crop region: <code>Rect(0,<wbr/> 187,<wbr/> 2000,<wbr/> 1312)</code></li>
+<li><img alt="16:9 aspect ratio crop diagram" src="images/camera2/metadata/android.control.zoomRatio/zoom-ratio-2-crop-169.png"/></li>
+<li><code>640x480</code> stream source area: <code>(250,<wbr/> 187,<wbr/> 1750,<wbr/> 1312)</code> (pillarboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(0,<wbr/> 187,<wbr/> 2000,<wbr/> 1312)</code> (equal to crop region)</li>
+</ul>
+</li>
+<li>Case #3: 1:1 crop region with 0.<wbr/>5x zoom out to ultrawide lens.<wbr/><ul>
+<li>Zoomed field of view: 4x of original field of view (switched from wide lens to ultrawide lens)</li>
+<li>Crop region: <code>Rect(250,<wbr/> 0,<wbr/> 1750,<wbr/> 1500)</code></li>
+<li><img alt="1:1 aspect ratio crop diagram" src="images/camera2/metadata/android.control.zoomRatio/zoom-ratio-0.5-crop-11.png"/></li>
+<li><code>640x480</code> stream source area: <code>(250,<wbr/> 187,<wbr/> 1750,<wbr/> 1312)</code> (letterboxed)</li>
+<li><code>1280x720</code> stream source area: <code>(250,<wbr/> 328,<wbr/> 1750,<wbr/> 1172)</code> (letterboxed)</li>
+</ul>
+</li>
+</ul>
+<p>As seen from the graphs above,<wbr/> the coordinate system of cropRegion now changes to the
+effective after-zoom field-of-view,<wbr/> and is represented by the rectangle of (0,<wbr/> 0,<wbr/>
+activeArrayWith,<wbr/> activeArrayHeight).<wbr/> The same applies to AE/<wbr/>AWB/<wbr/>AF regions,<wbr/> and faces.<wbr/>
+This coordinate system change isn't applicable to RAW capture and its related
+metadata such as intrinsicCalibration and lensShadingMap.<wbr/></p>
+<p>Using the same hypothetical example above,<wbr/> and assuming output stream #1 (640x480) is
+the viewfinder stream,<wbr/> the application can achieve 2.<wbr/>0x zoom in one of two ways:</p>
+<ul>
+<li>zoomRatio = 2.<wbr/>0,<wbr/> scaler.<wbr/>cropRegion = (0,<wbr/> 0,<wbr/> 2000,<wbr/> 1500)</li>
+<li>zoomRatio = 1.<wbr/>0 (default),<wbr/> scaler.<wbr/>cropRegion = (500,<wbr/> 375,<wbr/> 1500,<wbr/> 1125)</li>
+</ul>
+<p>If the application intends to set aeRegions to be top-left quarter of the viewfinder
+field-of-view,<wbr/> the <a href="#controls_android.control.aeRegions">android.<wbr/>control.<wbr/>ae<wbr/>Regions</a> should be set to (0,<wbr/> 0,<wbr/> 1000,<wbr/> 750) with
 zoomRatio set to 2.<wbr/>0.<wbr/> Alternatively,<wbr/> the application can set aeRegions to the equivalent
-region of (1008,<wbr/> 756,<wbr/> 2016,<wbr/> 1512) for zoomRatio of 1.<wbr/>0.<wbr/> If the application doesn't
+region of (500,<wbr/> 375,<wbr/> 1000,<wbr/> 750) for zoomRatio of 1.<wbr/>0.<wbr/> If the application doesn't
 explicitly set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> its value defaults to 1.<wbr/>0.<wbr/></p>
-<p>This coordinate system change isn't applicable to RAW capture and its related metadata
-such as intrinsicCalibration and lensShadingMap.<wbr/></p>
 <p>One limitation of controlling zoom using zoomRatio is that the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
 must only be used for letterboxing or pillarboxing of the sensor active array,<wbr/> and no
 FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/></p>
@@ -13665,7 +13743,9 @@ setting won't be applied instantaneously,<wbr/> and it may take several
 frames before the lens can change to the requested focal length.<wbr/>
 While the focal length is still changing,<wbr/> <a href="#dynamic_android.lens.state">android.<wbr/>lens.<wbr/>state</a> will
 be set to MOVING.<wbr/></p>
-<p>Optical zoom will not be supported on most devices.<wbr/></p>
+<p>Optical zoom via this control will not be supported on most devices.<wbr/> Starting from API
+level 30,<wbr/> the camera device may combine optical and digital zoom through the
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> control.<wbr/></p>
             </td>
           </tr>
 
@@ -15223,7 +15303,9 @@ setting won't be applied instantaneously,<wbr/> and it may take several
 frames before the lens can change to the requested focal length.<wbr/>
 While the focal length is still changing,<wbr/> <a href="#dynamic_android.lens.state">android.<wbr/>lens.<wbr/>state</a> will
 be set to MOVING.<wbr/></p>
-<p>Optical zoom will not be supported on most devices.<wbr/></p>
+<p>Optical zoom via this control will not be supported on most devices.<wbr/> Starting from API
+level 30,<wbr/> the camera device may combine optical and digital zoom through the
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> control.<wbr/></p>
             </td>
           </tr>
 
