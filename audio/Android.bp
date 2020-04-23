@@ -18,7 +18,8 @@ cc_library_headers {
         vendor: {
             cflags: ["-DAUDIO_NO_SYSTEM_DECLARATIONS"],
         },
-    }
+    },
+    min_sdk_version: "29",
 }
 
 filegroup {
