@@ -79,6 +79,7 @@ cc_library {
             cflags: ["-D__unused=__attribute__((unused))"],
         },
     },
+    min_sdk_version: "29",
 }
 
 cc_library_static {
@@ -93,6 +94,7 @@ cc_library_static {
     },
 
     srcs: ["fixedfft.cpp"],
+    min_sdk_version: "29",
 }
 
 cc_library_static {
@@ -114,6 +116,7 @@ cc_library_static {
         "primitives.c",
         "roundup.c",
     ],
+    min_sdk_version: "29",
 }
 
 cc_library_shared {
