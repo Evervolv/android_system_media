@@ -457,6 +457,14 @@ typedef enum {
     AUDIO_ENCAPSULATION_MODE_HANDLE            = 2,
 } audio_encapsulation_mode_t;
 
+// Manually add encapsulation metadata types.
+// TODO: add the definition in HIDL interface.
+typedef enum {
+    AUDIO_ENCAPSULATION_METADATA_TYPE_NONE              = 0,
+    AUDIO_ENCAPSULATION_METADATA_TYPE_FRAMEWORK_TUNER   = 1,
+    AUDIO_ENCAPSULATION_METADATA_TYPE_DVB_AD_DESCRIPTOR = 2,
+} audio_encapsulation_metadata_type_t;
+
 typedef enum {
     AUDIO_CONTENT_TYPE_UNKNOWN = 0u,
     AUDIO_CONTENT_TYPE_SPEECH = 1u,
