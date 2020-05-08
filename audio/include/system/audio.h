@@ -530,6 +530,10 @@ struct audio_port_device_ext {
     audio_module_handle_t hw_module;    /* module the device is attached to */
     audio_devices_t       type;         /* device type (e.g AUDIO_DEVICE_OUT_SPEAKER) */
     char                  address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    uint32_t              encapsulation_modes;
+    uint32_t              encapsulation_metadata_types;
+#endif
 };
 
 /* extension for audio port structure when the audio port is a sub mix */
@@ -1671,6 +1675,20 @@ __END_DECLS
 #define AUDIO_PARAMETER_RECONFIG_A2DP "reconfigA2dp"
 /* Query if HwModule supports reconfiguration of offloaded A2DP codec */
 #define AUDIO_PARAMETER_A2DP_RECONFIG_SUPPORTED "isReconfigA2dpSupported"
+
+/**
+ * For querying device supported encapsulation capabilities. All returned values are integer,
+ * which are bit fields composed from using encapsulation capability values as position bits.
+ * Encapsulation capability values are defined in audio_encapsulation_mode_t and
+ * audio_encapsulation_metadata_type_t. For instance, if the supported encapsulation mode is
+ * AUDIO_ENCAPSULATION_MODE_ELEMENTARY_STREAM, the returned value is
+ * "supEncapsulationModes=1 << AUDIO_ENCAPSULATION_MODE_ELEMENTARY_STREAM".
+ * When querying device supported encapsulation capabilities, the key should use device type
+ * and address so that it is able to identify the device. The device will be a key. The device
+ * type will be the value of key AUDIO_PARAMETER_STREAM_ROUTING.
+ */
+#define AUDIO_PARAMETER_DEVICE_SUP_ENCAPSULATION_MODES "supEncapsulationModes"
+#define AUDIO_PARAMETER_DEVICE_SUP_ENCAPSULATION_METADATA_TYPES "supEncapsulationMetadataTypes"
 
 /**
  * audio codec parameters
