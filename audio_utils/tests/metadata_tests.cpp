@@ -365,6 +365,38 @@ TEST(metadata_tests, compatibility_R) {
     }
 };
 
+TEST(metadata_tests, bytestring_examples) {
+    ByteString bs;
+
+    copyToByteString((int32_t)123, bs);
+    ALOGD("123 -> %s", toString(bs).c_str());
+    const ByteString ref1{ 0x7b, 0x00, 0x00, 0x00 };
+    ASSERT_EQ(ref1, bs);
+
+    bs.clear();
+    // for copyToByteString use std::string instead of char array.
+    copyToByteString(std::string("hi"), bs);
+    ALOGD("\"hi\" -> %s", toString(bs).c_str());
+    const ByteString ref2{ 0x02, 0x00, 0x00, 0x00, 0x68, 0x69 };
+    ASSERT_EQ(ref2, bs);
+
+    bs.clear();
+    Data d;
+    d.emplace("hello", "world");
+    d.emplace("value", (int32_t)1000);
+    copyToByteString(d, bs);
+    ALOGD("{{\"hello\", \"world\"}, {\"value\", 1000}} -> %s", toString(bs).c_str());
+    const ByteString ref3{
+        0x02, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
+        0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x05, 0x00, 0x00,
+        0x00, 0x09, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00,
+        0x00, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x05, 0x00,
+        0x00, 0x00, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x01,
+        0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0xe8,
+        0x03, 0x00, 0x00};
+    ASSERT_EQ(ref3, bs);
+};
+
 // Test C API
 TEST(metadata_tests, c) {
     audio_metadata_t *metadata = audio_metadata_create();
