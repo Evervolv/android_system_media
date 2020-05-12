@@ -465,13 +465,17 @@ static_assert(!std::is_polymorphic_v<Data>);
  * Parceling Format:
  * All values are native endian order.
  *
- * Datum = { (datum_size_t) Size (size of datum, including the size field)
+ * Datum = {
  *           (type_size_t)  Type (the type index from type_as_value<T>.)
+ *           (datum_size_t) Size (size of Payload)
  *           (byte string)  Payload<Type>
  *         }
  *
- * Primitive types:
- * Payload<Type> = { bytes in native endian order }
+ * Payload<Primitive_Type> = { bytes in native endian order }
+ *
+ * Payload<String> = { (index_size_t) number of elements (not including zero termination)
+ *                     bytes of string data.
+ *                   }
  *
  * Vector, Map, Container types:
  * Payload<Type> = { (index_size_t) number of elements
@@ -483,10 +487,52 @@ static_assert(!std::is_polymorphic_v<Data>);
  *                   (byte string) Payload<second>
  *                 }
  *
+ * Note: Data is a std::map<std::string, Datum>
+ *
  * Design notes:
  *
  * 1) The size of each datum allows skipping of unknown types for compatibility
  * of older code with newer Datums.
+ *
+ * Examples:
+ * Payload<Int32> of 123
+ * [ value of 123                   ] =  0x7b 0x00 0x00 0x00       123
+ *
+ * Example of Payload<String> of std::string("hi"):
+ * [ (index_size_t) length          ] = 0x02 0x00 0x00 0x00        2 strlen("hi")
+ * [ raw bytes "hi"                 ] = 0x68 0x69                  "hi"
+ *
+ * Payload<Data>
+ * [ (index_size_t) entries ]
+ * [ raw bytes   (entry 1) Key   (Payload<String>)
+ *                         Value (Datum)
+ *                ...  (until #entries) ]
+ *
+ * Example of Payload<Data> of {{"hello", "world"},
+ *                              {"value", (int32_t)1000}};
+ * [ (index_size_t) #entries        ] = 0x02 0x00 0x00 0x00        2 entries
+ *    Key (Payload<String>)
+ *    [ index_size_t length         ] = 0x05 0x00 0x00 0x00        5 strlen("hello")
+ *    [ raw bytes "hello"           ] = 0x68 0x65 0x6c 0x6c 0x6f   "hello"
+ *    Value (Datum)
+ *    [ (type_size_t) type          ] = 0x05 0x00 0x00 0x00        5 (TYPE_STRING)
+ *    [ (datum_size_t) size         ] = 0x09 0x00 0x00 0x00        sizeof(index_size_t) +
+ *                                                                 strlen("world")
+ *       Payload<String>
+ *       [ (index_size_t) length    ] = 0x05 0x00 0x00 0x00        5 strlen("world")
+ *       [ raw bytes "world"        ] = 0x77 0x6f 0x72 0x6c 0x64   "world"
+ *    Key (Payload<String>)
+ *    [ index_size_t length         ] = 0x05 0x00 0x00 0x00        5 strlen("value")
+ *    [ raw bytes "value"           ] = 0x76 0x61 0x6c 0x75 0x65   "value"
+ *    Value (Datum)
+ *    [ (type_size_t) type          ] = 0x01 0x00 0x00 0x00        1 (TYPE_INT32)
+ *    [ (datum_size_t) size         ] = 0x04 0x00 0x00 0x00        4 sizeof(int32_t)
+ *        Payload<Int32>
+ *        [ raw bytes 1000          ] = 0xe8 0x03 0x00 0x00        1000
+ *
+ * Metadata is passed as a Payload<Data>.
+ * An implementation dependent detail is that the Keys are always
+ * stored sorted, so the byte string representation generated is unique.
  */
 
 // Platform Apex compatibility note:
