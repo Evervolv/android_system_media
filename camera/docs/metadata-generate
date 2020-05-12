@@ -47,7 +47,7 @@ device_info_dir="$ANDROID_BUILD_TOP/cts/tools/cts-device-info/"`
 out_files=()
 
 function relpath() {
-    python -c "import os.path; print os.path.relpath('$1', '$PWD')"
+    python3 -c "import os.path; print(os.path.relpath('$1', '$PWD'))"
 }
 
 # Generates a file. Appends to $out_files array as a side effect.
@@ -66,7 +66,7 @@ function gen_file_abs() {
     local hal_version="${4:-3.2}"
     local spec_file=$thisdir/metadata_definitions.xml
 
-    python $thisdir/metadata_parser_xml.py $spec_file $in $out $hal_version
+    python3 $thisdir/metadata_parser_xml.py $spec_file $in $out $hal_version
 
     local succ=$?
 
