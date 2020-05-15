@@ -25934,8 +25934,8 @@ sensor interconnect bus (such as CSI2) or memory.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Duration between the start of first row exposure
-and the start of last row exposure.<wbr/></p>
+              <p>Duration between the start of exposure for the first row of the image sensor,<wbr/>
+and the start of exposure for one past the last row of the image sensor.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -25963,12 +25963,22 @@ and the start of last row exposure.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>This is the exposure time skew between the first and last
-row exposure start times.<wbr/> The first row and the last row are
-the first and last rows inside of the
+              <p>This is the exposure time skew between the first and <code>(last+1)</code> row exposure start times.<wbr/> The
+first row and the last row are the first and last rows inside of the
 <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/></p>
-<p>For typical camera sensors that use rolling shutters,<wbr/> this is also equivalent
-to the frame readout time.<wbr/></p>
+<p>For typical camera sensors that use rolling shutters,<wbr/> this is also equivalent to the frame
+readout time.<wbr/></p>
+<p>If the image sensor is operating in a binned or cropped mode due to the current output
+target resolutions,<wbr/> it's possible this skew is reported to be larger than the exposure
+time,<wbr/> for example,<wbr/> since it is based on the full array even if a partial array is read
+out.<wbr/> Be sure to scale the number to cover the section of the sensor actually being used
+for the outputs you care about.<wbr/> So if your output covers N rows of the active array of
+height H,<wbr/> scale this value by N/<wbr/>H to get the total skew for that viewport.<wbr/></p>
+<p><em>Note:</em> Prior to Android 11,<wbr/> this field was described as measuring duration from
+first to last row of the image sensor,<wbr/> which is not equal to the frame readout time for a
+rolling shutter sensor.<wbr/> Implementations generally reported the latter value,<wbr/> so to resolve
+the inconsistency,<wbr/> the description has been updated to range from (first,<wbr/> last+1) row
+exposure start,<wbr/> instead.<wbr/></p>
             </td>
           </tr>
 
