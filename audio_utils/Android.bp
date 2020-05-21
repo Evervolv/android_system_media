@@ -118,6 +118,12 @@ cc_library_static {
         "roundup.c",
     ],
     min_sdk_version: "29",
+    host_supported: true,
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
 }
 
 cc_library_shared {
