@@ -106,9 +106,9 @@ function python_check()
 
 binary_check xmllint libxml2 libxml2-utils
 binary_check tidy tidy tidy
-binary_check python3
+binary_check python3 python3 python3
 python_check bs4 python-bs4 python3-bs4
-python_check mako python-mako
+python_check mako python3-mako python3-mako
 python_check markdown python-markdown python3-markdown
 
 exit $retcode
