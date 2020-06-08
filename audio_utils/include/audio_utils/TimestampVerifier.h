@@ -64,6 +64,13 @@ public:
            ++mNotReady;
            return;
         }
+
+        // Reject timestamp if identical to last
+        if (mLastTimestamp.mFrames == frames && mLastTimestamp.mTimeNs == timeNs
+                && mSampleRate == sampleRate) {
+            return;
+        }
+
         if (mDiscontinuity || mSampleRate != sampleRate) {
             // ALOGD("disc:%d frames:%lld timeNs:%lld",
             //         mDiscontinuity, (long long)frames, (long long)timeNs);
