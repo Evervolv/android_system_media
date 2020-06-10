@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <pthread.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 #include <log/log.h>
