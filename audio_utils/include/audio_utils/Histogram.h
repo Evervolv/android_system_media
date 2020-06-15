@@ -40,7 +40,8 @@ public:
     void add(int32_t value) {
         int32_t binIndex = (value + mBinWidth) / mBinWidth;
         binIndex = std::max(binIndex, 0); // put values below range in bottom bin
-        binIndex = std::min(binIndex, (int32_t)mBins.size() - 1);  // put values below range in top bin
+        binIndex = std::min(binIndex, (int32_t)mBins.size() - 1);
+                                          // put values below range in top bin
         mBins[binIndex]++;
         mLastItemNumbers[binIndex] = mItemCount++;
     }
