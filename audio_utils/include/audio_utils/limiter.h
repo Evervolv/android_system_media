@@ -23,9 +23,6 @@
 __BEGIN_DECLS
 /** \endcond */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
     /**
      * This limiter function is the identity for [-sqrt(0.5), sqrt(0.5)]
      * and then approximates atan or spline.
@@ -35,9 +32,6 @@ extern "C" {
      * so the minimum and maximum outputs may not be achievable.
      */
     float limiter(float in);
-#ifdef __cplusplus
-}
-#endif
 
 /** \cond */
 __END_DECLS
