@@ -34,7 +34,7 @@ extern "C" {
      * The implementation is permitted to limit the output to a slightly smaller range,
      * so the minimum and maximum outputs may not be achievable.
      */
-    extern float limiter(float in);
+    float limiter(float in);
 #ifdef __cplusplus
 }
 #endif
