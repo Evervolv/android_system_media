@@ -125,7 +125,8 @@ std::string PowerLog::dumpToString(const char *prefix, size_t lines, int64_t lim
     size_t nonzeros = 0;
     ssize_t offset; // TODO doesn't dump if # entries exceeds SSIZE_MAX
     for (offset = 0; offset < (ssize_t)numberOfEntries && count < lines; ++offset) {
-        const size_t idx = (mIdx + numberOfEntries - offset - 1) % numberOfEntries; // reverse direction
+        const size_t idx = (mIdx + numberOfEntries - offset - 1) % numberOfEntries;
+                                                                                // reverse direction
         const int64_t time = mEntries[idx].first;
         const float energy = mEntries[idx].second;
 
