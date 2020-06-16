@@ -22,8 +22,6 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-#include <cutils/bitops.h>
-
 __BEGIN_DECLS
 
 /* The enums were moved here mostly from
