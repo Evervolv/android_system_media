@@ -286,7 +286,7 @@ enum {
 };
 
 /**
- * Validate that a metadata is structurally sane. That is, its internal
+ * Validate that a metadata is structurally correct. That is, its internal
  * state is such that we won't get buffer overflows or run into other
  * 'impossible' issues when calling the other API functions.
  *
