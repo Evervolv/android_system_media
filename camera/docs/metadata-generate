@@ -128,7 +128,7 @@ function insert_file() {
     (( start_line-- ))
     (( end_line++ ))
 
-    # Do some basic sanity checks
+    # Do some basic validity checks
 
     if [[ -z "$start_line" ]]; then
        echo "No starting delimiter found in ${dst_file}" >& 2
@@ -192,7 +192,7 @@ function copy_directory() {
 
 $thisdir/metadata-check-dependencies || exit 1
 $thisdir/metadata-validate $thisdir/metadata_definitions.xml || exit 1
-$thisdir/metadata-parser-sanity-check || exit 1
+$thisdir/metadata-parser-validity-check || exit 1
 
 # Generate HTML properties documentation
 gen_file html.mako docs.html || exit 1
