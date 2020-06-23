@@ -17,9 +17,9 @@
 //#define LOG_NDEBUG 0
 #define LOG_TAG "audio_utils_timestampverifier_tests"
 
-#include <stdio.h>
-
 #include <audio_utils/TimestampVerifier.h>
+
+#include <stdio.h>
 #include <gtest/gtest.h>
 
 // Ensure that all TimestampVerifier mutators are really constexpr and free from
