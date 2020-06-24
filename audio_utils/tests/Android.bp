@@ -1,5 +1,61 @@
 // Build the unit tests for audio_utils
 
+cc_binary {
+    name: "biquad_filter",
+
+    srcs: [
+        "biquad_filter.cpp"
+    ],
+
+    shared_libs: [
+        "libaudioutils",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+cc_benchmark {
+    name: "biquad_filter_benchmark",
+    host_supported: true,
+
+    srcs: ["biquad_filter_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+        "-ffast-math",
+    ],
+    static_libs: [
+        "libaudioutils",
+        "libgoogle-benchmark",
+    ],
+}
+
+cc_test {
+    name: "biquad_filter_tests",
+
+    srcs: [
+        "biquad_filter_tests.cpp",
+    ],
+
+    header_libs: [
+        "libaudioutils_headers",
+    ],
+
+    static_libs: [
+        "libgmock",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
 cc_test {
     name: "fdtostring_tests",
     host_supported: false,
