@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-//#define LOG_NDEBUG 0
-#define LOG_TAG "audio_utils_channels_tests"
-
 #include <math.h>
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <log/log.h>
 
 #include <audio_utils/channels.h>
 
