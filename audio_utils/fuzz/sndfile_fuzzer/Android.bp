@@ -1,0 +1,21 @@
+cc_fuzz {
+    name: "sndfile_fuzzer",
+    host_supported: true,
+    srcs: [
+        "sndfile_fuzzer.cpp",
+    ],
+    static_libs: [
+        "libaudioutils",
+        "libbase",
+        "libsndfile",
+    ],
+    target: {
+        android: {
+            cflags: ["-DSNDFILE_FUZZER_DEVICE"],
+        },
+        host: {
+            cflags: ["-DSNDFILE_FUZZER_HOST"],
+        },
+    },
+    corpus: ["corpus/*"],
+}
