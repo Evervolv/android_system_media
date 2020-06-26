@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-//#define LOG_NDEBUG 0
-#define LOG_TAG "audio_utils_primitives_tests"
-
 #include <math.h>
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <log/log.h>
 
 #include <audio_utils/primitives.h>
 #include <audio_utils/format.h>
@@ -51,7 +47,6 @@ inline void testClamp8(float f)
     uint8_t uval = clamp8_from_float((f - 128) / (1 << 7));
 
     // test clamping
-    ALOGV("clamp8_from_float(%f) = %u\n", f, uval);
     if (f > lim8pos) {
         EXPECT_EQ(lim8pos, uval);
     } else if (f < lim8neg) {
@@ -71,7 +66,6 @@ inline void testClamp16(float f)
     int16_t ival = clamp16_from_float(f / (1 << 15));
 
     // test clamping
-    ALOGV("clamp16_from_float(%f) = %d\n", f, ival);
     if (f > lim16pos) {
         EXPECT_EQ(lim16pos, ival);
     } else if (f < lim16neg) {
@@ -91,7 +85,6 @@ inline void testClamp24(float f)
     int32_t ival = clamp24_from_float(f / (1 << 23));
 
     // test clamping
-    ALOGV("clamp24_from_float(%f) = %d\n", f, ival);
     if (f > lim24pos) {
         EXPECT_EQ(lim24pos, ival);
     } else if (f < lim24neg) {
