@@ -1,0 +1,49 @@
+// Build the benchmarks for audio_utils
+
+cc_benchmark {
+    name: "biquad_filter_benchmark",
+    host_supported: true,
+
+    srcs: ["biquad_filter_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+        "-ffast-math",
+    ],
+    static_libs: [
+        "libaudioutils",
+    ],
+}
+
+cc_benchmark {
+    name: "primitives_benchmark",
+    host_supported: true,
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
+
+    srcs: ["primitives_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+    static_libs: [
+        "libaudioutils",
+    ],
+}
+
+cc_benchmark {
+    name: "statistics_benchmark",
+    host_supported: false,
+
+    srcs: ["statistics_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+    static_libs: [
+        "libaudioutils",
+    ],
+}

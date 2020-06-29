@@ -18,21 +18,6 @@ cc_binary {
     ],
 }
 
-cc_benchmark {
-    name: "biquad_filter_benchmark",
-    host_supported: true,
-
-    srcs: ["biquad_filter_benchmark.cpp"],
-    cflags: [
-        "-Werror",
-        "-Wall",
-        "-ffast-math",
-    ],
-    static_libs: [
-        "libaudioutils",
-    ],
-}
-
 cc_test {
     name: "biquad_filter_tests",
 
@@ -98,25 +83,6 @@ cc_test {
             static_libs: ["libaudioutils"],
         },
     }
-}
-
-cc_benchmark {
-    name: "primitives_benchmark",
-    host_supported: true,
-    target: {
-        darwin: {
-            enabled: false,
-        },
-    },
-
-    srcs: ["primitives_benchmark.cpp"],
-    cflags: [
-        "-Werror",
-        "-Wall",
-    ],
-    static_libs: [
-        "libaudioutils",
-    ],
 }
 
 cc_binary {
@@ -384,20 +350,6 @@ cc_test {
             static_libs: ["libaudioutils"],
         },
     }
-}
-
-cc_benchmark {
-    name: "statistics_benchmark",
-    host_supported: false,
-
-    srcs: ["statistics_benchmark.cpp"],
-    cflags: [
-        "-Werror",
-        "-Wall",
-    ],
-    static_libs: [
-        "libaudioutils",
-    ],
 }
 
 cc_test {
