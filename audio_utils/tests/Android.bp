@@ -30,7 +30,6 @@ cc_benchmark {
     ],
     static_libs: [
         "libaudioutils",
-        "libgoogle-benchmark",
     ],
 }
 
@@ -101,7 +100,7 @@ cc_test {
     }
 }
 
-cc_binary {
+cc_benchmark {
     name: "primitives_benchmark",
     host_supported: true,
     target: {
@@ -116,7 +115,6 @@ cc_binary {
         "-Wall",
     ],
     static_libs: [
-        "libgoogle-benchmark",
         "libaudioutils",
     ],
 }
@@ -388,7 +386,7 @@ cc_test {
     }
 }
 
-cc_binary {
+cc_benchmark {
     name: "statistics_benchmark",
     host_supported: false,
 
@@ -398,7 +396,6 @@ cc_binary {
         "-Wall",
     ],
     static_libs: [
-        "libgoogle-benchmark",
         "libaudioutils",
     ],
 }
