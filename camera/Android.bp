@@ -3,6 +3,8 @@ subdirs = ["tests"]
 cc_library_shared {
     name: "libcamera_metadata",
     vendor_available: true,
+    // TODO(b/153609531): remove when no longer needed.
+    native_bridge_supported: true,
     vndk: {
         enabled: true,
     },
