@@ -254,7 +254,7 @@ static int echo_reference_write(struct echo_reference_itfe *echo_reference,
             er->resampler->resample_from_provider(er->resampler,
                                                      (int16_t *)er->wr_buf, &inFrames);
             ALOGV_IF(er->wr_frames_in != 0,
-                    "echo_reference_write() er->wr_frames_in not 0 (%d) after resampler",
+                    "echo_reference_write() er->wr_frames_in not 0 (%zu) after resampler",
                     er->wr_frames_in);
         }
         srcBuf = er->wr_buf;
@@ -346,7 +346,7 @@ static int echo_reference_read(struct echo_reference_itfe *echo_reference,
 
         ALOGV_IF((er->frames_in < buffer->frame_count),
                  "echo_reference_read() waited %d ms but still not enough frames"
-                 " er->frames_in: %d, buffer->frame_count = %d",
+                 " er->frames_in: %zu, buffer->frame_count = %zu",
                  timeoutMs, er->frames_in, buffer->frame_count);
     }
 
