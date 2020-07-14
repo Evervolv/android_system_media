@@ -1,0 +1,17 @@
+cc_fuzz {
+    name: "monoblend_fuzzer",
+    srcs: [
+        "monoblend_fuzzer.cpp",
+    ],
+    static_libs: [
+        "libaudioutils",
+        "liblog",
+    ],
+    sanitize: {
+        misc_undefined: [
+            "bounds",
+            "signed-integer-overflow",
+            "unsigned-integer-overflow",
+        ],
+    },
+}
