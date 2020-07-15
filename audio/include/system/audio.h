@@ -25,6 +25,7 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
+// Remove in approximately 2021
 #include <cutils/bitops.h>
 
 #include "audio-base.h"
@@ -439,7 +440,7 @@ struct audio_gain_config  {
     int                  values[sizeof(audio_channel_mask_t) * 8]; /* gain values in millibels
                                                for each channel ordered from LSb to MSb in
                                                channel mask. The number of values is 1 in joint
-                                               mode or popcount(channel_mask) */
+                                               mode or __builtin_popcount(channel_mask) */
     unsigned int         ramp_duration_ms; /* ramp duration in ms */
 };
 
@@ -881,7 +882,7 @@ static inline uint32_t audio_channel_count_from_in_mask(audio_channel_mask_t cha
         bits &= AUDIO_CHANNEL_IN_ALL;
         FALLTHROUGH_INTENDED;
     case AUDIO_CHANNEL_REPRESENTATION_INDEX:
-        return popcount(bits);
+        return __builtin_popcount(bits);
     default:
         return 0;
     }
@@ -902,7 +903,7 @@ static inline uint32_t audio_channel_count_from_out_mask(audio_channel_mask_t ch
         bits &= AUDIO_CHANNEL_OUT_ALL;
         FALLTHROUGH_INTENDED;
     case AUDIO_CHANNEL_REPRESENTATION_INDEX:
-        return popcount(bits);
+        return __builtin_popcount(bits);
     default:
         return 0;
     }
@@ -1328,7 +1329,7 @@ static inline bool audio_gain_config_are_equal(
     case AUDIO_GAIN_MODE_CHANNELS:
     case AUDIO_GAIN_MODE_RAMP:
         if (lhs->channel_mask != rhs->channel_mask) return false;
-        for (int i = 0; i < popcount(lhs->channel_mask); ++i) {
+        for (int i = 0; i < __builtin_popcount(lhs->channel_mask); ++i) {
             if (lhs->values[i] != rhs->values[i]) return false;
         }
         break;
