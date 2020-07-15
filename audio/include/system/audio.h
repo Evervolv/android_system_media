@@ -25,9 +25,6 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-// Remove in approximately 2021
-#include <cutils/bitops.h>
-
 #include "audio-base.h"
 #include "audio-base-utils.h"
 
