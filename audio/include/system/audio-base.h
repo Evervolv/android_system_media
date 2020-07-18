@@ -119,6 +119,7 @@ typedef enum {
     AUDIO_FORMAT_LHDC                = 0x28000000u,
     AUDIO_FORMAT_LHDC_LL             = 0x29000000u,
     AUDIO_FORMAT_APTX_TWSP           = 0x2A000000u,
+    RESERVED_FOR_AUDIO_FORMAT_LC3    = 0x2B000000u,  /* See b/161009805 */
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000u,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFu,
 
