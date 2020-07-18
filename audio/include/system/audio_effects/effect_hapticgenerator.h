@@ -32,6 +32,7 @@ const effect_uuid_t * const FX_IID_HAPTICGENERATOR = &FX_IID_HAPTICGENERATOR_;
 /* enumerated parameter settings for haptic generator effect */
 typedef enum
 {
+    HG_PARAM_HAPTIC_INTENSITY, // haptic intensity
 } t_hapticgenerator_params;
 
 #if __cplusplus
