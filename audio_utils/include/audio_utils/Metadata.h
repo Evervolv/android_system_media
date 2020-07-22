@@ -647,7 +647,11 @@ copyToByteString(const T& t, ByteString& bs) {
     }
 }
 
+// TODO Consider moving to .cpp, but one advantage of keeping in the header
+// is that C++ invocations don't need to link with the shared library.
+
 // Datum
+inline
 bool copyToByteString(const Datum& datum, ByteString &bs) {
     bool success = false;
     return metadata_types::apply([&bs, &success](auto ptr) {
@@ -840,6 +844,9 @@ constexpr bool copyFromByteString(Datum *datum, const ByteString &bs,
 
 } // namespace tedious_details
 
+// TODO Ditto about moving to .cpp.
+
+inline
 bool copyFromByteString(Datum *datum, const ByteString &bs, size_t& idx,
         ByteStringUnknowns *unknowns) {
     type_size_t type;
@@ -876,6 +883,7 @@ bool copyFromByteString(Datum *datum, const ByteString &bs, size_t& idx,
  * encountered during parsing, and a partial map will be returned excluding all
  * unknown types encountered.
  */
+inline
 Data dataFromByteString(const ByteString &bs,
         ByteStringUnknowns *unknowns = nullptr) {
     Data d;
@@ -886,6 +894,7 @@ Data dataFromByteString(const ByteString &bs,
     return d; // copy elision
 }
 
+inline
 ByteString byteStringFromData(const Data &data) {
     ByteString bs;
     copyToByteString(data, bs);
