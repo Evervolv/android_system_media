@@ -17,6 +17,7 @@
 #ifndef ANDROID_AUDIO_UTILS_BALANCE_H
 #define ANDROID_AUDIO_UTILS_BALANCE_H
 
+#include <functional>
 #include <math.h>       /* expf */
 #include <sstream>
 #include <system/audio.h>
