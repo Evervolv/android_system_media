@@ -460,7 +460,11 @@ TEST(metadata_tests, c) {
     ASSERT_EQ(-EINVAL, byte_string_from_audio_metadata(metadata, nullBs));
 
     ASSERT_EQ(1, audio_metadata_erase(metadata, "data"));
-    audio_metadata_get(metadata, "data", dataVal);
+    // initialize to a known invalid pointer
+    dataVal = reinterpret_cast<audio_metadata_t *>(reinterpret_cast<intptr_t>(nullptr) + 1);
+    ASSERT_EQ(-ENOENT, audio_metadata_get(metadata, "data", &dataVal));
+    // confirm that a failed get will assign nullptr; be sure to
+    // update test if API behavior is changed to not assign nullptr on error
     ASSERT_EQ(nullptr, dataVal);
     ASSERT_EQ(0, audio_metadata_erase(metadata, "data"));
     ASSERT_EQ(-EINVAL, audio_metadata_erase(nullMetadata, "key"));

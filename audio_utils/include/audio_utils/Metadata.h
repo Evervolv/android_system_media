@@ -992,6 +992,8 @@ int audio_metadata_put_data(audio_metadata_t *metadata, const char *key, audio_m
  */
 int audio_metadata_put_unknown(audio_metadata_t *metadata, const char *key, const void *value);
 
+#ifndef __cplusplus // Only C11 has _Generic; C++ uses overloaded declarations instead
+
 // use C Generics to provide interfaces for put/get functions
 // See: https://en.cppreference.com/w/c/language/generic
 
@@ -1003,10 +1005,14 @@ int audio_metadata_put_unknown(audio_metadata_t *metadata, const char *key, cons
     int64_t: audio_metadata_put_int64,                             \
     float: audio_metadata_put_float,                               \
     double: audio_metadata_put_double,                             \
+    /* https://stackoverflow.com/questions/18857056/c11-generic-how-to-deal-with-string-literals */ \
     const char*: audio_metadata_put_string,                        \
+    char*: audio_metadata_put_string,                              \
     audio_metadata_t*: audio_metadata_put_data,                    \
     default: audio_metadata_put_unknown                            \
     )(metadata, key, value)
+
+#endif  // !__cplusplus
 
 /**
  * \brief Get mapped value whose type is int32_t by a given key from audio metadata.
@@ -1095,6 +1101,8 @@ int audio_metadata_get_data(audio_metadata_t *metadata, const char *key, audio_m
  */
 int audio_metadata_get_unknown(audio_metadata_t *metadata, const char *key, void *value);
 
+#ifndef __cplusplus // Only C11 has _Generic; C++ uses overloaded declarations instead
+
 /**
  * A generic interface to get mapped value by a given key from audio metadata. The value object
  * will remain the same if the key is not found in the audio metadata.
@@ -1108,6 +1116,8 @@ int audio_metadata_get_unknown(audio_metadata_t *metadata, const char *key, void
     audio_metadata_t**: audio_metadata_get_data,                   \
     default: audio_metadata_get_unknown                            \
     )(metadata, key, value)
+
+#endif  // !__cplusplus
 
 /**
  * \brief Remove item from audio metadata.
@@ -1150,5 +1160,85 @@ ssize_t byte_string_from_audio_metadata(audio_metadata_t *metadata, uint8_t **by
 /** \cond */
 __END_DECLS
 /** \endcond */
+
+#ifdef __cplusplus
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, int32_t value)
+{
+    return audio_metadata_put_int32(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, int64_t value)
+{
+    return audio_metadata_put_int64(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, float value)
+{
+    return audio_metadata_put_float(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, double value)
+{
+    return audio_metadata_put_double(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, const char *value)
+{
+    return audio_metadata_put_string(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, audio_metadata_t *value)
+{
+    return audio_metadata_put_data(metadata, key, value);
+}
+
+// No overload for default type
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, int32_t *value)
+{
+    return audio_metadata_get_int32(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, int64_t *value)
+{
+    return audio_metadata_get_int64(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, float *value)
+{
+    return audio_metadata_get_float(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, double *value)
+{
+    return audio_metadata_get_double(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, char **value)
+{
+    return audio_metadata_get_string(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, audio_metadata_t **value)
+{
+    return audio_metadata_get_data(metadata, key, value);
+}
+
+// No overload for default type
+
+#endif  // __cplusplus
 
 #endif // !ANDROID_AUDIO_METADATA_H
