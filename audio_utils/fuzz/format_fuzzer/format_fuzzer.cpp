@@ -37,7 +37,7 @@ const static audio_format_t formats[] = {AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_P
 AUDIO_FORMAT_PCM_8_BIT, AUDIO_FORMAT_PCM_24_BIT_PACKED, AUDIO_FORMAT_PCM_32_BIT,
 AUDIO_FORMAT_PCM_8_24_BIT};
 
-// Initialize PCM 16 bit ramp for basic data sanity check (generated from PCM 8 bit data).
+// Initialize PCM 16 bit ramp for basic data validation (generated from PCM 8 bit data).
 template<size_t size>
 static void fillBuffer(const uint8_t bytes[], int16_t(&buffer)[size], size_t input_size)
 {
