@@ -85,7 +85,7 @@ TEST(audio_utils_powerlog, c) {
             100 /* entries */,
             1 /* frames_per_entry */);
 
-    // sanity test
+    // soundness test
     const int16_t zero = 0;
     const int16_t quarter = 0x2000;
 
