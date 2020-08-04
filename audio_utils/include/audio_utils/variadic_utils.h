@@ -168,7 +168,7 @@ auto& ostream_variadic(
         std::index_sequence<I...>) {
     os << "(";
     // ((os << (I == 0 ? "" : ", ") << std::get<I>(t)), ...); is C++17
-    int dummy[] __unused = { (os << (I == 0 ? "" : ", ") << std::get<I>(t), 0) ... };
+    int temp[] __unused = { (os << (I == 0 ? "" : ", ") << std::get<I>(t), 0) ... };
     return os << ")";
 }
 
@@ -427,7 +427,7 @@ struct outerProduct_UT_array {
 // helper
 template <typename T, typename Op, std::size_t... I >
 constexpr void for_each(T& t, Op op, std::index_sequence<I...>) {
-    int dummy[] __unused = {(op(std::get<I>(t)), 0)...};
+    int temp[] __unused = {(op(std::get<I>(t)), 0)...};
 }
 
 // variadic
