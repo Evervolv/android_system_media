@@ -189,7 +189,8 @@ struct compound_type {
 
     // helper base class
     template <typename F, typename A>
-    static bool apply_impl(F f __unused, A *a __unused, std::any *result __unused) {
+    static bool apply_impl(F f __attribute__((unused)), A *a __attribute__((unused)),
+            std::any *result __attribute__((unused))) {
         return false;
     }
 };
@@ -696,7 +697,7 @@ std::enable_if_t<
         bool
         >
 copyFromByteString(T *dest, const ByteString& bs, size_t& idx,
-        ByteStringUnknowns *unknowns __unused) {
+        ByteStringUnknowns *unknowns __attribute__((unused))) {
     if (idx + sizeof(T) > bs.size()) return false;
     bs.copy((uint8_t*)dest, sizeof(T), idx);
     idx += sizeof(T);

@@ -103,7 +103,7 @@ TEST(metadata_tests, basic_datum) {
         arg = dummy{}; // not an expected type, apply will fail with false.
         std::any result;
 
-        ASSERT_FALSE(primitive_metadata_types::apply([&](auto *t __unused) {
+        ASSERT_FALSE(primitive_metadata_types::apply([&](auto *t __attribute__((unused))) {
                 value++;
             }, &arg, &result));
 
@@ -113,7 +113,7 @@ TEST(metadata_tests, basic_datum) {
         // try to apply with a valid argument.
         arg = (int)1;
 
-        ASSERT_TRUE(primitive_metadata_types::apply([&](auto *t __unused) {
+        ASSERT_TRUE(primitive_metadata_types::apply([&](auto *t __attribute__((unused))) {
                 value++;
             }, &arg, &result));
 
@@ -127,7 +127,7 @@ TEST(metadata_tests, basic_datum) {
         arg = (int)1;
         std::any result;
 
-        ASSERT_TRUE(primitive_metadata_types::apply([&](auto *t __unused) {
+        ASSERT_TRUE(primitive_metadata_types::apply([&](auto *t __attribute__((unused))) {
                 value++;
                 return (int32_t)2;
             }, &arg, &result));
