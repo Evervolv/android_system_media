@@ -75,11 +75,7 @@ int audio_metadata_put_data(
     return 0;
 }
 
-int audio_metadata_put_unknown(
-        audio_metadata_t *metadata __attribute__((unused)), const char *key __attribute__((unused)),
-        const void *value __attribute__((unused))) {
-    return -EINVAL;
-}
+// audio_metadata_put_unknown() is declared but not implemented
 
 int audio_metadata_get_int32(audio_metadata_t *metadata, const char *key, int32_t *value) {
     if (metadata == nullptr || key == nullptr || value == nullptr) {
@@ -156,11 +152,7 @@ int audio_metadata_get_data(
     return *value == nullptr ? -ENOMEM : 0;
 }
 
-int audio_metadata_get_unknown(
-        audio_metadata_t *metadata __attribute__((unused)), const char *key __attribute__((unused)),
-        void *value __attribute__((unused))) {
-    return -EINVAL;
-}
+// audio_metadata_get_unknown() is declared but not implemented
 
 ssize_t audio_metadata_erase(audio_metadata_t *metadata, const char *key) {
     if (metadata == nullptr || key == nullptr) {
