@@ -80,7 +80,8 @@ int audio_metadata_put_data(
 }
 
 int audio_metadata_put_unknown(
-        audio_metadata_t *metadata __unused, const char *key, const void *value __unused) {
+        audio_metadata_t *metadata __attribute__((unused)), const char *key,
+        const void *value __attribute__((unused))) {
     ALOGW("Unknown data type to put with key: %s", key);
     return -EINVAL;
 }
@@ -161,7 +162,8 @@ int audio_metadata_get_data(
 }
 
 int audio_metadata_get_unknown(
-        audio_metadata_t *metadata __unused, const char *key, void *value __unused) {
+        audio_metadata_t *metadata __attribute__((unused)), const char *key,
+        void *value __attribute__((unused))) {
     ALOGW("Unknown data type to get with key: %s", key);
     return -EINVAL;
 }
