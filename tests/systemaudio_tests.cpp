@@ -194,4 +194,10 @@ TEST(SystemAudioTest, AudioDeviceTypeHelperFunction) {
               std::begin(digitalDevices) + AUDIO_DEVICE_OUT_DIGITAL_CNT);
     runAudioDeviceTypeHelperFunction(allDeviceTypes, digitalDevices,
               std::size(digitalDevices), "digital", audio_device_is_digital);
+    runAudioDeviceTypeHelperFunction(allDeviceTypes, AUDIO_DEVICE_OUT_ALL_BLE_ARRAY,
+            std::size(AUDIO_DEVICE_OUT_ALL_BLE_ARRAY), "ble out",
+            audio_is_ble_out_device);
+    runAudioDeviceTypeHelperFunction(allDeviceTypes, AUDIO_DEVICE_IN_ALL_BLE_ARRAY,
+            std::size(AUDIO_DEVICE_IN_ALL_BLE_ARRAY), "ble in",
+            audio_is_ble_in_device);
 }

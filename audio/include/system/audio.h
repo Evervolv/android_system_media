@@ -820,6 +820,23 @@ static inline bool audio_device_is_digital(audio_devices_t device) {
            audio_is_digital_out_device(device);
 }
 
+static inline bool audio_is_ble_out_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_OUT_ALL_BLE_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_BLE_CNT, device);
+}
+
+static inline bool audio_is_ble_in_device(audio_devices_t device)
+{
+    return audio_binary_search_uint_array(
+            AUDIO_DEVICE_IN_ALL_BLE_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_BLE_CNT, device);
+}
+
+static inline bool audio_is_ble_device(audio_devices_t device) {
+    return audio_is_ble_in_device(device) ||
+           audio_is_ble_out_device(device);
+}
+
 /* Returns true if:
  *  representation is valid, and
  *  there is at least one channel bit set which _could_ correspond to an input channel, and
