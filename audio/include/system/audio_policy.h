@@ -100,6 +100,16 @@ typedef enum {
     APP_STATE_TOP, /* client has a visible UI: can capture and select use case */
 } app_state_t;
 
+/* The role indicates how the audio policy manager should consider particular
+ * device(s) when making routing decisions for a particular strategy or audio
+ * source. It is primarily used to override the default routing rules.
+ */
+typedef enum {
+    DEVICE_ROLE_NONE = 0, /* default routing rules and priority apply */
+    DEVICE_ROLE_PREFERRED = 1, /* devices are specified as preferred devices */
+    DEVICE_ROLE_DISABLED = 2, /* devices cannot be used */
+} device_role_t;
+
 __END_DECLS
 
 #endif  // ANDROID_AUDIO_POLICY_CORE_H
