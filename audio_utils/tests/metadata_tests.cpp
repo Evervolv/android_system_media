@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-//#define LOG_NDEBUG 0
-#define LOG_TAG "audio_utils_metadata_tests"
-
 #define METADATA_TESTING
 
 #include <audio_utils/Metadata.h>
 #include <gtest/gtest.h>
-#include <log/log.h>
+#include <stdio.h>
 
 #include <error.h>
 #include <iostream>
@@ -298,7 +295,7 @@ TEST(metadata_tests, compatibility_R) {
     d.emplace("data", s);
 
     ByteString bs = byteStringFromData(d);
-    ALOGD("%s", toString(bs).c_str());
+    printf("%s\n", toString(bs).c_str());
 
     // Since we use a map instead of a hashmap
     // layout order of elements is precisely defined.
@@ -369,14 +366,14 @@ TEST(metadata_tests, bytestring_examples) {
     ByteString bs;
 
     copyToByteString((int32_t)123, bs);
-    ALOGD("123 -> %s", toString(bs).c_str());
+    printf("123 -> %s\n", toString(bs).c_str());
     const ByteString ref1{ 0x7b, 0x00, 0x00, 0x00 };
     ASSERT_EQ(ref1, bs);
 
     bs.clear();
     // for copyToByteString use std::string instead of char array.
     copyToByteString(std::string("hi"), bs);
-    ALOGD("\"hi\" -> %s", toString(bs).c_str());
+    printf("\"hi\" -> %s\n", toString(bs).c_str());
     const ByteString ref2{ 0x02, 0x00, 0x00, 0x00, 0x68, 0x69 };
     ASSERT_EQ(ref2, bs);
 
@@ -385,7 +382,7 @@ TEST(metadata_tests, bytestring_examples) {
     d.emplace("hello", "world");
     d.emplace("value", (int32_t)1000);
     copyToByteString(d, bs);
-    ALOGD("{{\"hello\", \"world\"}, {\"value\", 1000}} -> %s", toString(bs).c_str());
+    printf("{{\"hello\", \"world\"}, {\"value\", 1000}} -> %s\n", toString(bs).c_str());
     const ByteString ref3{
         0x02, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
         0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x05, 0x00, 0x00,
