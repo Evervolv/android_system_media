@@ -3239,12 +3239,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             of view.
           </details>
           <hal_details>
-            When the key is reported, the camera device must be setting
-            android.scaler.availableMaxDigitalZoom to be the same as maxZoom. The camera framework
-            makes sure to always controls zoom via android.control.zoomRatio. The
-            android.scaler.cropRegion tag is only used to do horizontal or vertical cropping (but
-            not both) to achieve aspect ratio different than the camera sensor's native aspect
-            ratio.
+            When the key is reported, the camera device's android.scaler.availableMaxDigitalZoom
+            must be less than or equal to maxZoom. The camera framework makes sure to always
+            control zoom via android.control.zoomRatio. The android.scaler.cropRegion tag is only
+            used to do horizontal or vertical cropping (but not both) to achieve aspect ratio
+            different than the camera sensor's native aspect ratio.
 
             For a logical multi-camera device, this key must either be reported for both the logical
             camera device and all its physical sub-cameras, or none of them.

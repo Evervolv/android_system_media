@@ -6636,12 +6636,11 @@ of view.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>When the key is reported,<wbr/> the camera device must be setting
-<a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a> to be the same as maxZoom.<wbr/> The camera framework
-makes sure to always controls zoom via <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>.<wbr/> The
-<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> tag is only used to do horizontal or vertical cropping (but
-not both) to achieve aspect ratio different than the camera sensor's native aspect
-ratio.<wbr/></p>
+              <p>When the key is reported,<wbr/> the camera device's <a href="#static_android.scaler.availableMaxDigitalZoom">android.<wbr/>scaler.<wbr/>available<wbr/>Max<wbr/>Digital<wbr/>Zoom</a>
+must be less than or equal to maxZoom.<wbr/> The camera framework makes sure to always
+control zoom via <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>.<wbr/> The <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> tag is only
+used to do horizontal or vertical cropping (but not both) to achieve aspect ratio
+different than the camera sensor's native aspect ratio.<wbr/></p>
 <p>For a logical multi-camera device,<wbr/> this key must either be reported for both the logical
 camera device and all its physical sub-cameras,<wbr/> or none of them.<wbr/></p>
 <p>When the key is not reported,<wbr/> camera framework derives the application-facing
