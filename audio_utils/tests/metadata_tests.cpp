@@ -394,7 +394,7 @@ TEST(metadata_tests, bytestring_examples) {
     ASSERT_EQ(ref3, bs);
 };
 
-// Test C API
+// Test C API from C++
 TEST(metadata_tests, c) {
     audio_metadata_t *metadata = audio_metadata_create();
     Data d;
@@ -413,6 +413,15 @@ TEST(metadata_tests, c) {
     audio_metadata_t *data = audio_metadata_create();
     audio_metadata_put(data, "string", "hello");
     audio_metadata_put(metadata, "data", data);
+#if 0   // candidate function not viable: no known conversion
+    {
+        static const struct complex {
+            float re;
+            float im;
+        } prime = { -5.0, -4.0 };
+        audio_metadata_put(metadata, "complex", prime);
+    }
+#endif
     audio_metadata_destroy(data);
 
     int32_t i32Val;
