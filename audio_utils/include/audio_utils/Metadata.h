@@ -17,6 +17,10 @@
 #ifndef ANDROID_AUDIO_METADATA_H
 #define ANDROID_AUDIO_METADATA_H
 
+#include <stdint.h>
+#include <sys/cdefs.h>
+#include <unistd.h>
+
 #ifdef __cplusplus
 
 #include <any>
@@ -913,6 +917,10 @@ __BEGIN_DECLS
 
 typedef struct audio_metadata_t audio_metadata_t;
 
+// Used by audio_metadata_put_unknown() and audio_metadata_get_unknown(), but not part of public API
+// The name and data structure representation discourage accidental use.
+typedef struct { char c; } audio_metadata_unknown_t;
+
 /**
  * \brief Creates a metadata object
  *
@@ -988,25 +996,33 @@ int audio_metadata_put_string(audio_metadata_t *metadata, const char *key, const
 int audio_metadata_put_data(audio_metadata_t *metadata, const char *key, audio_metadata_t *value);
 
 /**
- * \brief The type is not allowed in audio metadata. Only log the key and return -EINVAL here.
+ * \brief Declared but not implemented, as any potential caller won't supply a correct value.
  */
-int audio_metadata_put_unknown(audio_metadata_t *metadata, const char *key, const void *value);
+int audio_metadata_put_unknown(audio_metadata_t *metadata, const char *key,
+        audio_metadata_unknown_t value);
+
+#ifndef __cplusplus // Only C11 has _Generic; C++ uses overloaded declarations instead
 
 // use C Generics to provide interfaces for put/get functions
 // See: https://en.cppreference.com/w/c/language/generic
 
 /**
  * A generic interface to put key value pair into the audio metadata.
+ * Fails at compile-time if type isn't supported.
  */
 #define audio_metadata_put(metadata, key, value) _Generic((value), \
     int32_t: audio_metadata_put_int32,                             \
     int64_t: audio_metadata_put_int64,                             \
     float: audio_metadata_put_float,                               \
     double: audio_metadata_put_double,                             \
+    /* https://stackoverflow.com/questions/18857056/c11-generic-how-to-deal-with-string-literals */ \
     const char*: audio_metadata_put_string,                        \
+    char*: audio_metadata_put_string,                              \
     audio_metadata_t*: audio_metadata_put_data,                    \
     default: audio_metadata_put_unknown                            \
     )(metadata, key, value)
+
+#endif  // !__cplusplus
 
 /**
  * \brief Get mapped value whose type is int32_t by a given key from audio metadata.
@@ -1091,13 +1107,17 @@ int audio_metadata_get_string(audio_metadata_t *metadata, const char *key, char 
 int audio_metadata_get_data(audio_metadata_t *metadata, const char *key, audio_metadata_t **value);
 
 /**
- * \brief The data type is not allowed in audio metadata. Only log the key and return -EINVAL here.
+ * \brief Declared but not implemented, as any potential caller won't supply a correct value.
  */
-int audio_metadata_get_unknown(audio_metadata_t *metadata, const char *key, void *value);
+int audio_metadata_get_unknown(audio_metadata_t *metadata, const char *key,
+        audio_metadata_unknown_t *value);
+
+#ifndef __cplusplus // Only C11 has _Generic; C++ uses overloaded declarations instead
 
 /**
  * A generic interface to get mapped value by a given key from audio metadata. The value object
  * will remain the same if the key is not found in the audio metadata.
+ * Fails at compile-time if type isn't supported.
  */
 #define audio_metadata_get(metadata, key, value) _Generic((value), \
     int32_t*: audio_metadata_get_int32,                            \
@@ -1108,6 +1128,8 @@ int audio_metadata_get_unknown(audio_metadata_t *metadata, const char *key, void
     audio_metadata_t**: audio_metadata_get_data,                   \
     default: audio_metadata_get_unknown                            \
     )(metadata, key, value)
+
+#endif  // !__cplusplus
 
 /**
  * \brief Remove item from audio metadata.
@@ -1150,5 +1172,85 @@ ssize_t byte_string_from_audio_metadata(audio_metadata_t *metadata, uint8_t **by
 /** \cond */
 __END_DECLS
 /** \endcond */
+
+#ifdef __cplusplus
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, int32_t value)
+{
+    return audio_metadata_put_int32(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, int64_t value)
+{
+    return audio_metadata_put_int64(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, float value)
+{
+    return audio_metadata_put_float(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, double value)
+{
+    return audio_metadata_put_double(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, const char *value)
+{
+    return audio_metadata_put_string(metadata, key, value);
+}
+
+inline
+int audio_metadata_put(audio_metadata_t *metadata, const char *key, audio_metadata_t *value)
+{
+    return audio_metadata_put_data(metadata, key, value);
+}
+
+// No overload for default type
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, int32_t *value)
+{
+    return audio_metadata_get_int32(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, int64_t *value)
+{
+    return audio_metadata_get_int64(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, float *value)
+{
+    return audio_metadata_get_float(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, double *value)
+{
+    return audio_metadata_get_double(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, char **value)
+{
+    return audio_metadata_get_string(metadata, key, value);
+}
+
+inline
+int audio_metadata_get(audio_metadata_t *metadata, const char *key, audio_metadata_t **value)
+{
+    return audio_metadata_get_data(metadata, key, value);
+}
+
+// No overload for default type
+
+#endif  // __cplusplus
 
 #endif // !ANDROID_AUDIO_METADATA_H
