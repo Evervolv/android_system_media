@@ -232,6 +232,8 @@ static CONST_ARRAY uint32_t AUDIO_DEVICE_OUT_ALL_ARRAY[] = {
     AUDIO_DEVICE_OUT_USB_HEADSET,               // 0x04000000u
     AUDIO_DEVICE_OUT_HEARING_AID,               // 0x08000000u
     AUDIO_DEVICE_OUT_ECHO_CANCELLER,            // 0x10000000u
+    AUDIO_DEVICE_OUT_BLE_HEADSET,               // 0x20000000u
+    AUDIO_DEVICE_OUT_BLE_SPEAKER,               // 0x20000001u
     AUDIO_DEVICE_OUT_DEFAULT,                   // 0x40000000u, BIT_DEFAULT
 };
 
@@ -269,6 +271,11 @@ static CONST_ARRAY uint32_t AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY[] = {
     AUDIO_DEVICE_OUT_USB_HEADSET,               // 0x04000000u
 };
 
+static CONST_ARRAY uint32_t AUDIO_DEVICE_OUT_ALL_BLE_ARRAY[] = {
+    AUDIO_DEVICE_OUT_BLE_HEADSET,               // 0x20000000u
+    AUDIO_DEVICE_OUT_BLE_SPEAKER,               // 0x20000001u
+};
+
 // inline constexpr
 static CONST_ARRAY uint32_t AUDIO_DEVICE_IN_ALL_ARRAY[] = {
     AUDIO_DEVICE_IN_COMMUNICATION,              // 0x80000001u
@@ -297,6 +304,7 @@ static CONST_ARRAY uint32_t AUDIO_DEVICE_IN_ALL_ARRAY[] = {
     AUDIO_DEVICE_IN_BLUETOOTH_BLE,              // 0x84000000u
     AUDIO_DEVICE_IN_HDMI_ARC,                   // 0x88000000u
     AUDIO_DEVICE_IN_ECHO_REFERENCE,             // 0x90000000u
+    AUDIO_DEVICE_IN_BLE_HEADSET,                // 0xA0000000u
     AUDIO_DEVICE_IN_DEFAULT,                    // 0xC0000000u
 };
 
@@ -325,6 +333,11 @@ static CONST_ARRAY uint32_t AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY[] = {
     AUDIO_DEVICE_IN_HDMI_ARC,                   // 0x88000000u
 };
 
+static CONST_ARRAY uint32_t AUDIO_DEVICE_IN_ALL_BLE_ARRAY[] = {
+    AUDIO_DEVICE_IN_BLE_HEADSET,                // 0xA0000000u
+};
+
+
 #ifndef AUDIO_ARRAY_SIZE
 // std::size()
 #define AUDIO_ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -337,11 +350,16 @@ static const uint32_t AUDIO_DEVICE_OUT_SCO_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_O
 static const uint32_t AUDIO_DEVICE_OUT_USB_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_OUT_ALL_USB_ARRAY);
 static const uint32_t AUDIO_DEVICE_OUT_DIGITAL_CNT = AUDIO_ARRAY_SIZE(
                                                      AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY);
+static const uint32_t AUDIO_DEVICE_OUT_BLE_CNT = AUDIO_ARRAY_SIZE(
+                                                     AUDIO_DEVICE_OUT_ALL_BLE_ARRAY);
+
 static const uint32_t AUDIO_DEVICE_IN_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_IN_ALL_ARRAY);
 static const uint32_t AUDIO_DEVICE_IN_SCO_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_IN_ALL_SCO_ARRAY);
 static const uint32_t AUDIO_DEVICE_IN_USB_CNT = AUDIO_ARRAY_SIZE(AUDIO_DEVICE_IN_ALL_USB_ARRAY);
 static const uint32_t AUDIO_DEVICE_IN_DIGITAL_CNT = AUDIO_ARRAY_SIZE(
                                                     AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY);
+static const uint32_t AUDIO_DEVICE_IN_BLE_CNT = AUDIO_ARRAY_SIZE(
+                                                    AUDIO_DEVICE_IN_ALL_BLE_ARRAY);
 
 static const uint32_t AUDIO_ENCAPSULATION_MODE_ALL_POSITION_BITS =
         (1 << AUDIO_ENCAPSULATION_MODE_NONE) |
@@ -374,6 +392,8 @@ static_assert(isSorted(AUDIO_DEVICE_OUT_ALL_USB_ARRAY),
               "AUDIO_DEVICE_OUT_ALL_USB_ARRAY must be sorted");
 static_assert(isSorted(AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY),
               "AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY must be sorted");
+static_assert(isSorted(AUDIO_DEVICE_OUT_ALL_BLE_ARRAY),
+              "AUDIO_DEVICE_OUT_ALL_BLE_ARRAY must be sorted");
 static_assert(isSorted(AUDIO_DEVICE_IN_ALL_ARRAY),
               "AUDIO_DEVICE_IN_ALL_ARRAY must be sorted");
 static_assert(isSorted(AUDIO_DEVICE_IN_ALL_SCO_ARRAY),
@@ -382,16 +402,20 @@ static_assert(isSorted(AUDIO_DEVICE_IN_ALL_USB_ARRAY),
               "AUDIO_DEVICE_IN_ALL_USB_ARRAY must be sorted");
 static_assert(isSorted(AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY),
               "AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY must be sorted");
+static_assert(isSorted(AUDIO_DEVICE_IN_ALL_BLE_ARRAY),
+              "AUDIO_DEVICE_IN_ALL_BLE_ARRAY must be sorted");
 
 static_assert(AUDIO_DEVICE_OUT_CNT == std::size(AUDIO_DEVICE_OUT_ALL_ARRAY));
 static_assert(AUDIO_DEVICE_OUT_A2DP_CNT == std::size(AUDIO_DEVICE_OUT_ALL_A2DP_ARRAY));
 static_assert(AUDIO_DEVICE_OUT_SCO_CNT == std::size(AUDIO_DEVICE_OUT_ALL_SCO_ARRAY));
 static_assert(AUDIO_DEVICE_OUT_USB_CNT == std::size(AUDIO_DEVICE_OUT_ALL_USB_ARRAY));
 static_assert(AUDIO_DEVICE_OUT_DIGITAL_CNT == std::size(AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY));
+static_assert(AUDIO_DEVICE_OUT_BLE_CNT == std::size(AUDIO_DEVICE_OUT_ALL_BLE_ARRAY));
 static_assert(AUDIO_DEVICE_IN_CNT == std::size(AUDIO_DEVICE_IN_ALL_ARRAY));
 static_assert(AUDIO_DEVICE_IN_SCO_CNT == std::size(AUDIO_DEVICE_IN_ALL_SCO_ARRAY));
 static_assert(AUDIO_DEVICE_IN_USB_CNT == std::size(AUDIO_DEVICE_IN_ALL_USB_ARRAY));
 static_assert(AUDIO_DEVICE_IN_DIGITAL_CNT == std::size(AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY));
+static_assert(AUDIO_DEVICE_IN_BLE_CNT == std::size(AUDIO_DEVICE_IN_ALL_BLE_ARRAY));
 
 #endif  // AUDIO_ARRAYS_STATIC_CHECK
 
