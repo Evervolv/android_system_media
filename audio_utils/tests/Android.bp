@@ -2,6 +2,7 @@
 
 cc_binary {
     name: "biquad_filter",
+    host_supported: true,
 
     srcs: [
         "biquad_filter.cpp"
@@ -20,6 +21,7 @@ cc_binary {
 
 cc_test {
     name: "biquad_filter_tests",
+    host_supported: true,
 
     srcs: [
         "biquad_filter_tests.cpp",
