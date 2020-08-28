@@ -507,7 +507,7 @@ static void start_tag(void *data, const XML_Char *tag_name,
         /* Obtain the mixer ctl and value */
         ctl = mixer_get_ctl_by_name(ar->mixer, attr_name);
         if (ctl == NULL) {
-            ALOGE("Control '%s' doesn't exist - skipping", attr_name);
+            ALOGW("Control '%s' doesn't exist - skipping", attr_name);
             goto done;
         }
 
