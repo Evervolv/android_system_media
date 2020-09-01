@@ -17,6 +17,7 @@ cc_library_headers {
     host_supported: true,
     vendor_available: true,
     export_include_dirs: ["include"],
+    sdk_version: "current",
 }
 
 cc_library {
@@ -35,10 +36,12 @@ cc_library {
         "ErrorLog.cpp",
         "fifo.cpp",
         "fifo_index.cpp",
-        "fifo_writer32.cpp",
+        "fifo_writer_T.cpp",
         "format.c",
         "limiter.c",
+        "Metadata.cpp",
         "minifloat.c",
+        "mono_blend.cpp",
         "power.cpp",
         "PowerLog.cpp",
         "primitives.c",
@@ -64,7 +67,7 @@ cc_library {
     target: {
         android: {
             srcs: [
-                "mono_blend.cpp",
+                // "mono_blend.cpp",
                 "resampler.c",
                 "echo_reference.c",
             ],
