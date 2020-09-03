@@ -1331,30 +1331,6 @@ static inline char *audio_device_address_to_parameter(audio_devices_t device, co
     return strdup(param);
 }
 
-static inline bool audio_is_valid_audio_source(audio_source_t audioSource)
-{
-    switch (audioSource) {
-    case AUDIO_SOURCE_MIC:
-    case AUDIO_SOURCE_VOICE_UPLINK:
-    case AUDIO_SOURCE_VOICE_DOWNLINK:
-    case AUDIO_SOURCE_VOICE_CALL:
-    case AUDIO_SOURCE_CAMCORDER:
-    case AUDIO_SOURCE_VOICE_RECOGNITION:
-    case AUDIO_SOURCE_VOICE_COMMUNICATION:
-    case AUDIO_SOURCE_REMOTE_SUBMIX:
-    case AUDIO_SOURCE_UNPROCESSED:
-    case AUDIO_SOURCE_VOICE_PERFORMANCE:
-    case AUDIO_SOURCE_ECHO_REFERENCE:
-    case AUDIO_SOURCE_FM_TUNER:
-#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
-    case AUDIO_SOURCE_HOTWORD:
-#endif // AUDIO_NO_SYSTEM_DECLARATIONS
-        return true;
-    default:
-        return false;
-    }
-}
-
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
 
 static inline bool audio_gain_config_are_equal(
