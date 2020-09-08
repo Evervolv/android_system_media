@@ -17,45 +17,45 @@
 #include <atomic>
 #include <stdlib.h>
 #include <string.h>
+#include <audio_utils/fifo_writer_T.h>
 
-// TODO templatize int32_t
-
-#include <audio_utils/fifo_writer32.h>
-
-static inline void memcpyWords(int32_t *dst, const int32_t *src, uint32_t count)
+template <typename T>
+static inline void memcpyWords(T *dst, const T *src, uint32_t count)
 {
     switch (count) {
     case 0: break;
 // TODO templatize here also, but first confirm no performance regression compared to current
 #define _(n) \
     case n: { \
-        struct s##n { int32_t a[n]; }; \
+        struct s##n { T a[n]; }; \
         *(struct s##n *)dst = *(const struct s##n *)src; \
         break; \
     }
     _(1) _(2) _(3) _(4) _(5) _(6) _(7) _(8) _(9) _(10) _(11) _(12) _(13) _(14) _(15) _(16)
 #undef _
     default:
-        memcpy(dst, src, count * sizeof(int32_t));
+        memcpy(dst, src, count * sizeof(T));
         break;
     }
 }
 
-audio_utils_fifo_writer32::audio_utils_fifo_writer32(audio_utils_fifo& fifo) :
-    mLocalRear(0), mFrameCountP2(fifo.mFrameCountP2), mBuffer((int32_t *) fifo.mBuffer),
+template <typename T>
+audio_utils_fifo_writer_T<T>::audio_utils_fifo_writer_T(audio_utils_fifo& fifo) :
+    mLocalRear(0), mFrameCountP2(fifo.mFrameCountP2), mBuffer((T *) fifo.mBuffer),
     mWriterRear(fifo.mWriterRear)
 {
-    if (fifo.mFrameSize != sizeof(int32_t) || fifo.mFudgeFactor != 0 ||
-            ((size_t) mBuffer & ((sizeof(int32_t) - 1))) != 0) {
+    if (fifo.mFrameSize != sizeof(T) || fifo.mFudgeFactor != 0) {
         abort();
     }
 }
 
-audio_utils_fifo_writer32::~audio_utils_fifo_writer32()
+template <typename T>
+audio_utils_fifo_writer_T<T>::~audio_utils_fifo_writer_T()
 {
 }
 
-void audio_utils_fifo_writer32::write(const int32_t *buffer, uint32_t count)
+template <typename T>
+void audio_utils_fifo_writer_T<T>::write(const T *buffer, uint32_t count)
         __attribute__((no_sanitize("integer")))     // mLocalRear += can wrap
 {
     uint32_t availToWrite = mFrameCountP2;
@@ -73,3 +73,8 @@ void audio_utils_fifo_writer32::write(const int32_t *buffer, uint32_t count)
     memcpyWords(&mBuffer[0], &buffer[part1], part2);
     mLocalRear += availToWrite;
 }
+
+// Instantiate for the specific types we need, which is currently just int32_t and int64_t.
+
+template class audio_utils_fifo_writer_T<int32_t>;
+template class audio_utils_fifo_writer_T<int64_t>;

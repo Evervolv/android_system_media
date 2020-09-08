@@ -33,7 +33,7 @@ function check_test
 {
     local file="$1"
     local results
-    results="$(python "$file" 2>&1)"
+    results="$(python3 "$file" 2>&1)"
     local retval=$?
     if [[ $retval -ne 0 ]]
     then
@@ -47,7 +47,7 @@ function check_test
 
 check_test "$thisdir/metadata_model_test.py" || exit 1
 check_test "$thisdir/metadata_helpers_test.py" || exit 1
-python $thisdir/metadata_parser_xml.py $thisdir/metadata_definitions.xml $thisdir/metadata_template.mako $tmp_out || exit 1
+python3 $thisdir/metadata_parser_xml.py $thisdir/metadata_definitions.xml $thisdir/metadata_template.mako $tmp_out || exit 1
 tidy -indent -xml -quiet $thisdir/metadata_definitions.xml > $tmp_tidy1
 tidy -indent -xml -quiet $tmp_out > $tmp_tidy2
 

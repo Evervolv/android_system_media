@@ -184,6 +184,30 @@ cc_test {
 }
 
 cc_test {
+    name: "metadata_tests",
+    host_supported: false,
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    srcs: ["metadata_tests.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    target: {
+        android: {
+            shared_libs: ["libaudioutils"],
+        },
+        host: {
+            static_libs: ["libaudioutils"],
+        },
+    }
+}
+
+cc_test {
     name: "powerlog_tests",
     host_supported: true,
 
@@ -372,3 +396,20 @@ cc_test {
         },
     }
 }
+
+cc_test {
+    name: "spdif_tests",
+
+    shared_libs: [
+        "libaudioutils",
+        "libaudiospdif",
+        "liblog",
+        "libcutils",
+    ],
+    srcs: ["spdif_tests.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+    ],
+}
+
