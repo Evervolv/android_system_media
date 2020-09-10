@@ -33,7 +33,7 @@
 
 /*
  * Annotation to tell clang that we intend to fall through from one case to
- * another in a switch (for c++ files). Sourced from android-base/macros.h.
+ * another in a switch. Sourced from android-base/macros.h.
  */
 #ifndef FALLTHROUGH_INTENDED
 #ifdef __cplusplus
@@ -80,6 +80,7 @@ enum {
     AUDIO_FLAG_NO_MEDIA_PROJECTION        = 0X400,
     AUDIO_FLAG_MUTE_HAPTIC                = 0x800,
     AUDIO_FLAG_NO_SYSTEM_CAPTURE          = 0X1000,
+    AUDIO_FLAG_CAPTURE_PRIVATE            = 0X2000,
 };
 
 /* Audio attributes */
@@ -125,24 +126,31 @@ static inline void audio_flags_to_audio_output_flags(
 }
 
 
-/* a unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
- * effect ID (int), audio_module_handle_t, and audio_patch_handle_t.
+/* A unique ID allocated by AudioFlinger for use as an audio_io_handle_t, audio_session_t,
+ * audio_effect_handle_t, audio_module_handle_t, and audio_patch_handle_t.
  * Audio port IDs (audio_port_handle_t) are allocated by AudioPolicy
  * in a different namespace than AudioFlinger unique IDs.
  */
 typedef int audio_unique_id_t;
 
+/* A unique ID with use AUDIO_UNIQUE_ID_USE_EFFECT */
+typedef int audio_effect_handle_t;
+
 /* Possible uses for an audio_unique_id_t */
 typedef enum {
     AUDIO_UNIQUE_ID_USE_UNSPECIFIED = 0,
-    AUDIO_UNIQUE_ID_USE_SESSION = 1,    // for allocated sessions, not special AUDIO_SESSION_*
-    AUDIO_UNIQUE_ID_USE_MODULE = 2,
-    AUDIO_UNIQUE_ID_USE_EFFECT = 3,
-    AUDIO_UNIQUE_ID_USE_PATCH = 4,
-    AUDIO_UNIQUE_ID_USE_OUTPUT = 5,
-    AUDIO_UNIQUE_ID_USE_INPUT = 6,
+    AUDIO_UNIQUE_ID_USE_SESSION = 1, // audio_session_t
+                                     // for allocated sessions, not special AUDIO_SESSION_*
+    AUDIO_UNIQUE_ID_USE_MODULE = 2,  // audio_module_handle_t
+    AUDIO_UNIQUE_ID_USE_EFFECT = 3,  // audio_effect_handle_t
+    AUDIO_UNIQUE_ID_USE_PATCH = 4,   // audio_patch_handle_t
+    AUDIO_UNIQUE_ID_USE_OUTPUT = 5,  // audio_io_handle_t
+    AUDIO_UNIQUE_ID_USE_INPUT = 6,   // audio_io_handle_t
     AUDIO_UNIQUE_ID_USE_CLIENT = 7,  // client-side players and recorders
-    AUDIO_UNIQUE_ID_USE_MAX = 8,  // must be a power-of-two
+                                     // FIXME should move to a separate namespace;
+                                     // these IDs are allocated by AudioFlinger on client request,
+                                     // but are never used by AudioFlinger
+    AUDIO_UNIQUE_ID_USE_MAX = 8,     // must be a power-of-two
     AUDIO_UNIQUE_ID_USE_MASK = AUDIO_UNIQUE_ID_USE_MAX - 1
 } audio_unique_id_use_t;
 
@@ -302,13 +310,16 @@ typedef struct {
     uint32_t bit_width;
     uint32_t offload_buffer_size;       // offload fragment size
     audio_usage_t usage;
+    audio_encapsulation_mode_t encapsulation_mode;  // version 0.2:
+    int32_t content_id;                 // version 0.2: content id from tuner hal (0 if none)
+    int32_t sync_id;                    // version 0.2: sync id from tuner hal (0 if none)
 } __attribute__((aligned(8))) audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
             ((((maj) & 0xff) << 8) | ((min) & 0xff))
 
-#define AUDIO_OFFLOAD_INFO_VERSION_0_1 AUDIO_MAKE_OFFLOAD_INFO_VERSION(0, 1)
-#define AUDIO_OFFLOAD_INFO_VERSION_CURRENT AUDIO_OFFLOAD_INFO_VERSION_0_1
+#define AUDIO_OFFLOAD_INFO_VERSION_0_2 AUDIO_MAKE_OFFLOAD_INFO_VERSION(0, 2)
+#define AUDIO_OFFLOAD_INFO_VERSION_CURRENT AUDIO_OFFLOAD_INFO_VERSION_0_2
 
 static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .version = */ AUDIO_OFFLOAD_INFO_VERSION_CURRENT,
@@ -323,7 +334,10 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .is_streaming = */ false,
     /* .bit_width = */ 16,
     /* .offload_buffer_size = */ 0,
-    /* .usage = */ AUDIO_USAGE_UNKNOWN
+    /* .usage = */ AUDIO_USAGE_UNKNOWN,
+    /* .encapsulation_mode = */ AUDIO_ENCAPSULATION_MODE_NONE,
+    /* .content_id = */ 0,
+    /* .sync_id = */ 0,
 };
 
 /* common audio stream configuration parameters
@@ -357,7 +371,10 @@ static const audio_config_t AUDIO_CONFIG_INITIALIZER = {
         /* .is_streaming = */ false,
         /* .bit_width = */ 16,
         /* .offload_buffer_size = */ 0,
-        /* .usage = */ AUDIO_USAGE_UNKNOWN
+        /* .usage = */ AUDIO_USAGE_UNKNOWN,
+        /* .encapsulation_mode = */ AUDIO_ENCAPSULATION_MODE_NONE,
+        /* .content_id = */ 0,
+        /* .sync_id = */ 0,
     },
     /* .frame_count = */ 0,
 };
@@ -389,7 +406,7 @@ typedef int audio_module_handle_t;
 #define FLOAT_NOMINAL_RANGE_HEADROOM 1.412538
 
 /* If the audio hardware supports gain control on some audio paths,
- * the platform can expose them in the audio_policy.conf file. The audio HAL
+ * the platform can expose them in the audio_policy_configuration.xml file. The audio HAL
  * will then implement gain control functions that will use the following data
  * structures. */
 
@@ -515,6 +532,10 @@ struct audio_port_device_ext {
     audio_module_handle_t hw_module;    /* module the device is attached to */
     audio_devices_t       type;         /* device type (e.g AUDIO_DEVICE_OUT_SPEAKER) */
     char                  address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    uint32_t              encapsulation_modes;
+    uint32_t              encapsulation_metadata_types;
+#endif
 };
 
 /* extension for audio port structure when the audio port is a sub mix */
@@ -1524,6 +1545,50 @@ struct audio_microphone_characteristic_t {
     struct audio_microphone_coordinate orientation;
 };
 
+// AUDIO_TIMESTRETCH_SPEED_MIN and AUDIO_TIMESTRETCH_SPEED_MAX define the min and max time stretch
+// speeds supported by the system. These are enforced by the system and values outside this range
+// will result in a runtime error.
+// Depending on the AudioPlaybackRate::mStretchMode, the effective limits might be narrower than
+// the ones specified here
+// AUDIO_TIMESTRETCH_SPEED_MIN_DELTA is the minimum absolute speed difference that might trigger a
+// parameter update
+#define AUDIO_TIMESTRETCH_SPEED_MIN    0.01f
+#define AUDIO_TIMESTRETCH_SPEED_MAX    20.0f
+#define AUDIO_TIMESTRETCH_SPEED_NORMAL 1.0f
+#define AUDIO_TIMESTRETCH_SPEED_MIN_DELTA 0.0001f
+
+// AUDIO_TIMESTRETCH_PITCH_MIN and AUDIO_TIMESTRETCH_PITCH_MAX define the min and max time stretch
+// pitch shifting supported by the system. These are not enforced by the system and values
+// outside this range might result in a pitch different than the one requested.
+// Depending on the AudioPlaybackRate::mStretchMode, the effective limits might be narrower than
+// the ones specified here.
+// AUDIO_TIMESTRETCH_PITCH_MIN_DELTA is the minimum absolute pitch difference that might trigger a
+// parameter update
+#define AUDIO_TIMESTRETCH_PITCH_MIN    0.25f
+#define AUDIO_TIMESTRETCH_PITCH_MAX    4.0f
+#define AUDIO_TIMESTRETCH_PITCH_NORMAL 1.0f
+#define AUDIO_TIMESTRETCH_PITCH_MIN_DELTA 0.0001f
+
+//Limits for AUDIO_TIMESTRETCH_STRETCH_SPEECH mode
+#define TIMESTRETCH_SONIC_SPEED_MIN 0.1f
+#define TIMESTRETCH_SONIC_SPEED_MAX 6.0f
+
+struct audio_playback_rate {
+    float mSpeed;
+    float mPitch;
+    audio_timestretch_stretch_mode_t  mStretchMode;
+    audio_timestretch_fallback_mode_t mFallbackMode;
+};
+
+typedef struct audio_playback_rate audio_playback_rate_t;
+
+static const audio_playback_rate_t AUDIO_PLAYBACK_RATE_INITIALIZER = {
+    /* .mSpeed = */ AUDIO_TIMESTRETCH_SPEED_NORMAL,
+    /* .mPitch = */ AUDIO_TIMESTRETCH_PITCH_NORMAL,
+    /* .mStretchMode = */ AUDIO_TIMESTRETCH_STRETCH_DEFAULT,
+    /* .mFallbackMode = */ AUDIO_TIMESTRETCH_FALLBACK_FAIL
+};
+
 __END_DECLS
 
 /**
@@ -1629,6 +1694,20 @@ __END_DECLS
 #define AUDIO_PARAMETER_RECONFIG_A2DP "reconfigA2dp"
 /* Query if HwModule supports reconfiguration of offloaded A2DP codec */
 #define AUDIO_PARAMETER_A2DP_RECONFIG_SUPPORTED "isReconfigA2dpSupported"
+
+/**
+ * For querying device supported encapsulation capabilities. All returned values are integer,
+ * which are bit fields composed from using encapsulation capability values as position bits.
+ * Encapsulation capability values are defined in audio_encapsulation_mode_t and
+ * audio_encapsulation_metadata_type_t. For instance, if the supported encapsulation mode is
+ * AUDIO_ENCAPSULATION_MODE_ELEMENTARY_STREAM, the returned value is
+ * "supEncapsulationModes=1 << AUDIO_ENCAPSULATION_MODE_ELEMENTARY_STREAM".
+ * When querying device supported encapsulation capabilities, the key should use device type
+ * and address so that it is able to identify the device. The device will be a key. The device
+ * type will be the value of key AUDIO_PARAMETER_STREAM_ROUTING.
+ */
+#define AUDIO_PARAMETER_DEVICE_SUP_ENCAPSULATION_MODES "supEncapsulationModes"
+#define AUDIO_PARAMETER_DEVICE_SUP_ENCAPSULATION_METADATA_TYPES "supEncapsulationMetadataTypes"
 
 /**
  * audio codec parameters
