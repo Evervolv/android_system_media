@@ -34,6 +34,53 @@ static constexpr size_t DATA_SIZE = 1024;
 // with different coefficients as zero.
 static constexpr float REF_COEFS[] = {0.9460f, -1.8919f, 0.9460f, -1.8890f, 0.8949f};
 
+static void BM_BiquadFilter1D(benchmark::State& state) {
+    using android::audio_utils::BiquadFilter;
+
+    bool doParallel = (state.range(0) == 1);
+    // const size_t channelCount = state.range(1);
+    const size_t filters = 1;
+
+    std::vector<float> input(DATA_SIZE);
+    std::array<float, android::audio_utils::kBiquadNumCoefs> coefs;
+
+    // Initialize input buffer and coefs with deterministic pseudo-random values
+    constexpr std::minstd_rand::result_type SEED = 42; // arbitrary choice.
+    std::minstd_rand gen(SEED);
+    constexpr float amplitude = 1.0f;
+    std::uniform_real_distribution<> dis(-amplitude, amplitude);
+    for (size_t i = 0; i < DATA_SIZE; ++i) {
+        input[i] = dis(gen);
+    }
+
+    android::audio_utils::BiquadFilter parallel(filters, coefs);
+    std::vector<std::unique_ptr<BiquadFilter<float>>> biquads(filters);
+    for (auto& biquad : biquads) {
+        biquad.reset(new BiquadFilter<float>(1, coefs));
+    }
+
+    // Run the test
+    float *data = input.data();
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(data);
+        if (doParallel) {
+            parallel.process1D(data, DATA_SIZE);
+        } else {
+            for (auto& biquad : biquads) {
+                biquad->process(data, data, DATA_SIZE);
+            }
+        }
+        benchmark::ClobberMemory();
+    }
+}
+
+static void BiquadFilter1DArgs(benchmark::internal::Benchmark* b) {
+    for (int k = 0; k < 2; k++) // 0 for normal random data, 1 for subnormal random data
+         b->Args({k});
+}
+
+BENCHMARK(BM_BiquadFilter1D)->Apply(BiquadFilter1DArgs);
+
 /*******************************************************************
  * A test result running on Pixel 4 for comparison.
  * The first parameter indicates the input data is subnormal or not.
@@ -170,7 +217,7 @@ static constexpr float REF_COEFS[] = {0.9460f, -1.8919f, 0.9460f, -1.8890f, 0.89
  *******************************************************************/
 
 template <typename F>
-static void BM_BiquadFilter(benchmark::State& state) {
+static void BM_BiquadFilter(benchmark::State& state, bool optimized) {
     bool isSubnormal = (state.range(0) == 1);
     const size_t channelCount = state.range(1);
     const size_t occupancy = state.range(2);
@@ -190,7 +237,7 @@ static void BM_BiquadFilter(benchmark::State& state) {
         coefs[i] = (occupancy >> i & 1) * REF_COEFS[i];
     }
 
-    android::audio_utils::BiquadFilter<F> biquadFilter(channelCount, coefs);
+    android::audio_utils::BiquadFilter<F> biquadFilter(channelCount, coefs, optimized);
 
     // Run the test
     while (state.KeepRunning()) {
@@ -202,17 +249,60 @@ static void BM_BiquadFilter(benchmark::State& state) {
     state.SetComplexityN(state.range(1));  // O(channelCount)
 }
 
-static void BiquadFilterArgs(benchmark::internal::Benchmark* b) {
-    for (int k = 0; k < 2; k++) // 0 for normal random data, 1 for subnormal random data
-        for (int i = 1; i <= 2; ++i) // channel count
-            for (int j = 1; j < (1 << android::audio_utils::kBiquadNumCoefs); ++j) // Occupancy
+static void BM_BiquadFilterFloatOptimized(benchmark::State& state) {
+    BM_BiquadFilter<float>(state, true /* optimized */);
+}
+
+static void BM_BiquadFilterFloatNonOptimized(benchmark::State& state) {
+    BM_BiquadFilter<float>(state, false /* optimized */);
+}
+
+static void BM_BiquadFilterDoubleOptimized(benchmark::State& state) {
+    BM_BiquadFilter<double>(state, true /* optimized */);
+}
+
+static void BM_BiquadFilterDoubleNonOptimized(benchmark::State& state) {
+    BM_BiquadFilter<double>(state, false /* optimized */);
+}
+
+static void BiquadFilterQuickArgs(benchmark::internal::Benchmark* b) {
+    constexpr int CHANNEL_COUNT_BEGIN = 1;
+    constexpr int CHANNEL_COUNT_END = 24;
+    for (int k = 0; k < 1; k++) { // 0 for normal random data, 1 for subnormal random data
+        for (int i = CHANNEL_COUNT_BEGIN; i <= CHANNEL_COUNT_END; ++i) {
+            int j = (1 << android::audio_utils::kBiquadNumCoefs) - 1; // Full
+            b->Args({k, i, j});
+        }
+    }
+}
+
+static void BiquadFilterFullArgs(benchmark::internal::Benchmark* b) {
+    constexpr int CHANNEL_COUNT_BEGIN = 1;
+    constexpr int CHANNEL_COUNT_END = 4;
+    for (int k = 0; k < 2; k++) { // 0 for normal random data, 1 for subnormal random data
+        for (int i = CHANNEL_COUNT_BEGIN; i <= CHANNEL_COUNT_END; ++i) {
+            for (int j = 1; j < (1 << android::audio_utils::kBiquadNumCoefs); ++j) { // Occupancy
                 b->Args({k, i, j});
+            }
+        }
+    }
 }
 
-static void BM_BiquadFilterFloat(benchmark::State& state) {
-    BM_BiquadFilter<float>(state);
+static void BiquadFilterDoubleArgs(benchmark::internal::Benchmark* b) {
+    constexpr int CHANNEL_COUNT_BEGIN = 1;
+    constexpr int CHANNEL_COUNT_END = 4;
+    for (int k = 0; k < 1; k++) { // 0 for normal random data, 1 for subnormal random data
+        for (int i = CHANNEL_COUNT_BEGIN; i <= CHANNEL_COUNT_END; ++i) {
+            int j = (1 << android::audio_utils::kBiquadNumCoefs) - 1; // Full
+            b->Args({k, i, j});
+        }
+    }
 }
 
-BENCHMARK(BM_BiquadFilterFloat)->Apply(BiquadFilterArgs);
+BENCHMARK(BM_BiquadFilterDoubleOptimized)->Apply(BiquadFilterDoubleArgs);
+BENCHMARK(BM_BiquadFilterDoubleNonOptimized)->Apply(BiquadFilterDoubleArgs);
+BENCHMARK(BM_BiquadFilterFloatOptimized)->Apply(BiquadFilterQuickArgs);
+BENCHMARK(BM_BiquadFilterFloatNonOptimized)->Apply(BiquadFilterQuickArgs);
+BENCHMARK(BM_BiquadFilterFloatOptimized)->Apply(BiquadFilterFullArgs);
 
 BENCHMARK_MAIN();
