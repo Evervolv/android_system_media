@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <audio_utils/format.h>
-#include <system/audio-base.h>
+#include <system/audio.h>
 
 /** returns true if the format is a common source or destination format.
     memcpy_by_audio_format() allows interchange between any PCM format and the
