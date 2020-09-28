@@ -158,6 +158,30 @@ INSTANTIATE_TEST_CASE_P(
                 17, 18, 19, 20, 21, 22, 23, 24)
         );
 
+// Test the experimental 1D mode.
+TEST(BiquadBasicTest, OneDee) {
+    using D = float;
+    constexpr size_t TEST_LENGTH = 1024;
+    constexpr size_t FILTERS = 3;
+    std::vector<D> reference(TEST_LENGTH);
+    randomBuffer(reference.data(), TEST_LENGTH, 1 /* channelCount */);
+
+    BiquadFilter<D, true> parallel(FILTERS, COEFS);
+    std::vector<std::unique_ptr<BiquadFilter<D>>> biquads(FILTERS);
+    for (auto& biquad : biquads) {
+        biquad.reset(new BiquadFilter<D>(1, COEFS));
+    }
+
+    auto test1 = reference;
+    parallel.process1D(test1.data(), TEST_LENGTH);
+
+    auto test2 = reference;
+    for (auto& biquad : biquads) {
+        biquad->process(test2.data(), test2.data(), TEST_LENGTH);
+    }
+    EXPECT_THAT(test1, Pointwise(FloatNear(EPS), test2));
+}
+
 // The BiquadBasicTest is parameterized on floating point type (float or double).
 template <typename D>
 class BiquadBasicTest : public ::testing::Test {
