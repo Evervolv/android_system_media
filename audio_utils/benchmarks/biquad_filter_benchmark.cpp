@@ -168,18 +168,20 @@ static constexpr float REF_COEFS[] = {0.9460f, -1.8919f, 0.9460f, -1.8890f, 0.89
  * BM_BiquadFilter/1/2/30       6514 ns         6498 ns       107752
  * BM_BiquadFilter/1/2/31       4353 ns         4342 ns       161227
  *******************************************************************/
+
+template <typename F>
 static void BM_BiquadFilter(benchmark::State& state) {
     bool isSubnormal = (state.range(0) == 1);
     const size_t channelCount = state.range(1);
     const size_t occupancy = state.range(2);
 
-    std::vector<float> input(DATA_SIZE * channelCount);
-    std::vector<float> output(DATA_SIZE * channelCount);
-    std::array<float, android::audio_utils::kBiquadNumCoefs> coefs;
+    std::vector<F> input(DATA_SIZE * channelCount);
+    std::vector<F> output(DATA_SIZE * channelCount);
+    std::array<F, android::audio_utils::kBiquadNumCoefs> coefs;
 
     // Initialize input buffer and coefs with deterministic pseudo-random values
     std::minstd_rand gen(occupancy);
-    const float amplitude = isSubnormal ? std::numeric_limits<float>::min() * 0.1 : 1.0f;
+    const F amplitude = isSubnormal ? std::numeric_limits<F>::min() * 0.1 : 1.;
     std::uniform_real_distribution<> dis(-amplitude, amplitude);
     for (size_t i = 0; i < DATA_SIZE * channelCount; ++i) {
         input[i] = dis(gen);
@@ -188,7 +190,7 @@ static void BM_BiquadFilter(benchmark::State& state) {
         coefs[i] = (occupancy >> i & 1) * REF_COEFS[i];
     }
 
-    android::audio_utils::BiquadFilter biquadFilter(channelCount, coefs);
+    android::audio_utils::BiquadFilter<F> biquadFilter(channelCount, coefs);
 
     // Run the test
     while (state.KeepRunning()) {
@@ -197,9 +199,7 @@ static void BM_BiquadFilter(benchmark::State& state) {
         biquadFilter.process(output.data(), input.data(), DATA_SIZE);
         benchmark::ClobberMemory();
     }
-
-    state.SetComplexityN(state.range(0));
-
+    state.SetComplexityN(state.range(1));  // O(channelCount)
 }
 
 static void BiquadFilterArgs(benchmark::internal::Benchmark* b) {
@@ -209,6 +209,10 @@ static void BiquadFilterArgs(benchmark::internal::Benchmark* b) {
                 b->Args({k, i, j});
 }
 
-BENCHMARK(BM_BiquadFilter)->Apply(BiquadFilterArgs);
+static void BM_BiquadFilterFloat(benchmark::State& state) {
+    BM_BiquadFilter<float>(state);
+}
+
+BENCHMARK(BM_BiquadFilterFloat)->Apply(BiquadFilterArgs);
 
 BENCHMARK_MAIN();
