@@ -4850,10 +4850,8 @@ view may be smaller than when bokeh mode is off.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>Instead of using <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> with dual purposes of crop and zoom,<wbr/> the
-application can now choose to use this tag to specify the desired zoom level.<wbr/> The
-<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> can still be used to specify the horizontal or vertical
-crop to achieve aspect ratios different than the native camera sensor.<wbr/></p>
+              <p>Instead of using <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> for zoom,<wbr/> the application can now choose to
+use this tag to specify the desired zoom level.<wbr/></p>
 <p>By using this control,<wbr/> the application gains a simpler way to control zoom,<wbr/> which can
 be a combination of optical and digital zoom.<wbr/> For example,<wbr/> a multi-camera system may
 contain more than one lens with different focal lengths,<wbr/> and the user can use optical
@@ -10486,10 +10484,8 @@ view may be smaller than when bokeh mode is off.<wbr/></p>
           </tr>
           <tr class="entry_cont">
             <td class="entry_details" colspan="6">
-              <p>Instead of using <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> with dual purposes of crop and zoom,<wbr/> the
-application can now choose to use this tag to specify the desired zoom level.<wbr/> The
-<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> can still be used to specify the horizontal or vertical
-crop to achieve aspect ratios different than the native camera sensor.<wbr/></p>
+              <p>Instead of using <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> for zoom,<wbr/> the application can now choose to
+use this tag to specify the desired zoom level.<wbr/></p>
 <p>By using this control,<wbr/> the application gains a simpler way to control zoom,<wbr/> which can
 be a combination of optical and digital zoom.<wbr/> For example,<wbr/> a multi-camera system may
 contain more than one lens with different focal lengths,<wbr/> and the user can use optical
@@ -19651,11 +19647,18 @@ and
 respectively.<wbr/></p>
 <p>The camera device may adjust the crop region to account for rounding and other hardware
 requirements; the final crop region used will be included in the output capture result.<wbr/></p>
+<p>The camera sensor output aspect ratio depends on factors such as output stream
+combination and <a href="#controls_android.control.aeTargetFpsRange">android.<wbr/>control.<wbr/>ae<wbr/>Target<wbr/>Fps<wbr/>Range</a>,<wbr/> and shouldn't be adjusted by using
+this control.<wbr/> And the camera device will treat different camera sensor output sizes
+(potentially with in-sensor crop) as the same crop of
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/> As a result,<wbr/> the application shouldn't assume the
+maximum crop region always maps to the same aspect ratio or field of view for the
+sensor output.<wbr/></p>
 <p>Starting from API level 30,<wbr/> it's strongly recommended to use <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
 to take advantage of better support for zoom with logical multi-camera.<wbr/> The benefits
 include better precision with optical-digital zoom combination,<wbr/> and ability to do
 zoom-out from 1.<wbr/>0x.<wbr/> When using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for zoom,<wbr/> the crop region in
-the capture request must be either letterboxing or pillarboxing (but not both).<wbr/> The
+the capture request should be left as the default activeArray size.<wbr/> The
 coordinate system is post-zoom,<wbr/> meaning that the activeArraySize or
 preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>  See
 <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
@@ -22023,11 +22026,18 @@ and
 respectively.<wbr/></p>
 <p>The camera device may adjust the crop region to account for rounding and other hardware
 requirements; the final crop region used will be included in the output capture result.<wbr/></p>
+<p>The camera sensor output aspect ratio depends on factors such as output stream
+combination and <a href="#controls_android.control.aeTargetFpsRange">android.<wbr/>control.<wbr/>ae<wbr/>Target<wbr/>Fps<wbr/>Range</a>,<wbr/> and shouldn't be adjusted by using
+this control.<wbr/> And the camera device will treat different camera sensor output sizes
+(potentially with in-sensor crop) as the same crop of
+<a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>.<wbr/> As a result,<wbr/> the application shouldn't assume the
+maximum crop region always maps to the same aspect ratio or field of view for the
+sensor output.<wbr/></p>
 <p>Starting from API level 30,<wbr/> it's strongly recommended to use <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>
 to take advantage of better support for zoom with logical multi-camera.<wbr/> The benefits
 include better precision with optical-digital zoom combination,<wbr/> and ability to do
 zoom-out from 1.<wbr/>0x.<wbr/> When using <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for zoom,<wbr/> the crop region in
-the capture request must be either letterboxing or pillarboxing (but not both).<wbr/> The
+the capture request should be left as the default activeArray size.<wbr/> The
 coordinate system is post-zoom,<wbr/> meaning that the activeArraySize or
 preCorrectionActiveArraySize covers the camera device's field of view "after" zoom.<wbr/>  See
 <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> for details.<wbr/></p>
