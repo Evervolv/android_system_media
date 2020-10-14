@@ -57,12 +57,10 @@ __BEGIN_DECLS
 /* AudioFlinger and AudioPolicy services use I/O handles to identify audio sources and sinks */
 typedef int audio_io_handle_t;
 
-typedef uint32_t audio_flags_mask_t;
-
 /* Do not change these values without updating their counterparts
  * in frameworks/base/media/java/android/media/AudioAttributes.java
  */
-enum {
+typedef enum {
     AUDIO_FLAG_NONE                       = 0x0,
     AUDIO_FLAG_AUDIBILITY_ENFORCED        = 0x1,
     AUDIO_FLAG_SECURE                     = 0x2,
@@ -78,7 +76,7 @@ enum {
     AUDIO_FLAG_MUTE_HAPTIC                = 0x800,
     AUDIO_FLAG_NO_SYSTEM_CAPTURE          = 0X1000,
     AUDIO_FLAG_CAPTURE_PRIVATE            = 0X2000,
-};
+} audio_flags_mask_t;
 
 /* Audio attributes */
 #define AUDIO_ATTRIBUTES_TAGS_MAX_SIZE 256
@@ -198,7 +196,6 @@ static inline bool audio_is_global_session(audio_session_t session) {
  * that is currently resolved by checking the channel mask, the implementer should look for ways to
  * fix it with additional information outside of the mask.
  */
-typedef uint32_t audio_channel_mask_t;
 
 /* log(2) of maximum number of representations, not part of public API */
 #define AUDIO_CHANNEL_REPRESENTATION_LOG2   2
@@ -209,7 +206,10 @@ static inline uint32_t audio_channel_mask_get_bits(audio_channel_mask_t channel)
     return channel & ((1 << AUDIO_CHANNEL_COUNT_MAX) - 1);
 }
 
-typedef uint32_t audio_channel_representation_t;
+typedef enum {
+    AUDIO_CHANNEL_REPRESENTATION_POSITION   = 0x0u,
+    AUDIO_CHANNEL_REPRESENTATION_INDEX      = 0x2u,
+} audio_channel_representation_t;
 
 /* The return value is undefined if the channel mask is invalid. */
 static inline audio_channel_representation_t audio_channel_mask_get_representation(
@@ -219,6 +219,13 @@ static inline audio_channel_representation_t audio_channel_mask_get_representati
     return (audio_channel_representation_t)
             ((channel >> AUDIO_CHANNEL_COUNT_MAX) & ((1 << AUDIO_CHANNEL_REPRESENTATION_LOG2) - 1));
 }
+
+#ifdef __cplusplus
+// Some effects use `int32_t` directly for channel mask.
+static inline uint32_t audio_channel_mask_get_representation(int32_t mask) {
+    return audio_channel_mask_get_representation(static_cast<audio_channel_mask_t>(mask));
+}
+#endif
 
 /* Returns true if the channel mask is valid,
  * or returns false for AUDIO_CHANNEL_NONE, AUDIO_CHANNEL_INVALID, and other invalid values.
@@ -275,22 +282,6 @@ typedef enum {
     AUDIO_IN_ACOUSTICS_TX_DISABLE    = 0,
 } audio_in_acoustics_t;
 
-typedef uint32_t audio_devices_t;
-
-enum {
-    /**
-     * Stub audio output device. Used in policy configuration file on platforms without audio
-     * outputs.  This alias value to AUDIO_DEVICE_OUT_DEFAULT is only used in the audio policy
-     * context.
-     */
-    AUDIO_DEVICE_OUT_STUB = AUDIO_DEVICE_OUT_DEFAULT,
-    /**
-     * Stub audio input device. Used in policy configuration file on platforms without audio inputs.
-     * This alias value to AUDIO_DEVICE_IN_DEFAULT is only used in the audio policy context.
-     */
-    AUDIO_DEVICE_IN_STUB = AUDIO_DEVICE_IN_DEFAULT,
-};
-
 /* Additional information about compressed streams offloaded to
  * hardware playback
  * The version and size fields must be initialized by the caller by using
@@ -326,7 +317,7 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     /* .version = */ AUDIO_OFFLOAD_INFO_VERSION_CURRENT,
     /* .size = */ sizeof(audio_offload_info_t),
     /* .sample_rate = */ 0,
-    /* .channel_mask = */ 0,
+    /* .channel_mask = */ AUDIO_CHANNEL_NONE,
     /* .format = */ AUDIO_FORMAT_DEFAULT,
     /* .stream_type = */ AUDIO_STREAM_VOICE_CALL,
     /* .bit_rate = */ 0,
@@ -363,7 +354,7 @@ static const audio_config_t AUDIO_CONFIG_INITIALIZER = {
         /* .version = */ AUDIO_OFFLOAD_INFO_VERSION_CURRENT,
         /* .size = */ sizeof(audio_offload_info_t),
         /* .sample_rate = */ 0,
-        /* .channel_mask = */ 0,
+        /* .channel_mask = */ AUDIO_CHANNEL_NONE,
         /* .format = */ AUDIO_FORMAT_DEFAULT,
         /* .stream_type = */ AUDIO_STREAM_VOICE_CALL,
         /* .bit_rate = */ 0,
@@ -410,9 +401,6 @@ typedef int audio_module_handle_t;
  * the platform can expose them in the audio_policy_configuration.xml file. The audio HAL
  * will then implement gain control functions that will use the following data
  * structures. */
-
-typedef uint32_t audio_gain_mode_t;
-
 
 /* An audio_gain struct is a representation of a gain stage.
  * A gain stage is always attached to an audio port. */
@@ -672,8 +660,9 @@ typedef struct record_track_metadata {
 
 // see also: std::binary_search
 // search range [left, right)
-static inline bool audio_binary_search_uint_array(const uint32_t audio_array[], size_t left,
-                                                  size_t right, uint32_t target)
+static inline bool audio_binary_search_device_array(const audio_devices_t audio_array[],
+                                                    size_t left, size_t right,
+                                                    audio_devices_t target)
 {
     if (right <= left || target < audio_array[left] || target > audio_array[right - 1]) {
         return false;
@@ -710,7 +699,7 @@ static inline bool audio_is_output_device(audio_devices_t device)
         return true;
     default:
         // Binary seach all devices if the device is not a most common device.
-        return audio_binary_search_uint_array(
+        return audio_binary_search_device_array(
                 AUDIO_DEVICE_OUT_ALL_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_CNT, device);
     }
 }
@@ -731,10 +720,23 @@ static inline bool audio_is_input_device(audio_devices_t device)
         return true;
     default:
         // Binary seach all devices if the device is not a most common device.
-        return audio_binary_search_uint_array(
+        return audio_binary_search_device_array(
                 AUDIO_DEVICE_IN_ALL_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_CNT, device);
     }
 }
+
+#ifdef __cplusplus
+// Some effects use `uint32_t` directly for device.
+static inline bool audio_is_input_device(uint32_t device) {
+    return audio_is_input_device(static_cast<audio_devices_t>(device));
+}
+// This needs to be used when `audio_is_input_device` is passed
+// to an STL algorithm, as otherwise the compiler can't resolve
+// the overload at that point--the type of the container elements
+// doesn't appear in the predicate parameter type definition.
+const auto audio_call_is_input_device = [](auto x) { return audio_is_input_device(x); };
+#endif
+
 
 // TODO: this function expects a combination of audio device types as parameter. It should
 // be deprecated as audio device types should not be use as bit mask any more since R.
@@ -750,7 +752,7 @@ static inline bool audio_is_a2dp_in_device(audio_devices_t device)
 
 static inline bool audio_is_a2dp_out_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_OUT_ALL_A2DP_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_A2DP_CNT, device);
 }
 
@@ -762,13 +764,13 @@ static inline bool audio_is_a2dp_device(audio_devices_t device)
 
 static inline bool audio_is_bluetooth_out_sco_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_OUT_ALL_SCO_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_SCO_CNT, device);
 }
 
 static inline bool audio_is_bluetooth_in_sco_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_IN_ALL_SCO_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_SCO_CNT, device);
 }
 
@@ -785,13 +787,13 @@ static inline bool audio_is_hearing_aid_out_device(audio_devices_t device)
 
 static inline bool audio_is_usb_out_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_OUT_ALL_USB_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_USB_CNT, device);
 }
 
 static inline bool audio_is_usb_in_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_IN_ALL_USB_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_USB_CNT, device);
 }
 
@@ -809,13 +811,13 @@ static inline bool audio_is_remote_submix_device(audio_devices_t device)
 
 static inline bool audio_is_digital_out_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_OUT_ALL_DIGITAL_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_DIGITAL_CNT, device);
 }
 
 static inline bool audio_is_digital_in_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_IN_ALL_DIGITAL_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_DIGITAL_CNT, device);
 }
 
@@ -826,13 +828,13 @@ static inline bool audio_device_is_digital(audio_devices_t device) {
 
 static inline bool audio_is_ble_out_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_OUT_ALL_BLE_ARRAY, 0 /*left*/, AUDIO_DEVICE_OUT_BLE_CNT, device);
 }
 
 static inline bool audio_is_ble_in_device(audio_devices_t device)
 {
-    return audio_binary_search_uint_array(
+    return audio_binary_search_device_array(
             AUDIO_DEVICE_IN_ALL_BLE_ARRAY, 0 /*left*/, AUDIO_DEVICE_IN_BLE_CNT, device);
 }
 
@@ -906,6 +908,14 @@ static inline uint32_t audio_channel_count_from_in_mask(audio_channel_mask_t cha
     }
 }
 
+#ifdef __cplusplus
+// FIXME(b/169889714): buffer_config_t uses `uint32_t` for the mask.
+// A lot of effects code thus use `uint32_t` directly.
+static inline uint32_t audio_channel_count_from_in_mask(uint32_t mask) {
+    return audio_channel_count_from_in_mask(static_cast<audio_channel_mask_t>(mask));
+}
+#endif
+
 /* Returns the number of channels from an output channel mask,
  * used in the context of audio output or playback.
  * If a channel bit is set which could _not_ correspond to an output channel,
@@ -926,6 +936,14 @@ static inline uint32_t audio_channel_count_from_out_mask(audio_channel_mask_t ch
         return 0;
     }
 }
+
+#ifdef __cplusplus
+// FIXME(b/169889714): buffer_config_t uses `uint32_t` for the mask.
+// A lot of effects code thus use `uint32_t` directly.
+static inline uint32_t audio_channel_count_from_out_mask(uint32_t mask) {
+    return audio_channel_count_from_out_mask(static_cast<audio_channel_mask_t>(mask));
+}
+#endif
 
 /* Derive a channel mask for index assignment from a channel count.
  * Returns the matching channel mask,
@@ -1095,10 +1113,11 @@ static inline bool audio_channel_position_mask_is_out_canonical(audio_channel_ma
         return false;
     }
     const uint32_t audioChannelCount = audio_channel_count_from_out_mask(
-            channelMask & ~AUDIO_CHANNEL_HAPTIC_ALL);
+            (audio_channel_mask_t)(channelMask & ~AUDIO_CHANNEL_HAPTIC_ALL));
     const uint32_t hapticChannelCount = audio_channel_count_from_out_mask(
-            channelMask & AUDIO_CHANNEL_HAPTIC_ALL);
-    return channelMask == (audio_channel_out_mask_from_count(audioChannelCount) |
+            (audio_channel_mask_t)(channelMask & AUDIO_CHANNEL_HAPTIC_ALL));
+    return channelMask == (audio_channel_mask_t)(
+            audio_channel_out_mask_from_count(audioChannelCount) |
             haptic_channel_mask_from_count(hapticChannelCount));
 }
 
