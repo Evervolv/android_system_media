@@ -13,7 +13,11 @@ cc_test {
 
     header_libs: ["libmedia_headers"],
 
-    srcs: ["systemaudio_tests.cpp"],
+    srcs: [
+        "static_checks_c.c",
+        "static_checks.cpp",
+        "systemaudio_tests.cpp",
+    ],
 
     cflags: [
         "-Werror",
