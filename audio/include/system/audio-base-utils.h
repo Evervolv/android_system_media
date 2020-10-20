@@ -18,7 +18,6 @@
 #define ANDROID_AUDIO_BASE_UTILS_H
 
 #include "audio-base.h"
-#include "audio-hal-enums.h"
 
 /** Define helper values to iterate over enum, extend them or checking value validity.
  *  Those values are compatible with the O corresponding enum values.
@@ -26,16 +25,15 @@
  *  with the libhardware_legacy audio.h.
  */
 enum {
-    AUDIO_STREAM_MIN = AUDIO_STREAM_VOICE_CALL,
-    /** Number of audio streams available to vendors. */
+    /** Number of audio stream available to vendors. */
     AUDIO_STREAM_PUBLIC_CNT = AUDIO_STREAM_ASSISTANT + 1,
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
-    /** Total number of streams handled by the policy. */
+    /** Total number of stream handled by the policy*/
     AUDIO_STREAM_FOR_POLICY_CNT= AUDIO_STREAM_REROUTING + 1,
 #endif
 
-   /** Total number of streams. */
+   /** Total number of stream. */
     AUDIO_STREAM_CNT          = AUDIO_STREAM_CALL_ASSISTANT + 1,
 
     AUDIO_SOURCE_MAX          = AUDIO_SOURCE_VOICE_PERFORMANCE,
