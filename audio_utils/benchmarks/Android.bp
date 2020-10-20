@@ -9,6 +9,25 @@ cc_benchmark {
         "-Werror",
         "-Wall",
         "-ffast-math",
+      //  "-fno-vectorize",      // (test only)
+      //  "-fno-slp-vectorize",  // (test only)
+    ],
+    static_libs: [
+        "libaudioutils",
+    ],
+}
+
+cc_benchmark {
+    name: "intrinsic_benchmark",
+    host_supported: false,
+
+    srcs: ["intrinsic_benchmark.cpp"],
+    cflags: [
+        "-Werror",
+        "-Wall",
+        "-ffast-math",
+      //  "-fno-vectorize",      // (test only)
+      //  "-fno-slp-vectorize",  // (test only)
     ],
     static_libs: [
         "libaudioutils",
