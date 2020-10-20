@@ -27,6 +27,7 @@
 
 #include "audio-base.h"
 #include "audio-base-utils.h"
+#include "audio-hal-enums.h"
 
 /*
  * Annotation to tell clang that we intend to fall through from one case to
@@ -1246,6 +1247,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_LHDC:
     case AUDIO_FORMAT_LHDC_LL:
     case AUDIO_FORMAT_APTX_TWSP:
+    case AUDIO_FORMAT_LC3:
         return true;
     default:
         return false;
