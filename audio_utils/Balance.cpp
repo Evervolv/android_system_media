@@ -53,7 +53,7 @@ void Balance::setChannelMask(audio_channel_mask_t channelMask)
     // which is a fixed geometrical constant for a given channel mask.
     // This assumes that the channel mask does not change frequently.
     //
-    // For the channel mask spec, see system/media/audio/include/system/audio*.h.
+    // For the channel mask spec, see system/media/audio/include/system/audio-base.h.
     //
     // The side is: 0 = left, 1 = right, 2 = center.
     static constexpr int sideFromChannel[] = {
