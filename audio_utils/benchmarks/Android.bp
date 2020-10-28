@@ -19,7 +19,7 @@ cc_benchmark {
 
 cc_benchmark {
     name: "intrinsic_benchmark",
-    host_supported: true,
+    host_supported: false,
 
     srcs: ["intrinsic_benchmark.cpp"],
     cflags: [
