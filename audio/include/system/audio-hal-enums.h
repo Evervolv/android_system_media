@@ -618,7 +618,7 @@ inline bool audio_gain_mode_from_string(const char* s, audio_gain_mode_t* t) {
 #undef AUDIO_GAIN_MODE_LIST_DEF
 
 
-#define AUDIO_SOURCE_LIST_DEF(V) \
+#define AUDIO_SOURCE_LIST_NO_SYS_DEF(V) \
     V(AUDIO_SOURCE_DEFAULT, 0) \
     V(AUDIO_SOURCE_MIC, 1) \
     V(AUDIO_SOURCE_VOICE_UPLINK, 2) \
@@ -633,6 +633,13 @@ inline bool audio_gain_mode_from_string(const char* s, audio_gain_mode_t* t) {
     V(AUDIO_SOURCE_ECHO_REFERENCE, 1997) \
     V(AUDIO_SOURCE_FM_TUNER, 1998) \
     V(AUDIO_SOURCE_HOTWORD, 1999)
+#ifdef AUDIO_NO_SYSTEM_DECLARATIONS
+#define AUDIO_SOURCE_LIST_DEF AUDIO_SOURCE_LIST_NO_SYS_DEF
+#else
+#define AUDIO_SOURCE_LIST_DEF(V) \
+    AUDIO_SOURCE_LIST_NO_SYS_DEF(V) \
+    V(AUDIO_SOURCE_INVALID, -1)
+#endif  // AUDIO_NO_SYSTEM_DECLARATIONS
 
 typedef enum {
     AUDIO_SOURCE_LIST_DEF(AUDIO_DEFINE_ENUM_SYMBOL_V)
@@ -646,12 +653,12 @@ inline const char* audio_source_to_string(audio_source_t t) {
 }
 
 inline bool audio_source_from_string(const char* s, audio_source_t* t) {
-    AUDIO_SOURCE_LIST_DEF(AUDIO_DEFINE_PARSE_CASE_V)
+    AUDIO_SOURCE_LIST_NO_SYS_DEF(AUDIO_DEFINE_PARSE_CASE_V)
     return false;
 }
 
 #undef AUDIO_SOURCE_LIST_DEF
-
+#undef AUDIO_SOURCE_LIST_NO_SYS_DEF
 
 #define AUDIO_STREAM_LIST_NO_SYS_DEF(V) \
     V(AUDIO_STREAM_VOICE_CALL, 0) \
