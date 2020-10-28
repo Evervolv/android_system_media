@@ -25,9 +25,10 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-#include "audio-base.h"
 #include "audio-base-utils.h"
+#include "audio-base.h"
 #include "audio-hal-enums.h"
+#include "audio_common-base.h"
 
 /*
  * Annotation to tell clang that we intend to fall through from one case to
@@ -57,6 +58,30 @@ __BEGIN_DECLS
 
 /* AudioFlinger and AudioPolicy services use I/O handles to identify audio sources and sinks */
 typedef int audio_io_handle_t;
+
+/* Null values for handles. */
+enum {
+    AUDIO_IO_HANDLE_NONE = 0,
+    AUDIO_MODULE_HANDLE_NONE = 0,
+    AUDIO_PORT_HANDLE_NONE = 0,
+    AUDIO_PATCH_HANDLE_NONE = 0,
+};
+
+typedef enum {
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_MODE_INVALID = -2, // (-2)
+    AUDIO_MODE_CURRENT = -1, // (-1)
+#endif // AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_MODE_NORMAL = HAL_AUDIO_MODE_NORMAL,
+    AUDIO_MODE_RINGTONE = HAL_AUDIO_MODE_RINGTONE,
+    AUDIO_MODE_IN_CALL = HAL_AUDIO_MODE_IN_CALL,
+    AUDIO_MODE_IN_COMMUNICATION = HAL_AUDIO_MODE_IN_COMMUNICATION,
+    AUDIO_MODE_CALL_SCREEN = HAL_AUDIO_MODE_CALL_SCREEN,
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_MODE_MAX            = AUDIO_MODE_CALL_SCREEN,
+    AUDIO_MODE_CNT            = AUDIO_MODE_MAX + 1,
+#endif // AUDIO_NO_SYSTEM_DECLARATIONS
+} audio_mode_t;
 
 /* Do not change these values without updating their counterparts
  * in frameworks/base/media/java/android/media/AudioAttributes.java
@@ -156,6 +181,16 @@ static inline audio_unique_id_use_t audio_unique_id_get_use(audio_unique_id_t id
     return (audio_unique_id_use_t) (id & AUDIO_UNIQUE_ID_USE_MASK);
 }
 
+typedef enum {
+    AUDIO_SESSION_DEVICE = HAL_AUDIO_SESSION_DEVICE,
+    AUDIO_SESSION_OUTPUT_STAGE = HAL_AUDIO_SESSION_OUTPUT_STAGE,
+    AUDIO_SESSION_OUTPUT_MIX = HAL_AUDIO_SESSION_OUTPUT_MIX,
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_SESSION_ALLOCATE = 0,
+    AUDIO_SESSION_NONE = 0,
+#endif
+} audio_session_t;
+
 /* Reserved audio_unique_id_t values.  FIXME: not a complete list. */
 #define AUDIO_UNIQUE_ID_ALLOCATE AUDIO_SESSION_ALLOCATE
 
@@ -165,6 +200,14 @@ static inline audio_unique_id_use_t audio_unique_id_get_use(audio_unique_id_t id
 static inline bool audio_is_global_session(audio_session_t session) {
     return session <= AUDIO_SESSION_OUTPUT_MIX;
 }
+
+/* These constants are used instead of "magic numbers" 2 and 8 for
+ * stereo and multichannel channel counts.
+ */
+enum {
+    FCC_2 = 2,
+    FCC_8 = 8,
+};
 
 /* A channel mask per se only defines the presence or absence of a channel, not the order.
  * But see AUDIO_INTERLEAVE_* below for the platform convention of order.
@@ -485,6 +528,38 @@ struct audio_port_config_mix_ext {
 struct audio_port_config_session_ext {
     audio_session_t   session; /* audio session */
 };
+
+typedef enum {
+    AUDIO_PORT_ROLE_NONE = 0,
+    AUDIO_PORT_ROLE_SOURCE = 1,
+    AUDIO_PORT_ROLE_SINK = 2,
+} audio_port_role_t;
+
+typedef enum {
+    AUDIO_PORT_TYPE_NONE = 0,
+    AUDIO_PORT_TYPE_DEVICE = 1,
+    AUDIO_PORT_TYPE_MIX = 2,
+    AUDIO_PORT_TYPE_SESSION = 3,
+} audio_port_type_t;
+
+enum {
+    AUDIO_PORT_CONFIG_SAMPLE_RATE  = 0x1u,
+    AUDIO_PORT_CONFIG_CHANNEL_MASK = 0x2u,
+    AUDIO_PORT_CONFIG_FORMAT       = 0x4u,
+    AUDIO_PORT_CONFIG_GAIN         = 0x8u,
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_PORT_CONFIG_FLAGS        = 0x10u,
+#endif
+    AUDIO_PORT_CONFIG_ALL          = AUDIO_PORT_CONFIG_SAMPLE_RATE |
+                                     AUDIO_PORT_CONFIG_CHANNEL_MASK |
+                                     AUDIO_PORT_CONFIG_FORMAT |
+                                     AUDIO_PORT_CONFIG_GAIN,
+};
+
+typedef enum {
+    AUDIO_LATENCY_LOW = 0,
+    AUDIO_LATENCY_NORMAL = 1,
+} audio_mix_latency_class_t;
 
 /* audio port configuration structure used to specify a particular configuration of
  * an audio port */
@@ -1591,6 +1666,18 @@ struct audio_microphone_characteristic_t {
     struct audio_microphone_coordinate orientation;
 };
 
+typedef enum {
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    AUDIO_TIMESTRETCH_FALLBACK_CUT_REPEAT = -1, // (framework only) for speed <1.0 will truncate
+                                                // frames, for speed > 1.0 will repeat frames
+    AUDIO_TIMESTRETCH_FALLBACK_DEFAULT    = 0,  // (framework only) system determines behavior
+#endif
+    /* Set all processed frames to zero. */
+    AUDIO_TIMESTRETCH_FALLBACK_MUTE       = HAL_AUDIO_TIMESTRETCH_FALLBACK_MUTE,
+    /* Stop processing and indicate an error. */
+    AUDIO_TIMESTRETCH_FALLBACK_FAIL       = HAL_AUDIO_TIMESTRETCH_FALLBACK_FAIL,
+} audio_timestretch_fallback_mode_t;
+
 // AUDIO_TIMESTRETCH_SPEED_MIN and AUDIO_TIMESTRETCH_SPEED_MAX define the min and max time stretch
 // speeds supported by the system. These are enforced by the system and values outside this range
 // will result in a runtime error.
@@ -1615,7 +1702,7 @@ struct audio_microphone_characteristic_t {
 #define AUDIO_TIMESTRETCH_PITCH_NORMAL 1.0f
 #define AUDIO_TIMESTRETCH_PITCH_MIN_DELTA 0.0001f
 
-//Limits for AUDIO_TIMESTRETCH_STRETCH_SPEECH mode
+//Limits for AUDIO_TIMESTRETCH_STRETCH_VOICE mode
 #define TIMESTRETCH_SONIC_SPEED_MIN 0.1f
 #define TIMESTRETCH_SONIC_SPEED_MAX 6.0f
 
