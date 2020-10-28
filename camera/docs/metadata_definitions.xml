@@ -3130,7 +3130,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             are supported by this camera device, and each extended scene mode's capabilities such
             as maximum streaming size, and supported zoom ratio ranges.</description>
           <details>
-            For DISABLED mode, the camera behaves normally with no extended scene mdoe enabled.
+            For DISABLED mode, the camera behaves normally with no extended scene mode enabled.
 
             For BOKEH_STILL_CAPTURE mode, the maximum streaming dimension specifies the limit
             under which bokeh is effective when capture intent is PREVIEW. Note that when capture
@@ -8059,7 +8059,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
             E.g. to calculate position of a pixel, (x,y), in a processed YUV output image with the
             dimensions in android.sensor.info.activeArraySize given the position of a pixel,
-            (x', y'), in the raw pixel array with dimensions give in
+            (x', y'), in the raw pixel array with dimensions given in
             android.sensor.info.pixelArraySize:
 
             1. Choose a pixel (x', y') within the active array region of the raw buffer given in
