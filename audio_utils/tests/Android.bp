@@ -204,7 +204,7 @@ cc_test {
 
 cc_test {
     name: "metadata_tests",
-    host_supported: true,
+    host_supported: false,
 
     shared_libs: [
         "libcutils",
@@ -311,7 +311,7 @@ cc_test {
 
 cc_test {
     name: "string_tests",
-    host_supported: true,
+    host_supported: false,
 
     shared_libs: ["libaudioutils"],
     srcs: ["string_tests.cpp"],
@@ -319,11 +319,6 @@ cc_test {
         "-Wall",
         "-Werror",
     ],
-    target: {
-        host: {
-            shared_libs: ["libcutils"],
-        },
-    }
 }
 
 cc_test {
