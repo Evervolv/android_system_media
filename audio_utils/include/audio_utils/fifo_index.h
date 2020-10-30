@@ -34,11 +34,25 @@ public:
     ~audio_utils_fifo_index() { }
 
     /**
+     * Load value of index by a simple non-atomic memory read.
+     *
+     * \return Index value
+     */
+    uint32_t loadSingleThreaded();
+
+    /**
      * Load value of index now with memory order 'acquire'.
      *
      * \return Index value
      */
     uint32_t loadAcquire();
+
+    /**
+     * Store new value into index by a simple non-atomic memory write.
+     *
+     * \param value New value to store into index
+     */
+    void storeSingleThreaded(uint32_t value);
 
     /**
      * Store new value into index now with memory order 'release'.
@@ -81,6 +95,7 @@ private:
     // It would make more sense to declare this as atomic_uint32_t, but there is no such type name.
     // TODO Support 64-bit index with 32-bit futex in low-order bits.
     std::atomic_uint_least32_t  mIndex; // accessed by both sides using atomic operations
+    // TODO Should be a union with a simple non-atomic variable
     static_assert(sizeof(mIndex) == sizeof(uint32_t), "mIndex must be 32 bits");
 };
 
