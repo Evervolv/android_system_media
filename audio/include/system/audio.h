@@ -589,6 +589,13 @@ struct audio_port_config {
 #define AUDIO_PORT_MAX_CHANNEL_MASKS 32
 /* max number of audio formats in audio port */
 #define AUDIO_PORT_MAX_FORMATS 32
+/* max number of audio profiles in audio port. The audio profiles are used in
+ * `struct audio_port_v7`. When converting between `struct audio_port` and
+ * `struct audio_port_v7`, the number of audio profiles in `struct audio_port_v7`
+ * must be the same as the number of formats in `struct audio_port`. Therefore,
+ * the maximum number of audio profiles must be the same as the maximum number
+ * of formats. */
+#define AUDIO_PORT_MAX_AUDIO_PROFILES AUDIO_PORT_MAX_FORMATS
 /* max number of gain controls in audio port */
 #define AUDIO_PORT_MAX_GAINS 16
 
@@ -617,25 +624,369 @@ struct audio_port_session_ext {
 };
 
 struct audio_port {
-    audio_port_handle_t      id;                /* port unique ID */
-    audio_port_role_t        role;              /* sink or source */
-    audio_port_type_t        type;              /* device, mix ... */
+    audio_port_handle_t      id;                 /* port unique ID */
+    audio_port_role_t        role;               /* sink or source */
+    audio_port_type_t        type;               /* device, mix ... */
     char                     name[AUDIO_PORT_MAX_NAME_LEN];
-    unsigned int             num_sample_rates;  /* number of sampling rates in following array */
+    unsigned int             num_sample_rates;   /* number of sampling rates in following array */
     unsigned int             sample_rates[AUDIO_PORT_MAX_SAMPLING_RATES];
-    unsigned int             num_channel_masks; /* number of channel masks in following array */
+    unsigned int             num_channel_masks;  /* number of channel masks in following array */
     audio_channel_mask_t     channel_masks[AUDIO_PORT_MAX_CHANNEL_MASKS];
-    unsigned int             num_formats;       /* number of formats in following array */
+    unsigned int             num_formats;        /* number of formats in following array */
     audio_format_t           formats[AUDIO_PORT_MAX_FORMATS];
-    unsigned int             num_gains;         /* number of gains in following array */
+    unsigned int             num_gains;          /* number of gains in following array */
     struct audio_gain        gains[AUDIO_PORT_MAX_GAINS];
-    struct audio_port_config active_config;     /* current audio port configuration */
+    struct audio_port_config active_config;      /* current audio port configuration */
     union {
         struct audio_port_device_ext  device;
         struct audio_port_mix_ext     mix;
         struct audio_port_session_ext session;
     } ext;
 };
+
+/* configurations supported for a certain format */
+struct audio_profile {
+    audio_format_t           format;
+    unsigned int             num_sample_rates;  /* number of sampling rates in following array */
+    unsigned int             sample_rates[AUDIO_PORT_MAX_SAMPLING_RATES];
+    unsigned int             num_channel_masks; /* number of channel masks in following array */
+    audio_channel_mask_t     channel_masks[AUDIO_PORT_MAX_CHANNEL_MASKS];
+};
+
+struct audio_port_v7 {
+    audio_port_handle_t      id;                 /* port unique ID */
+    audio_port_role_t        role;               /* sink or source */
+    audio_port_type_t        type;               /* device, mix ... */
+    char                     name[AUDIO_PORT_MAX_NAME_LEN];
+    unsigned int             num_audio_profiles; /* number of audio profiles in the following
+                                                    array */
+    struct audio_profile     audio_profiles[AUDIO_PORT_MAX_AUDIO_PROFILES];
+    unsigned int             num_gains;          /* number of gains in following array */
+    struct audio_gain        gains[AUDIO_PORT_MAX_GAINS];
+    struct audio_port_config active_config;      /* current audio port configuration */
+    union {
+        struct audio_port_device_ext  device;
+        struct audio_port_mix_ext     mix;
+        struct audio_port_session_ext session;
+    } ext;
+};
+
+static inline void audio_populate_audio_port_v7(
+        const struct audio_port *port, struct audio_port_v7 *portV7) {
+    portV7->id = port->id;
+    portV7->role = port->role;
+    portV7->type = port->type;
+    strncpy(portV7->name, port->name, AUDIO_PORT_MAX_NAME_LEN);
+    portV7->name[AUDIO_PORT_MAX_NAME_LEN-1] = '\0';
+    portV7->num_audio_profiles =
+            port->num_formats > AUDIO_PORT_MAX_AUDIO_PROFILES ?
+            AUDIO_PORT_MAX_AUDIO_PROFILES : port->num_formats;
+    for (size_t i = 0; i < portV7->num_audio_profiles; ++i) {
+        portV7->audio_profiles[i].format = port->formats[i];
+        portV7->audio_profiles[i].num_sample_rates = port->num_sample_rates;
+        memcpy(portV7->audio_profiles[i].sample_rates, port->sample_rates,
+                port->num_sample_rates * sizeof(unsigned int));
+        portV7->audio_profiles[i].num_channel_masks = port->num_channel_masks;
+        memcpy(portV7->audio_profiles[i].channel_masks, port->channel_masks,
+                port->num_channel_masks * sizeof(audio_channel_mask_t));
+    }
+    portV7->num_gains = port->num_gains;
+    memcpy(portV7->gains, port->gains, port->num_gains * sizeof(struct audio_gain));
+    memcpy(&portV7->active_config, &port->active_config, sizeof(struct audio_port_config));
+    memcpy(&portV7->ext, &port->ext, sizeof(port->ext));
+}
+
+/* Populate the data in `struct audio_port` using data from `struct audio_port_v7`. As the
+ * `struct audio_port_v7` use audio profiles to describe its capabilities, it may contain more
+ * data for sample rates or channel masks than the data that can be held by `struct audio_port`.
+ * Return true if all the data from `struct audio_port_v7` are converted to `struct audio_port`.
+ * Otherwise, return false.
+ */
+static inline bool audio_populate_audio_port(
+        const struct audio_port_v7 *portV7, struct audio_port *port) {
+    bool allDataConverted = true;
+    port->id = portV7->id;
+    port->role = portV7->role;
+    port->type = portV7->type;
+    strncpy(port->name, portV7->name, AUDIO_PORT_MAX_NAME_LEN);
+    port->name[AUDIO_PORT_MAX_NAME_LEN-1] = '\0';
+    port->num_formats =
+            portV7->num_audio_profiles > AUDIO_PORT_MAX_FORMATS ?
+            AUDIO_PORT_MAX_FORMATS : portV7->num_audio_profiles;
+    port->num_sample_rates = 0;
+    port->num_channel_masks = 0;
+    for (size_t i = 0; i < port->num_formats; ++i) {
+        port->formats[i] = portV7->audio_profiles[i].format;
+        for (size_t j = 0; j < portV7->audio_profiles[i].num_sample_rates; ++j) {
+            size_t k = 0;
+            for (; k < port->num_sample_rates; ++k) {
+                if (port->sample_rates[k] == portV7->audio_profiles[i].sample_rates[j]) {
+                    break;
+                }
+            }
+            if (k == port->num_sample_rates) {
+                if (port->num_sample_rates >= AUDIO_PORT_MAX_SAMPLING_RATES) {
+                    allDataConverted = false;
+                    break;
+                }
+                port->sample_rates[port->num_sample_rates++] =
+                        portV7->audio_profiles[i].sample_rates[j];
+            }
+        }
+        for (size_t j = 0; j < portV7->audio_profiles[i].num_channel_masks; ++j) {
+            size_t k = 0;
+            for (; k < port->num_channel_masks; ++k) {
+                if (port->channel_masks[k] == portV7->audio_profiles[i].channel_masks[j]) {
+                    break;
+                }
+            }
+            if (k == port->num_channel_masks) {
+                if (port->num_channel_masks >= AUDIO_PORT_MAX_CHANNEL_MASKS) {
+                    allDataConverted = false;
+                    break;
+                }
+                port->channel_masks[port->num_channel_masks++] =
+                        portV7->audio_profiles[i].channel_masks[j];
+            }
+        }
+    }
+    port->num_gains = portV7->num_gains;
+    memcpy(port->gains, portV7->gains, port->num_gains * sizeof(struct audio_gain));
+    memcpy(&port->active_config, &portV7->active_config, sizeof(struct audio_port_config));
+    memcpy(&port->ext, &portV7->ext, sizeof(port->ext));
+    return allDataConverted;
+}
+
+static inline bool audio_gain_config_are_equal(
+        const struct audio_gain_config *lhs, const struct audio_gain_config *rhs) {
+    if (lhs->mode != rhs->mode) return false;
+    switch (lhs->mode) {
+    case AUDIO_GAIN_MODE_JOINT:
+        if (lhs->values[0] != rhs->values[0]) return false;
+        break;
+    case AUDIO_GAIN_MODE_CHANNELS:
+    case AUDIO_GAIN_MODE_RAMP:
+        if (lhs->channel_mask != rhs->channel_mask) return false;
+        for (int i = 0; i < __builtin_popcount(lhs->channel_mask); ++i) {
+            if (lhs->values[i] != rhs->values[i]) return false;
+        }
+        break;
+    default: return false;
+    }
+    return lhs->ramp_duration_ms == rhs->ramp_duration_ms;
+}
+
+static inline bool audio_port_config_has_input_direction(const struct audio_port_config *port_cfg) {
+    switch (port_cfg->type) {
+    case AUDIO_PORT_TYPE_DEVICE:
+        switch (port_cfg->role) {
+        case AUDIO_PORT_ROLE_SOURCE: return true;
+        case AUDIO_PORT_ROLE_SINK: return false;
+        default: return false;
+        }
+    case AUDIO_PORT_TYPE_MIX:
+        switch (port_cfg->role) {
+        case AUDIO_PORT_ROLE_SOURCE: return false;
+        case AUDIO_PORT_ROLE_SINK: return true;
+        default: return false;
+        }
+    default: return false;
+    }
+}
+
+static inline bool audio_port_configs_are_equal(
+        const struct audio_port_config *lhs, const struct audio_port_config *rhs) {
+    if (lhs->role != rhs->role || lhs->type != rhs->type) return false;
+    switch (lhs->type) {
+    case AUDIO_PORT_TYPE_NONE: break;
+    case AUDIO_PORT_TYPE_DEVICE:
+        if (lhs->ext.device.hw_module != rhs->ext.device.hw_module ||
+                lhs->ext.device.type != rhs->ext.device.type ||
+                strncmp(lhs->ext.device.address, rhs->ext.device.address,
+                        AUDIO_DEVICE_MAX_ADDRESS_LEN) != 0) {
+            return false;
+        }
+        break;
+    case AUDIO_PORT_TYPE_MIX:
+        if (lhs->ext.mix.hw_module != rhs->ext.mix.hw_module ||
+                lhs->ext.mix.handle != rhs->ext.mix.handle) return false;
+        if (lhs->role == AUDIO_PORT_ROLE_SOURCE &&
+                lhs->ext.mix.usecase.stream != rhs->ext.mix.usecase.stream) return false;
+        else if (lhs->role == AUDIO_PORT_ROLE_SINK &&
+                lhs->ext.mix.usecase.source != rhs->ext.mix.usecase.source) return false;
+        break;
+    case AUDIO_PORT_TYPE_SESSION:
+        if (lhs->ext.session.session != rhs->ext.session.session) return false;
+        break;
+    default: return false;
+    }
+    return
+            lhs->config_mask == rhs->config_mask &&
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+            ((lhs->config_mask & AUDIO_PORT_CONFIG_FLAGS) == 0 ||
+                    (audio_port_config_has_input_direction(lhs) ?
+                            lhs->flags.input == rhs->flags.input :
+                            lhs->flags.output == rhs->flags.output)) &&
+#endif
+            ((lhs->config_mask & AUDIO_PORT_CONFIG_SAMPLE_RATE) == 0 ||
+                    lhs->sample_rate == rhs->sample_rate) &&
+            ((lhs->config_mask & AUDIO_PORT_CONFIG_CHANNEL_MASK) == 0 ||
+                    lhs->channel_mask == rhs->channel_mask) &&
+            ((lhs->config_mask & AUDIO_PORT_CONFIG_FORMAT) == 0 ||
+                    lhs->format == rhs->format) &&
+            ((lhs->config_mask & AUDIO_PORT_CONFIG_GAIN) == 0 ||
+                    audio_gain_config_are_equal(&lhs->gain, &rhs->gain));
+}
+
+static inline bool audio_gains_are_equal(const struct audio_gain* lhs, const struct audio_gain* rhs) {
+    return lhs->mode == rhs->mode &&
+            ((lhs->mode & AUDIO_GAIN_MODE_CHANNELS) != AUDIO_GAIN_MODE_CHANNELS ||
+                    lhs->channel_mask == rhs->channel_mask) &&
+            lhs->min_value == rhs->min_value &&
+            lhs->max_value == rhs->max_value &&
+            lhs->default_value == rhs->default_value &&
+            lhs->step_value == rhs->step_value &&
+            lhs->min_ramp_ms == rhs->min_ramp_ms &&
+            lhs->max_ramp_ms == rhs->max_ramp_ms;
+}
+
+// Define the helper functions of compare two audio_port/audio_port_v7 only in
+// C++ as it is easier to compare the device capabilities.
+#ifdef __cplusplus
+extern "C++" {
+#include <map>
+#include <set>
+#include <type_traits>
+#include <utility>
+
+namespace {
+
+static inline bool audio_gain_array_contains_all_elements_from(
+        const struct audio_gain gains[], const size_t numGains,
+        const struct audio_gain from[], size_t numFromGains) {
+    for (size_t i = 0; i < numFromGains; ++i) {
+        size_t j = 0;
+        for (;j < numGains; ++j) {
+            if (audio_gains_are_equal(&from[i], &gains[j])) {
+                break;
+            }
+        }
+        if (j == numGains) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T, std::enable_if_t<std::is_same<T, struct audio_port>::value
+                                    || std::is_same<T, struct audio_port_v7>::value, int> = 0>
+static inline bool audio_ports_base_are_equal(const T* lhs, const T* rhs) {
+    if (lhs->id != rhs->id || lhs->role != rhs->role || lhs->type != rhs->type ||
+            strncmp(lhs->name, rhs->name, AUDIO_PORT_MAX_NAME_LEN) != 0 ||
+            lhs->num_gains != rhs->num_gains) {
+        return false;
+    }
+    switch (lhs->type) {
+    case AUDIO_PORT_TYPE_NONE: break;
+    case AUDIO_PORT_TYPE_DEVICE:
+        if (
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+                lhs->ext.device.encapsulation_modes != rhs->ext.device.encapsulation_modes ||
+                lhs->ext.device.encapsulation_metadata_types !=
+                        rhs->ext.device.encapsulation_metadata_types ||
+#endif
+                lhs->ext.device.hw_module != rhs->ext.device.hw_module ||
+                lhs->ext.device.type != rhs->ext.device.type ||
+                strncmp(lhs->ext.device.address, rhs->ext.device.address,
+                        AUDIO_DEVICE_MAX_ADDRESS_LEN) != 0) {
+            return false;
+        }
+        break;
+    case AUDIO_PORT_TYPE_MIX:
+        if (lhs->ext.mix.hw_module != rhs->ext.mix.hw_module ||
+                lhs->ext.mix.handle != rhs->ext.mix.handle ||
+                lhs->ext.mix.latency_class != rhs->ext.mix.latency_class) {
+            return false;
+        }
+        break;
+    case AUDIO_PORT_TYPE_SESSION:
+        if (lhs->ext.session.session != rhs->ext.session.session) {
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
+    if (!audio_gain_array_contains_all_elements_from(
+            lhs->gains, lhs->num_gains, rhs->gains, rhs->num_gains) ||
+            !audio_gain_array_contains_all_elements_from(
+                    rhs->gains, rhs->num_gains, lhs->gains, lhs->num_gains)) {
+        return false;
+    }
+    return audio_port_configs_are_equal(&lhs->active_config, &rhs->active_config);
+}
+
+template <typename T, std::enable_if_t<std::is_same<T, audio_format_t>::value
+                                    || std::is_same<T, unsigned int>::value
+                                    || std::is_same<T, audio_channel_mask_t>::value, int> = 0>
+static inline bool audio_capability_arrays_are_equal(
+        const T lhs[], unsigned int lsize, const T rhs[], unsigned int rsize) {
+    std::set<T> lhsSet(lhs, lhs + lsize);
+    std::set<T> rhsSet(rhs, rhs + rsize);
+    return lhsSet == rhsSet;
+}
+
+using AudioProfileMap =
+        std::map<audio_format_t,
+                 std::pair<std::set<unsigned int>, std::set<audio_channel_mask_t>>>;
+static inline AudioProfileMap getAudioProfileMap(
+        const struct audio_profile profiles[], unsigned int size) {
+    AudioProfileMap audioProfiles;
+    for (size_t i = 0; i < size; ++i) {
+        std::set<unsigned int> sampleRates(
+                profiles[i].sample_rates, profiles[i].sample_rates + profiles[i].num_sample_rates);
+        std::set<audio_channel_mask_t> channelMasks(
+                profiles[i].channel_masks,
+                profiles[i].channel_masks + profiles[i].num_channel_masks);
+        audioProfiles.emplace(profiles[i].format, std::make_pair(sampleRates, channelMasks));
+    }
+    return audioProfiles;
+}
+
+static inline bool audio_profile_arrays_are_equal(
+        const struct audio_profile lhs[], unsigned int lsize,
+        const struct audio_profile rhs[], unsigned int rsize) {
+    return getAudioProfileMap(lhs, lsize) == getAudioProfileMap(rhs, rsize);
+}
+} // namespace
+
+static inline bool audio_ports_are_equal(
+        const struct audio_port* lhs, const struct audio_port* rhs) {
+    if (!audio_ports_base_are_equal(lhs, rhs)) {
+        return false;
+    }
+    return audio_capability_arrays_are_equal(
+            lhs->formats, lhs->num_formats, rhs->formats, rhs->num_formats) &&
+            audio_capability_arrays_are_equal(
+                    lhs->sample_rates, lhs->num_sample_rates,
+                    rhs->sample_rates, rhs->num_sample_rates) &&
+            audio_capability_arrays_are_equal(
+                    lhs->channel_masks, lhs->num_channel_masks,
+                    rhs->channel_masks, rhs->num_channel_masks);
+}
+
+static inline bool audio_ports_v7_are_equal(
+        const struct audio_port_v7* lhs, const struct audio_port_v7* rhs) {
+    if (!audio_ports_base_are_equal(lhs, rhs)) {
+        return false;
+    }
+    return audio_profile_arrays_are_equal(
+            lhs->audio_profiles, lhs->num_audio_profiles,
+            rhs->audio_profiles, rhs->num_audio_profiles);
+}
+
+} // extern "C++"
+#endif // __cplusplus
 
 /* An audio patch represents a connection between one or more source ports and
  * one or more sink ports. Patches are connected and disconnected by audio policy manager or by
@@ -1456,84 +1807,6 @@ static inline bool audio_is_valid_audio_source(audio_source_t audioSource)
 }
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
-
-static inline bool audio_gain_config_are_equal(
-        const struct audio_gain_config *lhs, const struct audio_gain_config *rhs) {
-    if (lhs->mode != rhs->mode) return false;
-    switch (lhs->mode) {
-    case AUDIO_GAIN_MODE_JOINT:
-        if (lhs->values[0] != rhs->values[0]) return false;
-        break;
-    case AUDIO_GAIN_MODE_CHANNELS:
-    case AUDIO_GAIN_MODE_RAMP:
-        if (lhs->channel_mask != rhs->channel_mask) return false;
-        for (int i = 0; i < __builtin_popcount(lhs->channel_mask); ++i) {
-            if (lhs->values[i] != rhs->values[i]) return false;
-        }
-        break;
-    default: return false;
-    }
-    return lhs->ramp_duration_ms == rhs->ramp_duration_ms;
-}
-
-static inline bool audio_port_config_has_input_direction(const struct audio_port_config *port_cfg) {
-    switch (port_cfg->type) {
-    case AUDIO_PORT_TYPE_DEVICE:
-        switch (port_cfg->role) {
-        case AUDIO_PORT_ROLE_SOURCE: return true;
-        case AUDIO_PORT_ROLE_SINK: return false;
-        default: return false;
-        }
-    case AUDIO_PORT_TYPE_MIX:
-        switch (port_cfg->role) {
-        case AUDIO_PORT_ROLE_SOURCE: return false;
-        case AUDIO_PORT_ROLE_SINK: return true;
-        default: return false;
-        }
-    default: return false;
-    }
-}
-
-static inline bool audio_port_configs_are_equal(
-        const struct audio_port_config *lhs, const struct audio_port_config *rhs) {
-    if (lhs->role != rhs->role || lhs->type != rhs->type) return false;
-    switch (lhs->type) {
-    case AUDIO_PORT_TYPE_NONE: break;
-    case AUDIO_PORT_TYPE_DEVICE:
-        if (lhs->ext.device.hw_module != rhs->ext.device.hw_module ||
-                lhs->ext.device.type != rhs->ext.device.type ||
-                strncmp(lhs->ext.device.address, rhs->ext.device.address,
-                        AUDIO_DEVICE_MAX_ADDRESS_LEN) != 0) {
-            return false;
-        }
-        break;
-    case AUDIO_PORT_TYPE_MIX:
-        if (lhs->ext.mix.hw_module != rhs->ext.mix.hw_module ||
-                lhs->ext.mix.handle != rhs->ext.mix.handle) return false;
-        if (lhs->role == AUDIO_PORT_ROLE_SOURCE &&
-                lhs->ext.mix.usecase.stream != rhs->ext.mix.usecase.stream) return false;
-        else if (lhs->role == AUDIO_PORT_ROLE_SINK &&
-                lhs->ext.mix.usecase.source != rhs->ext.mix.usecase.source) return false;
-        break;
-    case AUDIO_PORT_TYPE_SESSION:
-        if (lhs->ext.session.session != rhs->ext.session.session) return false;
-        break;
-    default: return false;
-    }
-    return lhs->config_mask == rhs->config_mask &&
-            ((lhs->config_mask & AUDIO_PORT_CONFIG_SAMPLE_RATE) == 0 ||
-                    lhs->sample_rate == rhs->sample_rate) &&
-            ((lhs->config_mask & AUDIO_PORT_CONFIG_CHANNEL_MASK) == 0 ||
-                    lhs->channel_mask == rhs->channel_mask) &&
-            ((lhs->config_mask & AUDIO_PORT_CONFIG_FORMAT) == 0 ||
-                    lhs->format == rhs->format) &&
-            ((lhs->config_mask & AUDIO_PORT_CONFIG_GAIN) == 0 ||
-                    audio_gain_config_are_equal(&lhs->gain, &rhs->gain)) &&
-            ((lhs->config_mask & AUDIO_PORT_CONFIG_FLAGS) == 0 ||
-                    (audio_port_config_has_input_direction(lhs) ?
-                            lhs->flags.input == rhs->flags.input :
-                            lhs->flags.output == rhs->flags.output));
-}
 
 static inline bool audio_port_config_has_hw_av_sync(const struct audio_port_config *port_cfg) {
     if (!(port_cfg->config_mask & AUDIO_PORT_CONFIG_FLAGS)) {
