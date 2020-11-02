@@ -203,9 +203,10 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
     size_t availToWrite;
     if (mFifo.mThrottleFront != NULL) {
         int retries = kRetries;
-        uint32_t front;
         for (;;) {
-            front = mFifo.mThrottleFront->loadAcquire();
+            uint32_t front = mFifo.mThrottleFrontSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED ?
+                    mFifo.mThrottleFront->loadSingleThreaded() :
+                    mFifo.mThrottleFront->loadAcquire();
             // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(mLocalRear, front);
             if (filled < 0) {
@@ -227,6 +228,9 @@ ssize_t audio_utils_fifo_writer::obtain(audio_utils_iovec iovec[2], size_t count
             //      separate from the low level code (indexes, available, masking).
             int op = FUTEX_WAIT;
             switch (mFifo.mThrottleFrontSync) {
+            case AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED:
+                err = -ENOTSUP;
+                break;
             case AUDIO_UTILS_FIFO_SYNC_SLEEP:
                 err = audio_utils_clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout,
                         NULL /*remain*/);
@@ -311,14 +315,21 @@ void audio_utils_fifo_writer::release(size_t count)
             return;
         }
         if (mFifo.mThrottleFront != NULL) {
-            uint32_t front = mFifo.mThrottleFront->loadAcquire();
+            uint32_t front = mFifo.mThrottleFrontSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED ?
+                    mFifo.mThrottleFront->loadSingleThreaded() :
+                    mFifo.mThrottleFront->loadAcquire();
             // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(mLocalRear, front);
             mLocalRear = mFifo.sum(mLocalRear, count);
-            mFifo.mWriterRear.storeRelease(mLocalRear);
+            if (mFifo.mWriterRearSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED) {
+                mFifo.mWriterRear.storeSingleThreaded(mLocalRear);
+            } else {
+                mFifo.mWriterRear.storeRelease(mLocalRear);
+            }
             // TODO add comments
             int op = FUTEX_WAKE;
             switch (mFifo.mWriterRearSync) {
+            case AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED:
             case AUDIO_UTILS_FIFO_SYNC_SLEEP:
                 break;
             case AUDIO_UTILS_FIFO_SYNC_PRIVATE:
@@ -346,7 +357,11 @@ void audio_utils_fifo_writer::release(size_t count)
             }
         } else {
             mLocalRear = mFifo.sum(mLocalRear, count);
-            mFifo.mWriterRear.storeRelease(mLocalRear);
+            if (mFifo.mWriterRearSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED) {
+                mFifo.mWriterRear.storeSingleThreaded(mLocalRear);
+            } else {
+                mFifo.mWriterRear.storeRelease(mLocalRear);
+            }
         }
         mObtained -= count;
         mTotalReleased += count;
@@ -469,14 +484,20 @@ void audio_utils_fifo_reader::release(size_t count)
             return;
         }
         if (mThrottleFront != NULL) {
-            uint32_t rear = mFifo.mWriterRear.loadAcquire();
+            uint32_t rear = mFifo.mWriterRearSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED ?
+                    mFifo.mWriterRear.loadSingleThreaded() : mFifo.mWriterRear.loadAcquire();
             // returns -EIO if mIsShutdown
             int32_t filled = mFifo.diff(rear, mLocalFront);
             mLocalFront = mFifo.sum(mLocalFront, count);
-            mThrottleFront->storeRelease(mLocalFront);
+            if (mFifo.mThrottleFrontSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED) {
+                mThrottleFront->storeSingleThreaded(mLocalFront);
+            } else {
+                mThrottleFront->storeRelease(mLocalFront);
+            }
             // TODO add comments
             int op = FUTEX_WAKE;
             switch (mFifo.mThrottleFrontSync) {
+            case AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED:
             case AUDIO_UTILS_FIFO_SYNC_SLEEP:
                 break;
             case AUDIO_UTILS_FIFO_SYNC_PRIVATE:
@@ -519,7 +540,8 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
     int retries = kRetries;
     uint32_t rear;
     for (;;) {
-        rear = mFifo.mWriterRear.loadAcquire();
+        rear = mFifo.mWriterRearSync == AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED ?
+                mFifo.mWriterRear.loadSingleThreaded() : mFifo.mWriterRear.loadAcquire();
         // TODO pull out "count == 0"
         if (count == 0 || rear != mLocalFront || timeout == NULL ||
                 (timeout->tv_sec == 0 && timeout->tv_nsec == 0)) {
@@ -528,6 +550,9 @@ ssize_t audio_utils_fifo_reader::obtain(audio_utils_iovec iovec[2], size_t count
         // TODO add comments
         int op = FUTEX_WAIT;
         switch (mFifo.mWriterRearSync) {
+        case AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED:
+            err = -ENOTSUP;
+            break;
         case AUDIO_UTILS_FIFO_SYNC_SLEEP:
             err = audio_utils_clock_nanosleep(CLOCK_MONOTONIC, 0 /*flags*/, timeout,
                     NULL /*remain*/);

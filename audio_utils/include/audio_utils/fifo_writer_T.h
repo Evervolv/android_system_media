@@ -39,7 +39,7 @@
  *  - construct an ordinary FIFO that follows the restrictions above
  *  - construct an ordinary reader based on that FIFO
  *  - construct a writer_T using the FIFO
- *  - use a sequence of write and write1, followed by storeRelaxed or storeRelease to commit
+ *  - use a sequence of write and write1, followed by storeSingleThreaded or storeRelease to commit
  */
 template <typename T>
 class audio_utils_fifo_writer_T /* : public audio_utils_fifo_provider */ {
