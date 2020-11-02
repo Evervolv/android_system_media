@@ -26,6 +26,8 @@
 
 /** Indicates whether index is multi-thread safe, and the synchronization technique. */
 enum audio_utils_fifo_sync {
+    /** Index is not multi-thread safe. No support for synchronization or timeouts. */
+    AUDIO_UTILS_FIFO_SYNC_SINGLE_THREADED,
     /** Index is multi-thread safe. Synchronization is by polling, timeouts by clock_nanosleep(). */
     AUDIO_UTILS_FIFO_SYNC_SLEEP,
     /** Index is multi-thread safe. Synchronization is by futex mapped in one process. */
