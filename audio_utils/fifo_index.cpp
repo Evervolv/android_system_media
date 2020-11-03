@@ -56,7 +56,9 @@ int audio_utils_fifo_index::wake(int op, int waiters)
     return sys_futex(&mIndex, op, waiters, NULL, NULL, 0);
 }
 
-////
+// ----------------------------------------------------------------------------
+
+#if 0   // TODO not currently used, review this code later: bug 150627616
 
 RefIndexDeferredStoreReleaseDeferredWake::RefIndexDeferredStoreReleaseDeferredWake(
         audio_utils_fifo_index& index)
@@ -169,3 +171,5 @@ int RefIndexCachedLoadAcquireDeferredWait::wait(int op, const struct timespec *t
     invalidate();
     return err;
 }
+
+#endif  // 0
