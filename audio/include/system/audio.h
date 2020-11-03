@@ -1861,26 +1861,6 @@ typedef struct audio_uuid_s {
     uint8_t node[6];
 } audio_uuid_t;
 
-//TODO: audio_microphone_location_t need to move to HAL v4.0
-typedef enum {
-    AUDIO_MICROPHONE_LOCATION_UNKNOWN = 0,
-    AUDIO_MICROPHONE_LOCATION_MAINBODY = 1,
-    AUDIO_MICROPHONE_LOCATION_MAINBODY_MOVABLE = 2,
-    AUDIO_MICROPHONE_LOCATION_PERIPHERAL = 3,
-    AUDIO_MICROPHONE_LOCATION_CNT = 4,
-} audio_microphone_location_t;
-
-//TODO: audio_microphone_directionality_t need to move to HAL v4.0
-typedef enum {
-    AUDIO_MICROPHONE_DIRECTIONALITY_UNKNOWN = 0,
-    AUDIO_MICROPHONE_DIRECTIONALITY_OMNI = 1,
-    AUDIO_MICROPHONE_DIRECTIONALITY_BI_DIRECTIONAL = 2,
-    AUDIO_MICROPHONE_DIRECTIONALITY_CARDIOID = 3,
-    AUDIO_MICROPHONE_DIRECTIONALITY_HYPER_CARDIOID = 4,
-    AUDIO_MICROPHONE_DIRECTIONALITY_SUPER_CARDIOID = 5,
-    AUDIO_MICROPHONE_DIRECTIONALITY_CNT = 6,
-} audio_microphone_directionality_t;
-
 /* A 3D point which could be used to represent geometric location
  * or orientation of a microphone.
  */
@@ -1895,13 +1875,6 @@ struct audio_microphone_coordinate {
  * that locate on the same peripheral or attachments.
  */
 typedef int audio_microphone_group_t;
-
-typedef enum {
-    AUDIO_MICROPHONE_CHANNEL_MAPPING_UNUSED = 0,
-    AUDIO_MICROPHONE_CHANNEL_MAPPING_DIRECT = 1,
-    AUDIO_MICROPHONE_CHANNEL_MAPPING_PROCESSED = 2,
-    AUDIO_MICROPHONE_CHANNEL_MAPPING_CNT = 3,
-} audio_microphone_channel_mapping_t;
 
 /* the maximum length for the microphone id */
 #define AUDIO_MICROPHONE_ID_MAX_LEN 32
