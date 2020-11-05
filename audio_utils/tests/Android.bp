@@ -311,7 +311,7 @@ cc_test {
 
 cc_test {
     name: "string_tests",
-    host_supported: false,
+    host_supported: true,
 
     shared_libs: ["libaudioutils"],
     srcs: ["string_tests.cpp"],
@@ -319,6 +319,11 @@ cc_test {
         "-Wall",
         "-Werror",
     ],
+    target: {
+        host: {
+            shared_libs: ["libcutils"],
+        },
+    }
 }
 
 cc_test {
