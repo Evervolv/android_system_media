@@ -46,3 +46,8 @@ cc_library_shared {
         },
     },
 }
+
+filegroup {
+    name: "libcamera_metadata_tags_file",
+    srcs: ["include/system/camera_metadata_tags.h"],
+}
