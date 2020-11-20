@@ -180,7 +180,8 @@ def protobuf_type(entry):
     "int64"                  : "int64",
     "enumList"               : "int32",
     "string"                 : "string",
-    "capability"             : "Capability"
+    "capability"             : "Capability",
+    "multiResolutionStreamConfigurationMap" : "MultiResolutionStreamConfigurations"
   }
 
   if typeName not in typename_to_protobuftype:

@@ -772,6 +772,10 @@
             ><a href="#static_android.scaler.availableRotateAndCropModes">android.scaler.availableRotateAndCropModes</a></li>
             <li
             ><a href="#static_android.scaler.defaultSecureImageSize">android.scaler.defaultSecureImageSize</a></li>
+            <li
+            ><a href="#static_android.scaler.physicalCameraMultiResolutionStreamConfigurations">android.scaler.physicalCameraMultiResolutionStreamConfigurations</a></li>
+            <li
+            ><a href="#static_android.scaler.multiResolutionStreamConfigurationMap">android.scaler.multiResolutionStreamConfigurationMap</a></li>
           </ul>
         </li>
         <li>
@@ -21937,6 +21941,188 @@ are supported.<wbr/></p>
             </td>
           </tr>
 
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.scaler.physicalCameraMultiResolutionStreamConfigurations">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>scaler.<wbr/>physical<wbr/>Camera<wbr/>Multi<wbr/>Resolution<wbr/>Stream<wbr/>Configurations
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n x 4
+                </span>
+              <span class="entry_type_visibility"> [ndk_public as streamConfiguration]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">OUTPUT (v3.6)</span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">INPUT (v3.6)</span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The available multi-resolution stream configurations that this
+physical camera device supports
+(i.<wbr/>e.<wbr/> format,<wbr/> width,<wbr/> height,<wbr/> output/<wbr/>input stream).<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>6</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This list contains a subset of the parent logical camera's multi-resolution stream
+configurations which belong to this physical camera,<wbr/> and it will advertise and will only
+advertise the maximum supported resolutions for a particular format.<wbr/></p>
+<p>If this camera device isn't a physical camera device constituting a logical camera,<wbr/>
+but a standalone ULTRA_<wbr/>HIGH_<wbr/>RESOLUTION_<wbr/>SENSOR camera,<wbr/> this field represents the
+multi-resolution input/<wbr/>output stream configurations of default mode and max resolution
+modes.<wbr/> The sizes will be the maximum resolution of a particular format for default mode
+and max resolution mode.<wbr/></p>
+<p>This field will only be advertised if the device is a physical camera of a
+logical multi-camera device or an ultra high resolution sensor camera.<wbr/> For a logical
+multi-camera,<wbr/> the camera API will derive the logical camera’s multi-resolution stream
+configurations from all physical cameras.<wbr/> For an ultra high resolution sensor camera,<wbr/> this
+is used directly as the camera’s multi-resolution stream configurations.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The HAL must support the buffer management API by setting supportedBufferManagementVersion
+to HIDL_<wbr/>DEVICE_<wbr/>3_<wbr/>5 or higher.<wbr/></p>
+<p>For a logical multi-camera or standalone ultra high resolution sensor camera to claim
+multi-resolution stream support,<wbr/> when combined there must be at least 2 stream
+configurations for each advertised format.<wbr/></p>
+<p>If the HAL advertises multi-resolution input stream support for a particular format
+(namely PRIVATE,<wbr/> or YUV),<wbr/> the logical multi-camera or standalone ultra high resolution
+sensor camera must have the corresponding reprocessing capabilities (PRIVATE_<wbr/>REPROCESSING,<wbr/>
+or YUV_<wbr/>REPROCESSING respectively).<wbr/> The camera HAL must support all of the input format and
+output format mappings found in the logical multi-camera or standalone ultra high
+resolution sensor camera's availableInputOutputFormatsMap.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.scaler.multiResolutionStreamConfigurationMap">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>scaler.<wbr/>multi<wbr/>Resolution<wbr/>Stream<wbr/>Configuration<wbr/>Map
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+
+              <span class="entry_type_visibility"> [java_public as multiResolutionStreamConfigurationMap]</span>
+
+              <span class="entry_type_synthetic">[synthetic] </span>
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The multi-resolution stream configurations supported by this logical camera
+or ultra high resolution sensor camera device.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>2</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Multi-resolution streams can be used by a LOGICAL_<wbr/>MULTI_<wbr/>CAMERA or an
+ULTRA_<wbr/>HIGH_<wbr/>RESOLUTION_<wbr/>SENSOR camera where the images sent or received can vary in
+resolution per frame.<wbr/> This is useful in cases where the camera device's effective full
+resolution changes depending on factors such as the current zoom level,<wbr/> lighting
+condition,<wbr/> focus distance,<wbr/> or pixel mode.<wbr/></p>
+<ul>
+<li>For a logical multi-camera implementing optical zoom,<wbr/> at different zoom level,<wbr/> a
+different physical camera may be active,<wbr/> resulting in different full-resolution image
+sizes.<wbr/></li>
+<li>For an ultra high resolution camera,<wbr/> depending on whether the camera operates in default
+mode,<wbr/> or maximum resolution mode,<wbr/> the output full-size images may be of either binned
+resolution or maximum resolution.<wbr/></li>
+</ul>
+<p>To use multi-resolution output streams,<wbr/> the supported formats can be queried by <a href="https://developer.android.com/reference/android/hardware/camera2/params/MultiResolutionStreamConfigurationMap.html#getOutputFormats">MultiResolutionStreamConfigurationMap#getOutputFormats</a>.<wbr/>
+A <a href="https://developer.android.com/reference/android/hardware/camera2/MultiResolutionImageReader.html">MultiResolutionImageReader</a> can then be created for a
+supported format with the MultiResolutionStreamInfo group queried by <a href="https://developer.android.com/reference/android/hardware/camera2/params/MultiResolutionStreamConfigurationMap.html#getOutputInfo">MultiResolutionStreamConfigurationMap#getOutputInfo</a>.<wbr/></p>
+<p>If a camera device supports multi-resolution output streams for a particular format,<wbr/> for
+each of its mandatory stream combinations,<wbr/> the camera device will support using a
+MultiResolutionImageReader for the MAXIMUM stream of supported formats.<wbr/> Refer to
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureSession">CameraDevice#createCaptureSession</a> for additional details.<wbr/></p>
+<p>To use multi-resolution input streams,<wbr/> the supported formats can be queried by <a href="https://developer.android.com/reference/android/hardware/camera2/params/MultiResolutionStreamConfigurationMap.html#getInputFormats">MultiResolutionStreamConfigurationMap#getInputFormats</a>.<wbr/>
+A reprocessable CameraCaptureSession can then be created using an <a href="https://developer.android.com/reference/android/hardware/camera2/params/InputConfiguration.html">InputConfiguration</a> constructed with
+the input MultiResolutionStreamInfo group,<wbr/> queried by <a href="https://developer.android.com/reference/android/hardware/camera2/params/MultiResolutionStreamConfigurationMap.html#getInputInfo">MultiResolutionStreamConfigurationMap#getInputInfo</a>.<wbr/></p>
+<p>If a camera device supports multi-resolution {@code YUV} input and multi-resolution
+{@code YUV} output,<wbr/> or multi-resolution {@code PRIVATE} input and multi-resolution
+{@code PRIVATE} output,<wbr/> {@code JPEG} and {@code YUV} are guaranteed to be supported
+multi-resolution output stream formats.<wbr/> Refer to
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureSession">CameraDevice#createCaptureSession</a> for
+details about the additional mandatory stream combinations in this case.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Do not set this property directly
+(it is synthetic and will not be available at the HAL layer).<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
