@@ -760,18 +760,14 @@ static inline bool audio_populate_audio_port(
 static inline bool audio_gain_config_are_equal(
         const struct audio_gain_config *lhs, const struct audio_gain_config *rhs) {
     if (lhs->mode != rhs->mode) return false;
-    switch (lhs->mode) {
-    case AUDIO_GAIN_MODE_JOINT:
+    if (lhs->mode & AUDIO_GAIN_MODE_JOINT) {
         if (lhs->values[0] != rhs->values[0]) return false;
-        break;
-    case AUDIO_GAIN_MODE_CHANNELS:
-    case AUDIO_GAIN_MODE_RAMP:
+    }
+    if (lhs->mode & (AUDIO_GAIN_MODE_CHANNELS | AUDIO_GAIN_MODE_RAMP)) {
         if (lhs->channel_mask != rhs->channel_mask) return false;
         for (int i = 0; i < __builtin_popcount(lhs->channel_mask); ++i) {
             if (lhs->values[i] != rhs->values[i]) return false;
         }
-        break;
-    default: return false;
     }
     return lhs->ramp_duration_ms == rhs->ramp_duration_ms;
 }
