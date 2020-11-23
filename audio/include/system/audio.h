@@ -279,16 +279,20 @@ typedef enum {
 } audio_in_acoustics_t;
 
 typedef uint32_t audio_devices_t;
-/**
- * Stub audio output device. Used in policy configuration file on platforms without audio outputs.
- * This alias value to AUDIO_DEVICE_OUT_DEFAULT is only used in the audio policy context.
- */
-#define AUDIO_DEVICE_OUT_STUB AUDIO_DEVICE_OUT_DEFAULT
-/**
- * Stub audio input device. Used in policy configuration file on platforms without audio inputs.
- * This alias value to AUDIO_DEVICE_IN_DEFAULT is only used in the audio policy context.
- */
-#define AUDIO_DEVICE_IN_STUB AUDIO_DEVICE_IN_DEFAULT
+
+enum {
+    /**
+     * Stub audio output device. Used in policy configuration file on platforms without audio
+     * outputs.  This alias value to AUDIO_DEVICE_OUT_DEFAULT is only used in the audio policy
+     * context.
+     */
+    AUDIO_DEVICE_OUT_STUB = AUDIO_DEVICE_OUT_DEFAULT,
+    /**
+     * Stub audio input device. Used in policy configuration file on platforms without audio inputs.
+     * This alias value to AUDIO_DEVICE_IN_DEFAULT is only used in the audio policy context.
+     */
+    AUDIO_DEVICE_IN_STUB = AUDIO_DEVICE_IN_DEFAULT,
+};
 
 /* Additional information about compressed streams offloaded to
  * hardware playback
