@@ -65,6 +65,12 @@ struct mixer_value {
     unsigned int ctl_index;
     int index;
     long value;
+    /*
+     memory pointed by this is allocated in start_tag during parsing ctl of
+     MIXER_CTL_TYPE_BYTE, and is released after the parsed values are updated to
+     either setting value within a path, or top level initial setting value
+     */
+    unsigned char *bytes;
 };
 
 struct mixer_path {
@@ -348,10 +354,10 @@ static int path_add_value(struct audio_route *ar, struct mixer_path *path,
     }
 
     if (mixer_value->index == -1) {
-        /* set all values the same */
+        /* set all values the same except for CTL_TYPE_BYTE */
         if (path->setting[path_index].type == MIXER_CTL_TYPE_BYTE) {
             for (i = 0; i < num_values; i++)
-                path->setting[path_index].value.bytes[i] = mixer_value->value;
+                path->setting[path_index].value.bytes[i] = mixer_value->bytes[i];
         } else if (path->setting[path_index].type == MIXER_CTL_TYPE_ENUM) {
             for (i = 0; i < num_values; i++)
                 path->setting[path_index].value.enumerated[i] = mixer_value->value;
@@ -470,12 +476,13 @@ static void start_tag(void *data, const XML_Char *tag_name,
     unsigned int id;
     struct mixer_value mixer_value;
     enum mixer_ctl_type type;
+    unsigned char* value_array = NULL;
 
     /* Get name, id and value attributes (these may be empty) */
     for (i = 0; attr[i]; i += 2) {
         if (strcmp(attr[i], "name") == 0)
             attr_name = attr[i + 1];
-        if (strcmp(attr[i], "id") == 0)
+        else if (strcmp(attr[i], "id") == 0)
             attr_id = attr[i + 1];
         else if (strcmp(attr[i], "value") == 0)
             attr_value = attr[i + 1];
@@ -501,9 +508,7 @@ static void start_tag(void *data, const XML_Char *tag_name,
                 }
             }
         }
-    }
-
-    else if (strcmp(tag_name, "ctl") == 0) {
+    } else if (strcmp(tag_name, "ctl") == 0) {
         /* Obtain the mixer ctl and value */
         ctl = mixer_get_ctl_by_name(ar->mixer, attr_name);
         if (ctl == NULL) {
@@ -514,12 +519,44 @@ static void start_tag(void *data, const XML_Char *tag_name,
         switch (mixer_ctl_get_type(ctl)) {
         case MIXER_CTL_TYPE_BOOL:
         case MIXER_CTL_TYPE_INT:
+            if (attr_value == NULL) {
+                ALOGE("No value specified for ctl %s", attr_name);
+                goto done;
+            }
             value = strtol((char *)attr_value, NULL, 0);
             break;
-        case MIXER_CTL_TYPE_BYTE:
-            value = (unsigned char) strtol((char *)attr_value, NULL, 16);
-            break;
+        case MIXER_CTL_TYPE_BYTE: {
+                char *value_byte, *test_r;
+                unsigned int num_values = mixer_ctl_get_num_values(ctl);
+                size_t value_sz = sizeof_ctl_type(MIXER_CTL_TYPE_BYTE);
+
+                if (attr_value == NULL) {
+                    ALOGE("No value specified for ctl %s", attr_name);
+                    goto done;
+                }
+                value_array = calloc(num_values, value_sz);
+                if (value_array == NULL) {
+                    ALOGE("failed to allocate mem for ctl %s", attr_name);
+                    goto done;
+                }
+                value_byte = strtok_r((char *)attr_value, " ", &test_r);
+                if (value_byte != NULL) {
+                    for (i = 0; i < num_values; i++) {
+                        value_array[i] = (unsigned char) strtol((char *)value_byte, NULL, 16);
+                        value_byte = strtok_r(NULL, " ", &test_r);
+                        if ((value_byte == NULL) && (i + 1 < num_values)) {
+                            ALOGE("expect %d values but only %d specified for ctl %s",
+                                num_values, i + 1, attr_name);
+                            goto done;
+                        }
+                    }
+                }
+            } break;
         case MIXER_CTL_TYPE_ENUM:
+            if (attr_value == NULL) {
+                ALOGE("No value specified for ctl %s", attr_name);
+                goto done;
+            }
             value = mixer_enum_string_to_value(ctl, (char *)attr_value);
             break;
         default:
@@ -544,7 +581,7 @@ static void start_tag(void *data, const XML_Char *tag_name,
                     id = atoi((char *)attr_id);
                     if (id < ar->mixer_state[ctl_index].num_values)
                         if (type == MIXER_CTL_TYPE_BYTE)
-                            ar->mixer_state[ctl_index].new_value.bytes[id] = value;
+                            ar->mixer_state[ctl_index].new_value.bytes[id] = value_array[0];
                         else if (type == MIXER_CTL_TYPE_ENUM)
                             ar->mixer_state[ctl_index].new_value.enumerated[id] = value;
                         else
@@ -553,10 +590,10 @@ static void start_tag(void *data, const XML_Char *tag_name,
                         ALOGE("value id out of range for mixer ctl '%s'",
                               mixer_ctl_get_name(ctl));
                 } else {
-                    /* set all values the same */
+                    /* set all values the same except for CTL_TYPE_BYTE */
                     for (i = 0; i < ar->mixer_state[ctl_index].num_values; i++)
                         if (type == MIXER_CTL_TYPE_BYTE)
-                            ar->mixer_state[ctl_index].new_value.bytes[i] = value;
+                            ar->mixer_state[ctl_index].new_value.bytes[i] = value_array[i];
                         else if (type == MIXER_CTL_TYPE_ENUM)
                             ar->mixer_state[ctl_index].new_value.enumerated[i] = value;
                         else
@@ -566,7 +603,12 @@ static void start_tag(void *data, const XML_Char *tag_name,
         } else {
             /* nested ctl (within a path) */
             mixer_value.ctl_index = ctl_index;
-            mixer_value.value = value;
+            if (mixer_ctl_get_type(ctl) == MIXER_CTL_TYPE_BYTE) {
+                mixer_value.bytes = value_array;
+                mixer_value.value = value_array[0];
+            } else {
+                mixer_value.value = value;
+            }
             if (attr_id)
                 mixer_value.index = atoi((char *)attr_id);
             else
@@ -577,6 +619,7 @@ static void start_tag(void *data, const XML_Char *tag_name,
     }
 
 done:
+    free(value_array);
     state->level++;
 }
 
