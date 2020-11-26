@@ -1964,6 +1964,14 @@ static const audio_playback_rate_t AUDIO_PLAYBACK_RATE_INITIALIZER = {
     /* .mFallbackMode = */ AUDIO_TIMESTRETCH_FALLBACK_FAIL
 };
 
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+typedef enum {
+    AUDIO_OFFLOAD_NOT_SUPPORTED = 0,
+    AUDIO_OFFLOAD_SUPPORTED = 1,
+    AUDIO_OFFLOAD_GAPLESS_SUPPORTED = 2
+} audio_offload_mode_t;
+#endif // AUDIO_NO_SYSTEM_DECLARATIONS
+
 __END_DECLS
 
 /**
@@ -2100,5 +2108,6 @@ __END_DECLS
 #define AUDIO_OFFLOAD_CODEC_DOWN_SAMPLING  "music_offload_down_sampling"
 #define AUDIO_OFFLOAD_CODEC_DELAY_SAMPLES  "delay_samples"
 #define AUDIO_OFFLOAD_CODEC_PADDING_SAMPLES  "padding_samples"
+
 
 #endif  // ANDROID_AUDIO_CORE_H
