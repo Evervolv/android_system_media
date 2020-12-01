@@ -197,9 +197,7 @@ enum {
     FCC_8 = 8,
 };
 
-enum {
-    AUDIO_CHANNEL_REPRESENTATION_POSITION   = 0x0u,
-    AUDIO_CHANNEL_REPRESENTATION_INDEX      = 0x2u,
+typedef enum {
     AUDIO_CHANNEL_NONE                      = 0x0u,
     AUDIO_CHANNEL_INVALID                   = 0xC0000000u,
 
@@ -228,6 +226,10 @@ enum {
     AUDIO_CHANNEL_OUT_MONO                  = 0x1u,     // OUT_FRONT_LEFT
     AUDIO_CHANNEL_OUT_STEREO                = 0x3u,     // OUT_FRONT_LEFT | OUT_FRONT_RIGHT
     AUDIO_CHANNEL_OUT_2POINT1               = 0xBu,     // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_LOW_FREQUENCY
+    // TODO(mnaganov): Add to HAL V7
+    AUDIO_CHANNEL_OUT_TRI                   = 0x7u,     // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_FRONT_CENTER
+    AUDIO_CHANNEL_OUT_TRI_BACK              = 0x103u,   // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_BACK_CENTER
+    AUDIO_CHANNEL_OUT_3POINT1               = 0xFu,     // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_FRONT_CENTER | OUT_LOW_FREQUENCY
     AUDIO_CHANNEL_OUT_2POINT0POINT2         = 0xC0003u, // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_TOP_SIDE_LEFT | OUT_TOP_SIDE_RIGHT
     AUDIO_CHANNEL_OUT_2POINT1POINT2         = 0xC000Bu, // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_TOP_SIDE_LEFT | OUT_TOP_SIDE_RIGHT | OUT_LOW_FREQUENCY
     AUDIO_CHANNEL_OUT_3POINT0POINT2         = 0xC0007u, // OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_FRONT_CENTER | OUT_TOP_SIDE_LEFT | OUT_TOP_SIDE_RIGHT
@@ -251,6 +253,32 @@ enum {
     AUDIO_CHANNEL_OUT_HAPTIC_AB             = 0x30000000u,// OUT_HAPTIC_A | OUT_HAPTIC_B
     AUDIO_CHANNEL_OUT_MONO_HAPTIC_AB        = 0x30000001u,// OUT_FRONT_LEFT | OUT_HAPTIC_A | OUT_HAPTIC_B
     AUDIO_CHANNEL_OUT_STEREO_HAPTIC_AB      = 0x30000003u,// OUT_FRONT_LEFT | OUT_FRONT_RIGHT | OUT_HAPTIC_A | OUT_HAPTIC_B
+
+    AUDIO_CHANNEL_OUT_ALL     = AUDIO_CHANNEL_OUT_FRONT_LEFT |
+                                AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                AUDIO_CHANNEL_OUT_FRONT_CENTER |
+                                AUDIO_CHANNEL_OUT_LOW_FREQUENCY |
+                                AUDIO_CHANNEL_OUT_BACK_LEFT |
+                                AUDIO_CHANNEL_OUT_BACK_RIGHT |
+                                AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER |
+                                AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER |
+                                AUDIO_CHANNEL_OUT_BACK_CENTER |
+                                AUDIO_CHANNEL_OUT_SIDE_LEFT |
+                                AUDIO_CHANNEL_OUT_SIDE_RIGHT |
+                                AUDIO_CHANNEL_OUT_TOP_CENTER |
+                                AUDIO_CHANNEL_OUT_TOP_FRONT_LEFT |
+                                AUDIO_CHANNEL_OUT_TOP_FRONT_CENTER |
+                                AUDIO_CHANNEL_OUT_TOP_FRONT_RIGHT |
+                                AUDIO_CHANNEL_OUT_TOP_BACK_LEFT |
+                                AUDIO_CHANNEL_OUT_TOP_BACK_CENTER |
+                                AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT |
+                                AUDIO_CHANNEL_OUT_TOP_SIDE_LEFT |
+                                AUDIO_CHANNEL_OUT_TOP_SIDE_RIGHT |
+                                AUDIO_CHANNEL_OUT_HAPTIC_B |
+                                AUDIO_CHANNEL_OUT_HAPTIC_A,
+
+    AUDIO_CHANNEL_HAPTIC_ALL  = AUDIO_CHANNEL_OUT_HAPTIC_B |
+                                AUDIO_CHANNEL_OUT_HAPTIC_A,
 
     AUDIO_CHANNEL_IN_LEFT                   = 0x4u,
     AUDIO_CHANNEL_IN_RIGHT                  = 0x8u,
@@ -285,6 +313,27 @@ enum {
     AUDIO_CHANNEL_IN_VOICE_DNLINK_MONO      = 0x8010u,   // IN_VOICE_DNLINK | IN_MONO
     AUDIO_CHANNEL_IN_VOICE_CALL_MONO        = 0xC010u,   // IN_VOICE_UPLINK_MONO | IN_VOICE_DNLINK_MONO
 
+    AUDIO_CHANNEL_IN_ALL      = AUDIO_CHANNEL_IN_LEFT |
+                                AUDIO_CHANNEL_IN_RIGHT |
+                                AUDIO_CHANNEL_IN_FRONT |
+                                AUDIO_CHANNEL_IN_BACK|
+                                AUDIO_CHANNEL_IN_LEFT_PROCESSED |
+                                AUDIO_CHANNEL_IN_RIGHT_PROCESSED |
+                                AUDIO_CHANNEL_IN_FRONT_PROCESSED |
+                                AUDIO_CHANNEL_IN_BACK_PROCESSED|
+                                AUDIO_CHANNEL_IN_PRESSURE |
+                                AUDIO_CHANNEL_IN_X_AXIS |
+                                AUDIO_CHANNEL_IN_Y_AXIS |
+                                AUDIO_CHANNEL_IN_Z_AXIS |
+                                AUDIO_CHANNEL_IN_VOICE_UPLINK |
+                                AUDIO_CHANNEL_IN_VOICE_DNLINK |
+                                AUDIO_CHANNEL_IN_BACK_LEFT |
+                                AUDIO_CHANNEL_IN_BACK_RIGHT |
+                                AUDIO_CHANNEL_IN_CENTER |
+                                AUDIO_CHANNEL_IN_LOW_FREQUENCY |
+                                AUDIO_CHANNEL_IN_TOP_LEFT |
+                                AUDIO_CHANNEL_IN_TOP_RIGHT,
+
     AUDIO_CHANNEL_COUNT_MAX                 = 30u,
     AUDIO_CHANNEL_INDEX_HDR                 = 0x80000000u, // REPRESENTATION_INDEX << COUNT_MAX
     AUDIO_CHANNEL_INDEX_MASK_1              = 0x80000001u, // INDEX_HDR | (1 << 1) - 1
@@ -311,7 +360,7 @@ enum {
     AUDIO_CHANNEL_INDEX_MASK_22             = 0x803FFFFFu, // INDEX_HDR | (1 << 22) - 1
     AUDIO_CHANNEL_INDEX_MASK_23             = 0x807FFFFFu, // INDEX_HDR | (1 << 23) - 1
     AUDIO_CHANNEL_INDEX_MASK_24             = 0x80FFFFFFu, // INDEX_HDR | (1 << 24) - 1
-};
+} audio_channel_mask_t;
 
 typedef enum {
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
@@ -325,7 +374,7 @@ typedef enum {
     AUDIO_MODE_CALL_SCREEN = 4,
 } audio_mode_t;
 
-enum {
+typedef enum {
     AUDIO_DEVICE_NONE                          = 0x0u,
     AUDIO_DEVICE_BIT_IN                        = 0x80000000u,
     AUDIO_DEVICE_BIT_DEFAULT                   = 0x40000000u,
@@ -363,6 +412,7 @@ enum {
     AUDIO_DEVICE_OUT_BLE_HEADSET               = 0x20000000u,
     AUDIO_DEVICE_OUT_BLE_SPEAKER               = 0x20000001u,
     AUDIO_DEVICE_OUT_DEFAULT                   = 0x40000000u, // BIT_DEFAULT
+    AUDIO_DEVICE_OUT_STUB                      = 0x40000000u, // OUT_DEFAULT
 
     AUDIO_DEVICE_IN_COMMUNICATION              = 0x80000001u, // BIT_IN | 0x1
     AUDIO_DEVICE_IN_AMBIENT                    = 0x80000002u, // BIT_IN | 0x2
@@ -394,7 +444,8 @@ enum {
     AUDIO_DEVICE_IN_ECHO_REFERENCE             = 0x90000000u, // BIT_IN | 0x10000000
     AUDIO_DEVICE_IN_BLE_HEADSET                = 0xA0000000u, // BIT_IN | 0x20000000
     AUDIO_DEVICE_IN_DEFAULT                    = 0xC0000000u, // BIT_IN | BIT_DEFAULT
-};
+    AUDIO_DEVICE_IN_STUB                       = 0xC0000000u, // IN_DEFAULT
+} audio_devices_t;
 
 typedef enum {
     AUDIO_OUTPUT_FLAG_NONE             = 0x0,
@@ -476,11 +527,11 @@ typedef enum {
     AUDIO_CONTENT_TYPE_SONIFICATION = 4u,
 } audio_content_type_t;
 
-enum {
+typedef enum {
     AUDIO_GAIN_MODE_JOINT    = 0x1u,
     AUDIO_GAIN_MODE_CHANNELS = 0x2u,
     AUDIO_GAIN_MODE_RAMP     = 0x4u,
-};
+} audio_gain_mode_t;
 
 typedef enum {
     AUDIO_PORT_ROLE_NONE = 0,
