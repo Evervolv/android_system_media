@@ -20,7 +20,7 @@ namespace android::audio_utils {
 
 void Balance::setChannelMask(audio_channel_mask_t channelMask)
 {
-    channelMask &= ~ AUDIO_CHANNEL_HAPTIC_ALL;
+    channelMask = static_cast<audio_channel_mask_t>(channelMask & ~AUDIO_CHANNEL_HAPTIC_ALL);
     if (!audio_is_output_channel(channelMask) // invalid mask
             || mChannelMask == channelMask) { // no need to do anything
         return;
