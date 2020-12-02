@@ -30,6 +30,7 @@
 
 #include "audio-base.h"
 #include "audio-base-utils.h"
+#include "audio-hal-enums.h"
 
 /*
  * Annotation to tell clang that we intend to fall through from one case to
@@ -1249,6 +1250,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_LHDC:
     case AUDIO_FORMAT_LHDC_LL:
     case AUDIO_FORMAT_APTX_TWSP:
+    case AUDIO_FORMAT_LC3:
         return true;
     default:
         return false;
@@ -1355,6 +1357,30 @@ static inline char *audio_device_address_to_parameter(audio_devices_t device, co
         snprintf(param, kSize, "%s", address);
     }
     return strdup(param);
+}
+
+static inline bool audio_is_valid_audio_source(audio_source_t audioSource)
+{
+    switch (audioSource) {
+    case AUDIO_SOURCE_MIC:
+    case AUDIO_SOURCE_VOICE_UPLINK:
+    case AUDIO_SOURCE_VOICE_DOWNLINK:
+    case AUDIO_SOURCE_VOICE_CALL:
+    case AUDIO_SOURCE_CAMCORDER:
+    case AUDIO_SOURCE_VOICE_RECOGNITION:
+    case AUDIO_SOURCE_VOICE_COMMUNICATION:
+    case AUDIO_SOURCE_REMOTE_SUBMIX:
+    case AUDIO_SOURCE_UNPROCESSED:
+    case AUDIO_SOURCE_VOICE_PERFORMANCE:
+    case AUDIO_SOURCE_ECHO_REFERENCE:
+    case AUDIO_SOURCE_FM_TUNER:
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+    case AUDIO_SOURCE_HOTWORD:
+#endif // AUDIO_NO_SYSTEM_DECLARATIONS
+        return true;
+    default:
+        return false;
+    }
 }
 
 #ifndef AUDIO_NO_SYSTEM_DECLARATIONS
