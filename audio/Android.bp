@@ -27,7 +27,7 @@ cc_library_headers {
 filegroup {
     name: "libaudio_system_audio_base",
     srcs: [
-        "include/system/audio-base.h",
+        "include/system/audio-hal-enums.h",
     ],
     path: "include",
 }
