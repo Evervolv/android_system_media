@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <algorithm>
 #include <audio_utils/limiter.h>
-#include <system/audio-base.h>
+#include <system/audio.h>
 #include <audio_utils/mono_blend.h>
 #include <fuzzer/FuzzedDataProvider.h>
 
