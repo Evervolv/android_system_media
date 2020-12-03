@@ -4917,7 +4917,10 @@ region of (500,<wbr/> 375,<wbr/> 1000,<wbr/> 750) for zoomRatio of 1.<wbr/>0.<wb
 explicitly set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> its value defaults to 1.<wbr/>0.<wbr/></p>
 <p>One limitation of controlling zoom using zoomRatio is that the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
 must only be used for letterboxing or pillarboxing of the sensor active array,<wbr/> and no
-FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/></p>
+FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/> If
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is not 1.<wbr/>0,<wbr/> and <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> is set to be
+windowboxing,<wbr/> the camera framework will override the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to be
+the active array.<wbr/></p>
             </td>
           </tr>
 
@@ -10551,7 +10554,10 @@ region of (500,<wbr/> 375,<wbr/> 1000,<wbr/> 750) for zoomRatio of 1.<wbr/>0.<wb
 explicitly set <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> its value defaults to 1.<wbr/>0.<wbr/></p>
 <p>One limitation of controlling zoom using zoomRatio is that the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a>
 must only be used for letterboxing or pillarboxing of the sensor active array,<wbr/> and no
-FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/></p>
+FREEFORM cropping can be used with <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> other than 1.<wbr/>0.<wbr/> If
+<a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> is not 1.<wbr/>0,<wbr/> and <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> is set to be
+windowboxing,<wbr/> the camera framework will override the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to be
+the active array.<wbr/></p>
             </td>
           </tr>
 
@@ -21404,7 +21410,9 @@ windowboxing.<wbr/></li>
 </ol>
 </li>
 <li>Setting <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a> to values different than 1.<wbr/>0 and
-<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to be windowboxing at the same time is undefined behavior.<wbr/></li>
+<a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to be windowboxing at the same time are not supported.<wbr/> In this
+case,<wbr/> the camera framework will override the <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> to be the active
+array.<wbr/></li>
 </ul>
 <p>LEGACY capability devices will only support CENTER_<wbr/>ONLY cropping.<wbr/></p>
             </td>
