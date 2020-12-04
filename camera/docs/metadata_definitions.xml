@@ -3321,7 +3321,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
             One limitation of controlling zoom using zoomRatio is that the android.scaler.cropRegion
             must only be used for letterboxing or pillarboxing of the sensor active array, and no
-            FREEFORM cropping can be used with android.control.zoomRatio other than 1.0.
+            FREEFORM cropping can be used with android.control.zoomRatio other than 1.0. If
+            android.control.zoomRatio is not 1.0, and android.scaler.cropRegion is set to be
+            windowboxing, the camera framework will override the android.scaler.cropRegion to be
+            the active array.
           </details>
           <hal_details>
             For all capture request templates, this field must be set to 1.0 in order to have
@@ -7201,7 +7204,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               the field of view vertically (letterboxing) or horizontally (pillarboxing), but not
               windowboxing.
           * Setting android.control.zoomRatio to values different than 1.0 and
-          android.scaler.cropRegion to be windowboxing at the same time is undefined behavior.
+          android.scaler.cropRegion to be windowboxing at the same time are not supported. In this
+          case, the camera framework will override the android.scaler.cropRegion to be the active
+          array.
 
           LEGACY capability devices will only support CENTER_ONLY cropping.
           </details>
