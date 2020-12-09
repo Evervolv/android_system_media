@@ -264,8 +264,7 @@ static unsigned profile_enum_sample_rates(alsa_device_profile* profile, unsigned
     return num_entries; /* return # of supported rates */
 }
 
-static unsigned profile_enum_sample_formats(alsa_device_profile* profile,
-        const struct pcm_mask * mask)
+static unsigned profile_enum_sample_formats(alsa_device_profile* profile, struct pcm_mask * mask)
 {
     const int num_slots = ARRAY_SIZE(mask->bits);
     const int bits_per_slot = sizeof(mask->bits[0]) * 8;
@@ -415,7 +414,7 @@ bool profile_read_device_info(alsa_device_profile* profile)
     }
 
     /* Formats */
-    const struct pcm_mask * format_mask = pcm_params_get_mask(alsa_hw_params, PCM_PARAM_FORMAT);
+    struct pcm_mask * format_mask = pcm_params_get_mask(alsa_hw_params, PCM_PARAM_FORMAT);
     profile_enum_sample_formats(profile, format_mask);
 
     /* Channels */
