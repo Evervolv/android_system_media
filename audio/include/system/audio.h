@@ -772,22 +772,26 @@ static inline bool audio_gain_config_are_equal(
     return lhs->ramp_duration_ms == rhs->ramp_duration_ms;
 }
 
-static inline bool audio_port_config_has_input_direction(const struct audio_port_config *port_cfg) {
-    switch (port_cfg->type) {
+static inline bool audio_has_input_direction(audio_port_type_t type, audio_port_role_t role) {
+    switch (type) {
     case AUDIO_PORT_TYPE_DEVICE:
-        switch (port_cfg->role) {
+        switch (role) {
         case AUDIO_PORT_ROLE_SOURCE: return true;
         case AUDIO_PORT_ROLE_SINK: return false;
         default: return false;
         }
     case AUDIO_PORT_TYPE_MIX:
-        switch (port_cfg->role) {
+        switch (role) {
         case AUDIO_PORT_ROLE_SOURCE: return false;
         case AUDIO_PORT_ROLE_SINK: return true;
         default: return false;
         }
     default: return false;
     }
+}
+
+static inline bool audio_port_config_has_input_direction(const struct audio_port_config *port_cfg) {
+    return audio_has_input_direction(port_cfg->type, port_cfg->role);
 }
 
 static inline bool audio_port_configs_are_equal(
