@@ -51,10 +51,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 #define AUDIO_ENUM_QUOTE(x) #x
 #define AUDIO_ENUM_STRINGIFY(x) AUDIO_ENUM_QUOTE(x)
@@ -757,8 +756,6 @@ inline bool audio_usage_from_string(const char* s, audio_usage_t* t) {
 #undef AUDIO_ENUM_STRINGIFY
 #undef AUDIO_ENUM_QUOTE
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif  // ANDROID_AUDIO_HAL_ENUMS_H
