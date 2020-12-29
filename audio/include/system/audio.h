@@ -204,10 +204,11 @@ static inline bool audio_is_global_session(audio_session_t session) {
     return session <= AUDIO_SESSION_OUTPUT_MIX;
 }
 
-/* These constants are used instead of "magic numbers" 2 and 8 for
- * stereo and multichannel channel counts.
+/* These constants are used instead of "magic numbers" for
+ * channel counts.
  */
 enum {
+    FCC_1 = 1,
     FCC_2 = 2,
     FCC_8 = 8,
 };
