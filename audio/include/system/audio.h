@@ -1081,6 +1081,43 @@ typedef struct record_track_metadata {
     char dest_device_address[AUDIO_DEVICE_MAX_ADDRESS_LEN];
 } record_track_metadata_t;
 
+/** Metadata of a playback track for an in stream. */
+typedef struct playback_track_metadata_v7 {
+    struct playback_track_metadata base;
+    audio_channel_mask_t channel_mask;
+    char tags[AUDIO_ATTRIBUTES_TAGS_MAX_SIZE]; /* UTF8 */
+} playback_track_metadata_v7_t;
+
+/** Metadata of a record track for an out stream. */
+typedef struct record_track_metadata_v7 {
+    struct record_track_metadata base;
+    audio_channel_mask_t channel_mask;
+    char tags[AUDIO_ATTRIBUTES_TAGS_MAX_SIZE]; /* UTF8 */
+} record_track_metadata_v7_t;
+
+static inline void playback_track_metadata_to_v7(struct playback_track_metadata_v7 *dst,
+                                                 const struct playback_track_metadata *src) {
+    dst->base = *src;
+    dst->channel_mask = AUDIO_CHANNEL_NONE;
+    dst->tags[0] = '\0';
+}
+
+static inline void playback_track_metadata_from_v7(struct playback_track_metadata *dst,
+                                                   const struct playback_track_metadata_v7 *src) {
+    *dst = src->base;
+}
+
+static inline void record_track_metadata_to_v7(struct record_track_metadata_v7 *dst,
+                                               const struct record_track_metadata *src) {
+    dst->base = *src;
+    dst->channel_mask = AUDIO_CHANNEL_NONE;
+    dst->tags[0] = '\0';
+}
+
+static inline void record_track_metadata_from_v7(struct record_track_metadata *dst,
+                                                 const struct record_track_metadata_v7 *src) {
+    *dst = src->base;
+}
 
 /******************************
  *  Helper functions
