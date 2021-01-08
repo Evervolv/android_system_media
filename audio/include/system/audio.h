@@ -211,6 +211,7 @@ enum {
     FCC_1 = 1,
     FCC_2 = 2,
     FCC_8 = 8,
+    FCC_24 = 24,
 };
 
 /* A channel mask per se only defines the presence or absence of a channel, not the order.
