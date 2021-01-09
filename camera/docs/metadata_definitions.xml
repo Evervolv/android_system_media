@@ -1326,7 +1326,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>
           This control is only effective if android.control.mode is AUTO.
 
-          When set to the ON mode, the camera device's auto-white balance
+          When set to the AUTO mode, the camera device's auto-white balance
           routine is enabled, overriding the application's selected
           android.colorCorrection.transform, android.colorCorrection.gains and
           android.colorCorrection.mode. Note that when android.control.aeMode
