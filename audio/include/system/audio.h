@@ -2126,6 +2126,10 @@ __END_DECLS
 #define AUDIO_PARAMETER_DEVICE_SUP_ENCAPSULATION_MODES "supEncapsulationModes"
 #define AUDIO_PARAMETER_DEVICE_SUP_ENCAPSULATION_METADATA_TYPES "supEncapsulationMetadataTypes"
 
+/* Query additional delay in millisecond on each output device. */
+#define AUDIO_PARAMETER_DEVICE_ADDITIONAL_OUTPUT_DELAY "additional_output_device_delay"
+#define AUDIO_PARAMETER_DEVICE_MAX_ADDITIONAL_OUTPUT_DELAY "max_additional_output_device_delay"
+
 /**
  * audio codec parameters
  */
