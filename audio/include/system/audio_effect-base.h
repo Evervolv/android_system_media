@@ -80,14 +80,6 @@ typedef enum {
     EFFECT_BUFFER_ACCESS_ACCUMULATE = 2 /* ::android::hardware::audio::effect::V7_0::EffectBufferAccess.ACCESS_READ implicitly + 1 */,
 } effect_buffer_access_e;
 
-enum {
-    EFFECT_CONFIG_BUFFER = 1 /* 0x0001 */,
-    EFFECT_CONFIG_SMP_RATE = 2 /* 0x0002 */,
-    EFFECT_CONFIG_CHANNELS = 4 /* 0x0004 */,
-    EFFECT_CONFIG_FORMAT = 8 /* 0x0008 */,
-    EFFECT_CONFIG_ACC_MODE = 16 /* 0x0010 */,
-};
-
 typedef enum {
     EFFECT_FEATURE_AUX_CHANNELS = 0,
     EFFECT_FEATURE_CNT = 1 /* ::android::hardware::audio::effect::V7_0::EffectFeature.AUX_CHANNELS implicitly + 1 */,
