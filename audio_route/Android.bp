@@ -1,19 +1,34 @@
-cc_library_shared {
-    name: "libaudioroute",
+cc_defaults {
+    name: "libaudioroute_defaults",
     vendor_available: true,
-    vndk: {
-        enabled: true,
-    },
     srcs: ["audio_route.c"],
     shared_libs: [
         "liblog",
         "libcutils",
         "libutils",
         "libexpat",
-        "libtinyalsa",
     ],
     cflags: [
         "-Werror",
         "-Wall",
+    ],
+}
+
+cc_library_shared {
+    name: "libaudioroute",
+    defaults: ["libaudioroute_defaults"],
+    vndk: {
+        enabled: true,
+    },
+    shared_libs: [
+        "libtinyalsa",
+    ],
+}
+
+cc_library_shared {
+    name: "libaudioroutev2",
+    defaults: ["libaudioroute_defaults"],
+    shared_libs: [
+        "libtinyalsav2",
     ],
 }
