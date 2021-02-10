@@ -41,3 +41,12 @@ filegroup {
     ],
     path: "include",
 }
+
+
+filegroup {
+    name: "libaudio_system_audio_common_base",
+    srcs: [
+        "include/system/audio_common-base.h",
+    ],
+    path: "include",
+}
