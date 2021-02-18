@@ -7594,6 +7594,37 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <clone entry="android.scaler.rotateAndCrop" kind="controls" hal_version="3.5">
         </clone>
       </dynamic>
+      <static>
+        <entry name="defaultSecureImageSize" type="int32" visibility="public"
+               type_notes="width/height for the default secure image data size" container="array"
+               typedef="size" hal_version="3.6">
+          <array>
+            <size>2</size>
+          </array>
+          <description>
+            Default YUV/PRIVATE size to use for requesting secure image buffers.
+          </description>
+          <units>Pixels</units>
+          <details>
+            This entry lists the default size supported in the secure camera mode. This entry is
+            optional on devices support the SECURE_IMAGE_DATA capability. This entry will be null
+            if the camera device does not list SECURE_IMAGE_DATA capability.
+
+            When the key is present, only a PRIVATE/YUV output of the specified size is guaranteed
+            to be supported by the camera HAL in the secure camera mode. Any other format or
+            resolutions might not be supported. Use
+            {@link CameraDevice#isSessionConfigurationSupported|ACameraDevice_isSessionConfigurationSupported}
+            API to query if a secure session configuration is supported if the device supports this
+            API.
+
+            If this key returns null on a device with SECURE_IMAGE_DATA capability, the application
+            can assume all output sizes listed in the
+            {@link
+            android.hardware.camera2.params.StreamConfigurationMap|ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS}
+            are supported.
+          </details>
+        </entry>
+      </static>
     </section>
     <section name="sensor">
       <controls>
