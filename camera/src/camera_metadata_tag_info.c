@@ -482,6 +482,8 @@ static tag_info_t android_scaler[ANDROID_SCALER_END -
     { "availableRotateAndCropModes",   TYPE_BYTE   },
     [ ANDROID_SCALER_ROTATE_AND_CROP - ANDROID_SCALER_START ] =
     { "rotateAndCrop",                 TYPE_BYTE   },
+    [ ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE - ANDROID_SCALER_START ] =
+    { "defaultSecureImageSize",        TYPE_INT32  },
 };
 
 static tag_info_t android_sensor[ANDROID_SENSOR_END -
@@ -2282,6 +2284,9 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE: {
             break;
         }
 
@@ -4802,6 +4807,9 @@ int camera_metadata_enum_value(uint32_t tag,
                     ret = 0;
                     break;
                 }
+            break;
+        }
+        case ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE: {
             break;
         }
 
