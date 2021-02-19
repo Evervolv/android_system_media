@@ -770,6 +770,8 @@
             ><a href="#static_android.scaler.mandatoryConcurrentStreamCombinations">android.scaler.mandatoryConcurrentStreamCombinations</a></li>
             <li
             ><a href="#static_android.scaler.availableRotateAndCropModes">android.scaler.availableRotateAndCropModes</a></li>
+            <li
+            ><a href="#static_android.scaler.defaultSecureImageSize">android.scaler.defaultSecureImageSize</a></li>
           </ul>
         </li>
         <li>
@@ -21865,6 +21867,73 @@ part of at least one set of combinations returned by
 <p>Starting with API level 30,<wbr/> all devices will list at least <code>ROTATE_<wbr/>AND_<wbr/>CROP_<wbr/>NONE</code>.<wbr/>
 Devices with support for rotate-and-crop will additionally list at least
 <code>ROTATE_<wbr/>AND_<wbr/>CROP_<wbr/>AUTO</code> and <code>ROTATE_<wbr/>AND_<wbr/>CROP_<wbr/>90</code>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.scaler.defaultSecureImageSize">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>scaler.<wbr/>default<wbr/>Secure<wbr/>Image<wbr/>Size
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  2
+                </span>
+              <span class="entry_type_visibility"> [public as size]</span>
+
+
+
+
+                <div class="entry_type_notes">width/<wbr/>height for the default secure image data size</div>
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Default YUV/<wbr/>PRIVATE size to use for requesting secure image buffers.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              Pixels
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>6</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This entry lists the default size supported in the secure camera mode.<wbr/> This entry is
+optional on devices support the SECURE_<wbr/>IMAGE_<wbr/>DATA capability.<wbr/> This entry will be null
+if the camera device does not list SECURE_<wbr/>IMAGE_<wbr/>DATA capability.<wbr/></p>
+<p>When the key is present,<wbr/> only a PRIVATE/<wbr/>YUV output of the specified size is guaranteed
+to be supported by the camera HAL in the secure camera mode.<wbr/> Any other format or
+resolutions might not be supported.<wbr/> Use
+<a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>
+API to query if a secure session configuration is supported if the device supports this
+API.<wbr/></p>
+<p>If this key returns null on a device with SECURE_<wbr/>IMAGE_<wbr/>DATA capability,<wbr/> the application
+can assume all output sizes listed in the
+<a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html">StreamConfigurationMap</a>
+are supported.<wbr/></p>
             </td>
           </tr>
 
