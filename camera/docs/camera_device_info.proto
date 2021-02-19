@@ -127,6 +127,7 @@ message CameraDeviceInfo {
     repeated MandatoryStreamCombination android_scaler_mandatoryStreamCombinations = 917507;
     repeated MandatoryStreamCombination android_scaler_mandatoryConcurrentStreamCombinations = 917508;
     repeated int32 android_scaler_availableRotateAndCropModes = 917509;
+    optional Size android_scaler_defaultSecureImageSize = 917510;
     optional int32 android_sensor_referenceIlluminant1 = 983040;
     optional int32 android_sensor_referenceIlluminant2 = 983041;
     optional ColorSpaceTransform android_sensor_calibrationTransform1 = 983042;
