@@ -1487,6 +1487,9 @@ def wbr(text):
 
   return soup.decode()
 
+def copyright_year():
+  return _copyright_year
+
 def hal_major_version():
   return _hal_major_version
 
