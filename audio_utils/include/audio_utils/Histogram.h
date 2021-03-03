@@ -118,9 +118,9 @@ public:
             result << "below range = " << count << std::endl;
         }
         result << "index, start, count, last" << std::endl;
-        for (int32_t i = 1; i < mBins.size() - 1; i++) {
+        for (size_t i = 1; i < mBins.size() - 1; i++) {
             if (mBins[i] > 0) {
-                int32_t properIndex = i - 1;
+                size_t properIndex = i - 1;
                 result << properIndex;
                 result << ", "<< (properIndex * mBinWidth);
                 result << ", " << mBins[i];
