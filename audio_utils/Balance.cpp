@@ -82,7 +82,7 @@ void Balance::setChannelMask(audio_channel_mask_t channelMask)
     mSides.resize(mChannelCount);
     for (unsigned i = 0, channel = channelMask; channel != 0; ++i) {
         const int index = __builtin_ctz(channel);
-        if (index < std::size(sideFromChannel)) {
+        if (static_cast<std::size_t>(index) < std::size(sideFromChannel)) {
             mSides[i] = sideFromChannel[index];
         } else {
             mSides[i] = 2; // consider center
