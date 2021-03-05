@@ -484,6 +484,9 @@ static tag_info_t android_scaler[ANDROID_SCALER_END -
     { "rotateAndCrop",                 TYPE_BYTE   },
     [ ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE - ANDROID_SCALER_START ] =
     { "defaultSecureImageSize",        TYPE_INT32  },
+    [ ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS - ANDROID_SCALER_START ] =
+    { "physicalCameraMultiResolutionStreamConfigurations",
+                                        TYPE_INT32  },
 };
 
 static tag_info_t android_sensor[ANDROID_SENSOR_END -
@@ -2287,6 +2290,21 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE: {
+            break;
+        }
+        case ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS: {
+            switch (value) {
+                case ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS_OUTPUT:
+                    msg = "OUTPUT";
+                    ret = 0;
+                    break;
+                case ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS_INPUT:
+                    msg = "INPUT";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
             break;
         }
 
@@ -4810,6 +4828,21 @@ int camera_metadata_enum_value(uint32_t tag,
             break;
         }
         case ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE: {
+            break;
+        }
+        case ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS: {
+                enumName = "OUTPUT";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS_OUTPUT;
+                    ret = 0;
+                    break;
+                }
+                enumName = "INPUT";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS_INPUT;
+                    ret = 0;
+                    break;
+                }
             break;
         }
 
