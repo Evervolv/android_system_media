@@ -77,6 +77,17 @@ message CameraDeviceInfo {
         repeated int32 black_level_pattern = 1;
     }
 
+    message MultiResolutionStreamConfigurations {
+        message MultiResolutionStreamConfig {
+            optional int32 format = 1;
+            optional int32 width = 2;
+            optional int32 height = 3;
+            optional string cameraId = 4;
+            optional bool input = 5;
+        }
+        repeated MultiResolutionStreamConfig availableMultiResolutionConfigurations = 1;
+    }
+
     optional string cameraId = 1;
 
     // Start of codegen fields
