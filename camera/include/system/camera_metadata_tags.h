@@ -314,6 +314,8 @@ typedef enum camera_metadata_tag {
     ANDROID_SCALER_AVAILABLE_ROTATE_AND_CROP_MODES,   // byte[]       | public       | HIDL v3.5
     ANDROID_SCALER_ROTATE_AND_CROP,                   // enum         | public       | HIDL v3.5
     ANDROID_SCALER_DEFAULT_SECURE_IMAGE_SIZE,         // int32[]      | public       | HIDL v3.6
+    ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS,
+                                                      // enum[]       | ndk_public   | HIDL v3.6
     ANDROID_SCALER_END,
 
     ANDROID_SENSOR_EXPOSURE_TIME =                    // int64        | public       | HIDL v3.2
@@ -891,6 +893,14 @@ typedef enum camera_metadata_enum_android_scaler_rotate_and_crop {
     ANDROID_SCALER_ROTATE_AND_CROP_270                              , // HIDL v3.5
     ANDROID_SCALER_ROTATE_AND_CROP_AUTO                             , // HIDL v3.5
 } camera_metadata_enum_android_scaler_rotate_and_crop_t;
+
+// ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS
+typedef enum camera_metadata_enum_android_scaler_physical_camera_multi_resolution_stream_configurations {
+    ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS_OUTPUT
+                                                                     , // HIDL v3.6
+    ANDROID_SCALER_PHYSICAL_CAMERA_MULTI_RESOLUTION_STREAM_CONFIGURATIONS_INPUT
+                                                                     , // HIDL v3.6
+} camera_metadata_enum_android_scaler_physical_camera_multi_resolution_stream_configurations_t;
 
 
 // ANDROID_SENSOR_REFERENCE_ILLUMINANT1
