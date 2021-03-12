@@ -107,7 +107,8 @@ void PowerLog::log(const void *buffer, size_t frames, int64_t nowNs)
     }
 }
 
-std::string PowerLog::dumpToString(const char *prefix, size_t lines, int64_t limitNs) const
+std::string PowerLog::dumpToString(
+        const char *prefix, size_t lines, int64_t limitNs, bool logPlot) const
 {
     std::lock_guard<std::mutex> guard(mLock);
 
@@ -223,19 +224,22 @@ std::string PowerLog::dumpToString(const char *prefix, size_t lines, int64_t lim
             // false indicates the value doesn't have a new series time stamp.
             plotEntries.emplace_back(power, false);
         }
-        ss << "\n" << audio_utils_log_plot(plotEntries.begin(), plotEntries.end());
+        if (logPlot) {
+            ss << "\n" << audio_utils_log_plot(plotEntries.begin(), plotEntries.end());
+        }
         ss << "\n";
     }
     return ss.str();
 }
 
-status_t PowerLog::dump(int fd, const char *prefix, size_t lines, int64_t limitNs) const
+status_t PowerLog::dump(
+        int fd, const char *prefix, size_t lines, int64_t limitNs, bool logPlot) const
 {
     // Since dumpToString and write are thread safe, this function
     // is conceptually thread-safe but simultaneous calls to dump
     // by different threads to the same file descriptor may not write
     // the two logs in time order.
-    const std::string s = dumpToString(prefix, lines, limitNs);
+    const std::string s = dumpToString(prefix, lines, limitNs, logPlot);
     if (s.size() > 0 && write(fd, s.c_str(), s.size()) < 0) {
         return -errno;
     }
