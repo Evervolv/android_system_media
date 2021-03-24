@@ -758,6 +758,28 @@ inline bool audio_usage_from_string(const char* s, audio_usage_t* t) {
 #undef AUDIO_USAGE_LIST_NO_SYS_DEF
 #undef AUDIO_USAGE_LIST_DEF
 
+#define AUDIO_ENCAPSULATION_TYPE_LIST_DEF(V) \
+    V(AUDIO_ENCAPSULATION_TYPE_NONE, 0) \
+    V(AUDIO_ENCAPSULATION_TYPE_IEC61937, 1)
+
+typedef enum {
+    AUDIO_ENCAPSULATION_TYPE_LIST_DEF(AUDIO_DEFINE_ENUM_SYMBOL_V)
+} audio_encapsulation_type_t;
+
+inline const char* audio_encapsulation_type_to_string(audio_encapsulation_type_t t) {
+    switch (t) {
+    AUDIO_ENCAPSULATION_TYPE_LIST_DEF(AUDIO_DEFINE_STRINGIFY_CASE_V)
+    }
+    return "";
+}
+
+inline bool audio_encapsulation_type_from_string(const char* s, audio_encapsulation_type_t* t) {
+    AUDIO_ENCAPSULATION_TYPE_LIST_DEF(AUDIO_DEFINE_PARSE_CASE_V)
+    return false;
+}
+
+#undef AUDIO_ENCAPSULATION_TYPE_LIST_DEF
+
 #undef AUDIO_DEFINE_PARSE_CASE_V
 #undef AUDIO_DEFINE_PARSE_CASE
 #undef AUDIO_DEFINE_STRINGIFY_CASE_V
