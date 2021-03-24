@@ -280,6 +280,8 @@ static constexpr audio_channel_mask_t IN_CHANNEL_MASKS[AUDIO_PORT_MAX_CHANNEL_MA
     AUDIO_CHANNEL_IN_VOICE_CALL_MONO
 };
 
+static constexpr unsigned int SHORT_AUDIO_DESCRIPTOR_LENGTH = 3;
+
 using SystemAudioPortTestParams = std::tuple<audio_port_role_t, audio_port_type_t>;
 
 class SystemAudioPortTest : public testing::TestWithParam<SystemAudioPortTestParams> {
@@ -317,7 +319,7 @@ protected:
     size_t fillFakeFormats(audio_format_t formats[], size_t numFormats);
     void fillFakeAudioPortConfigInfo(struct audio_port_config* config);
     void fillFakeAudioPortInfo(struct audio_port* audioPort);
-    void fillFakeAudioPortV7Info(struct audio_port_v7* portV7);
+    void fillFakeAudioPortV7Info(struct audio_port_v7* portV7, bool containsExtraAudioDescriptor);
 
     template <typename T, typename U, typename Func>
     void updateFieldAndCompare(const T updatedValue, T U::*field, U* lhs, U* rhs, Func p) {
@@ -555,7 +557,8 @@ void SystemAudioPortTest::fillFakeAudioPortInfo(struct audio_port* audioPort) {
     audioPort->num_formats = fillFakeFormats(audioPort->formats, audioPort->num_formats);
 }
 
-void SystemAudioPortTest::fillFakeAudioPortV7Info(struct audio_port_v7* portV7) {
+void SystemAudioPortTest::fillFakeAudioPortV7Info(struct audio_port_v7* portV7,
+                                                  bool containsExtraAudioDescriptor) {
     fillFakeAudioPortBaseInfo(portV7);
     audio_format_t formats[AUDIO_PORT_MAX_FORMATS];
     portV7->num_audio_profiles = fillFakeFormats(formats, AUDIO_PORT_MAX_FORMATS);
@@ -572,6 +575,18 @@ void SystemAudioPortTest::fillFakeAudioPortV7Info(struct audio_port_v7* portV7) 
                                                                  : IN_CHANNEL_MASKS;
         std::copy(channelMasks, channelMasks+portV7->audio_profiles[i].num_channel_masks,
                 std::begin(portV7->audio_profiles[i].channel_masks));
+    }
+    if (containsExtraAudioDescriptor) {
+        portV7->num_extra_audio_descriptors = AUDIO_PORT_MAX_EXTRA_AUDIO_DESCRIPTORS;
+        for (size_t i = 0; i < portV7->num_extra_audio_descriptors; ++i) {
+            portV7->extra_audio_descriptors[i].standard = AUDIO_STANDARD_EDID;
+            portV7->extra_audio_descriptors[i].descriptor_length = SHORT_AUDIO_DESCRIPTOR_LENGTH;
+            for (unsigned int j = 0; j < SHORT_AUDIO_DESCRIPTOR_LENGTH; ++j) {
+                portV7->extra_audio_descriptors[i].descriptor[j] = rand() % 254 + 1;
+            }
+            portV7->extra_audio_descriptors[i].encapsulation_type =
+                    AUDIO_ENCAPSULATION_TYPE_IEC61937;
+        }
     }
 }
 
@@ -700,7 +715,7 @@ TEST_P(SystemAudioPortTest, AudioPortEquivalentTest) {
 
 TEST_P(SystemAudioPortTest, AudioPortV7EquivalentTest) {
     struct audio_port_v7 lhs;
-    ASSERT_NO_FATAL_FAILURE(fillFakeAudioPortV7Info(&lhs));
+    ASSERT_NO_FATAL_FAILURE(fillFakeAudioPortV7Info(&lhs, true /*containsExtraAudioDescriptor*/));
     struct audio_port_v7 rhs = lhs;
     ASSERT_TRUE(audio_ports_v7_are_equal(&lhs, &rhs));
 
@@ -716,6 +731,10 @@ TEST_P(SystemAudioPortTest, AudioPortV7EquivalentTest) {
     testAudioPortCapabilityArraysEquivalent(firstProfile.channel_masks,
             firstProfile.num_channel_masks, AUDIO_CHANNEL_NONE,
             &lhs, &rhs, audio_ports_v7_are_equal);
+
+    struct audio_extra_audio_descriptor emptyDesc = {};
+    testAudioPortCapabilityArraysEquivalent(lhs.extra_audio_descriptors,
+            lhs.num_extra_audio_descriptors, emptyDesc, &lhs, &rhs, audio_ports_v7_are_equal);
 }
 
 TEST_P(SystemAudioPortTest, AudioPortV7ConversionTest) {
@@ -728,7 +747,8 @@ TEST_P(SystemAudioPortTest, AudioPortV7ConversionTest) {
 
     struct audio_port_v7 srcPortV7, dstPortV7 = {};
     struct audio_port audioPort;
-    ASSERT_NO_FATAL_FAILURE(fillFakeAudioPortV7Info(&srcPortV7));
+    ASSERT_NO_FATAL_FAILURE(
+            fillFakeAudioPortV7Info(&srcPortV7, false /*containsExtraAudioDescriptor*/));
     ASSERT_EQ(srcPortV7.num_audio_profiles, AUDIO_PORT_MAX_AUDIO_PROFILES);
     auto& profile = srcPortV7.audio_profiles[0];
     ASSERT_EQ(profile.num_channel_masks, AUDIO_PORT_MAX_CHANNEL_MASKS);
@@ -742,6 +762,16 @@ TEST_P(SystemAudioPortTest, AudioPortV7ConversionTest) {
     srcPortV7.num_audio_profiles = 0;
     dstPortV7.num_audio_profiles = 0;
     ASSERT_TRUE(audio_ports_v7_are_equal(&srcPortV7, &dstPortV7));
+}
+
+TEST_P(SystemAudioPortTest, AudioPortV7ContainingExtraAudioDescriptorConversionTest) {
+    struct audio_port_v7 srcPortV7, dstPortV7 = {};
+    struct audio_port audioPort;
+    ASSERT_NO_FATAL_FAILURE(
+            fillFakeAudioPortV7Info(&srcPortV7, true /*containsExtraAudioDescriptor*/));
+    ASSERT_FALSE(audio_populate_audio_port(&srcPortV7, &audioPort));
+    audio_populate_audio_port_v7(&audioPort, &dstPortV7);
+    ASSERT_FALSE(audio_ports_v7_are_equal(&srcPortV7, &dstPortV7));
 }
 
 INSTANTIATE_TEST_CASE_P(SystemAudioPortTest, SystemAudioPortTest,
