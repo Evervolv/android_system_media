@@ -606,8 +606,12 @@ struct audio_port_config {
  * the maximum number of audio profiles must be the same as the maximum number
  * of formats. */
 #define AUDIO_PORT_MAX_AUDIO_PROFILES AUDIO_PORT_MAX_FORMATS
+/* max number of extra audio descriptors in audio port. */
+#define AUDIO_PORT_MAX_EXTRA_AUDIO_DESCRIPTORS AUDIO_PORT_MAX_FORMATS
 /* max number of gain controls in audio port */
 #define AUDIO_PORT_MAX_GAINS 16
+/* max bytes of extra audio descriptor */
+#define EXTRA_AUDIO_DESCRIPTOR_SIZE 32
 
 /* extension for audio port structure when the audio port is a hardware device */
 struct audio_port_device_ext {
@@ -654,13 +658,30 @@ struct audio_port {
     } ext;
 };
 
+typedef enum {
+    AUDIO_STANDARD_NONE = 0,
+    AUDIO_STANDARD_EDID = 1,
+} audio_standard_t;
+
+/**
+ * Configuration described by hardware descriptor for a format that is unrecognized
+ * by the platform.
+ */
+struct audio_extra_audio_descriptor {
+    audio_standard_t standard;
+    unsigned int descriptor_length;
+    uint8_t descriptor[EXTRA_AUDIO_DESCRIPTOR_SIZE];
+    audio_encapsulation_type_t encapsulation_type;
+};
+
 /* configurations supported for a certain format */
 struct audio_profile {
-    audio_format_t           format;
-    unsigned int             num_sample_rates;  /* number of sampling rates in following array */
-    unsigned int             sample_rates[AUDIO_PORT_MAX_SAMPLING_RATES];
-    unsigned int             num_channel_masks; /* number of channel masks in following array */
-    audio_channel_mask_t     channel_masks[AUDIO_PORT_MAX_CHANNEL_MASKS];
+    audio_format_t format;
+    unsigned int num_sample_rates;  /* number of sampling rates in following array */
+    unsigned int sample_rates[AUDIO_PORT_MAX_SAMPLING_RATES];
+    unsigned int num_channel_masks; /* number of channel masks in following array */
+    audio_channel_mask_t channel_masks[AUDIO_PORT_MAX_CHANNEL_MASKS];
+    audio_encapsulation_type_t encapsulation_type;
 };
 
 struct audio_port_v7 {
@@ -671,6 +692,10 @@ struct audio_port_v7 {
     unsigned int             num_audio_profiles; /* number of audio profiles in the following
                                                     array */
     struct audio_profile     audio_profiles[AUDIO_PORT_MAX_AUDIO_PROFILES];
+    unsigned int             num_extra_audio_descriptors; /* number of extra audio descriptors in
+                                                             the following array */
+    struct audio_extra_audio_descriptor
+            extra_audio_descriptors[AUDIO_PORT_MAX_EXTRA_AUDIO_DESCRIPTORS];
     unsigned int             num_gains;          /* number of gains in following array */
     struct audio_gain        gains[AUDIO_PORT_MAX_GAINS];
     struct audio_port_config active_config;      /* current audio port configuration */
@@ -680,6 +705,14 @@ struct audio_port_v7 {
         struct audio_port_session_ext session;
     } ext;
 };
+
+/* Return true when a given uint8_t array is a valid short audio descriptor. This function just
+ * does basic validation by checking if the first value is not zero.
+ */
+static inline bool audio_is_valid_short_audio_descriptor(const uint8_t *shortAudioDescriptor,
+                                                         size_t length) {
+    return length != 0 && *shortAudioDescriptor != 0;
+}
 
 static inline void audio_populate_audio_port_v7(
         const struct audio_port *port, struct audio_port_v7 *portV7) {
@@ -764,7 +797,7 @@ static inline bool audio_populate_audio_port(
     memcpy(port->gains, portV7->gains, port->num_gains * sizeof(struct audio_gain));
     memcpy(&port->active_config, &portV7->active_config, sizeof(struct audio_port_config));
     memcpy(&port->ext, &portV7->ext, sizeof(port->ext));
-    return allDataConverted;
+    return allDataConverted && portV7->num_extra_audio_descriptors == 0;
 }
 
 static inline bool audio_gain_config_are_equal(
@@ -868,6 +901,7 @@ extern "C++" {
 #include <set>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace {
 
@@ -968,6 +1002,32 @@ static inline bool audio_profile_arrays_are_equal(
         const struct audio_profile rhs[], unsigned int rsize) {
     return getAudioProfileMap(lhs, lsize) == getAudioProfileMap(rhs, rsize);
 }
+
+using ExtraAudioDescriptorMap =std::map<audio_standard_t,
+                                        std::map<audio_encapsulation_type_t,
+                                                 std::set<std::vector<uint8_t>>>>;
+
+static inline ExtraAudioDescriptorMap getExtraAudioDescriptorMap(
+        const struct audio_extra_audio_descriptor extraAudioDescriptors[],
+        unsigned int numExtraAudioDescriptors) {
+    ExtraAudioDescriptorMap extraAudioDescriptorMap;
+    for (unsigned int i = 0; i < numExtraAudioDescriptors; ++i) {
+        extraAudioDescriptorMap[extraAudioDescriptors[i].standard]
+                [extraAudioDescriptors[i].encapsulation_type].insert(
+                std::vector<uint8_t>(
+                        extraAudioDescriptors[i].descriptor,
+                        extraAudioDescriptors[i].descriptor
+                                + extraAudioDescriptors[i].descriptor_length));
+    }
+    return extraAudioDescriptorMap;
+}
+
+static inline bool audio_extra_audio_descriptor_are_equal(
+        const struct audio_extra_audio_descriptor lhs[], unsigned int lsize,
+        const struct audio_extra_audio_descriptor rhs[], unsigned int rsize) {
+    return getExtraAudioDescriptorMap(lhs, lsize) == getExtraAudioDescriptorMap(rhs, rsize);
+}
+
 } // namespace
 
 static inline bool audio_ports_are_equal(
@@ -992,7 +1052,10 @@ static inline bool audio_ports_v7_are_equal(
     }
     return audio_profile_arrays_are_equal(
             lhs->audio_profiles, lhs->num_audio_profiles,
-            rhs->audio_profiles, rhs->num_audio_profiles);
+            rhs->audio_profiles, rhs->num_audio_profiles) &&
+           audio_extra_audio_descriptor_are_equal(
+                   lhs->extra_audio_descriptors, lhs->num_extra_audio_descriptors,
+                   rhs->extra_audio_descriptors, rhs->num_extra_audio_descriptors);
 }
 
 } // extern "C++"
