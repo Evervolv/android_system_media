@@ -201,7 +201,7 @@ static struct mixer_path *path_create(struct audio_route *ar, const char *name)
     struct mixer_path *new_mixer_path = NULL;
 
     if (path_get_by_name(ar, name)) {
-        ALOGE("Path name '%s' already exists", name);
+        ALOGW("Path name '%s' already exists", name);
         return NULL;
     }
 
@@ -454,7 +454,7 @@ static int mixer_enum_string_to_value(struct mixer_ctl *ctl, const char *string)
             break;
     }
     if (i == num_values) {
-        ALOGE("unknown enum value string %s for ctl %s",
+        ALOGW("unknown enum value string %s for ctl %s",
               string, mixer_ctl_get_name(ctl));
         return 0;
     }
@@ -497,12 +497,12 @@ static void start_tag(void *data, const XML_Char *tag_name,
                 /* top level path: create and stash the path */
                 state->path = path_create(ar, (char *)attr_name);
                 if (state->path == NULL)
-                    ALOGE("path created failed, please check the path if existed");
+                    ALOGW("path creation failed, please check if the path exists");
             } else {
                 /* nested path */
                 struct mixer_path *sub_path = path_get_by_name(ar, attr_name);
                 if (!sub_path) {
-                    ALOGE("unable to find sub path '%s'", attr_name);
+                    ALOGW("unable to find sub path '%s'", attr_name);
                 } else if (state->path != NULL) {
                     path_add_path(ar, state->path, sub_path);
                 }
@@ -587,7 +587,7 @@ static void start_tag(void *data, const XML_Char *tag_name,
                         else
                             ar->mixer_state[ctl_index].new_value.integer[id] = value;
                     else
-                        ALOGE("value id out of range for mixer ctl '%s'",
+                        ALOGW("value id out of range for mixer ctl '%s'",
                               mixer_ctl_get_name(ctl));
                 } else {
                     /* set all values the same except for CTL_TYPE_BYTE */
