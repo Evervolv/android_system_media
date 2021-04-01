@@ -33,6 +33,7 @@ const effect_uuid_t * const FX_IID_HAPTICGENERATOR = &FX_IID_HAPTICGENERATOR_;
 typedef enum
 {
     HG_PARAM_HAPTIC_INTENSITY, // haptic intensity
+    HG_PARAM_VIBRATOR_INFO, // vibrator information, e.g. resonant frequency, Q factor
 } t_hapticgenerator_params;
 
 #if __cplusplus
