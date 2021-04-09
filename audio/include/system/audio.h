@@ -1797,6 +1797,8 @@ static inline bool audio_is_valid_format(audio_format_t format)
             return false;
         }
         /* not reached */
+    case AUDIO_FORMAT_DTS_UHD:
+        return true;
     default:
         return false;
     }
