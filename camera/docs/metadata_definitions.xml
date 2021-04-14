@@ -3221,7 +3221,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           * If the camera device has BURST_CAPTURE capability, the frame rate requirement of
           BURST_CAPTURE must still be met.
           * All streams not larger than the maximum streaming dimension for BOKEH_STILL_CAPTURE mode
-          (queried via {@link android.hardware.camera2.CameraCharacteristics#CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES|ACAMERA_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES})
+          (queried via {@link android.hardware.camera2.CameraCharacteristics#CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_CAPABILITIES|ACAMERA_CONTROL_AVAILABLE_EXTENDED_SCENE_MODE_MAX_SIZES})
           will have preview bokeh effect applied.
 
           When set to BOKEH_CONTINUOUS mode, configured streams dimension should not exceed this mode's
