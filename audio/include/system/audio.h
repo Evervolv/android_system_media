@@ -1537,10 +1537,15 @@ static inline audio_channel_mask_t audio_channel_out_mask_from_count(uint32_t ch
     case 7: // 6.1
         bits = AUDIO_CHANNEL_OUT_5POINT1 | AUDIO_CHANNEL_OUT_BACK_CENTER;
         break;
-    case 8:
+    case FCC_8:
         bits = AUDIO_CHANNEL_OUT_7POINT1;
         break;
-    // FIXME FCC_8
+    case FCC_12:
+        bits = AUDIO_CHANNEL_OUT_7POINT1POINT4;
+        break;
+    case FCC_24:
+        bits = AUDIO_CHANNEL_OUT_22POINT2;
+        break;
     default:
         return AUDIO_CHANNEL_INVALID;
     }
