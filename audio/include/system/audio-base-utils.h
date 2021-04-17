@@ -377,6 +377,66 @@ static_assert(AUDIO_DEVICE_IN_DIGITAL_CNT == std::size(AUDIO_DEVICE_IN_ALL_DIGIT
 static_assert(AUDIO_DEVICE_IN_BLE_CNT == std::size(AUDIO_DEVICE_IN_ALL_BLE_ARRAY));
 static_assert(AUDIO_ENCAPSULATION_TYPE_CNT == std::size(AUDIO_ENCAPSULATION_TYPE_ALL_ARRAY));
 
+#if __has_builtin(__builtin_popcount)
+// Replace with constexpr std::popcount with C++20
+
+// Check common channel masks have counts we expect.
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_MONO) == 1);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_STEREO) == 2);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_2POINT1) == 3);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_TRI) == 3);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_TRI_BACK) == 3);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_QUAD) == 4);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_3POINT1) == 4);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_2POINT0POINT2) == 4);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_QUAD) == 4);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_QUAD_SIDE) == 4);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_SURROUND) == 4);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_PENTA) == 5);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_2POINT1POINT2) == 5);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_3POINT0POINT2) == 5);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_5POINT1) == 6);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_3POINT1POINT2) == 6);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_6POINT1) == 7);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_7POINT1) == 8);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_5POINT1POINT2) == 8);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_5POINT1POINT4) == 10);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_7POINT1POINT2) == 10);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_7POINT1POINT4) == 12);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_13POINT_360RA) == 13);
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_22POINT2) == 24);
+
+// Check common channel masks which are a subset of another.
+// (by subset, all the channel positions are contained in the other mask).
+
+// Validate that channel positions in (a) are a subset of (b).
+#define CHANNEL_CHECK_SUBSET_OF(a, b) \
+    static_assert(__builtin_popcount((a)^(b)) == __builtin_popcount(b) - __builtin_popcount(a))
+
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_MONO, AUDIO_CHANNEL_OUT_STEREO);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_STEREO, AUDIO_CHANNEL_OUT_2POINT1);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_STEREO, AUDIO_CHANNEL_OUT_QUAD);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_QUAD, AUDIO_CHANNEL_OUT_PENTA);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_2POINT1, AUDIO_CHANNEL_OUT_5POINT1);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_5POINT1, AUDIO_CHANNEL_OUT_5POINT1POINT2);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_5POINT1, AUDIO_CHANNEL_OUT_5POINT1POINT4);
+// Note AUDIO_CHANNEL_OUT_5POINT1POINT2 is not subset of AUDIO_CHANNEL_OUT_5POINT1POINT4
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_5POINT1POINT2, AUDIO_CHANNEL_OUT_7POINT1POINT2);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_7POINT1, AUDIO_CHANNEL_OUT_7POINT1POINT2);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_7POINT1, AUDIO_CHANNEL_OUT_7POINT1POINT4);
+// Note AUDIO_CHANNEL_OUT_7POINT1POINT2 is not subset of AUDIO_CHANNEL_OUT_7POINT1POINT4
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_5POINT1POINT4, AUDIO_CHANNEL_OUT_7POINT1POINT4);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_13POINT_360RA, AUDIO_CHANNEL_OUT_22POINT2);
+CHANNEL_CHECK_SUBSET_OF(AUDIO_CHANNEL_OUT_7POINT1POINT4, AUDIO_CHANNEL_OUT_22POINT2);
+
+#undef CHANNEL_CHECK_SUBSET_OF
+
+// Extra channel mask check
+static_assert(__builtin_popcount(AUDIO_CHANNEL_OUT_13POINT_360RA
+        ^ AUDIO_CHANNEL_OUT_7POINT1POINT4) == 7); // bfl, bfr, bfc + tfc replace lfe + bl + br
+
+#endif // __has_builtin(__builtin_popcount)
+
 #endif  // AUDIO_ARRAYS_STATIC_CHECK
 
 #endif  // ANDROID_AUDIO_BASE_UTILS_H
