@@ -1803,6 +1803,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
         }
         /* not reached */
     case AUDIO_FORMAT_DTS_UHD:
+    case AUDIO_FORMAT_DRA:
         return true;
     default:
         return false;
