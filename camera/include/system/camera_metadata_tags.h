@@ -329,6 +329,7 @@ typedef enum camera_metadata_tag {
                                                       // int64[]      | ndk_public   | HIDL v3.6
     ANDROID_SCALER_AVAILABLE_INPUT_OUTPUT_FORMATS_MAP_MAXIMUM_RESOLUTION,
                                                       // int32        | hidden       | HIDL v3.6
+    ANDROID_SCALER_MULTI_RESOLUTION_STREAM_SUPPORTED, // enum         | ndk_public   | HIDL v3.6
     ANDROID_SCALER_END,
 
     ANDROID_SENSOR_EXPOSURE_TIME =                    // int64        | public       | HIDL v3.2
@@ -953,6 +954,12 @@ typedef enum camera_metadata_enum_android_scaler_available_stream_configurations
     ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_MAXIMUM_RESOLUTION_INPUT
                                                                      , // HIDL v3.6
 } camera_metadata_enum_android_scaler_available_stream_configurations_maximum_resolution_t;
+
+// ANDROID_SCALER_MULTI_RESOLUTION_STREAM_SUPPORTED
+typedef enum camera_metadata_enum_android_scaler_multi_resolution_stream_supported {
+    ANDROID_SCALER_MULTI_RESOLUTION_STREAM_SUPPORTED_FALSE          , // HIDL v3.6
+    ANDROID_SCALER_MULTI_RESOLUTION_STREAM_SUPPORTED_TRUE           , // HIDL v3.6
+} camera_metadata_enum_android_scaler_multi_resolution_stream_supported_t;
 
 
 // ANDROID_SENSOR_REFERENCE_ILLUMINANT1
