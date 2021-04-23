@@ -21177,7 +21177,7 @@ an input stream of a particular format.<wbr/> For more details,<wbr/> see
 <a href="#static_android.scaler.availableInputOutputFormatsMap">android.<wbr/>scaler.<wbr/>available<wbr/>Input<wbr/>Output<wbr/>Formats<wbr/>Map</a>.<wbr/></p>
 <p>The following table describes the minimum required output stream
 configurations based on the hardware level
-(<a href="#static_android.info.supportedHardwareLevel">android.<wbr/>info.<wbr/>supported<wbr/>Hardware<wbr/>Level</a>):</p>
+(<a href="#static_android.info.supportedHardwareLevel">android.<wbr/>info.<wbr/>supported<wbr/>Hardware<wbr/>Level</a>),<wbr/> prior to Android 12:</p>
 <table>
 <thead>
 <tr>
@@ -21238,6 +21238,76 @@ configurations based on the hardware level
 </tr>
 </tbody>
 </table>
+<p>Starting from Android 12,<wbr/> the camera device may not support JPEG sizes smaller than the
+minimum of 1080p and the camera sensor active array size.<wbr/> The requirements for
+IMPLEMENTATION_<wbr/>DEFINED and YUV_<wbr/>420_<wbr/>888 stay the same.<wbr/> This new minimum required output
+stream configurations are illustrated by the table below:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Format</th>
+<th align="center">Size</th>
+<th align="center">Hardware Level</th>
+<th align="center">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">JPEG</td>
+<td align="center"><a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></td>
+<td align="center">Any</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">JPEG</td>
+<td align="center">1920x1080 (1080p)</td>
+<td align="center">Any</td>
+<td align="center">if 1080p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center"><a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></td>
+<td align="center">FULL</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">1920x1080 (1080p)</td>
+<td align="center">FULL</td>
+<td align="center">if 1080p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">1280x720 (720)</td>
+<td align="center">FULL</td>
+<td align="center">if 720p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">640x480 (480p)</td>
+<td align="center">FULL</td>
+<td align="center">if 480p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">320x240 (240p)</td>
+<td align="center">FULL</td>
+<td align="center">if 240p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">all output sizes available for FULL hardware level,<wbr/> up to the maximum video size</td>
+<td align="center">LIMITED</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">IMPLEMENTATION_<wbr/>DEFINED</td>
+<td align="center">same as YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">Any</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
 <p>Refer to <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a> for additional
 mandatory stream configurations on a per-capability basis.<wbr/></p>
 <p>Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability for
@@ -21278,7 +21348,7 @@ ratio 4:3,<wbr/> the JPEG encoder alignment requirement is 16,<wbr/> the maximum
 the HAL must include all YUV_<wbr/>420_<wbr/>888 sizes that have JPEG sizes listed
 here as output streams.<wbr/></p>
 <p>It must also include each below resolution if it is smaller than or
-equal to the sensor maximum resolution (for both YUV_<wbr/>420_<wbr/>888 and JPEG
+equal to the sensor maximum resolution (for both YUV_<wbr/>420_<wbr/>888 and IMPLEMENTATION_<wbr/>DEFINED
 formats),<wbr/> as output streams:</p>
 <ul>
 <li>240p (320 x 240)</li>

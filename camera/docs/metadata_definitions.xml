@@ -7032,7 +7032,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           The following table describes the minimum required output stream
           configurations based on the hardware level
-          (android.info.supportedHardwareLevel):
+          (android.info.supportedHardwareLevel), prior to Android 12:
 
           Format         | Size                                         | Hardware Level | Notes
           :-------------:|:--------------------------------------------:|:--------------:|:--------------:
@@ -7043,6 +7043,23 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           JPEG           | 320x240 (240p)                               | Any            | if 240p &lt;= activeArraySize
           YUV_420_888    | all output sizes available for JPEG          | FULL           |
           YUV_420_888    | all output sizes available for JPEG, up to the maximum video size | LIMITED        |
+          IMPLEMENTATION_DEFINED | same as YUV_420_888                  | Any            |
+
+          Starting from Android 12, the camera device may not support JPEG sizes smaller than the
+          minimum of 1080p and the camera sensor active array size. The requirements for
+          IMPLEMENTATION_DEFINED and YUV_420_888 stay the same. This new minimum required output
+          stream configurations are illustrated by the table below:
+
+          Format         | Size                                         | Hardware Level | Notes
+          :-------------:|:--------------------------------------------:|:--------------:|:--------------:
+          JPEG           | android.sensor.info.activeArraySize          | Any            |
+          JPEG           | 1920x1080 (1080p)                            | Any            | if 1080p &lt;= activeArraySize
+          YUV_420_888    | android.sensor.info.activeArraySize          | FULL           |
+          YUV_420_888    | 1920x1080 (1080p)                            | FULL           | if 1080p &lt;= activeArraySize
+          YUV_420_888    | 1280x720 (720)                               | FULL           | if 720p &lt;= activeArraySize
+          YUV_420_888    | 640x480 (480p)                               | FULL           | if 480p &lt;= activeArraySize
+          YUV_420_888    | 320x240 (240p)                               | FULL           | if 240p &lt;= activeArraySize
+          YUV_420_888    | all output sizes available for FULL hardware level, up to the maximum video size | LIMITED        |
           IMPLEMENTATION_DEFINED | same as YUV_420_888                  | Any            |
 
           Refer to android.request.availableCapabilities for additional
@@ -7085,7 +7102,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           here as output streams.
 
           It must also include each below resolution if it is smaller than or
-          equal to the sensor maximum resolution (for both YUV_420_888 and JPEG
+          equal to the sensor maximum resolution (for both YUV_420_888 and IMPLEMENTATION_DEFINED
           formats), as output streams:
 
           * 240p (320 x 240)
