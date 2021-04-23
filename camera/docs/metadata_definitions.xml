@@ -7811,21 +7811,6 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           configurations from all physical cameras. For an ultra high resolution sensor camera, this
           is used directly as the camera’s multi-resolution stream configurations.
           </details>
-          <hal_details>
-          The HAL must support the buffer management API by setting supportedBufferManagementVersion
-          to HIDL_DEVICE_3_5 or higher.
-
-          For a logical multi-camera or standalone ultra high resolution sensor camera to claim
-          multi-resolution stream support, when combined there must be at least 2 stream
-          configurations for each advertised format.
-
-          If the HAL advertises multi-resolution input stream support for a particular format
-          (namely PRIVATE, or YUV), the logical multi-camera or standalone ultra high resolution
-          sensor camera must have the corresponding reprocessing capabilities (PRIVATE_REPROCESSING,
-          or YUV_REPROCESSING respectively). The camera HAL must support all of the input format and
-          output format mappings found in the logical multi-camera or standalone ultra high
-          resolution sensor camera's availableInputOutputFormatsMap.
-          </hal_details>
         </entry>
         <entry name="multiResolutionStreamConfigurationMap" type="int32" visibility="java_public"
                synthetic="true" optional="true" typedef="multiResolutionStreamConfigurationMap">
@@ -8026,6 +8011,49 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <hal_details>
           Do not set this property directly
           (it is synthetic and will not be available at the HAL layer).
+          </hal_details>
+        </entry>
+        <entry name="multiResolutionStreamSupported" type="byte" visibility="ndk_public" enum="true"
+          typedef="boolean" hwlevel="limited" hal_version="3.6">
+          <enum>
+            <value>FALSE</value>
+            <value>TRUE</value>
+          </enum>
+          <description>Whether the camera device supports multi-resolution input or output streams
+          </description>
+          <details>
+          A logical multi-camera or an ultra high resolution camera may support multi-resolution
+          input or output streams. With multi-resolution output streams, the camera device is able
+          to output different resolution images depending on the current active physical camera or
+          pixel mode. With multi-resolution input streams, the camera device can reprocess images
+          of different resolutions from different physical cameras or sensor pixel modes.
+
+          When set to TRUE:
+          * For a logical multi-camera, the camera framework derives
+          android.scaler.multiResolutionStreamConfigurationMap by combining the
+          android.scaler.physicalCameraMultiResolutionStreamConfigurations from its physical
+          cameras.
+          * For an ultra-high resolution sensor camera, the camera framework directly copies
+          the value of android.scaler.physicalCameraMultiResolutionStreamConfigurations to
+          android.scaler.multiResolutionStreamConfigurationMap.
+          </details>
+          <hal_details>
+          For the HAL to claim support for multi-resolution streams:
+          * The HAL must support the buffer management API by setting
+          supportedBufferManagementVersion to HIDL_DEVICE_3_5.
+          * For a logical multi-camera, when combined from all its physical cameras, there must be
+          at a minimum one input or output stream format with at least two different
+          physicalCameraMultiResolutionStreamConfigurations entries for that format.
+          * For an ultra high resolution sensor camera, for each supported multi-resolution format,
+          the physicalCameraMultiResolutionStreamConfigurations must contain both the largest stream
+          configuration within the android.scaler.streamConfigurationMap and the largest stream
+          configuration within the android.scaler.streamConfigurationMapMaximumResolution.
+          * If the HAL advertises multi-resolution input stream support for a particular format
+          (namely PRIVATE, or YUV), the logical multi-camera or ultra high resolution sensor camera
+          must have the corresponding reprocessing capabilities (PRIVATE_REPROCESSING,
+          or YUV_REPROCESSING respectively). The camera HAL must support reprocessing the
+          multi-resolution input stream to the output formats specified in the camera's
+          android.scaler.availableInputOutputFormatsMap.
           </hal_details>
         </entry>
       </static>
