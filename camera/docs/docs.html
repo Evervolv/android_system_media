@@ -794,6 +794,8 @@
             ><a href="#static_android.scaler.availableInputOutputFormatsMapMaximumResolution">android.scaler.availableInputOutputFormatsMapMaximumResolution</a></li>
             <li
             ><a href="#static_android.scaler.mandatoryMaximumResolutionStreamCombinations">android.scaler.mandatoryMaximumResolutionStreamCombinations</a></li>
+            <li
+            ><a href="#static_android.scaler.multiResolutionStreamSupported">android.scaler.multiResolutionStreamSupported</a></li>
           </ul>
         </li>
         <li>
@@ -21175,7 +21177,7 @@ an input stream of a particular format.<wbr/> For more details,<wbr/> see
 <a href="#static_android.scaler.availableInputOutputFormatsMap">android.<wbr/>scaler.<wbr/>available<wbr/>Input<wbr/>Output<wbr/>Formats<wbr/>Map</a>.<wbr/></p>
 <p>The following table describes the minimum required output stream
 configurations based on the hardware level
-(<a href="#static_android.info.supportedHardwareLevel">android.<wbr/>info.<wbr/>supported<wbr/>Hardware<wbr/>Level</a>):</p>
+(<a href="#static_android.info.supportedHardwareLevel">android.<wbr/>info.<wbr/>supported<wbr/>Hardware<wbr/>Level</a>),<wbr/> prior to Android 12:</p>
 <table>
 <thead>
 <tr>
@@ -21236,6 +21238,76 @@ configurations based on the hardware level
 </tr>
 </tbody>
 </table>
+<p>Starting from Android 12,<wbr/> the camera device may not support JPEG sizes smaller than the
+minimum of 1080p and the camera sensor active array size.<wbr/> The requirements for
+IMPLEMENTATION_<wbr/>DEFINED and YUV_<wbr/>420_<wbr/>888 stay the same.<wbr/> This new minimum required output
+stream configurations are illustrated by the table below:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Format</th>
+<th align="center">Size</th>
+<th align="center">Hardware Level</th>
+<th align="center">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">JPEG</td>
+<td align="center"><a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></td>
+<td align="center">Any</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">JPEG</td>
+<td align="center">1920x1080 (1080p)</td>
+<td align="center">Any</td>
+<td align="center">if 1080p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center"><a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a></td>
+<td align="center">FULL</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">1920x1080 (1080p)</td>
+<td align="center">FULL</td>
+<td align="center">if 1080p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">1280x720 (720)</td>
+<td align="center">FULL</td>
+<td align="center">if 720p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">640x480 (480p)</td>
+<td align="center">FULL</td>
+<td align="center">if 480p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">320x240 (240p)</td>
+<td align="center">FULL</td>
+<td align="center">if 240p &lt;= activeArraySize</td>
+</tr>
+<tr>
+<td align="center">YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">all output sizes available for FULL hardware level,<wbr/> up to the maximum video size</td>
+<td align="center">LIMITED</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">IMPLEMENTATION_<wbr/>DEFINED</td>
+<td align="center">same as YUV_<wbr/>420_<wbr/>888</td>
+<td align="center">Any</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
 <p>Refer to <a href="#static_android.request.availableCapabilities">android.<wbr/>request.<wbr/>available<wbr/>Capabilities</a> for additional
 mandatory stream configurations on a per-capability basis.<wbr/></p>
 <p>Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability for
@@ -21276,7 +21348,7 @@ ratio 4:3,<wbr/> the JPEG encoder alignment requirement is 16,<wbr/> the maximum
 the HAL must include all YUV_<wbr/>420_<wbr/>888 sizes that have JPEG sizes listed
 here as output streams.<wbr/></p>
 <p>It must also include each below resolution if it is smaller than or
-equal to the sensor maximum resolution (for both YUV_<wbr/>420_<wbr/>888 and JPEG
+equal to the sensor maximum resolution (for both YUV_<wbr/>420_<wbr/>888 and IMPLEMENTATION_<wbr/>DEFINED
 formats),<wbr/> as output streams:</p>
 <ul>
 <li>240p (320 x 240)</li>
@@ -22287,7 +22359,7 @@ are supported.<wbr/></p>
                 
           <tr class="entry" id="static_android.scaler.physicalCameraMultiResolutionStreamConfigurations">
             <td class="entry_name
-             " rowspan="5">
+             " rowspan="3">
               android.<wbr/>scaler.<wbr/>physical<wbr/>Camera<wbr/>Multi<wbr/>Resolution<wbr/>Stream<wbr/>Configurations
             </td>
             <td class="entry_type">
@@ -22356,24 +22428,6 @@ is used directly as the camera’s multi-resolution stream configurations.<wbr/>
             </td>
           </tr>
 
-          <tr class="entries_header">
-            <th class="th_details" colspan="6">HAL Implementation Details</th>
-          </tr>
-          <tr class="entry_cont">
-            <td class="entry_details" colspan="6">
-              <p>The HAL must support the buffer management API by setting supportedBufferManagementVersion
-to HIDL_<wbr/>DEVICE_<wbr/>3_<wbr/>5 or higher.<wbr/></p>
-<p>For a logical multi-camera or standalone ultra high resolution sensor camera to claim
-multi-resolution stream support,<wbr/> when combined there must be at least 2 stream
-configurations for each advertised format.<wbr/></p>
-<p>If the HAL advertises multi-resolution input stream support for a particular format
-(namely PRIVATE,<wbr/> or YUV),<wbr/> the logical multi-camera or standalone ultra high resolution
-sensor camera must have the corresponding reprocessing capabilities (PRIVATE_<wbr/>REPROCESSING,<wbr/>
-or YUV_<wbr/>REPROCESSING respectively).<wbr/> The camera HAL must support all of the input format and
-output format mappings found in the logical multi-camera or standalone ultra high
-resolution sensor camera's availableInputOutputFormatsMap.<wbr/></p>
-            </td>
-          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
@@ -22885,6 +22939,99 @@ device.<wbr/></p>
             <td class="entry_details" colspan="6">
               <p>Do not set this property directly
 (it is synthetic and will not be available at the HAL layer).<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.scaler.multiResolutionStreamSupported">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>scaler.<wbr/>multi<wbr/>Resolution<wbr/>Stream<wbr/>Supported
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [ndk_public as boolean]</span>
+
+
+              <span class="entry_type_hwlevel">[limited] </span>
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">FALSE (v3.6)</span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">TRUE (v3.6)</span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Whether the camera device supports multi-resolution input or output streams</p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>6</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>A logical multi-camera or an ultra high resolution camera may support multi-resolution
+input or output streams.<wbr/> With multi-resolution output streams,<wbr/> the camera device is able
+to output different resolution images depending on the current active physical camera or
+pixel mode.<wbr/> With multi-resolution input streams,<wbr/> the camera device can reprocess images
+of different resolutions from different physical cameras or sensor pixel modes.<wbr/></p>
+<p>When set to TRUE:
+* For a logical multi-camera,<wbr/> the camera framework derives
+<a href="#static_android.scaler.multiResolutionStreamConfigurationMap">android.<wbr/>scaler.<wbr/>multi<wbr/>Resolution<wbr/>Stream<wbr/>Configuration<wbr/>Map</a> by combining the
+<a href="#static_android.scaler.physicalCameraMultiResolutionStreamConfigurations">android.<wbr/>scaler.<wbr/>physical<wbr/>Camera<wbr/>Multi<wbr/>Resolution<wbr/>Stream<wbr/>Configurations</a> from its physical
+cameras.<wbr/>
+* For an ultra-high resolution sensor camera,<wbr/> the camera framework directly copies
+the value of <a href="#static_android.scaler.physicalCameraMultiResolutionStreamConfigurations">android.<wbr/>scaler.<wbr/>physical<wbr/>Camera<wbr/>Multi<wbr/>Resolution<wbr/>Stream<wbr/>Configurations</a> to
+<a href="#static_android.scaler.multiResolutionStreamConfigurationMap">android.<wbr/>scaler.<wbr/>multi<wbr/>Resolution<wbr/>Stream<wbr/>Configuration<wbr/>Map</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>For the HAL to claim support for multi-resolution streams:
+* The HAL must support the buffer management API by setting
+supportedBufferManagementVersion to HIDL_<wbr/>DEVICE_<wbr/>3_<wbr/>5.<wbr/>
+* For a logical multi-camera,<wbr/> when combined from all its physical cameras,<wbr/> there must be
+at a minimum one input or output stream format with at least two different
+physicalCameraMultiResolutionStreamConfigurations entries for that format.<wbr/>
+* For an ultra high resolution sensor camera,<wbr/> for each supported multi-resolution format,<wbr/>
+the physicalCameraMultiResolutionStreamConfigurations must contain both the largest stream
+configuration within the <a href="#static_android.scaler.streamConfigurationMap">android.<wbr/>scaler.<wbr/>stream<wbr/>Configuration<wbr/>Map</a> and the largest stream
+configuration within the <a href="#static_android.scaler.streamConfigurationMapMaximumResolution">android.<wbr/>scaler.<wbr/>stream<wbr/>Configuration<wbr/>Map<wbr/>Maximum<wbr/>Resolution</a>.<wbr/>
+* If the HAL advertises multi-resolution input stream support for a particular format
+(namely PRIVATE,<wbr/> or YUV),<wbr/> the logical multi-camera or ultra high resolution sensor camera
+must have the corresponding reprocessing capabilities (PRIVATE_<wbr/>REPROCESSING,<wbr/>
+or YUV_<wbr/>REPROCESSING respectively).<wbr/> The camera HAL must support reprocessing the
+multi-resolution input stream to the output formats specified in the camera's
+<a href="#static_android.scaler.availableInputOutputFormatsMap">android.<wbr/>scaler.<wbr/>available<wbr/>Input<wbr/>Output<wbr/>Formats<wbr/>Map</a>.<wbr/></p>
             </td>
           </tr>
 
