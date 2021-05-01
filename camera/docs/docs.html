@@ -22359,7 +22359,7 @@ are supported.<wbr/></p>
                 
           <tr class="entry" id="static_android.scaler.physicalCameraMultiResolutionStreamConfigurations">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="5">
               android.<wbr/>scaler.<wbr/>physical<wbr/>Camera<wbr/>Multi<wbr/>Resolution<wbr/>Stream<wbr/>Configurations
             </td>
             <td class="entry_type">
@@ -22428,6 +22428,19 @@ is used directly as the camera’s multi-resolution stream configurations.<wbr/>
             </td>
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>If this field contains input stream configurations,<wbr/> and the camera device is a physical
+camera (not a standalone ultra-high resolution camera),<wbr/> the
+<a href="#dynamic_android.logicalMultiCamera.activePhysicalId">android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>active<wbr/>Physical<wbr/>Id</a> tag must be set to the physical camera Id in
+the physical camera result metadata.<wbr/> This is to make sure during multi-resolution
+reprocessing,<wbr/> the camera HAL is notified of which physical camera the reprocessing
+request comes from.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
