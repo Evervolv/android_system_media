@@ -7828,6 +7828,14 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           configurations from all physical cameras. For an ultra high resolution sensor camera, this
           is used directly as the camera’s multi-resolution stream configurations.
           </details>
+          <hal_details>
+          If this field contains input stream configurations, and the camera device is a physical
+          camera (not a standalone ultra-high resolution camera), the
+          android.logicalMultiCamera.activePhysicalId tag must be set to the physical camera Id in
+          the physical camera result metadata. This is to make sure during multi-resolution
+          reprocessing, the camera HAL is notified of which physical camera the reprocessing
+          request comes from.
+          </hal_details>
         </entry>
         <entry name="multiResolutionStreamConfigurationMap" type="int32" visibility="java_public"
                synthetic="true" optional="true" typedef="multiResolutionStreamConfigurationMap">
