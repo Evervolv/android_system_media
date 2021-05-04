@@ -448,13 +448,19 @@ TEST(metadata_tests, c) {
     ASSERT_EQ(-EINVAL, audio_metadata_get(metadata, "i32", nullI32Val));
 
     uint8_t *bs = nullptr;
-    size_t length = byte_string_from_audio_metadata(metadata, &bs);
+    ssize_t length = byte_string_from_audio_metadata(metadata, &bs);
+    ASSERT_GT(length, 0); // if gt 0, the bs has been updated to a new value.
+    ASSERT_EQ((size_t)length, audio_metadata_byte_string_len(bs));
+    ASSERT_EQ((size_t)length, dataByteStringLen(bs));
     ASSERT_EQ(byteStringFromData(d).size(), ByteString(bs, length).size());
     audio_metadata_t *metadataFromBs = audio_metadata_from_byte_string(bs, length);
     free(bs);
     bs = nullptr;
     length = byte_string_from_audio_metadata(metadataFromBs, &bs);
+    ASSERT_GT(length, 0); // if gt 0, the bs has been updated to a new value.
     ASSERT_EQ(byteStringFromData(d), ByteString(bs, length));
+    ASSERT_EQ((size_t)length, audio_metadata_byte_string_len(bs));
+    ASSERT_EQ((size_t)length, dataByteStringLen(bs));
     free(bs);
     bs = nullptr;
     audio_metadata_destroy(metadataFromBs);
@@ -470,4 +476,26 @@ TEST(metadata_tests, c) {
     ASSERT_EQ(-EINVAL, audio_metadata_erase(metadata, nullKey));
 
     audio_metadata_destroy(metadata);
+};
+
+TEST(metadata_tests, empty_data_c) {
+    std::unique_ptr<audio_metadata_t, decltype(&audio_metadata_destroy)>
+        metadata{audio_metadata_create(), audio_metadata_destroy};  // empty metadata container.
+    uint8_t *bs = nullptr;
+    ssize_t length = byte_string_from_audio_metadata(metadata.get(), &bs);
+    ASSERT_GT(length, 0); // if gt 0, the bs has been updated to a new value.
+    std::unique_ptr<uint8_t, decltype(&free)> bs_scoped_deleter{bs, free};
+    ASSERT_EQ((size_t)length, audio_metadata_byte_string_len(bs));
+    ASSERT_EQ((size_t)length, dataByteStringLen(bs));
+
+    Data d;  // empty metadata container.
+    ASSERT_EQ(byteStringFromData(d).size(), ByteString(bs, length).size());
+    std::unique_ptr<audio_metadata_t, decltype(&audio_metadata_destroy)>
+            metadataFromBs{audio_metadata_from_byte_string(bs, length), audio_metadata_destroy};
+    length = byte_string_from_audio_metadata(metadataFromBs.get(), &bs);
+    ASSERT_GT(length, 0); // if gt 0, the bs has been updated to a new value.
+    bs_scoped_deleter.reset(bs);
+    ASSERT_EQ(byteStringFromData(d), ByteString(bs, length));
+    ASSERT_EQ((size_t)length, audio_metadata_byte_string_len(bs));
+    ASSERT_EQ((size_t)length, dataByteStringLen(bs));
 };
