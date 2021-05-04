@@ -891,6 +891,43 @@ ByteString byteStringFromData(const Data &data) {
     return bs; // copy elision
 }
 
+/**
+ * \brief Returns the length of the byte string buffer from the raw pointer.
+ *
+ * The raw pointer comes from the Data object's ByteString.data()
+ * or from the C API byte_string_from_audio_metadata().
+ * This is a helper method for C implementations which may pass the raw
+ * byte string buffer pointer (which does not directly contain the length).
+ * C++ methods should always use the ByteString object.
+ *
+ * \param byteString       byte string buffer raw pointer.
+ * \return size in bytes of metadata in the buffer or 0 if something went wrong.
+ */
+
+inline size_t dataByteStringLen(const uint8_t *ptr) {
+    index_size_t elements;
+    const uint8_t * const origPtr = ptr;
+    memcpy(&elements, ptr, sizeof(elements));
+    ptr += sizeof(elements);
+    for (index_size_t i = 0; i < elements; ++i) {
+        // get key (string)
+        index_size_t keyLen;
+        memcpy(&keyLen, ptr, sizeof(keyLen));
+        ptr += keyLen + sizeof(keyLen);
+        // get type
+        type_size_t type;
+        memcpy(&type, ptr, sizeof(type));
+        ptr += sizeof(type_size_t);
+        // Note: could check type validity.
+        // payload size
+        datum_size_t datumSize;
+        memcpy(&datumSize, ptr, sizeof(datumSize));
+        ptr += datumSize + sizeof(datumSize);
+    }
+    const ptrdiff_t size = ptr - origPtr;
+    return size < 0 ? 0 : size;
+}
+
 } // namespace android::audio_utils::metadata
 
 #endif // __cplusplus
@@ -1136,6 +1173,16 @@ audio_metadata_t *audio_metadata_from_byte_string(const uint8_t *byteString, siz
  *         The length of the byte string.
  */
 ssize_t byte_string_from_audio_metadata(audio_metadata_t *metadata, uint8_t **byteString);
+
+/**
+ * \brief Return the size in bytes of the metadata byte string
+ *
+ * Note: strlen() cannot be used as there are embedded 0's in the byte string.
+ *
+ * \param byteString       a valid byte string buffer from byte_string_from_audio_metadata().
+ * \return size in bytes of metadata in the buffer or 0 if something went wrong.
+ */
+size_t audio_metadata_byte_string_len(const uint8_t *byteString);
 
 /** \cond */
 __END_DECLS
