@@ -185,3 +185,7 @@ ssize_t byte_string_from_audio_metadata(audio_metadata_t *metadata, uint8_t **by
     memcpy(*byteString, bs.c_str(), bs.size());
     return bs.size();
 }
+
+size_t audio_metadata_byte_string_len(const uint8_t *byteString) {
+    return dataByteStringLen(byteString);
+}
