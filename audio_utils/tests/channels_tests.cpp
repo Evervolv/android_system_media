@@ -61,6 +61,9 @@ TEST(audio_utils_channels, geometry_constexpr) {
     (void) checkConstexprSide;
     (void) checkConstexprHeight;
     (void) checkConstexprDepth;
+
+    static constexpr ssize_t leftIdx = pairIdxFromChannelIdx(RIGHT_IDX);
+    ASSERT_EQ(0, leftIdx);
 }
 
 TEST(audio_utils_channels, geometry_range) {
@@ -78,6 +81,27 @@ TEST(audio_utils_channels, geometry_range) {
         ASSERT_TRUE(depth == AUDIO_GEOMETRY_DEPTH_FRONT
                 || depth == AUDIO_GEOMETRY_DEPTH_MIDDLE
                 || depth == AUDIO_GEOMETRY_DEPTH_BACK);
+    }
+}
+
+TEST(audio_utils_channels, array_lr_pair_matching) {
+    using namespace android::audio_utils::channels;
+    for (size_t i = 0; i < FCC_24; ++i) {
+        const AUDIO_GEOMETRY_SIDE side = sideFromChannelIdx(i);
+        const ssize_t pairIdx = pairIdxFromChannelIdx(i);
+        switch (side) {
+        case AUDIO_GEOMETRY_SIDE_LEFT:
+        case AUDIO_GEOMETRY_SIDE_RIGHT: {
+            ASSERT_GE(pairIdx, 0);
+            ASSERT_LT(pairIdx, FCC_24);
+            const AUDIO_GEOMETRY_SIDE pairSide = side == AUDIO_GEOMETRY_SIDE_LEFT
+                    ? AUDIO_GEOMETRY_SIDE_RIGHT : AUDIO_GEOMETRY_SIDE_LEFT;
+            ASSERT_EQ(pairSide, sideFromChannelIdx(pairIdx));
+        } break;
+        case AUDIO_GEOMETRY_SIDE_CENTER:
+            ASSERT_EQ(-1, pairIdx);
+            break;
+        }
     }
 }
 

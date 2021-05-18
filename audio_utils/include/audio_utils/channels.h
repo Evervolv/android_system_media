@@ -183,6 +183,60 @@ constexpr inline AUDIO_GEOMETRY_DEPTH depthFromChannelIdx(size_t idx) {
     return AUDIO_GEOMETRY_DEPTH_FRONT;
 }
 
+/**
+ * Returns the pair channel position mask bit index as determined by
+ * AUDIO_GEOMETRY_SIDE_LEFT and AUDIO_GEOMETRY_SIDE_RIGHT characteristics.
+ *
+ * For example a bit index of 0 (AUDIO_CHANNEL_OUT_FRONT_LEFT) returns
+ * a pair bit index of 1 (AUDIO_CHANNEL_OUT_FRONT_RIGHT).
+ *
+ * If there is no left/right characteristic, then -1 is returned.
+ * For example, a bit index of 2 (AUDIO_CHANNEL_OUT_FRONT_CENTER) returns
+ * a pair bit index of -1 (doesn't exist).
+ *
+ * For the channel mask spec, see system/media/audio/include/system/audio*.h.
+ *
+ * \param idx index of bit in the channel position mask.
+ * \return    index of bit of the pair if non-negative, or -1 if it doesn't exist.
+ */
+
+#pragma push_macro("CHANNEL_ASSOCIATE")
+#undef CHANNEL_ASSOCIATE
+#define CHANNEL_ASSOCIATE(x, y) \
+ [__builtin_ctz(x)] = __builtin_ctz(y), [__builtin_ctz(y)] = __builtin_ctz(x),
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winitializer-overrides"  // we use override array assignment
+
+constexpr inline int kPairIdxFromChannelIdx[FCC_24] = {
+    [ 0 ... 23 ] = -1,  // everything defaults to -1 unless overridden below.
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_FRONT_LEFT, AUDIO_CHANNEL_OUT_FRONT_RIGHT)
+    // AUDIO_CHANNEL_OUT_FRONT_CENTER          = 0x4u,
+    // AUDIO_CHANNEL_OUT_LOW_FREQUENCY         = 0x8u,
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_BACK_LEFT, AUDIO_CHANNEL_OUT_BACK_RIGHT)
+    CHANNEL_ASSOCIATE(
+            AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER, AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER)
+    // AUDIO_CHANNEL_OUT_BACK_CENTER           = 0x100u,
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_SIDE_LEFT, AUDIO_CHANNEL_OUT_SIDE_RIGHT)
+    // AUDIO_CHANNEL_OUT_TOP_CENTER            = 0x800u,
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_TOP_FRONT_LEFT, AUDIO_CHANNEL_OUT_TOP_FRONT_RIGHT)
+    // AUDIO_CHANNEL_OUT_TOP_FRONT_CENTER      = 0x2000u,
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_TOP_BACK_LEFT, AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT)
+    // AUDIO_CHANNEL_OUT_TOP_BACK_CENTER       = 0x10000u,
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_TOP_SIDE_LEFT, AUDIO_CHANNEL_OUT_TOP_SIDE_RIGHT)
+    CHANNEL_ASSOCIATE(AUDIO_CHANNEL_OUT_BOTTOM_FRONT_LEFT, AUDIO_CHANNEL_OUT_BOTTOM_FRONT_RIGHT)
+    // AUDIO_CHANNEL_OUT_BOTTOM_FRONT_CENTER   = 0x200000u,
+    // AUDIO_CHANNEL_OUT_LOW_FREQUENCY_2       = 0x800000u,
+};
+#pragma GCC diagnostic pop
+#pragma pop_macro("CHANNEL_ASSOCIATE")
+
+constexpr inline ssize_t pairIdxFromChannelIdx(size_t idx) {
+    static_assert(std::size(kPairIdxFromChannelIdx) == FCC_24);
+    if (idx < std::size(kPairIdxFromChannelIdx)) return kPairIdxFromChannelIdx[idx];
+    return -1;
+}
+
 } // android::audio_utils::channels
 
 #endif // __cplusplus
