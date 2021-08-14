@@ -25,9 +25,6 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-// Remove in approximately 2021
-#include <cutils/bitops.h>
-
 #include "audio-base-utils.h"
 #include "audio-base.h"
 #include "audio-hal-enums.h"
@@ -220,6 +217,12 @@ enum {
     FCC_8 = 8,
     FCC_12 = 12,
     FCC_24 = 24,
+    // FCC_LIMIT is the maximum PCM channel count supported through
+    // the mixing pipeline to the audio HAL.
+    //
+    // This can be adjusted onto a value such as FCC_12 or FCC_24
+    // if the device HAL can support it.  Do not reduce below FCC_8.
+    FCC_LIMIT = FCC_12,
 };
 
 /* A channel mask per se only defines the presence or absence of a channel, not the order.
@@ -818,22 +821,26 @@ static inline bool audio_gain_config_are_equal(
     return lhs->ramp_duration_ms == rhs->ramp_duration_ms;
 }
 
-static inline bool audio_port_config_has_input_direction(const struct audio_port_config *port_cfg) {
-    switch (port_cfg->type) {
+static inline bool audio_has_input_direction(audio_port_type_t type, audio_port_role_t role) {
+    switch (type) {
     case AUDIO_PORT_TYPE_DEVICE:
-        switch (port_cfg->role) {
+        switch (role) {
         case AUDIO_PORT_ROLE_SOURCE: return true;
         case AUDIO_PORT_ROLE_SINK: return false;
         default: return false;
         }
     case AUDIO_PORT_TYPE_MIX:
-        switch (port_cfg->role) {
+        switch (role) {
         case AUDIO_PORT_ROLE_SOURCE: return false;
         case AUDIO_PORT_ROLE_SINK: return true;
         default: return false;
         }
     default: return false;
     }
+}
+
+static inline bool audio_port_config_has_input_direction(const struct audio_port_config *port_cfg) {
+    return audio_has_input_direction(port_cfg->type, port_cfg->role);
 }
 
 static inline bool audio_port_configs_are_equal(
@@ -1572,15 +1579,10 @@ static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t cha
     case 2:
         bits = AUDIO_CHANNEL_IN_STEREO;
         break;
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-        // FIXME FCC_8
-        return audio_channel_mask_for_index_assignment_from_count(channel_count);
     default:
+        if (channel_count <= FCC_LIMIT) {
+            return audio_channel_mask_for_index_assignment_from_count(channel_count);
+        }
         return AUDIO_CHANNEL_INVALID;
     }
     return audio_channel_mask_from_representation_and_bits(
@@ -2101,6 +2103,14 @@ static const audio_playback_rate_t AUDIO_PLAYBACK_RATE_INITIALIZER = {
     /* .mFallbackMode = */ AUDIO_TIMESTRETCH_FALLBACK_FAIL
 };
 
+#ifndef AUDIO_NO_SYSTEM_DECLARATIONS
+typedef enum {
+    AUDIO_OFFLOAD_NOT_SUPPORTED = 0,
+    AUDIO_OFFLOAD_SUPPORTED = 1,
+    AUDIO_OFFLOAD_GAPLESS_SUPPORTED = 2
+} audio_offload_mode_t;
+#endif // AUDIO_NO_SYSTEM_DECLARATIONS
+
 __END_DECLS
 
 /**
@@ -2241,5 +2251,6 @@ __END_DECLS
 #define AUDIO_OFFLOAD_CODEC_DOWN_SAMPLING  "music_offload_down_sampling"
 #define AUDIO_OFFLOAD_CODEC_DELAY_SAMPLES  "delay_samples"
 #define AUDIO_OFFLOAD_CODEC_PADDING_SAMPLES  "padding_samples"
+
 
 #endif  // ANDROID_AUDIO_CORE_H
