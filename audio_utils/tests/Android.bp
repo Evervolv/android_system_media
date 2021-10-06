@@ -253,6 +253,18 @@ cc_test {
     }
 }
 
+cc_binary {
+    name: "metadata_c_tests",
+    host_supported: true,
+    srcs: ["metadata_tests_c.c"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    shared_libs: ["libaudioutils"],
+}
+
 cc_test {
     name: "powerlog_tests",
     host_supported: true,
