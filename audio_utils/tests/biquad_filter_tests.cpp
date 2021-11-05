@@ -142,6 +142,11 @@ struct StateSpaceOptions {
     using FilterType = BiquadStateSpace<T, F>;
 };
 
+struct StateSpaceChannelOptimizedOptions {
+    template <typename T, typename F>
+    using FilterType = BiquadStateSpace<T, F, true /* SEPARATE_CHANNEL_OPTIMIZATION */>;
+};
+
 struct Direct2TransposeOptions {
     template <typename T, typename F>
     using FilterType = BiquadDirect2Transpose<T, F>;
@@ -161,6 +166,14 @@ TEST_P(BiquadFilterTest, ConstructAndProcessSSFilterFloatZero3) {
 
 TEST_P(BiquadFilterTest, ConstructAndProcessSSFilterDoubleZero5) {
     testProcess<StateSpaceOptions, double>(5 /* zeroChannels */);
+}
+
+TEST_P(BiquadFilterTest, ConstructAndProcessSSChanelOptimizedFilterFloat) {
+    testProcess<StateSpaceChannelOptimizedOptions, float>();
+}
+
+TEST_P(BiquadFilterTest, ConstructAndProcessSSChannelOptimizedFilterDouble) {
+    testProcess<StateSpaceChannelOptimizedOptions, double>();
 }
 
 TEST_P(BiquadFilterTest, ConstructAndProcessDT2FilterFloat) {
