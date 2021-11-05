@@ -220,7 +220,6 @@ struct BiquadDirect2Transpose {
  * by doing 2 filter updates at once (improving speed on NEON by about 20%).
  * Doing 2 updates at once costs 8 multiplies / sample instead of 5 multiples / sample,
  * but uses a 4 x 4 matrix multiply, exploiting single cycle multiply-add SIMD throughput.
- * TODO: consider this optimization.
  *
  * [3] Mathworks
  * https://www.mathworks.com/help/control/ug/canonical-state-space-realizations.html
@@ -231,7 +230,7 @@ struct BiquadDirect2Transpose {
  * T is the data type (scalar or vector).
  * F is the filter coefficient type.  It is either a scalar or vector (matching T).
  */
-template <typename T, typename F>
+template <typename T, typename F, bool SEPARATE_CHANNEL_OPTIMIZATION = false>
 struct BiquadStateSpace {
     F coef_[5]; // these are stored as state-space converted.
     T s_[2]; // delay states
@@ -291,6 +290,53 @@ struct BiquadStateSpace {
         constexpr size_t UNROLL_CHANNEL_UPPER_LIMIT = 16;  // above this won't be unrolled.
         constexpr size_t UNROLL_LOOPS = (CHANNELS >= UNROLL_CHANNEL_LOWER_LIMIT &&
                 CHANNELS <= UNROLL_CHANNEL_UPPER_LIMIT) ? 2 : 1;
+
+        if constexpr (SEPARATE_CHANNEL_OPTIMIZATION && CHANNELS == 1 && OCCUPANCY >= 11) {
+            // Special acceleration which computes 2 samples at a time.
+            // see reference [4] for computation of this matrix.
+            intrinsics::internal_array_t<T, 4> A[4] = {
+                {b0, b1ss, negativeA1 * b1ss + b2ss, negativeA2 * b1ss},
+                {0, b0, b1ss, b2ss},
+                {1, negativeA1, negativeA2 + negativeA1 * negativeA1, negativeA1 * negativeA2},
+                {0, 1, negativeA1, negativeA2},
+                };
+            intrinsics::internal_array_t<T, 4> y;
+            while (frames > 1) {
+                x = vld1<T>(input);
+                input += stride;
+#ifdef USE_DITHER
+                x = vadd(x, dither);
+                dither = vneg(dither);
+#endif
+                y = vmul(A[0], x);
+
+                x = vld1<T>(input);
+                input += stride;
+#ifdef USE_DITHER
+                x = vadd(x, dither);
+                dither = vneg(dither);
+#endif
+                y = vmla(y, A[1], x);
+                y = vmla(y, A[2], s[0]);
+                y = vmla(y, A[3], s[1]);
+
+                vst1(output, y.v[0]);
+                output += stride;
+
+                vst1(output, y.v[1]);
+                output += stride;
+
+                s[0] = y.v[2];
+                s[1] = y.v[3];
+                frames -= 2;
+            }
+            if (frames == 0) {
+                s_[0] = s[0];
+                s_[1] = s[1];
+                return;
+            }
+        }
+
         size_t remainder = 0;
         if constexpr (UNROLL_LOOPS > 1) {
             remainder = frames % UNROLL_LOOPS;
@@ -488,7 +534,7 @@ struct DefaultBiquadConstOptions {
     // Can be one of the already defined BiquadDirect2Transpose or BiquadStateSpace
     // filter kernels; also can be a user defined filter kernel as well.
     template <typename T, typename F>
-    using FilterType = BiquadStateSpace<T, F>;
+    using FilterType = BiquadStateSpace<T, F, false /* SEPARATE_CHANNEL_OPTIMIZATION */>;
 };
 
 #define BIQUAD_FILTER_CASE(N, ... /* type */) \
