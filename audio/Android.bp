@@ -31,6 +31,10 @@ cc_library_headers {
             cflags: ["-DAUDIO_NO_SYSTEM_DECLARATIONS"],
         },
     },
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.bluetooth",
+    ],
     min_sdk_version: "29",
 }
 
