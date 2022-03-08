@@ -102,6 +102,8 @@ typedef enum {
     AUDIO_FLAG_MUTE_HAPTIC                = 0x800,
     AUDIO_FLAG_NO_SYSTEM_CAPTURE          = 0X1000,
     AUDIO_FLAG_CAPTURE_PRIVATE            = 0X2000,
+    AUDIO_FLAG_CONTENT_SPATIALIZED        = 0X4000,
+    AUDIO_FLAG_NEVER_SPATIALIZE           = 0X8000,
 } audio_flags_mask_t;
 
 /* Audio attributes */
@@ -445,6 +447,16 @@ static const audio_config_base_t AUDIO_CONFIG_BASE_INITIALIZER = {
     /* .channel_mask = */ AUDIO_CHANNEL_NONE,
     /* .format = */ AUDIO_FORMAT_DEFAULT
 };
+
+
+static inline audio_config_t audio_config_initializer(const  audio_config_base_t *base)
+{
+    audio_config_t config = AUDIO_CONFIG_INITIALIZER;
+    config.sample_rate = base->sample_rate;
+    config.channel_mask = base->channel_mask;
+    config.format = base->format;
+    return config;
+}
 
 /* audio hw module handle functions or structures referencing a module */
 typedef int audio_module_handle_t;
