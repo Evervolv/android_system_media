@@ -47,7 +47,7 @@ const std::unordered_map<int32_t, int32_t> kAWeightDelta1000 =
 
 class MelCallbackMock : public MelProcessor::MelCallback {
  public:
-  MOCK_METHOD(void, onNewMelValues, (const std::vector<int32_t>&, size_t, size_t),
+  MOCK_METHOD(void, onNewMelValues, (const std::vector<float>&, size_t, size_t),
               (const override));
 };
 
@@ -109,12 +109,12 @@ TEST_P(MelProcessorFixtureTest, CheckAWeightingFrequency) {
 
     EXPECT_CALL(*mMelCallback.get(), onNewMelValues(_, _, _))
         .Times(1)
-        .WillRepeatedly([&] (const std::vector<int32_t>& mel, size_t offset, size_t length) {
+        .WillRepeatedly([&] (const std::vector<float>& mel, size_t offset, size_t length) {
             EXPECT_EQ(offset, size_t{0});
             EXPECT_EQ(length, size_t{2});
             int32_t deltaValue = abs(mel[0] - mel[1]);
-            ALOGV("MEL[%d] = %d,  MEL[1000] = %d\n", mFrequency, mel[0], mel[1]);
-            EXPECT_TRUE(abs(deltaValue - kAWeightDelta1000.at(mFrequency)) <= 1);
+            ALOGV("MEL[%d] = %.2f,  MEL[1000] = %.2f\n", mFrequency, mel[0], mel[1]);
+            EXPECT_TRUE(abs(deltaValue - kAWeightDelta1000.at(mFrequency)) <= 1.f);
         });
 
     EXPECT_GT(mProcessor.process(mBuffer.data(), mBuffer.size() * sizeof(float)), 0);

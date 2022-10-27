@@ -53,7 +53,7 @@ public:
          *               maximum number of elements in mels is defined in the MelProcessor
          *               constructor.
          */
-        virtual void onNewMelValues(const std::vector<int32_t>& mels,
+        virtual void onNewMelValues(const std::vector<float>& mels,
                                     size_t offset,
                                     size_t length) const = 0;
     };
@@ -108,7 +108,7 @@ private:
     std::vector<float> mCurrentChannelEnergy;  // local energy accumulation
     std::vector<float> mAWeightSamples;        // contains the A-weighted input samples
     std::vector<float> mFloatSamples;          // contains the input samples converted to float
-    std::vector<int32_t> mMelValues;           // accumulated MEL values
+    std::vector<float> mMelValues;             // accumulated MEL values
     uint32_t mCurrentIndex;                    // current index to store the MEL values
 
     using DefaultBiquadFilter = BiquadFilter<float, true, details::DefaultBiquadConstOptions>;

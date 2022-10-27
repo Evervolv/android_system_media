@@ -118,8 +118,8 @@ float MelProcessor::getCombinedChannelEnergy() {
 }
 
 void MelProcessor::addMelValue(float mel) {
-    mMelValues[mCurrentIndex] = static_cast<int32_t>(roundf(mel));
-    ALOGV("writing MEL %d at index %d", mMelValues[mCurrentIndex], mCurrentIndex);
+    mMelValues[mCurrentIndex] = mel;
+    ALOGV("%s: %f at index %d", __func__, mel, mCurrentIndex);
 
     bool reportContinuousValues = false;
     if ((mMelValues[mCurrentIndex] < kRs1OutputdBFS && mCurrentIndex > 0)) {
