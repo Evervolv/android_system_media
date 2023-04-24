@@ -133,24 +133,44 @@ static auto channelStatistics(const std::vector<T>& input, size_t channels) {
 }
 
 using ChannelMixParam = std::tuple<int /* channel mask */, int /* 0 = replace, 1 = accumulate */>;
-using StereoDownMix = android::audio_utils::channels::ChannelMix<AUDIO_CHANNEL_OUT_STEREO>;
 
-class ChannelMixTest : public ::testing::TestWithParam<ChannelMixParam> {
+template <audio_channel_mask_t OUTPUT_CHANNEL_MASK>
+class ChannelMixTestTemplate : public ::testing::TestWithParam<ChannelMixParam> {
 public:
+    using Remix = android::audio_utils::channels::ChannelMix<OUTPUT_CHANNEL_MASK>;
 
     void testBalance(audio_channel_mask_t channelMask, bool accumulate) {
         using namespace ::android::audio_utils::channels;
 
         size_t frames = 100; // set to an even number (2, 4, 6 ... ) stream alternates +1, -1.
-        constexpr unsigned outChannels = FCC_2;
+        constexpr unsigned outChannels = audio_channel_count_from_out_mask(OUTPUT_CHANNEL_MASK);
         unsigned inChannels = audio_channel_count_from_out_mask(channelMask);
         std::vector<float> input(frames * inChannels);
         std::vector<float> output(frames * outChannels);
 
-        double savedPower[32][FCC_2]{};
+        double savedPower[32][outChannels]{};
+
+        // Precompute output channel geometry.
+        AUDIO_GEOMETRY_SIDE outSide[outChannels];  // what side that channel index is on
+        int outIndexToOffset[32] = {[0 ... 31] = -1};
+        int outPair[outChannels];  // is there a matching pair channel?
+        for (unsigned i = 0, channel = OUTPUT_CHANNEL_MASK; channel != 0; ++i) {
+            const int index = __builtin_ctz(channel);
+            outIndexToOffset[index] = i;
+            outSide[i] = sideFromChannelIdx(index);
+            outPair[i] = pairIdxFromChannelIdx(index);
+
+            const int channelBit = 1 << index;
+            channel &= ~channelBit;
+        }
+        for (unsigned i = 0; i < outChannels; ++i) {
+            if (outPair[i] >= 0 && outPair[i] < (signed)std::size(outIndexToOffset)) {
+                outPair[i] = outIndexToOffset[outPair[i]];
+            }
+        }
         for (unsigned i = 0, channel = channelMask; channel != 0; ++i) {
             const int index = __builtin_ctz(channel);
-            ASSERT_LT((size_t)index, StereoDownMix::MAX_INPUT_CHANNELS_SUPPORTED);
+            ASSERT_LT((size_t)index, Remix::MAX_INPUT_CHANNELS_SUPPORTED);
             const int pairIndex = pairIdxFromChannelIdx(index);
             const AUDIO_GEOMETRY_SIDE side = sideFromChannelIdx(index);
             const int channelBit = 1 << index;
@@ -174,7 +194,7 @@ public:
             }
 
             // Do the channel mix
-            StereoDownMix(channelMask).process(input.data(), output.data(), frames, accumulate);
+            Remix(channelMask).process(input.data(), output.data(), frames, accumulate);
 
             // if we accumulate, we need to subtract the initial data offset.
             if (accumulate) {
@@ -194,76 +214,117 @@ public:
                 }
             }
 
-            auto stats = channelStatistics(output, FCC_2);
+            auto stats = channelStatistics(output, outChannels);
             // printf("power: %s %s\n", stats[0].toString().c_str(), stats[1].toString().c_str());
-            double power[FCC_2] = { stats[0].getPopVariance(), stats[1].getPopVariance() };
+            double power[outChannels];
+            for (size_t j = 0; j < outChannels; ++j) {
+                power[j] = stats[j].getPopVariance();
+            }
 
-            // Check symmetric power for pair channels on exchange of left/right position.
+            // Check symmetric power for pair channels on exchange of front left/right position.
             // to do this, we save previous power measurements.
             if (pairIndex >= 0 && pairIndex < index) {
-                EXPECT_NEAR_EPSILON(power[0], savedPower[pairIndex][1]);
-                EXPECT_NEAR_EPSILON(power[1], savedPower[pairIndex][0]);
+
+                for (unsigned j = 0; j < outChannels; ++j) {
+                    if (outPair[j] >= 0) {
+                        EXPECT_NEAR_EPSILON(power[j], savedPower[pairIndex][outPair[j]]);
+                        EXPECT_NEAR_EPSILON(power[outPair[j]], savedPower[pairIndex][j]);
+                    }
+                }
             }
-            savedPower[index][0] = power[0];
-            savedPower[index][1] = power[1];
+            for (unsigned j = 0; j < outChannels; ++j) {
+                savedPower[index][j] = power[j];
+            }
+
+            // For downmix to stereo, we compare exact values to a predefined matrix.
+            constexpr bool checkExpectedPower = OUTPUT_CHANNEL_MASK == AUDIO_CHANNEL_OUT_STEREO;
+            constexpr size_t FL = 0;
+            constexpr size_t FR = 1;
 
             // Confirm exactly the mix amount prescribed by the existing ChannelMix effect.
             // For future changes to the ChannelMix effect, the nearness needs to be relaxed
             // to compare behavior S or earlier.
 
             constexpr float POWER_TOLERANCE = 0.001;
-            const float expectedPower =
+            const float expectedPower = checkExpectedPower ?
                     kScaleFromChannelIdxLeft[index] * kScaleFromChannelIdxLeft[index]
-                    + kScaleFromChannelIdxRight[index] * kScaleFromChannelIdxRight[index];
-            EXPECT_NEAR(expectedPower, power[0] + power[1], POWER_TOLERANCE);
+                    + kScaleFromChannelIdxRight[index] * kScaleFromChannelIdxRight[index] : 0;
+
+            if (checkExpectedPower) {
+                EXPECT_NEAR(expectedPower, power[FL] + power[FR], POWER_TOLERANCE);
+            }
             switch (side) {
             case AUDIO_GEOMETRY_SIDE_LEFT:
                 if (channelBit == AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER) {
                     break;
                 }
-                EXPECT_EQ(0.f, power[1]);
+                for (unsigned j = 0; j < outChannels; ++j) {
+                    if (outSide[j] == AUDIO_GEOMETRY_SIDE_RIGHT) {
+                        EXPECT_EQ(0.f, power[j]);
+                    }
+                }
                 break;
             case AUDIO_GEOMETRY_SIDE_RIGHT:
                 if (channelBit == AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER) {
                     break;
                 }
-                EXPECT_EQ(0.f, power[0]);
+                for (unsigned j = 0; j < outChannels; ++j) {
+                    if (outSide[j] == AUDIO_GEOMETRY_SIDE_LEFT) {
+                        EXPECT_EQ(0.f, power[j]);
+                    }
+                }
                 break;
             case AUDIO_GEOMETRY_SIDE_CENTER:
                 if (channelBit == AUDIO_CHANNEL_OUT_LOW_FREQUENCY) {
                     if (channelMask & AUDIO_CHANNEL_OUT_LOW_FREQUENCY_2) {
-                        EXPECT_EQ(0.f, power[1]);
+                        EXPECT_EQ(0.f, power[FR]);
                         break;
                     } else {
-                        EXPECT_NEAR_EPSILON(power[0], power[1]); // always true
-                        EXPECT_NEAR(expectedPower, power[0] + power[1], POWER_TOLERANCE);
+                        for (unsigned j = 0; j < outChannels; ++j) {
+                            if (outPair[j] >= 0) {
+                                EXPECT_NEAR_EPSILON(power[j], power[outPair[j]]);
+                            }
+                        }
+                        if (checkExpectedPower) {
+                            EXPECT_NEAR(expectedPower, power[FL] + power[FR], POWER_TOLERANCE);
+                        }
                         break;
                     }
                 } else if (channelBit == AUDIO_CHANNEL_OUT_LOW_FREQUENCY_2) {
-                    EXPECT_EQ(0.f, power[0]);
-                    EXPECT_NEAR(expectedPower, power[1], POWER_TOLERANCE);
+                    EXPECT_EQ(0.f, power[FL]);
+                    if (checkExpectedPower) {
+                        EXPECT_NEAR(expectedPower, power[FR], POWER_TOLERANCE);
+                    }
                     break;
                 }
-                EXPECT_NEAR_EPSILON(power[0], power[1]);
+                for (unsigned j = 0; j < outChannels; ++j) {
+                    if (outPair[j] >= 0) {
+                        EXPECT_NEAR_EPSILON(power[j], power[outPair[j]]);
+                    }
+                }
                 break;
             }
         }
     }
 };
 
-TEST_P(ChannelMixTest, basic) {
+static constexpr const char *kName1[] = {"_replace_", "_accumulate_"};
+
+// Stereo
+using ChannelMixStereoTest = ChannelMixTestTemplate<AUDIO_CHANNEL_OUT_STEREO>;
+using StereoDownMix = android::audio_utils::channels::ChannelMix<AUDIO_CHANNEL_OUT_STEREO>;
+
+TEST_P(ChannelMixStereoTest, basic) {
     testBalance(kChannelPositionMasks[std::get<0>(GetParam())], (bool)std::get<1>(GetParam()));
 }
 
-static const char *kName1[] = {"_replace_", "_accumulate_"};
-
 INSTANTIATE_TEST_SUITE_P(
-        ChannelMixTestAll, ChannelMixTest,
+        ChannelMixStereoTestAll, ChannelMixStereoTest,
         ::testing::Combine(
                 ::testing::Range(0, (int)std::size(kChannelPositionMasks)),
-                ::testing::Range(0, 2)
+                ::testing::Range(0, 2) // accumulate off, on
                 ),
-        [](const testing::TestParamInfo<ChannelMixTest::ParamType>& info) {
+        [](const testing::TestParamInfo<ChannelMixStereoTest::ParamType>& info) {
             const int index = std::get<0>(info.param);
             const audio_channel_mask_t channelMask = kChannelPositionMasks[index];
             const std::string name = std::string(audio_channel_out_mask_to_string(channelMask)) +
@@ -274,6 +335,37 @@ INSTANTIATE_TEST_SUITE_P(
 TEST(channelmix, input_channel_mask) {
     using namespace ::android::audio_utils::channels;
     StereoDownMix channelMix(AUDIO_CHANNEL_NONE);
+
+    ASSERT_EQ(AUDIO_CHANNEL_NONE, channelMix.getInputChannelMask());
+    ASSERT_TRUE(channelMix.setInputChannelMask(AUDIO_CHANNEL_OUT_STEREO));
+    ASSERT_EQ(AUDIO_CHANNEL_OUT_STEREO, channelMix.getInputChannelMask());
+}
+
+// 5.1
+using ChannelMix5Point1Test = ChannelMixTestTemplate<AUDIO_CHANNEL_OUT_5POINT1>;
+using FiveOneMix = android::audio_utils::channels::ChannelMix<AUDIO_CHANNEL_OUT_5POINT1>;
+
+TEST_P(ChannelMix5Point1Test, basic) {
+    testBalance(kChannelPositionMasks[std::get<0>(GetParam())], (bool)std::get<1>(GetParam()));
+}
+
+INSTANTIATE_TEST_SUITE_P(
+        ChannelMix5Point1TestAll, ChannelMix5Point1Test,
+        ::testing::Combine(
+                ::testing::Range(0, (int)std::size(kChannelPositionMasks)),
+                ::testing::Range(0, 2) // accumulate off, on
+                ),
+        [](const testing::TestParamInfo<ChannelMix5Point1Test::ParamType>& info) {
+            const int index = std::get<0>(info.param);
+            const audio_channel_mask_t channelMask = kChannelPositionMasks[index];
+            const std::string name = std::string(audio_channel_out_mask_to_string(channelMask)) +
+                    kName1[std::get<1>(info.param)] + std::to_string(index);
+            return name;
+        });
+
+TEST(channelmix, input_5_1) {
+    using namespace ::android::audio_utils::channels;
+    FiveOneMix channelMix(AUDIO_CHANNEL_NONE);
 
     ASSERT_EQ(AUDIO_CHANNEL_NONE, channelMix.getInputChannelMask());
     ASSERT_TRUE(channelMix.setInputChannelMask(AUDIO_CHANNEL_OUT_STEREO));
