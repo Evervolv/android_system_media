@@ -76,30 +76,29 @@ static inline std::string audio_get_audio_policy_config_file() {
 
     std::string audioPolicyXmlConfigFile;
     // First try alternative files if needed
-    if (property_get_bool("ro.bluetooth.a2dp_offload.supported", false)) {
-        if (property_get_bool("persist.bluetooth.bluetooth_audio_hal.disabled", false) &&
-            property_get_bool("persist.bluetooth.a2dp_offload.disabled", false)) {
-            // Both BluetoothAudio@2.0 and BluetoothA2dp@1.0 (Offload) are disabled, and uses
-            // the legacy hardware module for A2DP and hearing aid.
+    const bool a2dpOffloadNotSupportedOrDisabled =
+        !property_get_bool("ro.bluetooth.a2dp_offload.supported", false) ||
+        property_get_bool("persist.bluetooth.a2dp_offload.disabled", false);
+    const bool leOffloadNotSupportedOrDisabled =
+        a2dpOffloadNotSupportedOrDisabled ||
+        !property_get_bool("ro.bluetooth.leaudio_offload.supported", false) ||
+        property_get_bool("persist.bluetooth.leaudio_offload.disabled", false);
+    if (a2dpOffloadNotSupportedOrDisabled) {
+        if (property_get_bool("persist.bluetooth.bluetooth_audio_hal.disabled", false)) {
             audioPolicyXmlConfigFile = audio_find_readable_configuration_file(
-                    apmBluetoothLegacyHalXmlConfigFileName);
-        } else if (property_get_bool("persist.bluetooth.a2dp_offload.disabled", false)) {
-            // A2DP offload supported but disabled: try to use special XML file
-            // assume that if a2dp offload is not supported, le offload is not supported as well
+                            apmBluetoothLegacyHalXmlConfigFileName);
+        } else {
             audioPolicyXmlConfigFile = audio_find_readable_configuration_file(
-                    apmA2dpOffloadDisabledXmlConfigFileName);
-        } else if (!property_get_bool("ro.bluetooth.leaudio_offload.supported", false) ||
-            property_get_bool("persist.bluetooth.leaudio_offload.disabled", false)) {
-            // A2DP offload supported but LE offload disabled: try to use special XML file
-            audioPolicyXmlConfigFile = audio_find_readable_configuration_file(
-                    apmLeOffloadDisabledXmlConfigFileName);
+                            apmA2dpOffloadDisabledXmlConfigFileName);
         }
-    } else if (property_get_bool("persist.bluetooth.bluetooth_audio_hal.disabled", false)) {
+    } else if (leOffloadNotSupportedOrDisabled) {
         audioPolicyXmlConfigFile = audio_find_readable_configuration_file(
-                apmBluetoothLegacyHalXmlConfigFileName);
+                        apmLeOffloadDisabledXmlConfigFileName);
+    } else {
+        audioPolicyXmlConfigFile = audio_find_readable_configuration_file(
+                        apmXmlConfigFileName);
     }
-    return audioPolicyXmlConfigFile.empty() ?
-            audio_find_readable_configuration_file(apmXmlConfigFileName) : audioPolicyXmlConfigFile;
+    return audioPolicyXmlConfigFile;
 }
 
 }  // namespace android
