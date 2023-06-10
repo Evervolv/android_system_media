@@ -184,7 +184,8 @@ TEST_P(MelProcessorFixtureTest, AttenuationCheck) {
 
 INSTANTIATE_TEST_SUITE_P(MelProcessorTestSuite,
     MelProcessorFixtureTest,
-    Combine(Values(44100, 48000), Values(80, 100, 500, 1000, 2000, 3000, 8000))
+    Combine(Values(192000, 176400, 96000, 88200, 64000, 44100, 48000, 32000),
+            Values(80, 100, 500, 1000, 2000, 3000, 8000))
 );
 
 }  // namespace
