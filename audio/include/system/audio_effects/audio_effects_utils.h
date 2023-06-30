@@ -228,6 +228,7 @@ class EffectParamWriter : public EffectParamReader {
     }
     std::memcpy((void *)&mParam, (void *)&reader.getEffectParam(), size);
     reset();
+    mValueWOffset += reader.getValueSize();
     return OK;
   }
 
