@@ -36,6 +36,8 @@ typedef struct {
 /* State */
 int proxy_prepare(alsa_device_proxy * proxy, const alsa_device_profile * profile,
                   struct pcm_config * config, bool require_exact_match);
+int proxy_prepare_from_default_config(
+        alsa_device_proxy * proxy, const alsa_device_profile * profile);
 int proxy_open(alsa_device_proxy * proxy);
 void proxy_close(alsa_device_proxy * proxy);
 int proxy_get_presentation_position(const alsa_device_proxy * proxy,
