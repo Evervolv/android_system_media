@@ -266,20 +266,43 @@ int proxy_get_capture_position(const alsa_device_proxy * proxy,
  */
 int proxy_write(alsa_device_proxy * proxy, const void *data, unsigned int count)
 {
-    int ret = pcm_write(proxy->pcm, data, count);
-    if (ret == 0) {
-        proxy->transferred += count / proxy->frame_size;
+    return proxy_write_with_retries(proxy, data, count, 1);
+}
+
+int proxy_write_with_retries(
+        alsa_device_proxy * proxy, const void *data, unsigned int count, int tries)
+{
+    while (true) {
+        --tries;
+        const int ret = pcm_write(proxy->pcm, data, count);
+        if (ret == 0) {
+            proxy->transferred += count / proxy->frame_size;
+            return 0;
+        } else if (tries > 0 && (ret == -EIO || ret == -EAGAIN)) {
+            continue;
+        }
+        return ret;
     }
-    return ret;
 }
 
 int proxy_read(alsa_device_proxy * proxy, void *data, unsigned int count)
 {
-    int ret = pcm_read(proxy->pcm, data, count);
-    if (ret == 0) {
-        proxy->transferred += count / proxy->frame_size;
+    return proxy_read_with_retries(proxy, data, count, 1);
+}
+
+int proxy_read_with_retries(alsa_device_proxy * proxy, void *data, unsigned int count, int tries)
+{
+    while (true) {
+        --tries;
+        const int ret = pcm_read(proxy->pcm, data, count);
+        if (ret == 0) {
+            proxy->transferred += count / proxy->frame_size;
+            return 0;
+        } else if (tries > 0 && (ret == -EIO || ret == -EAGAIN)) {
+            continue;
+        }
+        return ret;
     }
-    return ret;
 }
 
 /*
