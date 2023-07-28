@@ -2217,6 +2217,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           maximum YUV_420_888 output size.
 
           </details>
+          <hal_details>
+          HAL must make sure the lower bound and upper bound of each supported targetFpsRange can
+          be reached. For example, if HAL supports an aeTargetFpsRange of (15, 30), when set by the
+          application, the camera must be able to reach 15fps in sufficient dark scenes. This way
+          the application knows the exact range of frame rate it can expect.
+          </hal_details>
           <tag id="BC" />
         </entry>
         <entry name="aeCompensationRange" type="int32" visibility="public"
