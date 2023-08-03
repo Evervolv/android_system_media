@@ -20,7 +20,7 @@
 #include <tinyalsa/asoundlib.h>
 
 void log_pcm_mask(const char* mask_name, const struct pcm_mask* mask);
-void log_pcm_params(struct pcm_params * alsa_hw_params);
-void log_pcm_config(struct pcm_config * config, const char* label);
+void log_pcm_params(const struct pcm_params * alsa_hw_params);
+void log_pcm_config(const struct pcm_config * config, const char* label);
 
 #endif /* ANDROID_SYSTEM_MEDIA_ALSA_UTILS_ALSA_LOGGING_H */
