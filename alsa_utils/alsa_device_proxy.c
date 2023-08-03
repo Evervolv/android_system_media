@@ -31,7 +31,6 @@
 #include "include/alsa_logging.h"
 
 #define DEFAULT_PERIOD_SIZE     1024
-#define DEFAULT_PERIOD_COUNT    2
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -106,7 +105,7 @@ int proxy_prepare(alsa_device_proxy * proxy, const alsa_device_profile* profile,
     // Here we set the correct value for period_count if tinyalsa fails to get it from the
     // f_audio_source driver.
     if (proxy->alsa_config.period_count == 0) {
-        proxy->alsa_config.period_count = 4;
+        proxy->alsa_config.period_count = DEFAULT_PERIOD_COUNT;
     }
 
     proxy->pcm = NULL;
@@ -130,6 +129,33 @@ int proxy_prepare(alsa_device_proxy * proxy, const alsa_device_profile* profile,
         }
     }
     return ret;
+}
+
+int proxy_prepare_from_default_config(alsa_device_proxy * proxy,
+        const alsa_device_profile * profile)
+{
+    ALOGV("proxy_prepare_from_default_config(c:%d, d:%d)", profile->card, profile->device);
+
+    proxy->profile = profile;
+
+#ifdef LOG_PCM_PARAMS
+    log_pcm_config(config, "proxy_setup()");
+#endif
+
+    proxy->alsa_config.format = profile->default_config.format;
+    proxy->alsa_config.rate = profile->default_config.rate;
+    proxy->alsa_config.channels = profile->default_config.channels;
+    proxy->alsa_config.period_count = profile->default_config.period_count;
+    proxy->alsa_config.period_size = profile->default_config.period_size;
+    proxy->pcm = NULL;
+    enum pcm_format format = profile->default_config.format;
+    if (format >= 0 && (size_t)format < ARRAY_SIZE(format_byte_size_map)) {
+        proxy->frame_size = format_byte_size_map[format] * proxy->alsa_config.channels;
+    } else {
+        proxy->frame_size = 1;
+    }
+
+    return 0;
 }
 
 int proxy_open(alsa_device_proxy * proxy)
@@ -208,10 +234,15 @@ unsigned int proxy_get_period_count(const alsa_device_proxy * proxy)
     return proxy->alsa_config.period_count;
 }
 
+static unsigned int proxy_get_extra_latency_ms(const alsa_device_proxy * proxy)
+{
+    return proxy->profile->extra_latency_ms;
+}
+
 unsigned proxy_get_latency(const alsa_device_proxy * proxy)
 {
     return (proxy_get_period_size(proxy) * proxy_get_period_count(proxy) * 1000)
-               / proxy_get_sample_rate(proxy);
+            / proxy_get_sample_rate(proxy) + proxy_get_extra_latency_ms(proxy);
 }
 
 int proxy_get_presentation_position(const alsa_device_proxy * proxy,
@@ -266,20 +297,43 @@ int proxy_get_capture_position(const alsa_device_proxy * proxy,
  */
 int proxy_write(alsa_device_proxy * proxy, const void *data, unsigned int count)
 {
-    int ret = pcm_write(proxy->pcm, data, count);
-    if (ret == 0) {
-        proxy->transferred += count / proxy->frame_size;
+    return proxy_write_with_retries(proxy, data, count, 1);
+}
+
+int proxy_write_with_retries(
+        alsa_device_proxy * proxy, const void *data, unsigned int count, int tries)
+{
+    while (true) {
+        --tries;
+        const int ret = pcm_write(proxy->pcm, data, count);
+        if (ret == 0) {
+            proxy->transferred += count / proxy->frame_size;
+            return 0;
+        } else if (tries > 0 && (ret == -EIO || ret == -EAGAIN)) {
+            continue;
+        }
+        return ret;
     }
-    return ret;
 }
 
 int proxy_read(alsa_device_proxy * proxy, void *data, unsigned int count)
 {
-    int ret = pcm_read(proxy->pcm, data, count);
-    if (ret == 0) {
-        proxy->transferred += count / proxy->frame_size;
+    return proxy_read_with_retries(proxy, data, count, 1);
+}
+
+int proxy_read_with_retries(alsa_device_proxy * proxy, void *data, unsigned int count, int tries)
+{
+    while (true) {
+        --tries;
+        const int ret = pcm_read(proxy->pcm, data, count);
+        if (ret == 0) {
+            proxy->transferred += count / proxy->frame_size;
+            return 0;
+        } else if (tries > 0 && (ret == -EIO || ret == -EAGAIN)) {
+            continue;
+        }
+        return ret;
     }
-    return ret;
 }
 
 /*
