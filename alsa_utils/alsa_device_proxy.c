@@ -47,7 +47,7 @@ int proxy_prepare(alsa_device_proxy * proxy, const alsa_device_profile* profile,
 {
     int ret = 0;
 
-    ALOGV("proxy_prepare(c:%d, d:%d)", profile->card, profile->device);
+    ALOGD("proxy_prepare(c:%d, d:%d)", profile->card, profile->device);
 
     proxy->profile = profile;
 
@@ -134,12 +134,12 @@ int proxy_prepare(alsa_device_proxy * proxy, const alsa_device_profile* profile,
 int proxy_prepare_from_default_config(alsa_device_proxy * proxy,
         const alsa_device_profile * profile)
 {
-    ALOGV("proxy_prepare_from_default_config(c:%d, d:%d)", profile->card, profile->device);
+    ALOGD("proxy_prepare_from_default_config(c:%d, d:%d)", profile->card, profile->device);
 
     proxy->profile = profile;
 
 #ifdef LOG_PCM_PARAMS
-    log_pcm_config(config, "proxy_setup()");
+    log_pcm_config(&profile->default_config, "proxy_prepare_from_default_config()");
 #endif
 
     proxy->alsa_config.format = profile->default_config.format;
@@ -161,7 +161,7 @@ int proxy_prepare_from_default_config(alsa_device_proxy * proxy,
 int proxy_open(alsa_device_proxy * proxy)
 {
     const alsa_device_profile* profile = proxy->profile;
-    ALOGV("proxy_open(card:%d device:%d %s)", profile->card, profile->device,
+    ALOGD("proxy_open(card:%d device:%d %s)", profile->card, profile->device,
           profile->direction == PCM_OUT ? "PCM_OUT" : "PCM_IN");
 
     if (profile->card < 0 || profile->device < 0) {
@@ -189,7 +189,7 @@ int proxy_open(alsa_device_proxy * proxy)
 
 void proxy_close(alsa_device_proxy * proxy)
 {
-    ALOGV("proxy_close() [pcm:%p]", proxy->pcm);
+    ALOGD("proxy_close() [pcm:%p]", proxy->pcm);
 
     if (proxy->pcm != NULL) {
         pcm_close(proxy->pcm);
