@@ -39487,9 +39487,8 @@ the following entries,<wbr/> so that applications can determine the camera's exa
               <p>This control allows Camera extension clients to configure the strength of the applied
 extension effect.<wbr/> Strength equal to 0 means that the extension must not apply any
 post-processing and return a regular captured frame.<wbr/> Strength equal to 100 is the
-default level of post-processing applied when the control is not supported or not set
-by the client.<wbr/> Values between 0 and 100 will have different effect depending on the
-extension type as described below:</p>
+maximum level of post-processing.<wbr/> Values between 0 and 100 will have different effect
+depending on the extension type as described below:</p>
 <ul>
 <li><a href="https://developer.android.com/reference/android/hardware/camera2/CameraExtensionCharacteristics.html#EXTENSION_BOKEH">BOKEH</a> -
 the strength is expected to control the amount of blur.<wbr/></li>
@@ -39504,7 +39503,9 @@ smoothing.<wbr/></li>
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraExtensionCharacteristics.html#getAvailableCaptureRequestKeys">CameraExtensionCharacteristics#getAvailableCaptureRequestKeys</a>.<wbr/>
 The control is only defined and available to clients sending capture requests via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraExtensionSession.html">CameraExtensionSession</a>.<wbr/>
-The default value is 100.<wbr/></p>
+If the client doesn't specify the extension strength value,<wbr/> then a default value will
+be set by the extension.<wbr/> Clients can retrieve the default value by checking the
+corresponding capture result.<wbr/></p>
             </td>
           </tr>
 
@@ -39647,9 +39648,8 @@ then the result type will always match with the configured extension type.<wbr/>
               <p>This control allows Camera extension clients to configure the strength of the applied
 extension effect.<wbr/> Strength equal to 0 means that the extension must not apply any
 post-processing and return a regular captured frame.<wbr/> Strength equal to 100 is the
-default level of post-processing applied when the control is not supported or not set
-by the client.<wbr/> Values between 0 and 100 will have different effect depending on the
-extension type as described below:</p>
+maximum level of post-processing.<wbr/> Values between 0 and 100 will have different effect
+depending on the extension type as described below:</p>
 <ul>
 <li><a href="https://developer.android.com/reference/android/hardware/camera2/CameraExtensionCharacteristics.html#EXTENSION_BOKEH">BOKEH</a> -
 the strength is expected to control the amount of blur.<wbr/></li>
@@ -39664,7 +39664,9 @@ smoothing.<wbr/></li>
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraExtensionCharacteristics.html#getAvailableCaptureRequestKeys">CameraExtensionCharacteristics#getAvailableCaptureRequestKeys</a>.<wbr/>
 The control is only defined and available to clients sending capture requests via
 <a href="https://developer.android.com/reference/android/hardware/camera2/CameraExtensionSession.html">CameraExtensionSession</a>.<wbr/>
-The default value is 100.<wbr/></p>
+If the client doesn't specify the extension strength value,<wbr/> then a default value will
+be set by the extension.<wbr/> Clients can retrieve the default value by checking the
+corresponding capture result.<wbr/></p>
             </td>
           </tr>
 
