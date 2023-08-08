@@ -21,6 +21,7 @@
 #include <log/log.h>
 
 #include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -33,6 +34,11 @@
 #define DEFAULT_PERIOD_SIZE     1024
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+
+// These must use the same clock. If we change ALSA clock to real time, the system
+// clock must be updated, too.
+#define ALSA_CLOCK_TYPE PCM_MONOTONIC
+#define SYSTEM_CLOCK_TYPE CLOCK_MONOTONIC
 
 static const unsigned format_byte_size_map[] = {
     2, /* PCM_FORMAT_S16_LE */
@@ -169,7 +175,7 @@ int proxy_open(alsa_device_proxy * proxy)
     }
 
     proxy->pcm = pcm_open(profile->card, profile->device,
-            profile->direction | PCM_MONOTONIC, &proxy->alsa_config);
+            profile->direction | ALSA_CLOCK_TYPE, &proxy->alsa_config);
     if (proxy->pcm == NULL) {
         return -ENOMEM;
     }
@@ -250,21 +256,29 @@ int proxy_get_presentation_position(const alsa_device_proxy * proxy,
 {
     int ret = -EPERM; // -1
     unsigned int avail;
+    struct timespec alsaTs;
     if (proxy->pcm != NULL
-            && pcm_get_htimestamp(proxy->pcm, &avail, timestamp) == 0) {
-        const size_t kernel_buffer_size =
-                proxy->alsa_config.period_size * proxy->alsa_config.period_count;
+            && pcm_get_htimestamp(proxy->pcm, &avail, &alsaTs) == 0) {
+        const size_t kernel_buffer_size = pcm_get_buffer_size(proxy->pcm);
         if (avail > kernel_buffer_size) {
-            ALOGE("available frames(%u) > buffer size(%zu)", avail, kernel_buffer_size);
-        } else {
-            int64_t signed_frames = proxy->transferred - kernel_buffer_size + avail;
-            // It is possible to compensate for additional driver and device delay
-            // by changing signed_frames.  Example:
-            // signed_frames -= 20 /* ms */ * proxy->alsa_config.rate / 1000;
-            if (signed_frames >= 0) {
-                *frames = signed_frames;
-                ret = 0;
-            }
+            // pcm_get_htimestamp() computes the available frames by comparing the ALSA driver
+            // hw_ptr and the appl_ptr levels. In underrun, the hw_ptr may keep running and report
+            // an excessively large number available number.
+            ALOGW("available frames(%u) > buffer size(%zu), clamped", avail, kernel_buffer_size);
+            avail = kernel_buffer_size;
+        }
+        if (alsaTs.tv_sec != 0 || alsaTs.tv_nsec != 0) {
+            *timestamp = alsaTs;
+        } else {  // If ALSA returned a zero timestamp, do not use it.
+            clock_gettime(SYSTEM_CLOCK_TYPE, timestamp);
+        }
+        int64_t signed_frames = proxy->transferred - kernel_buffer_size + avail;
+        // It is possible to compensate for additional driver and device delay
+        // by changing signed_frames.  Example:
+        // signed_frames -= 20 /* ms */ * proxy->alsa_config.rate / 1000;
+        if (signed_frames >= 0) {
+            *frames = signed_frames;
+            ret = 0;
         }
     }
     return ret;
@@ -276,18 +290,19 @@ int proxy_get_capture_position(const alsa_device_proxy * proxy,
     int ret = -ENOSYS;
     unsigned int avail;
     struct timespec timestamp;
-    // TODO: add logging for tinyalsa errors.
     if (proxy->pcm != NULL
             && pcm_get_htimestamp(proxy->pcm, &avail, &timestamp) == 0) {
-        const size_t kernel_buffer_size =
-                proxy->alsa_config.period_size * proxy->alsa_config.period_count;
-        if (avail > kernel_buffer_size) {
-            ALOGE("available frames(%u) > buffer size(%zu)", avail, kernel_buffer_size);
-        } else {
-            *frames = proxy->transferred + avail;
-            *time = audio_utils_ns_from_timespec(&timestamp);
-            ret = 0;
+        if (timestamp.tv_sec == 0 && timestamp.tv_nsec == 0) {
+            // If ALSA returned a zero timestamp, do not use it.
+            clock_gettime(SYSTEM_CLOCK_TYPE, &timestamp);
         }
+        uint64_t framesTemp = proxy->transferred + avail;
+        if (framesTemp > INT64_MAX) {
+            framesTemp -= INT64_MAX;
+        }
+        *frames = framesTemp;
+        *time = audio_utils_ns_from_timespec(&timestamp);
+        ret = 0;
     }
     return ret;
 }
@@ -370,7 +385,7 @@ int proxy_scan_rates(alsa_device_proxy * proxy,
         }
         alsa_config.rate = sample_rates[rate_index];
         alsa_pcm = pcm_open(profile->card, profile->device,
-                profile->direction | PCM_MONOTONIC, &alsa_config);
+                profile->direction | ALSA_CLOCK_TYPE, &alsa_config);
         if (alsa_pcm != NULL) {
             if (pcm_is_ready(alsa_pcm)) {
                 pcm_close(alsa_pcm);
