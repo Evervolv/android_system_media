@@ -514,7 +514,6 @@ cc_test {
         "libcutils",
     ],
     srcs: ["logplot_tests.cpp"],
-    gtest:false,
     cflags: [
         "-Werror",
         "-Wall",
