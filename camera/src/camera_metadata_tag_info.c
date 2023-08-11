@@ -311,6 +311,16 @@ static tag_info_t android_flash[ANDROID_FLASH_END -
     { "maxEnergy",                     TYPE_BYTE   },
     [ ANDROID_FLASH_STATE - ANDROID_FLASH_START ] =
     { "state",                         TYPE_BYTE   },
+    [ ANDROID_FLASH_STRENGTH_LEVEL - ANDROID_FLASH_START ] =
+    { "strengthLevel",                 TYPE_INT32  },
+    [ ANDROID_FLASH_SINGLE_STRENGTH_MAX_LEVEL - ANDROID_FLASH_START ] =
+    { "singleStrengthMaxLevel",        TYPE_INT32  },
+    [ ANDROID_FLASH_SINGLE_STRENGTH_DEFAULT_LEVEL - ANDROID_FLASH_START ] =
+    { "singleStrengthDefaultLevel",    TYPE_INT32  },
+    [ ANDROID_FLASH_TORCH_STRENGTH_MAX_LEVEL - ANDROID_FLASH_START ] =
+    { "torchStrengthMaxLevel",         TYPE_INT32  },
+    [ ANDROID_FLASH_TORCH_STRENGTH_DEFAULT_LEVEL - ANDROID_FLASH_START ] =
+    { "torchStrengthDefaultLevel",     TYPE_INT32  },
 };
 
 static tag_info_t android_flash_info[ANDROID_FLASH_INFO_END -
@@ -1973,6 +1983,21 @@ int camera_metadata_enum_snprint(uint32_t tag,
                 default:
                     msg = "error: enum value out of range";
             }
+            break;
+        }
+        case ANDROID_FLASH_STRENGTH_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_SINGLE_STRENGTH_MAX_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_SINGLE_STRENGTH_DEFAULT_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_TORCH_STRENGTH_MAX_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_TORCH_STRENGTH_DEFAULT_LEVEL: {
             break;
         }
 
@@ -5096,6 +5121,21 @@ int camera_metadata_enum_value(uint32_t tag,
                     ret = 0;
                     break;
                 }
+            break;
+        }
+        case ANDROID_FLASH_STRENGTH_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_SINGLE_STRENGTH_MAX_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_SINGLE_STRENGTH_DEFAULT_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_TORCH_STRENGTH_MAX_LEVEL: {
+            break;
+        }
+        case ANDROID_FLASH_TORCH_STRENGTH_DEFAULT_LEVEL: {
             break;
         }
 

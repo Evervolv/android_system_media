@@ -219,6 +219,11 @@ typedef enum camera_metadata_tag {
     ANDROID_FLASH_COLOR_TEMPERATURE,                  // byte         | system       | HIDL v3.2
     ANDROID_FLASH_MAX_ENERGY,                         // byte         | system       | HIDL v3.2
     ANDROID_FLASH_STATE,                              // enum         | public       | HIDL v3.2
+    ANDROID_FLASH_STRENGTH_LEVEL,                     // int32        | public       | HIDL v3.9
+    ANDROID_FLASH_SINGLE_STRENGTH_MAX_LEVEL,          // int32        | public       | HIDL v3.9
+    ANDROID_FLASH_SINGLE_STRENGTH_DEFAULT_LEVEL,      // int32        | public       | HIDL v3.9
+    ANDROID_FLASH_TORCH_STRENGTH_MAX_LEVEL,           // int32        | public       | HIDL v3.9
+    ANDROID_FLASH_TORCH_STRENGTH_DEFAULT_LEVEL,       // int32        | public       | HIDL v3.9
     ANDROID_FLASH_END,
 
     ANDROID_FLASH_INFO_AVAILABLE =                    // enum         | public       | HIDL v3.2
