@@ -37848,7 +37848,7 @@ at the HAL layer.<wbr/></p>
                 
           <tr class="entry" id="static_android.logicalMultiCamera.physicalIds">
             <td class="entry_name
-             " rowspan="3">
+             " rowspan="5">
               android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>physical<wbr/>Ids
             </td>
             <td class="entry_type">
@@ -37904,6 +37904,28 @@ value of this tag will be ['2',<wbr/> '\0',<wbr/> '3',<wbr/> '\0'].<wbr/></p>
             </td>
           </tr>
 
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Each physical camera id should uniquely identify a camera lens in the system.<wbr/>
+So if each camera lens only backs one logical camera,<wbr/> all camera IDs in the system,<wbr/>
+physical IDs or non-physical IDs,<wbr/> should be unique.<wbr/></p>
+<p>In rare cases,<wbr/> one camera lens backs two different logical cameras,<wbr/> the
+physicalIds of both logical cameras should contain a physical camera ID
+identifying that same camera lens.<wbr/> For example,<wbr/> if the mobile device has 3 rear facing
+cameras and no front facing cameras,<wbr/> and the 3 rear facing lenses may be modelled as
+2 logical cameras:</p>
+<ul>
+<li>"device@1.<wbr/>0/<wbr/>internal/<wbr/>10": physicalIds: "camera0",<wbr/> "camera42"</li>
+<li>"device@1.<wbr/>0/<wbr/>internal/<wbr/>11": physicalIds: "camera1",<wbr/> "camera42"</li>
+</ul>
+<p>In this case,<wbr/> the two logical cameras are conflicting devices because they are backed
+by a common lens.<wbr/></p>
+<p>Physical camera IDs can be an arbitrary string not containing '\0'.<wbr/></p>
+            </td>
+          </tr>
 
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->

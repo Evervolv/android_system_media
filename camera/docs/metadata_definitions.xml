@@ -13461,6 +13461,25 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
             The number of physical camera IDs must be no less than 2.
           </details>
+          <hal_details>
+            Each physical camera id should uniquely identify a camera lens in the system.
+            So if each camera lens only backs one logical camera, all camera IDs in the system,
+            physical IDs or non-physical IDs, should be unique.
+
+            In rare cases, one camera lens backs two different logical cameras, the
+            physicalIds of both logical cameras should contain a physical camera ID
+            identifying that same camera lens. For example, if the mobile device has 3 rear facing
+            cameras and no front facing cameras, and the 3 rear facing lenses may be modelled as
+            2 logical cameras:
+
+            - "device@1.0/internal/10": physicalIds: "camera0", "camera42"
+            - "device@1.0/internal/11": physicalIds: "camera1", "camera42"
+
+            In this case, the two logical cameras are conflicting devices because they are backed
+            by a common lens.
+
+            Physical camera IDs can be an arbitrary string not containing '\0'.
+          </hal_details>
           <tag id="LOGICALCAMERA" />
         </entry>
         <entry name="sensorSyncType" type="byte" visibility="public"
