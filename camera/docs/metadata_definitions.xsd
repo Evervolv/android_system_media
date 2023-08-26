@@ -253,6 +253,7 @@
                 </restriction>
             </simpleType>
         </attribute>
+        <attribute name="aconfig_flag" type="string" />
     </complexType>
 
     <complexType name="EnumType">
