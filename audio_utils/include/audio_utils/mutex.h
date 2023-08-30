@@ -268,6 +268,157 @@ public:
     lock_guard_no_thread_safety_analysis(Mutex1& m) : std::lock_guard<Mutex1>(m) {}
 };
 
+// Define global capabilities for thread-safety annotation.
+//
+// These can be manually modified, or
+// compile generate_mutex_order.cpp in the tests directory
+// to generate this.
+
+// --- Begin generated section
+
+// Capabilities in priority order
+// (declaration only, value is nullptr)
+inline mutex* AudioFlinger_Mutex;
+inline mutex* EffectHandle_Mutex
+        ACQUIRED_AFTER(android::audio_utils::AudioFlinger_Mutex);
+inline mutex* AudioFlinger_HardwareMutex
+        ACQUIRED_AFTER(android::audio_utils::EffectHandle_Mutex);
+inline mutex* DeviceEffectManager_Mutex
+        ACQUIRED_AFTER(android::audio_utils::AudioFlinger_HardwareMutex);
+inline mutex* PatchCommandThread_Mutex
+        ACQUIRED_AFTER(android::audio_utils::DeviceEffectManager_Mutex);
+inline mutex* ThreadBase_Mutex
+        ACQUIRED_AFTER(android::audio_utils::PatchCommandThread_Mutex);
+inline mutex* AudioFlinger_ClientMutex
+        ACQUIRED_AFTER(android::audio_utils::ThreadBase_Mutex);
+inline mutex* MelReporter_Mutex
+        ACQUIRED_AFTER(android::audio_utils::AudioFlinger_ClientMutex);
+inline mutex* EffectChain_Mutex
+        ACQUIRED_AFTER(android::audio_utils::MelReporter_Mutex);
+inline mutex* EffectBase_Mutex
+        ACQUIRED_AFTER(android::audio_utils::EffectChain_Mutex);
+inline mutex* AudioFlinger_UnregisteredWritersMutex
+        ACQUIRED_AFTER(android::audio_utils::EffectBase_Mutex);
+inline mutex* AsyncCallbackThread_Mutex
+        ACQUIRED_AFTER(android::audio_utils::AudioFlinger_UnregisteredWritersMutex);
+inline mutex* ConfigEvent_Mutex
+        ACQUIRED_AFTER(android::audio_utils::AsyncCallbackThread_Mutex);
+inline mutex* OutputTrack_TrackMetadataMutex
+        ACQUIRED_AFTER(android::audio_utils::ConfigEvent_Mutex);
+inline mutex* PassthruPatchRecord_ReadMutex
+        ACQUIRED_AFTER(android::audio_utils::OutputTrack_TrackMetadataMutex);
+inline mutex* PatchCommandThread_ListenerMutex
+        ACQUIRED_AFTER(android::audio_utils::PassthruPatchRecord_ReadMutex);
+inline mutex* PlaybackThread_AudioTrackCbMutex
+        ACQUIRED_AFTER(android::audio_utils::PatchCommandThread_ListenerMutex);
+
+// Exclusion by capability
+#define EXCLUDES_BELOW_PlaybackThread_AudioTrackCbMutex
+#define EXCLUDES_PlaybackThread_AudioTrackCbMutex \
+    EXCLUDES(android::audio_utils::PlaybackThread_AudioTrackCbMutex) \
+    EXCLUDES_BELOW_PlaybackThread_AudioTrackCbMutex
+
+#define EXCLUDES_BELOW_PatchCommandThread_ListenerMutex \
+    EXCLUDES_PlaybackThread_AudioTrackCbMutex
+#define EXCLUDES_PatchCommandThread_ListenerMutex \
+    EXCLUDES(android::audio_utils::PatchCommandThread_ListenerMutex) \
+    EXCLUDES_BELOW_PatchCommandThread_ListenerMutex
+
+#define EXCLUDES_BELOW_PassthruPatchRecord_ReadMutex \
+    EXCLUDES_PatchCommandThread_ListenerMutex
+#define EXCLUDES_PassthruPatchRecord_ReadMutex \
+    EXCLUDES(android::audio_utils::PassthruPatchRecord_ReadMutex) \
+    EXCLUDES_BELOW_PassthruPatchRecord_ReadMutex
+
+#define EXCLUDES_BELOW_OutputTrack_TrackMetadataMutex \
+    EXCLUDES_PassthruPatchRecord_ReadMutex
+#define EXCLUDES_OutputTrack_TrackMetadataMutex \
+    EXCLUDES(android::audio_utils::OutputTrack_TrackMetadataMutex) \
+    EXCLUDES_BELOW_OutputTrack_TrackMetadataMutex
+
+#define EXCLUDES_BELOW_ConfigEvent_Mutex \
+    EXCLUDES_OutputTrack_TrackMetadataMutex
+#define EXCLUDES_ConfigEvent_Mutex \
+    EXCLUDES(android::audio_utils::ConfigEvent_Mutex) \
+    EXCLUDES_BELOW_ConfigEvent_Mutex
+
+#define EXCLUDES_BELOW_AsyncCallbackThread_Mutex \
+    EXCLUDES_ConfigEvent_Mutex
+#define EXCLUDES_AsyncCallbackThread_Mutex \
+    EXCLUDES(android::audio_utils::AsyncCallbackThread_Mutex) \
+    EXCLUDES_BELOW_AsyncCallbackThread_Mutex
+
+#define EXCLUDES_BELOW_AudioFlinger_UnregisteredWritersMutex \
+    EXCLUDES_AsyncCallbackThread_Mutex
+#define EXCLUDES_AudioFlinger_UnregisteredWritersMutex \
+    EXCLUDES(android::audio_utils::AudioFlinger_UnregisteredWritersMutex) \
+    EXCLUDES_BELOW_AudioFlinger_UnregisteredWritersMutex
+
+#define EXCLUDES_BELOW_EffectBase_Mutex \
+    EXCLUDES_AudioFlinger_UnregisteredWritersMutex
+#define EXCLUDES_EffectBase_Mutex \
+    EXCLUDES(android::audio_utils::EffectBase_Mutex) \
+    EXCLUDES_BELOW_EffectBase_Mutex
+
+#define EXCLUDES_BELOW_EffectChain_Mutex \
+    EXCLUDES_EffectBase_Mutex
+#define EXCLUDES_EffectChain_Mutex \
+    EXCLUDES(android::audio_utils::EffectChain_Mutex) \
+    EXCLUDES_BELOW_EffectChain_Mutex
+
+#define EXCLUDES_BELOW_MelReporter_Mutex \
+    EXCLUDES_EffectChain_Mutex
+#define EXCLUDES_MelReporter_Mutex \
+    EXCLUDES(android::audio_utils::MelReporter_Mutex) \
+    EXCLUDES_BELOW_MelReporter_Mutex
+
+#define EXCLUDES_BELOW_AudioFlinger_ClientMutex \
+    EXCLUDES_MelReporter_Mutex
+#define EXCLUDES_AudioFlinger_ClientMutex \
+    EXCLUDES(android::audio_utils::AudioFlinger_ClientMutex) \
+    EXCLUDES_BELOW_AudioFlinger_ClientMutex
+
+#define EXCLUDES_BELOW_ThreadBase_Mutex \
+    EXCLUDES_AudioFlinger_ClientMutex
+#define EXCLUDES_ThreadBase_Mutex \
+    EXCLUDES(android::audio_utils::ThreadBase_Mutex) \
+    EXCLUDES_BELOW_ThreadBase_Mutex
+
+#define EXCLUDES_BELOW_PatchCommandThread_Mutex \
+    EXCLUDES_ThreadBase_Mutex
+#define EXCLUDES_PatchCommandThread_Mutex \
+    EXCLUDES(android::audio_utils::PatchCommandThread_Mutex) \
+    EXCLUDES_BELOW_PatchCommandThread_Mutex
+
+#define EXCLUDES_BELOW_DeviceEffectManager_Mutex \
+    EXCLUDES_PatchCommandThread_Mutex
+#define EXCLUDES_DeviceEffectManager_Mutex \
+    EXCLUDES(android::audio_utils::DeviceEffectManager_Mutex) \
+    EXCLUDES_BELOW_DeviceEffectManager_Mutex
+
+#define EXCLUDES_BELOW_AudioFlinger_HardwareMutex \
+    EXCLUDES_DeviceEffectManager_Mutex
+#define EXCLUDES_AudioFlinger_HardwareMutex \
+    EXCLUDES(android::audio_utils::AudioFlinger_HardwareMutex) \
+    EXCLUDES_BELOW_AudioFlinger_HardwareMutex
+
+#define EXCLUDES_BELOW_EffectHandle_Mutex \
+    EXCLUDES_AudioFlinger_HardwareMutex
+#define EXCLUDES_EffectHandle_Mutex \
+    EXCLUDES(android::audio_utils::EffectHandle_Mutex) \
+    EXCLUDES_BELOW_EffectHandle_Mutex
+
+#define EXCLUDES_BELOW_AudioFlinger_Mutex \
+    EXCLUDES_EffectHandle_Mutex
+#define EXCLUDES_AudioFlinger_Mutex \
+    EXCLUDES(android::audio_utils::AudioFlinger_Mutex) \
+    EXCLUDES_BELOW_AudioFlinger_Mutex
+
+#define EXCLUDES_AUDIO_ALL \
+    EXCLUDES_AudioFlinger_Mutex
+
+// --- End generated section
+
 } // namespace android::audio_utils
 
 #pragma pop_macro("LOG_TAG")
