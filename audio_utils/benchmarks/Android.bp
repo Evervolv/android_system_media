@@ -9,6 +9,24 @@ package {
 }
 
 cc_benchmark {
+    name: "audio_mutex_benchmark",
+
+    srcs: ["audio_mutex_benchmark.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    shared_libs: [
+        "libaudioutils_nonvndk",
+        "liblog",
+        "libutils",
+    ],
+    static_libs: [
+        "libaudioutils",
+    ],
+}
+
+cc_benchmark {
     name: "biquad_filter_benchmark",
     host_supported: true,
 
