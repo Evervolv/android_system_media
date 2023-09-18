@@ -3004,6 +3004,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           HAL can also support 60fps preview during high speed recording session by advertising
           [60, max_fps] for preview and [max_fps, max_fps] for recording. However, HAL must not
           advertise both 30fps preview and 60fps preview for the same recording frame rate.
+
+          Starting from AIDL ICameraDevice V2, camera HAL must report the valid batch_size_max. The
+          field will actually be used to generate a high speed recording request list.
           </hal_details>
           <tag id="V1" />
         </entry>
