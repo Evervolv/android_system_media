@@ -128,6 +128,10 @@
                 permission_needed="true"
           % endif
 
+          % if prop.aconfig_flag:
+                aconfig_flag="${prop.aconfig_flag}"
+          % endif
+
           % if (prop.hal_major_version, prop.hal_minor_version) != (3,2):
                 hal_version="${prop.hal_major_version}.${prop.hal_minor_version}"
           % endif

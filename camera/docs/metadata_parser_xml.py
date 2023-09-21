@@ -187,6 +187,9 @@ class MetadataParserXml:
     #
     d['permission_needed'] = entry.get('permission_needed')
 
+    # Aconfig flag gating this entry ?
+    d['aconfig_flag'] = entry.get('aconfig_flag')
+
     #
     # Hardware Level (one of limited, legacy, full)
     #

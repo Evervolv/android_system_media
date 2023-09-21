@@ -1135,6 +1135,7 @@ class Entry(Node):
              hwlevels will also include this entry. None means that the
              entry is optional on any hardware level.
     permission_needed: Flags whether the tag needs extra camera permission.
+    aconfig_flag: The aconfig flag name that determines if the entry is actually enabled
     deprecated: Marks an entry as @Deprecated in the Java layer; if within an
                unreleased version this needs to be removed altogether. If applied
                to an entry from an older release, then this means the entry
@@ -1281,6 +1282,10 @@ class Entry(Node):
   @property
   def permission_needed(self):
     return self._permission_needed or "false"
+
+  @property
+  def aconfig_flag(self):
+    return self._aconfig_flag
 
   # TODO: optional should just return hwlevel is None
   @property
@@ -1441,6 +1446,7 @@ class Entry(Node):
     self._deprecation_description = kwargs.get('deprecation_description')
 
     self._permission_needed = kwargs.get('permission_needed')
+    self._aconfig_flag = kwargs.get('aconfig_flag')
     self._optional = kwargs.get('optional')
     self._ndk_visible = kwargs.get('ndk_visible')
 
@@ -1651,7 +1657,8 @@ class MergedEntry(Entry):
                     'typedef',
                     'hal_major_version',
                     'hal_minor_version',
-                    'permission_needed'
+                    'permission_needed',
+                    'aconfig_flag'
                    ]
 
     for p in props_common:

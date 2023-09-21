@@ -825,7 +825,16 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <range>Any of the entries in android.control.aeAvailableTargetFpsRanges</range>
           <details>Only constrains auto-exposure (AE) algorithm, not
           manual control of android.sensor.exposureTime and
-          android.sensor.frameDuration.</details>
+          android.sensor.frameDuration.
+
+          To start a CaptureSession with a target FPS range different from the
+          capture request template's default value, the application
+          is strongly recommended to call
+          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}
+          with the target fps range before creating the capture session. The aeTargetFpsRange is
+          typically a session parameter. Specifying it at session creation time helps avoid
+          session reconfiguration delays in cases like 60fps or high speed recording.
+          </details>
           <tag id="BC" />
         </entry>
         <entry name="aePrecaptureTrigger" type="byte" visibility="public"
@@ -2096,6 +2105,13 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           OFF if the recording output is not stabilized, or if there are no output
           Surface types that can be stabilized.
 
+          The application is strongly recommended to call
+          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}
+          with the desired video stabilization mode before creating the capture session.
+          Video stabilization mode is a session parameter on many devices. Specifying
+          it at session creation time helps avoid reconfiguration delay caused by difference
+          between the default value and the first CaptureRequest.
+
           If a camera device supports both this mode and OIS
           (android.lens.opticalStabilizationMode), turning both modes on may
           produce undesirable interaction, so it is recommended not to enable
@@ -2988,6 +3004,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           HAL can also support 60fps preview during high speed recording session by advertising
           [60, max_fps] for preview and [max_fps, max_fps] for recording. However, HAL must not
           advertise both 30fps preview and 60fps preview for the same recording frame rate.
+
+          Starting from AIDL ICameraDevice V2, camera HAL must report the valid batch_size_max. The
+          field will actually be used to generate a high speed recording request list.
           </hal_details>
           <tag id="V1" />
         </entry>
@@ -13461,6 +13480,25 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
             The number of physical camera IDs must be no less than 2.
           </details>
+          <hal_details>
+            Each physical camera id should uniquely identify a camera lens in the system.
+            So if each camera lens only backs one logical camera, all camera IDs in the system,
+            physical IDs or non-physical IDs, should be unique.
+
+            In rare cases, one camera lens backs two different logical cameras, the
+            physicalIds of both logical cameras should contain a physical camera ID
+            identifying that same camera lens. For example, if the mobile device has 3 rear facing
+            cameras and no front facing cameras, and the 3 rear facing lenses may be modelled as
+            2 logical cameras:
+
+            - "device@1.0/internal/10": physicalIds: "camera0", "camera42"
+            - "device@1.0/internal/11": physicalIds: "camera1", "camera42"
+
+            In this case, the two logical cameras are conflicting devices because they are backed
+            by a common lens.
+
+            Physical camera IDs can be an arbitrary string not containing '\0'.
+          </hal_details>
           <tag id="LOGICALCAMERA" />
         </entry>
         <entry name="sensorSyncType" type="byte" visibility="public"

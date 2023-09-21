@@ -68,6 +68,9 @@ ${entry.deprecation_description | javadoc(metadata)}
   % if entry.synthetic:
     @SyntheticKey
   % endif
+  % if entry.aconfig_flag:
+    @FlaggedApi(Flags.FLAG_${entry.aconfig_flag | jkey_identifier})
+  % endif
     public static final Key<${jtype_boxed(entry)}> ${entry.name | jkey_identifier} =
             new Key<${jtype_boxed(entry)}>("${entry.name}", ${jkey_type_token(entry)});
 </%def>\
