@@ -168,6 +168,34 @@ cc_library_static {
     ],
 }
 
+cc_library {
+    name: "libaudioutils_nonvndk",
+    vendor_available: true,
+    product_available: true,
+    double_loadable: true,
+    host_supported: true,
+    defaults: ["audio_utils_defaults"],
+
+    srcs: [
+        "mutex.cpp",
+    ],
+
+    header_libs: [
+        "libaudio_system_headers",
+        "libutils_headers",
+    ],
+    shared_libs: [
+        "aconfig_audio_flags_c_lib",
+        "libcutils",
+        "liblog",
+        "libutils",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}
+
 cc_library_static {
     name: "libsndfile",
     defaults: ["audio_utils_defaults"],

@@ -17,6 +17,13 @@
 #include <audio_utils/mutex.h>
 #include <gtest/gtest.h>
 
+// Currently tests mutex priority-inheritance (or not) based on flag
+// adb shell setprop \
+// persist.device_config.aconfig_flags.media_audio.\
+// com.android.media.audio.flags.mutex_priority_inheritance true
+//
+// TODO(b/209491695) enable both PI/non-PI mutex tests regardless of flag.
+
 namespace android {
 
 namespace audio_locks {
@@ -213,7 +220,7 @@ private:
     int v3_ GUARDED_BY(cap3) = 3;
 };
 
-TEST(audio_lock_tests, Container) {
+TEST(audio_mutex_tests, Container) {
     Container c;
 
     EXPECT_EQ(1, c.value1()); // success
@@ -236,7 +243,7 @@ TEST(audio_lock_tests, Container) {
 // see that mutex checking is done without knowledge of
 // the actual implementation.
 
-TEST(audio_lock_tests, Interface) {
+TEST(audio_mutex_tests, Interface) {
     Container c;
     IContainer *i = static_cast<IContainer*>(&c);
 

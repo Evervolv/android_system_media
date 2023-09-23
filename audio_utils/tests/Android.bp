@@ -16,8 +16,13 @@ cc_test {
         "audio_mutex_tests.cpp",
     ],
 
+    shared_libs: [
+        "server_configurable_flags",  // required for static aconfig libs
+    ],
     static_libs: [
+        "aconfig_audio_flags_c_lib",
         "libaudioutils",
+        "libaudioutils_nonvndk",
         "libbase",
         "liblog",
     ],
