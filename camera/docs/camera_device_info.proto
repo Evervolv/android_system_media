@@ -142,6 +142,10 @@ message CameraDeviceInfo {
     repeated int32 android_control_availableSettingsOverrides = 131091;
     optional bool android_control_autoframingAvailable = 131092;
     repeated int32 android_edge_availableEdgeModes = 262144;
+    optional int32 android_flash_singleStrengthMaxLevel = 327680;
+    optional int32 android_flash_singleStrengthDefaultLevel = 327681;
+    optional int32 android_flash_torchStrengthMaxLevel = 327682;
+    optional int32 android_flash_torchStrengthDefaultLevel = 327683;
     optional bool android_flash_info_available = 393216;
     optional int32 android_flash_info_strengthMaximumLevel = 393217;
     optional int32 android_flash_info_strengthDefaultLevel = 393218;
