@@ -400,6 +400,16 @@ static_assert(static_cast<int>(ANDROID_FLASH_MAX_ENERGY)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_MAX_ENERGY));
 static_assert(static_cast<int>(ANDROID_FLASH_STATE)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_STATE));
+static_assert(static_cast<int>(ANDROID_FLASH_STRENGTH_LEVEL)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_STRENGTH_LEVEL));
+static_assert(static_cast<int>(ANDROID_FLASH_SINGLE_STRENGTH_MAX_LEVEL)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_SINGLE_STRENGTH_MAX_LEVEL));
+static_assert(static_cast<int>(ANDROID_FLASH_SINGLE_STRENGTH_DEFAULT_LEVEL)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_SINGLE_STRENGTH_DEFAULT_LEVEL));
+static_assert(static_cast<int>(ANDROID_FLASH_TORCH_STRENGTH_MAX_LEVEL)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_TORCH_STRENGTH_MAX_LEVEL));
+static_assert(static_cast<int>(ANDROID_FLASH_TORCH_STRENGTH_DEFAULT_LEVEL)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_TORCH_STRENGTH_DEFAULT_LEVEL));
 static_assert(static_cast<int>(ANDROID_FLASH_INFO_AVAILABLE)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_FLASH_INFO_AVAILABLE));
 static_assert(static_cast<int>(ANDROID_FLASH_INFO_CHARGE_DURATION)
