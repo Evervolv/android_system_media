@@ -10,7 +10,6 @@ package {
 
 cc_test {
     name: "audio_mutex_tests",
-    host_supported: true,
 
     srcs: [
         "audio_mutex_tests.cpp",
@@ -25,6 +24,7 @@ cc_test {
         "libaudioutils_nonvndk",
         "libbase",
         "liblog",
+        "libutils",
     ],
 
     cflags: [

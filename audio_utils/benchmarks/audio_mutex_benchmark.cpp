@@ -32,40 +32,40 @@ $ atest audio_mutex_benchmark
 PI disabled
 Benchmark                                                     Time        CPU        Iteration
 audio_mutex_benchmark:
-  #BM_gettid                                                 2.115342172044339 ns    2.1061632376274173 ns     331472681
-  #BM_systemTime                                             43.03447060436191 ns    42.859535677190046 ns      16327477
-  #BM_thread_8_variables                                     2.822119749500643 ns    2.8087018476524515 ns     249247687
-  #BM_thread_local_8_variables                              2.8188819195970716 ns    2.8080987231726664 ns     249230645
-  #BM_StdMutexLockUnlock                                     18.42923637531376 ns    18.355880590413975 ns      38122065
-  #BM_AudioUtilsMutexLockUnlock                             20.530347308731717 ns     20.44086977790593 ns      34261160
-  #BM_StdMutexInitializationLockUnlock                       30.94981066330117 ns    30.772674894724165 ns      22748099
-  #BM_AudioUtilsMutexInitializationLockUnlock                33.60465197933802 ns     33.45088721995021 ns      20933197
-  #BM_StdMutexBlockingConditionVariable/threads:2           15598.164938497572 ns      17862.5971845997 ns         45038
-  #BM_AudioUtilsMutexBlockingConditionVariable/threads:2    25141.637174999687 ns     27852.38660000005 ns         20000
-  #BM_StdMutexScopedLockUnlock/threads:2                     380.0348418207431 ns     753.7573942934673 ns       4086124
-  #BM_AudioUtilsMutexScopedLockUnlock/threads:2              204.0065714999173 ns    403.36853050000013 ns       2000000
-  #BM_StdMutexReverseScopedLockUnlock/threads:2             198.50036686369555 ns    389.49119346043153 ns       4417172
-  #BM_AudioUtilsMutexReverseScopedLockUnlock/threads:2       79.61722432988687 ns    151.68738380988114 ns       4728242
-  #BM_empty_while                                            0.352485920999925 ns    0.3510130680000003 ns    1000000000
+  #BM_gettid                                                 2.5715349136988648 ns    2.5586918245763295 ns     273439199
+  #BM_systemTime                                              52.73853465198624 ns     52.47834849877889 ns      13291180
+  #BM_thread_8_variables                                     2.8220728658952146 ns     2.808457043254089 ns     247811101
+  #BM_thread_local_8_variables                                2.819040735896784 ns     2.808194582584339 ns     249232048
+  #BM_StdMutexLockUnlock                                     18.269513666323864 ns    18.187642353794956 ns      38449976
+  #BM_AudioUtilsMutexLockUnlock                              27.471324314156924 ns    27.369819151278517 ns      25569990
+  #BM_StdMutexInitializationLockUnlock                       27.642304788363877 ns    27.454472469163502 ns      25488292
+  #BM_AudioUtilsMutexInitializationLockUnlock                 43.40413311227762 ns     43.20731457780621 ns      16200771
+  #BM_StdMutexBlockingConditionVariable/threads:2            25165.942374951555 ns    28006.765750000013 ns         20000
+  #BM_AudioUtilsMutexBlockingConditionVariable/threads:2      14197.24746364191 ns    16493.674750414313 ns         49482
+  #BM_StdMutexScopedLockUnlock/threads:2                     109.94932188740843 ns    217.69939856399375 ns       2419210
+  #BM_AudioUtilsMutexScopedLockUnlock/threads:2              430.52361814635617 ns     842.5634754177531 ns       1424646
+  #BM_StdMutexReverseScopedLockUnlock/threads:2              111.16320912559515 ns     215.4758082434359 ns       4185682
+  #BM_AudioUtilsMutexReverseScopedLockUnlock/threads:2        581.0104671603232 ns    1144.9661062112107 ns       1842668
+  #BM_empty_while                                           0.35246984900004463 ns           0.351032429 ns    1000000000
 
 PI enabled
 Benchmark                                                     Time        CPU        Iteration
 audio_mutex_benchmark:
-  #BM_gettid                                                 2.115841043574212 ns      2.106164556890608 ns     314075356
-  #BM_systemTime                                            43.068210659253694 ns      42.89487830998286 ns      16326935
-  #BM_thread_8_variables                                     2.820321515912982 ns     2.8082632519905406 ns     249264987
-  #BM_thread_local_8_variables                               2.820691332360452 ns      2.808216987710365 ns     249210206
-  #BM_StdMutexLockUnlock                                      18.4656142717955 ns     18.366808223235488 ns      38184970
-  #BM_AudioUtilsMutexLockUnlock                             21.241130324140514 ns      21.14499540195153 ns      33086863
-  #BM_StdMutexInitializationLockUnlock                       30.90515911655626 ns      30.77286089397384 ns      22747131
-  #BM_AudioUtilsMutexInitializationLockUnlock                  39.248949517401 ns      39.07192182682415 ns      17915813
-  #BM_StdMutexBlockingConditionVariable/threads:2           14131.826570412255 ns     16092.564409410255 ns         48968
-  #BM_AudioUtilsMutexBlockingConditionVariable/threads:2     17858.91191208355 ns      18889.89038833846 ns         52686
-  #BM_StdMutexScopedLockUnlock/threads:2                     282.3911431662386 ns      560.1412155450038 ns       2963576
-  #BM_AudioUtilsMutexScopedLockUnlock/threads:2             1887.8786730000456 ns     2293.6081274999997 ns       2000000
-  #BM_StdMutexReverseScopedLockUnlock/threads:2             155.36251825000136 ns             269.308256 ns       2000000
-  #BM_AudioUtilsMutexReverseScopedLockUnlock/threads:2      373.71898424999017 ns     486.31225649999953 ns       2000000
-  #BM_empty_while                                           0.3571080320000419 ns    0.35527909100000166 ns    1000000000
+  #BM_gettid                                                  2.57265770908791 ns     2.558915261731079 ns     272750108
+  #BM_systemTime                                             45.02782731519532 ns     44.77538940288014 ns      15517990
+  #BM_thread_8_variables                                      2.82048821432608 ns    2.8086737310128336 ns     249207682
+  #BM_thread_local_8_variables                               2.821494282748445 ns    2.8082673263448075 ns     249269439
+  #BM_StdMutexLockUnlock                                      18.2899207197116 ns     18.19974609562134 ns      38449908
+  #BM_AudioUtilsMutexLockUnlock                             27.965107817753818 ns      27.7930076355372 ns      25186702
+  #BM_StdMutexInitializationLockUnlock                      27.563432355780428 ns    27.451745319727934 ns      25501402
+  #BM_AudioUtilsMutexInitializationLockUnlock               45.749190255258064 ns     45.56241199594726 ns      15367190
+  #BM_StdMutexBlockingConditionVariable/threads:2            24866.48901250736 ns    27328.534937855024 ns         46826
+  #BM_AudioUtilsMutexBlockingConditionVariable/threads:2    11861.117787962428 ns    14368.585792087117 ns         62430
+  #BM_StdMutexScopedLockUnlock/threads:2                    103.39507704299898 ns    204.76349922317442 ns       3591540
+  #BM_AudioUtilsMutexScopedLockUnlock/threads:2             1268.2326061774495 ns     1434.825134343846 ns       1079320
+  #BM_StdMutexReverseScopedLockUnlock/threads:2               65.2728623119491 ns    125.24614052060664 ns       4876694
+  #BM_AudioUtilsMutexReverseScopedLockUnlock/threads:2      1090.3344660587566 ns    1262.9917900152602 ns       5926564
+  #BM_empty_while                                           0.4291939290051232 ns    0.4264520980000004 ns    1000000000
 
 */
 
@@ -328,7 +328,7 @@ static void BM_empty_while(benchmark::State &state) {
     while (state.KeepRunning()) {
         ;
     }
-    ALOGD("%s", "");
+    ALOGD("%s", android::audio_utils::mutex::all_stats_to_string().c_str());
 }
 
 // Benchmark to see the cost of doing nothing.
