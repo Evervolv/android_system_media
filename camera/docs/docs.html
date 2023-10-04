@@ -3033,6 +3033,12 @@ exposure.<wbr/></p>
               <p>Only constrains auto-exposure (AE) algorithm,<wbr/> not
 manual control of <a href="#controls_android.sensor.exposureTime">android.<wbr/>sensor.<wbr/>exposure<wbr/>Time</a> and
 <a href="#controls_android.sensor.frameDuration">android.<wbr/>sensor.<wbr/>frame<wbr/>Duration</a>.<wbr/></p>
+<p>Note that the actual achievable max framerate also depends on the minimum frame
+duration of the output streams.<wbr/> The max frame rate will be
+<code>min(aeTargetFpsRange.<wbr/>maxFps,<wbr/> 1 /<wbr/> max(individual stream min durations)</code>.<wbr/> For example,<wbr/>
+if the application sets this key to <code>{60,<wbr/> 60}</code>,<wbr/> but the maximum minFrameDuration among
+all configured streams is 33ms,<wbr/> the maximum framerate won't be 60fps,<wbr/> but will be
+30fps.<wbr/></p>
 <p>To start a CaptureSession with a target FPS range different from the
 capture request template's default value,<wbr/> the application
 is strongly recommended to call
@@ -8311,6 +8317,12 @@ exposure.<wbr/></p>
               <p>Only constrains auto-exposure (AE) algorithm,<wbr/> not
 manual control of <a href="#controls_android.sensor.exposureTime">android.<wbr/>sensor.<wbr/>exposure<wbr/>Time</a> and
 <a href="#controls_android.sensor.frameDuration">android.<wbr/>sensor.<wbr/>frame<wbr/>Duration</a>.<wbr/></p>
+<p>Note that the actual achievable max framerate also depends on the minimum frame
+duration of the output streams.<wbr/> The max frame rate will be
+<code>min(aeTargetFpsRange.<wbr/>maxFps,<wbr/> 1 /<wbr/> max(individual stream min durations)</code>.<wbr/> For example,<wbr/>
+if the application sets this key to <code>{60,<wbr/> 60}</code>,<wbr/> but the maximum minFrameDuration among
+all configured streams is 33ms,<wbr/> the maximum framerate won't be 60fps,<wbr/> but will be
+30fps.<wbr/></p>
 <p>To start a CaptureSession with a target FPS range different from the
 capture request template's default value,<wbr/> the application
 is strongly recommended to call

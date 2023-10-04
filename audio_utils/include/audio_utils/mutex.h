@@ -38,12 +38,10 @@ namespace android::audio_utils {
 
 class CAPABILITY("mutex") mutex {
 public:
-    static constexpr bool kPriorityInheritance = false;
-
     // We use composition here.
     // No copy/move ctors as the member std::mutex has it deleted.
     mutex() {
-        if constexpr (!kPriorityInheritance) return;
+        if (!get_enable_flag()) return;
 
         pthread_mutexattr_t attr;
         int ret = pthread_mutexattr_init(&attr);
@@ -89,6 +87,7 @@ public:
     }
 
 private:
+    static bool get_enable_flag();
     std::mutex m_;
 };
 
