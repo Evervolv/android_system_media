@@ -26531,8 +26531,8 @@ OFF; otherwise the auto-exposure algorithm will override this value.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Duration from start of frame exposure to
-start of next frame exposure.<wbr/></p>
+              <p>Duration from start of frame readout to
+start of next frame readout.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -26620,6 +26620,10 @@ buffers from the previous <code>Rstall</code> have already been delivered.<wbr/>
 <p>For more details about stalling,<wbr/> see <a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html#getOutputStallDuration">StreamConfigurationMap#getOutputStallDuration</a>.<wbr/></p>
 <p>This control is only effective if <a href="#controls_android.control.aeMode">android.<wbr/>control.<wbr/>ae<wbr/>Mode</a> or <a href="#controls_android.control.mode">android.<wbr/>control.<wbr/>mode</a> is set to
 OFF; otherwise the auto-exposure algorithm will override this value.<wbr/></p>
+<p><em>Note:</em> Prior to Android 13,<wbr/> this field was described as measuring the duration from
+start of frame exposure to start of next frame exposure,<wbr/> which doesn't reflect the
+definition from sensor manufacturer.<wbr/> A mobile sensor defines the frame duration as
+intervals between sensor readouts.<wbr/></p>
             </td>
           </tr>
 
@@ -29757,8 +29761,8 @@ OFF; otherwise the auto-exposure algorithm will override this value.<wbr/></p>
             </td> <!-- entry_type -->
 
             <td class="entry_description">
-              <p>Duration from start of frame exposure to
-start of next frame exposure.<wbr/></p>
+              <p>Duration from start of frame readout to
+start of next frame readout.<wbr/></p>
             </td>
 
             <td class="entry_units">
@@ -29846,6 +29850,10 @@ buffers from the previous <code>Rstall</code> have already been delivered.<wbr/>
 <p>For more details about stalling,<wbr/> see <a href="https://developer.android.com/reference/android/hardware/camera2/params/StreamConfigurationMap.html#getOutputStallDuration">StreamConfigurationMap#getOutputStallDuration</a>.<wbr/></p>
 <p>This control is only effective if <a href="#controls_android.control.aeMode">android.<wbr/>control.<wbr/>ae<wbr/>Mode</a> or <a href="#controls_android.control.mode">android.<wbr/>control.<wbr/>mode</a> is set to
 OFF; otherwise the auto-exposure algorithm will override this value.<wbr/></p>
+<p><em>Note:</em> Prior to Android 13,<wbr/> this field was described as measuring the duration from
+start of frame exposure to start of next frame exposure,<wbr/> which doesn't reflect the
+definition from sensor manufacturer.<wbr/> A mobile sensor defines the frame duration as
+intervals between sensor readouts.<wbr/></p>
             </td>
           </tr>
 

@@ -9426,8 +9426,8 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <tag id="V1" />
         </entry>
         <entry name="frameDuration" type="int64" visibility="public" hwlevel="full">
-          <description>Duration from start of frame exposure to
-          start of next frame exposure.</description>
+          <description>Duration from start of frame readout to
+          start of next frame readout.</description>
           <units>Nanoseconds</units>
           <range>See android.sensor.info.maxFrameDuration, {@link
           android.hardware.camera2.params.StreamConfigurationMap|ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS}.
@@ -9502,6 +9502,11 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
           This control is only effective if android.control.aeMode or android.control.mode is set to
           OFF; otherwise the auto-exposure algorithm will override this value.
+
+          *Note:* Prior to Android 13, this field was described as measuring the duration from
+          start of frame exposure to start of next frame exposure, which doesn't reflect the
+          definition from sensor manufacturer. A mobile sensor defines the frame duration as
+          intervals between sensor readouts.
           </details>
           <hal_details>
           For more details about stalling, see
