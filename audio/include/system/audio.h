@@ -202,7 +202,7 @@ static inline audio_unique_id_use_t audio_unique_id_get_use(audio_unique_id_t id
     return (audio_unique_id_use_t) (id & AUDIO_UNIQUE_ID_USE_MASK);
 }
 
-typedef enum {
+typedef enum : int32_t {
     AUDIO_SESSION_DEVICE = HAL_AUDIO_SESSION_DEVICE,
     AUDIO_SESSION_OUTPUT_STAGE = HAL_AUDIO_SESSION_OUTPUT_STAGE,
     AUDIO_SESSION_OUTPUT_MIX = HAL_AUDIO_SESSION_OUTPUT_MIX,
@@ -748,6 +748,8 @@ struct audio_port {
 typedef enum : int32_t {
     AUDIO_STANDARD_NONE = 0,
     AUDIO_STANDARD_EDID = 1,
+    AUDIO_STANDARD_SADB = 2,
+    AUDIO_STANDARD_VSADB = 3,
 } audio_standard_t;
 
 /**
@@ -2240,6 +2242,49 @@ typedef enum {
     AUDIO_OFFLOAD_GAPLESS_SUPPORTED = AUDIO_DIRECT_OFFLOAD_GAPLESS_SUPPORTED
 } audio_offload_mode_t;
 #endif // AUDIO_NO_SYSTEM_DECLARATIONS
+
+typedef enum : int32_t {
+    AUDIO_MIXER_BEHAVIOR_INVALID = -1,
+    AUDIO_MIXER_BEHAVIOR_DEFAULT = 0,
+    AUDIO_MIXER_BEHAVIOR_BIT_PERFECT = 1,
+} audio_mixer_behavior_t;
+
+struct audio_mixer_attributes {
+    audio_config_base_t config;
+    audio_mixer_behavior_t mixer_behavior;
+};
+
+typedef struct audio_mixer_attributes audio_mixer_attributes_t;
+
+static const audio_mixer_attributes_t AUDIO_MIXER_ATTRIBUTES_INITIALIZER = {
+    /* .config */ {
+        /* .sample_rate*/ 0,
+        /* .channel_mask*/ AUDIO_CHANNEL_NONE,
+        /* .format */ AUDIO_FORMAT_DEFAULT,
+    },
+    /* .mixer_behavior */ AUDIO_MIXER_BEHAVIOR_DEFAULT,
+};
+
+static inline audio_output_flags_t audio_output_flags_from_mixer_behavior(
+        audio_mixer_behavior_t mixerBehavior) {
+    switch (mixerBehavior) {
+        case AUDIO_MIXER_BEHAVIOR_BIT_PERFECT:
+            return AUDIO_OUTPUT_FLAG_BIT_PERFECT;
+        case AUDIO_MIXER_BEHAVIOR_DEFAULT:
+        default:
+            return AUDIO_OUTPUT_FLAG_NONE;
+    }
+}
+
+inline const char* audio_channel_mask_to_string(audio_channel_mask_t channel_mask) {
+    if (audio_is_input_channel(channel_mask)) {
+        return audio_channel_in_mask_to_string(channel_mask);
+    } else if (audio_is_output_channel(channel_mask)) {
+        return audio_channel_out_mask_to_string(channel_mask);
+    } else {
+        return audio_channel_index_mask_to_string(channel_mask);
+    }
+}
 
 __END_DECLS
 
