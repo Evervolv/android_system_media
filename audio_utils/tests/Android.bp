@@ -9,6 +9,28 @@ package {
 }
 
 cc_test {
+    name: "audio_mutex_tests",
+    host_supported: true,
+
+    srcs: [
+        "audio_mutex_tests.cpp",
+    ],
+
+    static_libs: [
+        "libaudioutils",
+        "libbase",
+        "liblog",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+        "-Wthread-safety",
+    ],
+}
+
+cc_test {
     name: "balance_tests",
     host_supported: true,
 
