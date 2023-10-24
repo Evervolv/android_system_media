@@ -41,8 +41,10 @@ constexpr const char* mutexes[] {
   // 4) AudioFlinger -> ThreadBase -> EffectChain -> EffectBase(EffectModule)
   // 5) EffectHandle -> ThreadBase -> EffectChain -> EffectBase(EffectModule)
 
-  "AudioFlinger_Mutex",
   "EffectHandle_Mutex",
+  "EffectBase_PolicyMutex",  // held for AudioSystem::registerEffect, must come
+                             // after EffectHandle_Mutex.
+  "AudioFlinger_Mutex",
   "AudioFlinger_HardwareMutex",
   "DeviceEffectManager_Mutex",
   "PatchCommandThread_Mutex",
@@ -50,6 +52,7 @@ constexpr const char* mutexes[] {
   "AudioFlinger_ClientMutex",
   "MelReporter_Mutex",
   "EffectChain_Mutex",
+  "DeviceEffectProxy_ProxyMutex",  // used for device effects (which have no chain).
   "EffectBase_Mutex",
 
   // These mutexes are in leaf objects
@@ -62,6 +65,10 @@ constexpr const char* mutexes[] {
   "PassthruPatchRecord_ReadMutex",
   "PatchCommandThread_ListenerMutex",
   "PlaybackThread_AudioTrackCbMutex",
+  "MediaLogNotifier_Mutex",
+  "OtherMutex", // DO NOT CHANGE THIS: OtherMutex is used for mutexes without a specified order.
+                // An OtherMutex will always be the lowest order mutex and cannot acquire
+                // another named mutex while being held.
 };
 
 using namespace std;
@@ -70,7 +77,28 @@ using namespace std;
 // ordering and exclusion as listed above.
 
 int main() {
-  cout << "// Capabilities in priority order\n"
+  cout << "// Lock order\n";
+  cout << "enum class MutexOrder : uint32_t {\n";
+
+  for (size_t i = 0; i < size(mutexes); ++i) {
+      cout << "    k" << mutexes[i] << " = " << i << ",\n";
+  }
+  cout << "    kSize = " << size(mutexes) << ",\n";
+  cout << "};\n";
+
+  cout << "\n// Lock by name\n";
+  cout << "inline constexpr const char* const gMutexNames[] = {\n";
+  for (size_t i = 0; i < size(mutexes); ++i) {
+      cout << "    \"" << mutexes[i] << "\",\n";
+  }
+  cout << "};\n";
+
+  cout << "\n// Forward declarations\n";
+  cout << "class AudioMutexAttributes;\n";
+  cout << "template <typename T> class mutex_impl;\n";
+  cout << "using mutex = mutex_impl<AudioMutexAttributes>;\n";
+
+  cout << "\n// Capabilities in priority order\n"
        << "// (declaration only, value is nullptr)\n";
   const char *last = nullptr;
   for (auto mutex : mutexes) {
