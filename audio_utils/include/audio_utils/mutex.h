@@ -18,6 +18,7 @@
 
 #include <android-base/thread_annotations.h>
 #include <utils/Log.h>
+#include <utils/Timers.h>
 
 #include <mutex>
 
@@ -77,8 +78,18 @@ public:
         m_.unlock();
     }
 
-    bool try_lock() TRY_ACQUIRE(true) {
-        return m_.try_lock();
+    bool try_lock(int64_t timeout_ns = 0) TRY_ACQUIRE(true) {
+        if (timeout_ns <= 0) {
+            if (!m_.try_lock()) return false;
+        } else {
+            const int64_t deadline_ns = timeout_ns + systemTime(SYSTEM_TIME_REALTIME);
+            const struct timespec ts = {
+                .tv_sec = static_cast<time_t>(deadline_ns / 1'000'000'000),
+                .tv_nsec = static_cast<long>(deadline_ns % 1'000'000'000),
+            };
+            if (pthread_mutex_timedlock(m_.native_handle(), &ts) != 0) return false;
+        }
+        return true;
     }
 
     // additional method to obtain the underlying std::mutex.
