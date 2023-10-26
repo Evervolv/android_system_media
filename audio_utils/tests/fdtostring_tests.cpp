@@ -28,12 +28,12 @@ TEST(audio_utils_fdtostring, basic) {
     const std::string TEST_STRING{"hello world"};
 
     FdToString fdToString(PREFIX);
-    const int fd = fdToString.fd();
+    const int fd = fdToString.borrowFdUnsafe();
     ASSERT_TRUE(fd >= 0);
 
     write(fd, TEST_STRING.c_str(), TEST_STRING.size());
 
-    const std::string result = fdToString.getStringAndClose();
+    const std::string result = fdToString.closeAndGetString();
 
     ASSERT_EQ((PREFIX + TEST_STRING), result);
 }
@@ -45,14 +45,14 @@ TEST(audio_utils_fdtostring, multilines) {
     const std::string TEST_STRING2{"goodbye\n"};
 
     FdToString fdToString(PREFIX);
-    const int fd = fdToString.fd();
+    const int fd = fdToString.borrowFdUnsafe();
     ASSERT_TRUE(fd >= 0);
 
     write(fd, TEST_STRING1.c_str(), TEST_STRING1.size());
     write(fd, DELIM.c_str(), DELIM.size()); // double newline
     write(fd, TEST_STRING2.c_str(), TEST_STRING2.size());
 
-    const std::string result = fdToString.getStringAndClose();
+    const std::string result = fdToString.closeAndGetString();
 
     ASSERT_EQ((PREFIX + TEST_STRING1 + PREFIX + DELIM + PREFIX + TEST_STRING2), result);
 }

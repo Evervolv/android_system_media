@@ -31,9 +31,9 @@ extern "C" int LLVMFuzzerTestOneInput(const char *data, size_t size) {
   const std::string TEST_STRING{data_str.substr(3)+"\n"};
 
   FdToString fdToString(PREFIX);
-  const int fd = fdToString.fd();
+  const int fd = fdToString.borrowFdUnsafe();
   write(fd, TEST_STRING.c_str(), TEST_STRING.size());
 
-  (void)fdToString.getStringAndClose();
+  (void)fdToString.closeAndGetString();
   return 0;
 }
