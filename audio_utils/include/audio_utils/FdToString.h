@@ -34,7 +34,7 @@ namespace audio_utils {
  *
  * Captures string data written to a file descriptor.
  * The class will furnish a writable file descriptor by fd().
- * The string may be read through getStringAndClose().
+ * The string may be read through closeAndGetString().
  */
 
 class FdToString {
@@ -66,19 +66,20 @@ public:
      * Returns the write end of the pipe as a file descriptor or -1 if invalid or already closed.
      *
      * Do not close this fd directly as this class should own the fd. Instead, use
-     * getStringAndClose() to close the fd and return the string.
+     * closeAndGetString() to close the fd and return the string.
      */
-    int fd() const {
+    int borrowFdUnsafe() const {
         return mPipeFd[1];
     }
 
     /**
-     * Returns the string representation of data written to the fd.
+     * Returns the string representation of data written to the fd. Awaits reader thread.
      *
-     * An empty string is returned on failure (or timeout).  It is acceptable to call this
-     * method multiple times to obtain the final string; the fd is closed after the first call.
+     * All writers should have returned by this point.
+     *
+     * An empty string is returned on initialization failure or timeout. Closes fd.
      */
-    std::string getStringAndClose() {
+    std::string closeAndGetString() {
         if (!mOutput.valid()) return "";
         if (mPipeFd[1] >= 0) {
             close(mPipeFd[1]);
