@@ -185,7 +185,7 @@ cc_library {
         "libutils_headers",
     ],
     shared_libs: [
-        "aconfig_audio_flags_c_lib",
+        "com.android.media.audioserver-aconfig-cc",
         "libcutils",
         "liblog",
         "libutils",

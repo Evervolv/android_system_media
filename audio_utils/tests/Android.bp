@@ -19,7 +19,7 @@ cc_test {
         "server_configurable_flags",  // required for static aconfig libs
     ],
     static_libs: [
-        "aconfig_audio_flags_c_lib",
+        "com.android.media.audioserver-aconfig-cc",
         "libaudioutils",
         "libaudioutils_nonvndk",
         "libbase",
