@@ -56,6 +56,7 @@ cc_library {
         "Metadata.cpp",
         "minifloat.c",
         "mono_blend.cpp",
+        "mutex.cpp",
         "power.cpp",
         "PowerLog.cpp",
         "primitives.c",
@@ -78,9 +79,13 @@ cc_library {
         "libcutils",
         "liblog",
         "libutils",
+        "server_configurable_flags",
     ],
 
     whole_static_libs: [
+        // if libaudioutils is added as a static lib AND flags are used in the utils object,
+        // then add server_configurable_flags as a shared lib.
+        "com.android.media.audioserver-aconfig-cc",
         "libaudioutils_fastmath",
     ],
 
@@ -165,34 +170,6 @@ cc_library_static {
         "//apex_available:platform",
         "com.android.media",
         "com.android.media.swcodec",
-    ],
-}
-
-cc_library {
-    name: "libaudioutils_nonvndk",
-    vendor_available: true,
-    product_available: true,
-    double_loadable: true,
-    host_supported: true,
-    defaults: ["audio_utils_defaults"],
-
-    srcs: [
-        "mutex.cpp",
-    ],
-
-    header_libs: [
-        "libaudio_system_headers",
-        "libutils_headers",
-    ],
-    shared_libs: [
-        "com.android.media.audioserver-aconfig-cc",
-        "libcutils",
-        "liblog",
-        "libutils",
-    ],
-    cflags: [
-        "-Wall",
-        "-Werror",
     ],
 }
 

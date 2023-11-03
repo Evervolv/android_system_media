@@ -16,13 +16,12 @@ cc_benchmark {
         "-Wall",
         "-Werror",
     ],
+
     shared_libs: [
-        "libaudioutils_nonvndk",
+        "libaudioutils",
+        "libbase",
         "liblog",
         "libutils",
-    ],
-    static_libs: [
-        "libaudioutils",
     ],
 }
 
