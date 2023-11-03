@@ -20,6 +20,7 @@
 #include <utils/Log.h>
 #include <utils/Timers.h>
 
+#include <cmath>
 #include <mutex>
 #include <unistd.h>
 
@@ -282,12 +283,72 @@ public:
     // Order types, name arrays.
     using order_t = MutexOrder;
     static constexpr auto& order_names_ = gMutexNames;
-    static constexpr size_t order_size_ = (size_t)MutexOrder::kSize;
+    static constexpr size_t order_size_ = static_cast<size_t>(MutexOrder::kSize);
     static constexpr order_t order_default_ = MutexOrder::kOtherMutex;
 
     // verify order information
     static_assert(std::size(order_names_) == order_size_);
-    static_assert((size_t)order_default_ < order_size_);
+    static_assert(static_cast<size_t>(order_default_) < order_size_);
+
+    // Set mutex_tracking_enabled_ to true to enable mutex
+    // statistics and debugging (order checking) features.
+    static constexpr bool mutex_tracking_enabled_ = true;
+};
+
+/**
+ * Helper method to accumulate floating point values to an atomic
+ * prior to C++23 support of atomic<float> atomic<double> accumulation.
+ */
+template <typename AccumulateType, typename ValueType>
+void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src) {
+    static_assert(std::atomic<AccumulateType>::is_always_lock_free);
+    AccumulateType expected;
+    do {
+        expected = dst;
+    } while (!dst.compare_exchange_weak(expected, expected + src));
+}
+
+/**
+ * mutex_stat is a struct composed of atomic members associated
+ * with usage of a particular mutex order.
+ *
+ * Access of a snapshot of this does not have a global lock, so the reader
+ * may experience temporal shear. Use of this by a different reader thread
+ * is for informative purposes only.
+ */
+
+// CounterType == uint64_t, AccumulatorType == double
+template <typename CounterType, typename AccumulatorType>
+struct mutex_stat {
+    static_assert(std::is_floating_point_v<AccumulatorType>);
+    static_assert(std::is_integral_v<CounterType>);
+    std::atomic<CounterType> locks = 0;        // number of times locked
+    std::atomic<CounterType> unlocks = 0;      // number of times unlocked
+    std::atomic<CounterType> waits = 0;         // number of locks that waitedwa
+    std::atomic<AccumulatorType> wait_sum_ns = 0.;    // sum of time waited.
+    std::atomic<AccumulatorType> wait_sumsq_ns = 0.;  // sumsq of time waited.
+
+    template <typename WaitTimeType>
+    void add_wait_time(WaitTimeType wait_ns) {
+        AccumulatorType value_ns = wait_ns;
+        atomic_add_to(wait_sum_ns, value_ns);
+        atomic_add_to(wait_sumsq_ns, value_ns * value_ns);
+    }
+
+    std::string to_string() const {
+        CounterType uncontested = locks - waits;
+        AccumulatorType recip = waits == 0 ? 0. : 1. / waits;
+        AccumulatorType avg_wait_ms = waits == 0 ? 0. : wait_sum_ns * 1e-6 * recip;
+        AccumulatorType std_wait_ms = waits < 2 ? 0. :
+                std::sqrt(wait_sumsq_ns * recip * 1e-12 - avg_wait_ms * avg_wait_ms);
+        return std::string("locks: ").append(std::to_string(locks))
+            .append("\nuncontested: ").append(std::to_string(uncontested))
+            .append("\nwaits: ").append(std::to_string(waits))
+            .append("\nunlocks: ").append(std::to_string(unlocks))
+            .append("\navg_wait_ms: ").append(std::to_string(avg_wait_ms))
+            .append("\nstd_wait_ms: ").append(std::to_string(std_wait_ms))
+            .append("\n");
+    }
 };
 
 // audio_utils::mutex, audio_utils::lock_guard, audio_utils::unique_lock,
@@ -308,8 +369,9 @@ public:
     // No copy/move ctors as the member std::mutex has it deleted.
     mutex_impl(typename Attributes::order_t order = Attributes::order_default_)
         : order_(order)
+        , stat_{mutex_stat_[static_cast<size_t>(order)]}
     {
-        LOG_ALWAYS_FATAL_IF((size_t)order >= Attributes::order_size_,
+        LOG_ALWAYS_FATAL_IF(static_cast<size_t>(order) >= Attributes::order_size_,
                 "mutex order %u is equal to or greater than order limit:%zu",
                 order, Attributes::order_size_);
 
@@ -346,10 +408,16 @@ public:
     }
 
     void lock() ACQUIRE() {
-        m_.lock();
+        if (!m_.try_lock()) {  // if we directly use futex, we can optimize this with m_.lock().
+            // lock_scoped_stat_t accumulates waiting time for the mutex lock call.
+            lock_scoped_stat_t ls(*this);
+            m_.lock();
+        }
+        lock_scoped_stat_t::post_lock(*this);
     }
 
     void unlock() RELEASE() {
+        lock_scoped_stat_t::pre_unlock(*this);
         m_.unlock();
     }
 
@@ -362,8 +430,13 @@ public:
                 .tv_sec = static_cast<time_t>(deadline_ns / 1'000'000'000),
                 .tv_nsec = static_cast<long>(deadline_ns % 1'000'000'000),
             };
-            if (pthread_mutex_timedlock(m_.native_handle(), &ts) != 0) return false;
+            lock_scoped_stat_t ls(*this);
+            if (pthread_mutex_timedlock(m_.native_handle(), &ts) != 0) {
+                ls.ignoreWaitTime();  // didn't get lock, don't count wait time
+                return false;
+            }
         }
+        lock_scoped_stat_t::post_lock(*this);
         return true;
     }
 
@@ -372,10 +445,103 @@ public:
         return m_;
     }
 
+    using mutex_stat_t = mutex_stat<uint64_t, double>;
+
+    mutex_stat_t& get_stat() const {
+        return stat_;
+    }
+
+    /**
+     * Returns the locking statistics per mutex capability category.
+     */
+    static std::string all_stats_to_string() {
+        std::string out("mutex stats: priority inheritance ");
+        out.append(mutex_get_enable_flag() ? "enabled" : "disabled")
+            .append("\n");
+        for (size_t i = 0; i < std::size(mutex_stat_); ++i) {
+            if (mutex_stat_[i].locks != 0) {
+                out.append("Capability: ").append(gMutexNames[i]).append("\n")
+                    .append(mutex_stat_[i].to_string());
+            }
+        }
+        return out;
+    }
+
+    // helper class for registering statistics for a mutex lock.
+
+    class lock_scoped_stat_enabled {
+    public:
+        explicit lock_scoped_stat_enabled(mutex& m)
+            : mutex_(m)
+            , time_(systemTime()) {
+           ++mutex_.stat_.waits;
+        }
+
+        ~lock_scoped_stat_enabled() {
+           if (!discard_wait_time_) mutex_.stat_.add_wait_time(systemTime() - time_);
+        }
+
+        void ignoreWaitTime() {
+            discard_wait_time_ = true;
+        }
+
+        static void pre_unlock(mutex& m) {
+            ++m.stat_.unlocks;
+        }
+
+        static void post_lock(mutex& m) {
+            ++m.stat_.locks;
+        }
+
+    private:
+        mutex& mutex_;
+        const int64_t time_;
+        bool discard_wait_time_ = false;
+    };
+
+    class lock_scoped_stat_disabled {
+    public:
+        explicit lock_scoped_stat_disabled(mutex&) {}
+
+        void ignoreWaitTime() {}
+
+        static void pre_unlock(mutex&) {}
+
+        static void post_lock(mutex&) {}
+    };
+
+    using lock_scoped_stat_t = std::conditional_t<Attributes::mutex_tracking_enabled_,
+            lock_scoped_stat_enabled, lock_scoped_stat_disabled>;
+
+    // helper class for registering statistics for a cv wait.
+    class cv_wait_scoped_stat_enabled {
+    public:
+        explicit cv_wait_scoped_stat_enabled(mutex& m) : mutex_(m) {
+            ++mutex_.stat_.unlocks;
+        }
+
+        ~cv_wait_scoped_stat_enabled() {
+            ++mutex_.stat_.locks;
+        }
+    private:
+        mutex& mutex_;
+    };
+
+    class cv_wait_scoped_stat_disabled {
+        explicit cv_wait_scoped_stat_disabled(mutex&) {}
+    };
+
+    using cv_wait_scoped_stat_t = std::conditional_t<Attributes::mutex_tracking_enabled_,
+            cv_wait_scoped_stat_enabled, cv_wait_scoped_stat_disabled>;
+
 private:
 
     std::mutex m_;
     const typename Attributes::order_t order_;
+    mutex_stat_t& stat_;  // set in ctor
+
+    // Per-process mutex statistics, one instance per template typename.
+    static inline mutex_stat_t mutex_stat_[Attributes::order_size_];
 };
 
 // audio_utils::lock_guard only works with the defined mutex.
@@ -394,32 +560,53 @@ using lock_guard = std::lock_guard<mutex>;
 class SCOPED_CAPABILITY unique_lock {
 public:
     explicit unique_lock(mutex& m) ACQUIRE(m)
-        : ul_(m.std_mutex()) {}
+        : ul_(m.std_mutex(), std::defer_lock)
+        , mutex_(m) {
+        lock();
+    }
 
-    ~unique_lock() RELEASE() = default;
+    ~unique_lock() RELEASE() {
+        if (held) unlock();
+    }
 
     void lock() ACQUIRE() {
-       ul_.lock();
+        if (!ul_.try_lock()) {
+            mutex::lock_scoped_stat_t ls(mutex_);
+            ul_.lock();
+        }
+        mutex::lock_scoped_stat_t::post_lock(mutex_);
+        held = true;
     }
 
     void unlock() RELEASE() {
+        mutex::lock_scoped_stat_t::pre_unlock(mutex_);
+        held = false;
         ul_.unlock();
     }
 
     bool try_lock() TRY_ACQUIRE(true) {
-        return ul_.try_lock();
+        if (!ul_.try_lock()) return false;
+        mutex::lock_scoped_stat_t::post_lock(mutex_);
+        held = true;
+        return true;
     }
 
     template<class Rep, class Period>
     bool try_lock_for(const std::chrono::duration<Rep,Period>& timeout_duration)
             TRY_ACQUIRE(true) {
-        return ul_.try_lock_for(timeout_duration);
+        if (!ul_.try_lock_for(timeout_duration)) return false;
+        mutex::lock_scoped_stat_t::post_lock(mutex_);
+        held = true;
+        return true;
     }
 
     template<class Clock, class Duration>
     bool try_lock_until(const std::chrono::time_point<Clock,Duration>& timeout_time)
             TRY_ACQUIRE(true) {
-        return ul_.try_lock_until(timeout_time);
+        if (!ul_.try_lock_until(timeout_time)) return false;
+        mutex::lock_scoped_stat_t::post_lock(mutex_);
+        held = true;
+        return true;
     }
 
     // additional method to obtain the underlying std::unique_lock
@@ -427,8 +614,15 @@ public:
         return ul_;
     }
 
+    // additional method to obtain the underlying mutex
+    mutex& native_mutex() {
+        return mutex_;
+    }
+
 private:
     std::unique_lock<std::mutex> ul_;
+    bool held = false;
+    mutex& mutex_;
 };
 
 // audio_utils::condition_variable uses the optimized version of
@@ -447,17 +641,20 @@ public:
     }
 
     void wait(unique_lock& lock) {
+        mutex::cv_wait_scoped_stat_t ws(lock.native_mutex());
         cv_.wait(lock.std_unique_lock());
     }
 
     template<typename Predicate>
     void wait(unique_lock& lock, Predicate stop_waiting) {
+        mutex::cv_wait_scoped_stat_t ws(lock.native_mutex());
         cv_.wait(lock.std_unique_lock(), std::move(stop_waiting));
     }
 
     template<typename Rep, typename Period>
     std::cv_status wait_for(unique_lock& lock,
             const std::chrono::duration<Rep, Period>& rel_time) {
+        mutex::cv_wait_scoped_stat_t ws(lock.native_mutex());
         return cv_.wait_for(lock.std_unique_lock(), rel_time);
     }
 
@@ -465,12 +662,14 @@ public:
     bool wait_for(unique_lock& lock,
             const std::chrono::duration<Rep, Period>& rel_time,
             Predicate stop_waiting) {
+        mutex::cv_wait_scoped_stat_t ws(lock.native_mutex());
         return cv_.wait_for(lock.std_unique_lock(), rel_time, std::move(stop_waiting));
     }
 
     template<typename Clock, typename Duration>
     std::cv_status wait_until(unique_lock& lock,
             const std::chrono::time_point<Clock, Duration>& timeout_time) {
+        mutex::cv_wait_scoped_stat_t ws(lock.native_mutex());
         return cv_.wait_until(lock.std_unique_lock(), timeout_time);
     }
 
@@ -478,6 +677,7 @@ public:
     bool wait_until(unique_lock& lock,
             const std::chrono::time_point<Clock, Duration>& timeout_time,
             Predicate stop_waiting) {
+        mutex::cv_wait_scoped_stat_t ws(lock.native_mutex());
         return cv_.wait_until(lock.std_unique_lock(), timeout_time, std::move(stop_waiting));
     }
 

@@ -261,6 +261,8 @@ TEST(audio_mutex_tests, Interface) {
         audio_utils::lock_guard l(i->mutex1());
         EXPECT_EQ(3, i->combo12_l()); // success
     }
+
+    ALOGD("%s: %s", __func__, audio_utils::mutex::all_stats_to_string().c_str());
 }
 
 } // namespace android
