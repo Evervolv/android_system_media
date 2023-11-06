@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <audio_utils/mutex.h>
+
 #define LOG_TAG "audio_utils::mutex"
 #include <utils/Log.h>
 
@@ -28,6 +30,22 @@ bool mutex_get_enable_flag() {
         return flag;
     }();
     return enable;
+}
+
+// Define mutex::get_mutex_stat_array here because header-only ODR inline linking
+// results in multiple objects if included into multiple shared libraries.
+template<>
+mutex::stat_array_t& mutex::get_mutex_stat_array() {
+    static stat_array_t stat_array{};
+    return stat_array;
+}
+
+// Define mutex::get_registry here because header-only ODR inline linking
+// results in multiple objects if included into multiple shared libraries.
+template<>
+mutex::thread_registry_t& mutex::get_registry() {
+    static thread_registry_t thread_registry{};
+    return thread_registry;
 }
 
 }  // namespace android::audio_utils

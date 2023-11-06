@@ -443,7 +443,7 @@ TEST(audio_mutex_tests, DeadlockDetection) {
     std::thread t4([&]() {
         UniqueLock ul4(m4);
         UniqueLock ul(m);
-        tid4 = gettid();
+        tid4 = Mutex::gettid_wrapper();
         while (!quit) {
             cv.wait(ul, [&]{ return quit; });
             if (quit) break;
@@ -454,7 +454,7 @@ TEST(audio_mutex_tests, DeadlockDetection) {
 
     std::thread t3([&]() {
         UniqueLock ul3(m3);
-        tid3 = gettid();
+        tid3 = Mutex::gettid_wrapper();
         UniqueLock ul4(m4);
     });
 
@@ -462,7 +462,7 @@ TEST(audio_mutex_tests, DeadlockDetection) {
 
     std::thread t2([&]() {
         UniqueLock ul2(m2);
-        tid2 = gettid();
+        tid2 = Mutex::gettid_wrapper();
         UniqueLock ul3(m3);
     });
 
@@ -470,7 +470,7 @@ TEST(audio_mutex_tests, DeadlockDetection) {
 
     std::thread t1([&]() {
         UniqueLock ul1(m1);
-        tid1 = gettid();
+        tid1 = Mutex::gettid_wrapper();
         UniqueLock ul2(m2);
     });
 

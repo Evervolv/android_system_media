@@ -21,11 +21,12 @@
 #include <utils/Timers.h>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <unistd.h>
+#include <sys/syscall.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -889,7 +890,7 @@ public:
     // No copy/move ctors as the member std::mutex has it deleted.
     mutex_impl(typename Attributes::order_t order = Attributes::order_default_)
         : order_(order)
-        , stat_{mutex_stat_[static_cast<size_t>(order)]}
+        , stat_{get_mutex_stat_array()[static_cast<size_t>(order)]}
     {
         LOG_ALWAYS_FATAL_IF(static_cast<size_t>(order) >= Attributes::order_size_,
                 "mutex order %u is equal to or greater than order limit:%zu",
@@ -980,10 +981,11 @@ public:
         std::string out("mutex stats: priority inheritance ");
         out.append(mutex_get_enable_flag() ? "enabled" : "disabled")
             .append("\n");
-        for (size_t i = 0; i < std::size(mutex_stat_); ++i) {
-            if (mutex_stat_[i].locks != 0) {
-                out.append("Capability: ").append(gMutexNames[i]).append("\n")
-                    .append(mutex_stat_[i].to_string());
+        const auto& stat_array = get_mutex_stat_array();
+        for (size_t i = 0; i < stat_array.size(); ++i) {
+            if (stat_array[i].locks != 0) {
+                out.append("Capability: ").append(Attributes::order_names_[i]).append("\n")
+                    .append(stat_array[i].to_string());
             }
         }
         return out;
@@ -1029,7 +1031,7 @@ public:
     // so really a simple thread-local bool will do for a once_flag.
     static const std::shared_ptr<thread_mutex_info_t>& get_thread_mutex_info() {
         thread_local std::shared_ptr<thread_mutex_info_t> tminfo = []() {
-            auto info = std::make_shared<thread_mutex_info_t>(gettid());
+            auto info = std::make_shared<thread_mutex_info_t>(gettid_wrapper());
             get_registry().add_to_registry(info);
             return info;
         }();
@@ -1150,9 +1152,25 @@ public:
     using thread_registry_t = thread_registry<thread_mutex_info_t>;
 
     // One per-process thread registry, one instance per template typename.
-    static thread_registry_t& get_registry() {
-        static thread_registry_t tr;
-        return tr;
+    // Declared here but must be defined in a .cpp otherwise there will be multiple
+    // instances if the header is included into different shared libraries.
+    static thread_registry_t& get_registry();
+
+    using stat_array_t = std::array<mutex_stat_t, Attributes::order_size_>;
+
+    // One per-process mutex statistics array, one instance per template typename.
+    // Declared here but must be defined in a .cpp otherwise there will be multiple
+    // instances if the header is included into different shared libraries.
+    static stat_array_t& get_mutex_stat_array();
+
+    // gettid is available on bionic libc, and modern glibc.
+    // For other libc, we syscall directly.
+    static pid_t gettid_wrapper() {
+#if defined(__BIONIC__)
+        return ::gettid();
+#else
+        return syscall(SYS_gettid);
+#endif
     }
 
 private:
@@ -1160,9 +1178,6 @@ private:
     std::mutex m_;
     const typename Attributes::order_t order_;
     mutex_stat_t& stat_;  // set in ctor
-
-    // Per-process mutex statistics, one instance per template typename.
-    static inline mutex_stat_t mutex_stat_[Attributes::order_size_];
 };
 
 // define the destructor to remove from registry.
