@@ -600,8 +600,9 @@ union audio_io_flags {
     audio_output_flags_t output;
 };
 
-/* maximum audio device address length */
-#define AUDIO_DEVICE_MAX_ADDRESS_LEN 32
+/* maximum audio device address length
+ * set to 40 to accommodate IPv6 address: "1111:2222:3333:4444:5555:6666:7777:8888\0" (8*4+7+1) */
+#define AUDIO_DEVICE_MAX_ADDRESS_LEN 40
 
 /* extension for audio port configuration structure when the audio port is a
  * hardware device */
