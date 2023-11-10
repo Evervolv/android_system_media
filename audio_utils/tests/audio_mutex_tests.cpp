@@ -435,7 +435,17 @@ TEST(audio_mutex_tests, DeadlockDetection) {
     using UniqueLock = android::audio_utils::unique_lock;
     using ConditionVariable = android::audio_utils::condition_variable;
 
-    Mutex m1, m2, m3, m4, m;
+    // order checked below.
+    constexpr size_t kOrder1 = 1;
+    constexpr size_t kOrder2 = 2;
+    constexpr size_t kOrder3 = 3;
+    static_assert(Mutex::attributes_t::order_size_ > kOrder3);
+
+    Mutex m1{static_cast<Mutex::attributes_t::order_t>(kOrder1)};
+    Mutex m2{static_cast<Mutex::attributes_t::order_t>(kOrder2)};
+    Mutex m3{static_cast<Mutex::attributes_t::order_t>(kOrder3)};
+    Mutex m4;
+    Mutex m;
     ConditionVariable cv;
     bool quit = false;  // GUARDED_BY(m)
     std::atomic<pid_t> tid1{}, tid2{}, tid3{}, tid4{};
@@ -482,17 +492,29 @@ TEST(audio_mutex_tests, DeadlockDetection) {
     // futexes directly in our mutex (which allows atomic accuracy of wait).
     usleep(20000);
 
-    auto p = android::audio_utils::mutex::deadlock_detection(tid1);
+    const auto deadlockInfo = android::audio_utils::mutex::deadlock_detection(tid1);
 
     // no cycle.
-    EXPECT_EQ(false, p.first);
+    EXPECT_EQ(false, deadlockInfo.has_cycle);
 
     // thread1 is waiting on a chain of 3 other threads.
-    size_t s = p.second.size();
-    EXPECT_EQ(3u, s);
-    if (s > 0) EXPECT_EQ(tid2, p.second[0]);
-    if (s > 1) EXPECT_EQ(tid3, p.second[1]);
-    if (s > 2) EXPECT_EQ(tid4, p.second[2]);
+    const auto chain = deadlockInfo.chain;
+    const size_t chain_size = chain.size();
+    EXPECT_EQ(3u, chain_size);
+
+    const auto default_idx = static_cast<size_t>(Mutex::attributes_t::order_default_);
+    if (chain_size > 0) {
+        EXPECT_EQ(tid2, chain[0].first);
+        EXPECT_EQ(Mutex::attributes_t::order_names_[kOrder2], chain[0].second);
+    }
+    if (chain_size > 1) {
+        EXPECT_EQ(tid3, chain[1].first);
+        EXPECT_EQ(Mutex::attributes_t::order_names_[kOrder3], chain[1].second);
+    }
+    if (chain_size > 2) {
+        EXPECT_EQ(tid4, chain[2].first);
+        EXPECT_EQ(Mutex::attributes_t::order_names_[default_idx], chain[2].second);
+    }
 
     ALOGD("%s", android::audio_utils::mutex::all_threads_to_string().c_str());
 
