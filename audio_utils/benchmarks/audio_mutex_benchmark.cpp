@@ -75,7 +75,7 @@ audio_mutex_benchmark:
 static void BM_gettid(benchmark::State &state) {
     int32_t value = 0;
     while (state.KeepRunning()) {
-        value ^= gettid();  // ensure the return value used.
+        value ^= android::audio_utils::mutex::gettid_wrapper();  // ensure the return value used.
     }
     ALOGD("%s: value:%d", __func__, value);
 }
