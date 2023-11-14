@@ -177,7 +177,10 @@ cc_library_static {
     name: "libsndfile",
     defaults: ["audio_utils_defaults"],
     host_supported: true,
-    srcs: ["tinysndfile.c"],
+    srcs: [
+        "primitives.c",
+        "tinysndfile.c",
+    ],
     cflags: [
         "-UHAVE_STDERR",
     ],
