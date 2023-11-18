@@ -17,6 +17,7 @@
 #pragma once
 
 #include <android-base/thread_annotations.h>
+#include <audio_utils/threads.h>
 #include <utils/Log.h>
 #include <utils/Timers.h>
 
@@ -1162,16 +1163,6 @@ public:
     // Declared here but must be defined in a .cpp otherwise there will be multiple
     // instances if the header is included into different shared libraries.
     static stat_array_t& get_mutex_stat_array();
-
-    // gettid is available on bionic libc, and modern glibc.
-    // For other libc, we syscall directly.
-    static pid_t gettid_wrapper() {
-#if defined(__BIONIC__)
-        return ::gettid();
-#else
-        return syscall(SYS_gettid);
-#endif
-    }
 
 private:
 

@@ -32,6 +32,31 @@ cc_test {
 }
 
 cc_test {
+    name: "audio_thread_tests",
+
+    srcs: [
+        "audio_thread_tests.cpp",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libutils",
+    ],
+
+    static_libs: [
+        "libaudioutils",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+        "-Wthread-safety",
+    ],
+}
+
+cc_test {
     name: "balance_tests",
     host_supported: true,
 
