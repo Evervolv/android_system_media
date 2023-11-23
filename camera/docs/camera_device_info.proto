@@ -141,6 +141,7 @@ message CameraDeviceInfo {
     optional RangeFloat android_control_zoomRatioRange = 131090;
     repeated int32 android_control_availableSettingsOverrides = 131091;
     optional bool android_control_autoframingAvailable = 131092;
+    optional RangeFloat android_control_lowLightBoostInfoLuminanceRange = 131093;
     repeated int32 android_edge_availableEdgeModes = 262144;
     optional int32 android_flash_singleStrengthMaxLevel = 327680;
     optional int32 android_flash_singleStrengthDefaultLevel = 327681;
