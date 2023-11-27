@@ -985,9 +985,11 @@ class EnumValue(Node):
     parent: An edge to the parent, always an Enum instance.
     hal_major_version: The major HIDL HAL version this value was first added in
     hal_minor_version: The minor HIDL HAL version this value was first added in
+    aconfig_flag: The aconfig flag name that determines if this enum value is actually enabled
   """
   def __init__(self, name, parent,
-               id=None, deprecated=False, optional=False, visibility=None, notes=None, sdk_notes=None, ndk_notes=None, hal_version='3.2'):
+               id=None, deprecated=False, optional=False, visibility=None, notes=None,
+               sdk_notes=None, ndk_notes=None, hal_version='3.2', aconfig_flag=None):
     self._name = name                    # str, e.g. 'ON' or 'OFF'
     self._id = id                        # int, e.g. '0'
     self._deprecated = deprecated        # bool
@@ -1007,6 +1009,11 @@ class EnumValue(Node):
     else:
       self._hal_major_version = int(hal_version.partition('.')[0])
       self._hal_minor_version = int(hal_version.partition('.')[2])
+
+    self._aconfig_flag = aconfig_flag
+    if self._aconfig_flag is None:
+      if parent is not None and parent.parent is not None:
+        self._aconfig_flag = parent.parent.aconfig_flag
 
   @property
   def id(self):
@@ -1066,6 +1073,10 @@ class EnumValue(Node):
   def hal_minor_version(self):
     return self._hal_minor_version
 
+  @property
+  def aconfig_flag(self):
+    return self._aconfig_flag
+
   def _get_children(self):
     return None
 
@@ -1080,12 +1091,14 @@ class Enum(Node):
         non-empty id property.
   """
   def __init__(self, parent, values, ids={}, deprecateds=[],
-               optionals=[], visibilities={}, notes={}, sdk_notes={}, ndk_notes={}, hal_versions={}):
+               optionals=[], visibilities={}, notes={}, sdk_notes={}, ndk_notes={},
+               hal_versions={}, aconfig_flags={}):
     self._parent = parent
     self._name = None
     self._values =                                                             \
       [ EnumValue(val, self, ids.get(val), val in deprecateds, val in optionals, visibilities.get(val), \
-                  notes.get(val), sdk_notes.get(val), ndk_notes.get(val), hal_versions.get(val))        \
+                  notes.get(val), sdk_notes.get(val), ndk_notes.get(val), hal_versions.get(val),        \
+                  aconfig_flags.get(val)) \
         for val in values ]
 
   @property
@@ -1188,6 +1201,7 @@ class Entry(Node):
       enum_notes: A dictionary of value->notes strings.
       enum_ids: A dictionary of value->id strings.
       enum_hal_versions: A dictionary of value->hal version strings
+      enum_aconfig_flags: A dictionary of value->aconfig flag name strings
 
     Args (if the 'deprecated' attribute is true):
       deprecation_description: A string explaining the deprecation, to be added
@@ -1406,6 +1420,8 @@ class Entry(Node):
       self._hal_major_version = int(hal_version.partition('.')[0])
       self._hal_minor_version = int(hal_version.partition('.')[2])
 
+    self._aconfig_flag = kwargs.get('aconfig_flag')
+
     # access these via the 'enum' prop
     enum_values = kwargs.get('enum_values')
     enum_deprecateds = kwargs.get('enum_deprecateds')
@@ -1416,6 +1432,7 @@ class Entry(Node):
     enum_ndk_notes = kwargs.get('enum_ndk_notes')  # { value => ndk_notes }
     enum_ids = kwargs.get('enum_ids')  # { value => notes }
     enum_hal_versions = kwargs.get('enum_hal_versions') # { value => hal_versions }
+    enum_aconfig_flags = kwargs.get('enum_aconfig_flags') # { value => aconfig flags }
 
     self._tuple_values = kwargs.get('tuple_values')
 
@@ -1435,7 +1452,8 @@ class Entry(Node):
 
     if kwargs.get('enum', False):
       self._enum = Enum(self, enum_values, enum_ids, enum_deprecateds, enum_optionals,
-                        enum_visibilities, enum_notes, enum_sdk_notes, enum_ndk_notes, enum_hal_versions)
+                        enum_visibilities, enum_notes, enum_sdk_notes, enum_ndk_notes,
+                        enum_hal_versions, enum_aconfig_flags)
     else:
       self._enum = None
 
@@ -1446,7 +1464,6 @@ class Entry(Node):
     self._deprecation_description = kwargs.get('deprecation_description')
 
     self._permission_needed = kwargs.get('permission_needed')
-    self._aconfig_flag = kwargs.get('aconfig_flag')
     self._optional = kwargs.get('optional')
     self._ndk_visible = kwargs.get('ndk_visible')
 
