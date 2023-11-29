@@ -14,7 +14,59 @@
  * limitations under the License.
  */
 
+#pragma once
+
+#include <cmath>
+
 namespace android::audio_utils {
+
+/*
+ * The compilation option
+ * -ffast-math
+ *
+ * https://gcc.gnu.org/wiki/FloatingPointMath
+ *
+ * enables the following flags:
+ *
+ * -fno-trapping-math
+ * -funsafe-math-optimizations
+ * -ffinite-math-only
+ * -fno-errno-math
+ * -fno-signaling-nans
+ * -fno-rounding-math
+ * -fcx-limited-range
+ * -fno-signed-zeros.
+ *
+ * -ffinite-math-only means isnan() and isinf() detection may not work properly.
+ */
+
+/**
+ * Returns the unsigned integer layout of a float.
+ */
+inline unsigned float_as_unsigned(float f) {
+    // reinterpret_cast prevents constexpr.
+    return *reinterpret_cast<unsigned*>(&f);
+}
+
+/**
+ * Returns true if the float is nan regardless of -ffast-math compilation.
+ */
+inline bool safe_isnan(float f) {
+    // float is signed-magnitude, so shift sign bit out to do nan comparison.
+    // (This works for ILP32 / LP64 as the sign bit is removed by the shift).
+    // https://en.wikipedia.org/wiki/Single-precision_floating-point_format
+    return float_as_unsigned(f) << 1 >= 0xff800001 << 1;
+}
+
+/**
+ * Returns true if the float is infinite (pos or neg) regardless of -ffast-math compilation.
+ */
+inline bool safe_isinf(float f) {
+    // float is signed-magnitude, so shift sign bit out to do inf comparison.
+    // (This works for ILP32 / LP64 as the sign bit is removed by the shift).
+    // https://en.wikipedia.org/wiki/Single-precision_floating-point_format
+    return float_as_unsigned(f) << 1 == 0xff800000 << 1;
+}
 
 // safe_sub_overflow is used ensure that subtraction occurs in the same native
 // type with proper 2's complement overflow.  Without calling this function, it
