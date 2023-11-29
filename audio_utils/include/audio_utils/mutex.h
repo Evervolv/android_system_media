@@ -30,6 +30,7 @@
 #include <sys/syscall.h>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #pragma push_macro("LOG_TAG")
@@ -683,6 +684,45 @@ public:
     atomic_stack_t mutexes_held_;  // mutexes held
 };
 
+
+/**
+ * deadlock_info_t encapsulates the mutex wait / cycle information from
+ * thread_registry::deadlock_detection().
+ *
+ * If a cycle is detected, the last element of the vector chain represents
+ * a tid that is repeated somewhere earlier in the vector.
+ */
+struct deadlock_info_t {
+public:
+    explicit deadlock_info_t(pid_t tid_param) : tid(tid_param) {}
+
+    bool empty() const {
+        return chain.empty();
+    }
+
+    std::string to_string() const {
+        std::string description;
+
+        if (has_cycle) {
+            description.append("mutex cycle found (last tid repeated) ");
+        } else {
+            description.append("mutex wait chain ");
+        }
+        description.append("[ ").append(std::to_string(tid));
+        // Note: when we dump here, we add the timeout tid to the start of the wait chain.
+        for (const auto& [ tid2, name ] : chain) {
+            description.append(", ").append(std::to_string(tid2))
+                    .append(" (holding ").append(name).append(")");
+        }
+        description.append(" ]");
+        return description;
+    }
+
+    const pid_t tid;         // tid for which the deadlock was checked
+    bool has_cycle = false;  // true if there is a cycle detected
+    std::vector<std::pair<pid_t, std::string>> chain;  // wait chain of tids and mutexes.
+};
+
 /**
  * The thread_registry is a thread-safe locked structure that
  * maintains a list of the threads that contain thread_mutex_info.
@@ -785,11 +825,7 @@ public:
     }
 
     /**
-     * Returns a pair of bool (whether a cycle is detected) and a vector
-     * of mutex wait dependencies.
-     *
-     * If a cycle is detected, the last element of the vector represents
-     * a tid that is repeated somewhere earlier in the vector.
+     * Returns a deadlock_info_t struct describing the mutex wait / cycle information.
      *
      * The deadlock_detection() method is not exceptionally fast
      * and is not designed to be called for every mutex locked (and contended).
@@ -799,14 +835,20 @@ public:
      * Access of state is through atomics, so has minimal overhead on
      * concurrent execution, with the possibility of (mostly) false
      * negatives due to race.
+     *
+     * \param tid target tid which may be in a cycle or blocked.
+     * \param mutex_names a string array of mutex names indexed on capability order.
+     * \return a deadlock_info_t struct, which contains whether a cycle was found and
+     *         a vector of tids and mutex names in the mutex wait chain.
      */
-    std::pair<bool /* cycle found */, std::vector<pid_t> /* pid chain */>
-    deadlock_detection(pid_t tid) {
+    template <typename StringArray>
+    deadlock_info_t deadlock_detection(pid_t tid, const StringArray& mutex_names) {
         const auto registry_map = copy_map();
+        deadlock_info_t deadlock_info{tid};
 
         // if tid not waiting, return.
         void* m = tid_to_mutex_wait(registry_map, tid);
-        if (m == nullptr) return { false, {} };
+        if (m == nullptr) return deadlock_info;
 
         bool subset = false; // do we have missing mutex data per thread?
 
@@ -830,15 +872,22 @@ public:
         // Note that the mutex_ptr handle is opaque -- it may be deallocated from
         // a different thread, so we use the tid from the thread registry map.
         //
-        std::unordered_map<void*, pid_t> mutex_to_tid;
+        using pid_order_index_pair_t = std::pair<pid_t, size_t>;
+        std::unordered_map<void*, pid_order_index_pair_t> mutex_to_tid;
         for (const auto& [tid2, weak_info] : registry_map) {
             const auto info = weak_info.lock();
             if (info == nullptr) continue;
             const auto& stack = info->mutexes_held_;
             subset = subset || stack.size() != stack.true_size();
             for (size_t i = 0; i < stack.size(); ++i) {
-                const auto mutex_ptr = stack.bottom(i).first.load();  // this could change.
-                if (mutex_ptr != nullptr) mutex_to_tid[mutex_ptr] = tid2;
+                const auto& mutex_order_pair = stack.bottom(i);
+                // if this method is not called by the writer thread
+                // it is possible for data to change.
+                const auto mutex_ptr = mutex_order_pair.first.load();
+                const auto order = static_cast<size_t>(mutex_order_pair.second.load());
+                if (mutex_ptr != nullptr) {
+                    mutex_to_tid[mutex_ptr] = pid_order_index_pair_t{tid2, order};
+                }
             }
         }
         ALOGD_IF(subset, "%s: mutex info only subset, deadlock detection may be inaccurate",
@@ -848,23 +897,26 @@ public:
         // mutex -> tid holding
         // until we get no more tids, or a tid cycle.
         std::unordered_set<pid_t> visited;
-        std::vector<pid_t> chain;
         visited.insert(tid);  // mark the original tid, we start there for cycle detection.
         while (true) {
             // no tid associated with the mutex.
-            if (mutex_to_tid.count(m) == 0) return { false, chain };
-            const pid_t tid2 = mutex_to_tid[m];
+            if (mutex_to_tid.count(m) == 0) return deadlock_info;
+            const auto [tid2, order] = mutex_to_tid[m];
 
             // add to chain.
-            chain.push_back(tid2);
+            const auto name = order < std::size(mutex_names) ? mutex_names[order] : "unknown";
+            deadlock_info.chain.emplace_back(tid2, name);
 
             // cycle detected
-            if (visited.count(tid2)) return { true, chain };
+            if (visited.count(tid2)) {
+                deadlock_info.has_cycle = true;
+                return deadlock_info;
+            }
             visited.insert(tid2);
 
             // if tid not waiting return (could be blocked on binder).
             m = tid_to_mutex_wait(registry_map, tid2);
-            if (m == nullptr) return { false, chain };
+            if (m == nullptr) return deadlock_info;
         }
     }
 
@@ -887,6 +939,8 @@ extern bool mutex_get_enable_flag();
 template <typename Attributes>
 class CAPABILITY("mutex") mutex_impl {
 public:
+    using attributes_t = Attributes;
+
     // We use composition here.
     // No copy/move ctors as the member std::mutex has it deleted.
     mutex_impl(typename Attributes::order_t order = Attributes::order_default_)
@@ -1015,9 +1069,9 @@ public:
      * concurrent execution, with the possibility of (mostly) false
      * negatives due to race.
      */
-    static std::pair<bool /* cycle found */, std::vector<pid_t> /* pid chain */>
+    static deadlock_info_t
     deadlock_detection(pid_t tid) {
-        return get_registry().deadlock_detection(tid);
+        return get_registry().deadlock_detection(tid, Attributes::order_names_);
     }
 
     using thread_mutex_info_t = thread_mutex_info<
