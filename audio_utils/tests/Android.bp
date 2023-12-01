@@ -8,6 +8,49 @@ package {
     default_applicable_licenses: ["system_media_license"],
 }
 
+cc_defaults {
+    name: "audio_math_test_defaults",
+    host_supported: true,
+
+    srcs: [
+        "audio_math_tests.cpp"
+    ],
+
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libutils",
+    ],
+
+    static_libs: [
+        "libaudioutils",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
+
+cc_test {
+    name: "audio_fast_math_tests",
+    defaults: [
+        "audio_math_test_defaults",
+    ],
+    cflags: [
+        "-DFAST_MATH_ENABLED",
+        "-ffast-math",
+    ],
+}
+
+cc_test {
+    name: "audio_math_tests",
+    defaults: [
+        "audio_math_test_defaults",
+    ],
+}
+
 cc_test {
     name: "audio_mutex_tests",
     host_supported: true,
