@@ -2423,6 +2423,11 @@ __END_DECLS
 /* Query if HwModule supports variable Bluetooth latency control */
 #define AUDIO_PARAMETER_BT_VARIABLE_LATENCY_SUPPORTED "isBtVariableLatencySupported"
 
+/* Reconfigure offloaded LE codec */
+#define AUDIO_PARAMETER_RECONFIG_LE "reconfigLe"
+/* Query if HwModule supports reconfiguration of offloaded LE codec */
+#define AUDIO_PARAMETER_LE_RECONFIG_SUPPORTED "isReconfigLeSupported"
+
 /**
  * For querying device supported encapsulation capabilities. All returned values are integer,
  * which are bit fields composed from using encapsulation capability values as position bits.
