@@ -1615,6 +1615,8 @@ static_assert(static_cast<int32_t>(ANDROID_INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNA
 
 static_assert(static_cast<int32_t>(ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_HIDL_DEVICE_3_5)
         == static_cast<int32_t>(::aidl::android::hardware::camera::metadata::InfoSupportedBufferManagementVersion::ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_AIDL_DEVICE));
+static_assert(static_cast<int32_t>(ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_SESSION_CONFIGURABLE)
+        == static_cast<int32_t>(::aidl::android::hardware::camera::metadata::InfoSupportedBufferManagementVersion::ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_SESSION_CONFIGURABLE));
 
 static_assert(static_cast<int32_t>(ANDROID_BLACK_LEVEL_LOCK_OFF)
         == static_cast<int32_t>(::aidl::android::hardware::camera::metadata::BlackLevelLock::ANDROID_BLACK_LEVEL_LOCK_OFF));
