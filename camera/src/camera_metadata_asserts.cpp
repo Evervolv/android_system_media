@@ -750,6 +750,10 @@ static_assert(static_cast<int>(ANDROID_STATISTICS_OIS_X_SHIFTS)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_STATISTICS_OIS_X_SHIFTS));
 static_assert(static_cast<int>(ANDROID_STATISTICS_OIS_Y_SHIFTS)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_STATISTICS_OIS_Y_SHIFTS));
+static_assert(static_cast<int>(ANDROID_STATISTICS_LENS_INTRINSIC_TIMESTAMPS)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_STATISTICS_LENS_INTRINSIC_TIMESTAMPS));
+static_assert(static_cast<int>(ANDROID_STATISTICS_LENS_INTRINSIC_SAMPLES)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_STATISTICS_LENS_INTRINSIC_SAMPLES));
 static_assert(static_cast<int>(ANDROID_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES));
 static_assert(static_cast<int>(ANDROID_STATISTICS_INFO_HISTOGRAM_BUCKET_COUNT)
@@ -842,6 +846,8 @@ static_assert(static_cast<int>(ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE));
 static_assert(static_cast<int>(ANDROID_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID));
+static_assert(static_cast<int>(ANDROID_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_SENSOR_CROP_REGION)
+        == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_SENSOR_CROP_REGION));
 static_assert(static_cast<int>(ANDROID_DISTORTION_CORRECTION_MODE)
         == static_cast<int>(::aidl::android::hardware::camera::metadata::CameraMetadataTag::ANDROID_DISTORTION_CORRECTION_MODE));
 static_assert(static_cast<int>(ANDROID_DISTORTION_CORRECTION_AVAILABLE_MODES)

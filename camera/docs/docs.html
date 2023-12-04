@@ -1127,6 +1127,12 @@
             ><a href="#dynamic_android.statistics.oisYShifts">android.statistics.oisYShifts</a></li>
             <li
             ><a href="#dynamic_android.statistics.oisSamples">android.statistics.oisSamples</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.lensIntrinsicsSamples">android.statistics.lensIntrinsicsSamples</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.lensIntrinsicTimestamps">android.statistics.lensIntrinsicTimestamps</a></li>
+            <li
+            ><a href="#dynamic_android.statistics.lensIntrinsicSamples">android.statistics.lensIntrinsicSamples</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -1350,6 +1356,8 @@
           <ul class="toc_section">
             <li
             ><a href="#dynamic_android.logicalMultiCamera.activePhysicalId">android.logicalMultiCamera.activePhysicalId</a></li>
+            <li
+            ><a href="#dynamic_android.logicalMultiCamera.activePhysicalSensorCropRegion">android.logicalMultiCamera.activePhysicalSensorCropRegion</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -34143,6 +34151,181 @@ is needed.<wbr/></p>
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="dynamic_android.statistics.lensIntrinsicsSamples">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>lens<wbr/>Intrinsics<wbr/>Samples
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [java_public as lensIntrinsicsSample]</span>
+
+              <span class="entry_type_synthetic">[synthetic] </span>
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of intra-frame lens intrinsic samples.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>9</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>Contains an array of intra-frame <a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a> updates.<wbr/> This must
+not be confused or compared to <a href="#dynamic_android.statistics.oisSamples">android.<wbr/>statistics.<wbr/>ois<wbr/>Samples</a>.<wbr/> Although OIS could be the
+main driver,<wbr/> all relevant factors such as focus distance and optical zoom must also
+be included.<wbr/> Do note that OIS samples must not be applied on top of the lens intrinsic
+samples.<wbr/>
+Support for this capture result can be queried via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getAvailableCaptureResultKeys">CameraCharacteristics#getAvailableCaptureResultKeys</a>.<wbr/>
+If available,<wbr/> clients can expect multiple samples per capture result.<wbr/> The specific
+amount will depend on current frame duration and sampling rate.<wbr/> Generally a sampling rate
+greater than or equal to 200Hz is considered sufficient for high quality results.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.lensIntrinsicTimestamps">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>lens<wbr/>Intrinsic<wbr/>Timestamps
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int64</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  n
+                </span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of timestamps of lens intrinsics samples,<wbr/> in nanoseconds.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              nanoseconds
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>9</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The array contains the timestamps of lens intrinsics samples.<wbr/> The timestamps are in the
+same timebase as and comparable to <a href="#dynamic_android.sensor.timestamp">android.<wbr/>sensor.<wbr/>timestamp</a>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.statistics.lensIntrinsicSamples">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>statistics.<wbr/>lens<wbr/>Intrinsic<wbr/>Samples
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  5 x n
+                </span>
+              <span class="entry_type_visibility"> [ndk_public]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>An array of intra-frame lens intrinsics.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              
+          Pixels in the android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size coordinate system.<wbr/>
+          
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>9</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The data layout and contents of individual array entries matches with
+<a href="#static_android.lens.intrinsicCalibration">android.<wbr/>lens.<wbr/>intrinsic<wbr/>Calibration</a>.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -38539,6 +38722,106 @@ result metadata to indicate current active physical camera ID.<wbr/></p>
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="dynamic_android.logicalMultiCamera.activePhysicalSensorCropRegion">
+            <td class="entry_name
+             " rowspan="5">
+              android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>active<wbr/>Physical<wbr/>Sensor<wbr/>Crop<wbr/>Region
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">int32</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  4
+                </span>
+              <span class="entry_type_visibility"> [public as rectangle]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The current region of the active physical sensor that will be read out for this
+capture.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+              Pixel coordinates relative to
+        android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size or
+        android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size of the currently
+        android.<wbr/>logical<wbr/>Multi<wbr/>Camera.<wbr/>active<wbr/>Physical<wbr/>Id depending on distortion correction capability
+        and mode
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>9</p>
+            </td>
+
+            <td class="entry_tags">
+              <ul class="entry_tags">
+                  <li><a href="#tag_LOGICALCAMERA">LOGICALCAMERA</a></li>
+              </ul>
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>This capture result matches with <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> on non-logical single
+camera sensor devices.<wbr/> In case of logical cameras that can switch between several
+physical devices in response to <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> this capture result will
+not behave like <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> and <a href="#controls_android.control.zoomRatio">android.<wbr/>control.<wbr/>zoom<wbr/>Ratio</a>,<wbr/> where the
+combination of both reflects the effective zoom and crop of the logical camera output.<wbr/>
+Instead,<wbr/> this capture result value will describe the zoom and crop of the active physical
+device.<wbr/> Some examples of when the value of this capture result will change include
+switches between different physical lenses,<wbr/> switches between regular and maximum
+resolution pixel mode and going through the device digital or optical range.<wbr/>
+This capture result is similar to <a href="#controls_android.scaler.cropRegion">android.<wbr/>scaler.<wbr/>crop<wbr/>Region</a> with respect to distortion
+correction.<wbr/> When the distortion correction mode is OFF,<wbr/> the coordinate system follows
+<a href="#static_android.sensor.info.preCorrectionActiveArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/> 0) being the top-left pixel
+of the pre-correction active array.<wbr/> When the distortion correction mode is not OFF,<wbr/>
+the coordinate system follows <a href="#static_android.sensor.info.activeArraySize">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size</a>,<wbr/> with (0,<wbr/> 0) being
+the top-left pixel of the active array.<wbr/></p>
+<p>For camera devices with the
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraMetadata.html#REQUEST_AVAILABLE_CAPABILITIES_ULTRA_HIGH_RESOLUTION_SENSOR">Camera<wbr/>Metadata#REQUEST_<wbr/>AVAILABLE_<wbr/>CAPABILITIES_<wbr/>ULTRA_<wbr/>HIGH_<wbr/>RESOLUTION_<wbr/>SENSOR</a>
+capability or devices where <a href="https://developer.android.com/reference/CameraCharacteristics.html#getAvailableCaptureRequestKeys">CameraCharacteristics#getAvailableCaptureRequestKeys</a>
+lists <a href="https://developer.android.com/reference/CaptureRequest.html#SENSOR_PIXEL_MODE"><a href="#controls_android.sensor.pixelMode">android.<wbr/>sensor.<wbr/>pixel<wbr/>Mode</a></a>
+,<wbr/> the current active physical device
+<a href="#static_android.sensor.info.activeArraySizeMaximumResolution">android.<wbr/>sensor.<wbr/>info.<wbr/>active<wbr/>Array<wbr/>Size<wbr/>Maximum<wbr/>Resolution</a> /<wbr/>
+<a href="#static_android.sensor.info.preCorrectionActiveArraySizeMaximumResolution">android.<wbr/>sensor.<wbr/>info.<wbr/>pre<wbr/>Correction<wbr/>Active<wbr/>Array<wbr/>Size<wbr/>Maximum<wbr/>Resolution</a> must be used as the
+coordinate system for requests where <a href="#controls_android.sensor.pixelMode">android.<wbr/>sensor.<wbr/>pixel<wbr/>Mode</a> is set to
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraMetadata.html#SENSOR_PIXEL_MODE_MAXIMUM_RESOLUTION">Camera<wbr/>Metadata#SENSOR_<wbr/>PIXEL_<wbr/>MODE_<wbr/>MAXIMUM_<wbr/>RESOLUTION</a>.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">HAL Implementation Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The output streams must maintain square pixels at all
+times,<wbr/> no matter what the relative aspect ratios of the
+crop region and the stream are.<wbr/>  Negative values for
+corner are allowed for raw output if full pixel array is
+larger than active pixel array.<wbr/> Width and height may be
+rounded to nearest larger supportable width,<wbr/> especially
+for raw output,<wbr/> where only a few fixed scales may be
+possible.<wbr/></p>
+            </td>
+          </tr>
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -40777,6 +41060,7 @@ output format/<wbr/>size combination for Jpeg/<wbr/>R streams for CaptureRequest
           <li><a href="#static_android.logicalMultiCamera.physicalIds">android.logicalMultiCamera.physicalIds</a> (static)</li>
           <li><a href="#static_android.logicalMultiCamera.sensorSyncType">android.logicalMultiCamera.sensorSyncType</a> (static)</li>
           <li><a href="#dynamic_android.logicalMultiCamera.activePhysicalId">android.logicalMultiCamera.activePhysicalId</a> (dynamic)</li>
+          <li><a href="#dynamic_android.logicalMultiCamera.activePhysicalSensorCropRegion">android.logicalMultiCamera.activePhysicalSensorCropRegion</a> (dynamic)</li>
         </ul>
       </li> <!-- tag_LOGICALCAMERA -->
       <li id="tag_HEIC">HEIC - 

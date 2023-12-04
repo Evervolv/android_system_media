@@ -155,6 +155,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <typedef name="colorSpaceProfiles">
         <language name="java">android.hardware.camera2.params.ColorSpaceProfiles</language>
     </typedef>
+    <typedef name="lensIntrinsicsSample">
+        <language name="java">android.hardware.camera2.params.LensIntrinsicsSample</language>
+    </typedef>
   </types>
 
   <namespace name="android">
@@ -12142,6 +12145,59 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           is needed.
           </details>
         </entry>
+        <entry name="lensIntrinsicsSamples" type="float" visibility="java_public" synthetic="true"
+               container="array" typedef="lensIntrinsicsSample" aconfig_flag="concert_mode"
+               hal_version="3.9">
+          <array>
+            <size>n</size>
+          </array>
+          <description>
+          An array of intra-frame lens intrinsic samples.
+          </description>
+          <details>
+          Contains an array of intra-frame android.lens.intrinsicCalibration updates. This must
+          not be confused or compared to android.statistics.oisSamples. Although OIS could be the
+          main driver, all relevant factors such as focus distance and optical zoom must also
+          be included. Do note that OIS samples must not be applied on top of the lens intrinsic
+          samples.
+          Support for this capture result can be queried via
+          {@link android.hardware.camera2.CameraCharacteristics#getAvailableCaptureResultKeys}.
+          If available, clients can expect multiple samples per capture result. The specific
+          amount will depend on current frame duration and sampling rate. Generally a sampling rate
+          greater than or equal to 200Hz is considered sufficient for high quality results.
+          </details>
+        </entry>
+        <entry name="lensIntrinsicTimestamps" type="int64" visibility="ndk_public" container="array"
+               aconfig_flag="concert_mode" hal_version="3.9">
+          <array>
+            <size>n</size>
+          </array>
+          <description>
+          An array of timestamps of lens intrinsics samples, in nanoseconds.
+          </description>
+          <units>nanoseconds</units>
+          <details>
+          The array contains the timestamps of lens intrinsics samples. The timestamps are in the
+          same timebase as and comparable to android.sensor.timestamp.
+          </details>
+        </entry>
+        <entry name="lensIntrinsicSamples" type="float" visibility="ndk_public"
+               container="array" aconfig_flag="concert_mode" hal_version="3.9">
+          <array>
+            <size>5</size>
+            <size>n</size>
+          </array>
+          <description>
+          An array of intra-frame lens intrinsics.
+          </description>
+          <units>
+          Pixels in the android.sensor.info.preCorrectionActiveArraySize coordinate system.
+          </units>
+          <details>
+          The data layout and contents of individual array entries matches with
+          android.lens.intrinsicCalibration.
+          </details>
+        </entry>
       </dynamic>
     </section>
     <section name="tonemap">
@@ -13673,6 +13729,60 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         <hal_details>
           Staring from HIDL ICameraDevice version 3.5, the tag must be available in the capture
           result metadata to indicate current active physical camera ID.
+        </hal_details>
+        <tag id="LOGICALCAMERA" />
+      </entry>
+      <entry name="activePhysicalSensorCropRegion" type="int32" visibility="public"
+             container="array" typedef="rectangle" aconfig_flag="concert_mode" hal_version="3.9">
+        <array>
+          <size>4</size>
+        </array>
+        <description>The current region of the active physical sensor that will be read out for this
+        capture.</description>
+        <units>Pixel coordinates relative to
+        android.sensor.info.activeArraySize or
+        android.sensor.info.preCorrectionActiveArraySize of the currently
+        android.logicalMultiCamera.activePhysicalId depending on distortion correction capability
+        and mode</units>
+        <details>
+          This capture result matches with android.scaler.cropRegion on non-logical single
+          camera sensor devices. In case of logical cameras that can switch between several
+          physical devices in response to android.control.zoomRatio, this capture result will
+          not behave like android.scaler.cropRegion and android.control.zoomRatio, where the
+          combination of both reflects the effective zoom and crop of the logical camera output.
+          Instead, this capture result value will describe the zoom and crop of the active physical
+          device. Some examples of when the value of this capture result will change include
+          switches between different physical lenses, switches between regular and maximum
+          resolution pixel mode and going through the device digital or optical range.
+          This capture result is similar to android.scaler.cropRegion with respect to distortion
+          correction. When the distortion correction mode is OFF, the coordinate system follows
+          android.sensor.info.preCorrectionActiveArraySize, with (0, 0) being the top-left pixel
+          of the pre-correction active array. When the distortion correction mode is not OFF,
+          the coordinate system follows android.sensor.info.activeArraySize, with (0, 0) being
+          the top-left pixel of the active array.
+
+          For camera devices with the
+          {@link android.hardware.camera2.CameraMetadata#REQUEST_AVAILABLE_CAPABILITIES_ULTRA_HIGH_RESOLUTION_SENSOR}
+          capability or devices where {@link CameraCharacteristics#getAvailableCaptureRequestKeys}
+          lists {@link CaptureRequest#SENSOR_PIXEL_MODE android.sensor.pixelMode}
+          , the current active physical device
+          android.sensor.info.activeArraySizeMaximumResolution /
+          android.sensor.info.preCorrectionActiveArraySizeMaximumResolution must be used as the
+          coordinate system for requests where android.sensor.pixelMode is set to
+          {@link android.hardware.camera2.CameraMetadata#SENSOR_PIXEL_MODE_MAXIMUM_RESOLUTION}.
+        </details>
+        <ndk_details>
+          The data representation is int[4], which maps to (left, top, width, height).
+        </ndk_details>
+        <hal_details>
+          The output streams must maintain square pixels at all
+          times, no matter what the relative aspect ratios of the
+          crop region and the stream are.  Negative values for
+          corner are allowed for raw output if full pixel array is
+          larger than active pixel array. Width and height may be
+          rounded to nearest larger supportable width, especially
+          for raw output, where only a few fixed scales may be
+          possible.
         </hal_details>
         <tag id="LOGICALCAMERA" />
       </entry>
