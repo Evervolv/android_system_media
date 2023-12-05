@@ -200,6 +200,9 @@ typedef enum camera_metadata_tag {
     ANDROID_CONTROL_AUTOFRAMING,                      // enum         | public       | HIDL v3.9
     ANDROID_CONTROL_AUTOFRAMING_AVAILABLE,            // enum         | public       | HIDL v3.9
     ANDROID_CONTROL_AUTOFRAMING_STATE,                // enum         | public       | HIDL v3.9
+    ANDROID_CONTROL_LOW_LIGHT_BOOST_INFO_LUMINANCE_RANGE,
+                                                      // float[]      | public       | HIDL v3.9
+    ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE,            // enum         | public       | HIDL v3.9
     ANDROID_CONTROL_END,
 
     ANDROID_DEMOSAIC_MODE =                           // enum         | system       | HIDL v3.2
@@ -640,6 +643,7 @@ typedef enum camera_metadata_enum_android_control_ae_mode {
     ANDROID_CONTROL_AE_MODE_ON_ALWAYS_FLASH                         , // HIDL v3.2
     ANDROID_CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE                    , // HIDL v3.2
     ANDROID_CONTROL_AE_MODE_ON_EXTERNAL_FLASH                       , // HIDL v3.3
+    ANDROID_CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY  , // HIDL v3.9
 } camera_metadata_enum_android_control_ae_mode_t;
 
 // ANDROID_CONTROL_AE_PRECAPTURE_TRIGGER
@@ -857,6 +861,12 @@ typedef enum camera_metadata_enum_android_control_autoframing_state {
     ANDROID_CONTROL_AUTOFRAMING_STATE_FRAMING                       , // HIDL v3.9
     ANDROID_CONTROL_AUTOFRAMING_STATE_CONVERGED                     , // HIDL v3.9
 } camera_metadata_enum_android_control_autoframing_state_t;
+
+// ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE
+typedef enum camera_metadata_enum_android_control_low_light_boost_state {
+    ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE_INACTIVE                  , // HIDL v3.9
+    ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE_ACTIVE                    , // HIDL v3.9
+} camera_metadata_enum_android_control_low_light_boost_state_t;
 
 
 // ANDROID_DEMOSAIC_MODE

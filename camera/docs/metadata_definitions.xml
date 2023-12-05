@@ -680,6 +680,47 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 flash.
               </notes>
             </value>
+            <value optional="true" hal_version="3.9"
+                aconfig_flag="camera_ae_mode_low_light_boost">ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY
+              <notes>
+                Like 'ON' but applies additional brightness boost in low light scenes.
+
+                When the scene lighting conditions are within the range defined by
+                android.control.lowLightBoostInfoLuminanceRange this mode will apply additional
+                brightness boost.
+
+                This mode will automatically adjust the intensity of low light boost applied
+                according to the scene lighting conditions. A darker scene will receive more boost
+                while a brighter scene will receive less boost.
+
+                This mode can ignore the set target frame rate to allow more light to be captured
+                which can result in choppier motion. The frame rate can extend to lower than the
+                android.control.aeAvailableTargetFpsRanges but will not go below 10 FPS. This mode
+                can also increase the sensor sensitivity gain which can result in increased luma
+                and chroma noise. The sensor sensitivity gain can extend to higher values beyond
+                android.sensor.info.sensitivityRange. This mode may also apply additional
+                processing to recover details in dark and bright areas of the image,and noise
+                reduction at high sensitivity gain settings to manage the trade-off between light
+                sensitivity and capture noise.
+
+                This mode is restricted to two output surfaces. One output surface type can either
+                be SurfaceView or TextureView. Another output surface type can either be MediaCodec
+                or MediaRecorder. This mode cannot be used with a target FPS range higher than 30
+                FPS.
+
+                If the session configuration is not supported, the AE mode reported in the
+                CaptureResult will be 'ON' instead of 'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY'.
+
+                The application can observe the CapturerResult field
+                android.control.lowLightBoostState to determine when low light boost is 'ACTIVE' or
+                'INACTIVE'.
+
+                The low light boost is 'ACTIVE' once the scene lighting condition is less than the
+                upper bound lux value defined by android.control.lowLightBoostInfoLuminanceRange.
+                This mode will be 'INACTIVE' once the scene lighting condition is greater than the
+                upper bound lux value defined by android.control.lowLightBoostInfoLuminanceRange.
+              </notes>
+            </value>
           </enum>
           <description>The desired mode for the camera device's
           auto-exposure routine.</description>
@@ -3847,6 +3888,61 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
         </details>
       </entry>
     </dynamic>
+    <static>
+        <entry name="lowLightBoostInfoLuminanceRange" type="float" visibility="public"
+               optional="true" container="array" typedef="rangeFloat"
+               aconfig_flag="camera_ae_mode_low_light_boost" hal_version="3.9">
+          <array>
+            <size>2</size>
+          </array>
+          <description>
+            The operating luminance range of low light boost measured in lux (lx).
+          </description>
+          <range>
+            The lower bound indicates the lowest scene luminance value the AE mode
+            'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY' can operate within. Scenes of lower luminance
+            than this may receive less brightening, increased noise, or artifacts.
+
+            The upper bound indicates the luminance threshold at the point when the mode is enabled.
+            For example, 'Range[0.3, 30.0]' defines 0.3 lux being the lowest scene luminance the
+            mode can reliably support. 30.0 lux represents the threshold when this mode is
+            activated. Scenes measured at less than or equal to 30 lux will activate low light
+            boost.
+
+            If this key is defined, then the AE mode 'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY' will
+            also be present.
+          </range>
+        </entry>
+      </static>
+      <dynamic>
+        <entry name="lowLightBoostState" type="byte" visibility="public" optional="true" enum="true"
+               aconfig_flag="camera_ae_mode_low_light_boost" hal_version="3.9">
+          <enum>
+            <value>INACTIVE
+            <notes>
+              The AE mode 'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY' is enabled but not applied.
+            </notes></value>
+            <value>ACTIVE
+            <notes>
+              The AE mode 'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY' is enabled and applied.
+            </notes></value>
+          </enum>
+          <description>
+              Current state of the low light boost AE mode.
+          </description>
+          <details>
+            When low light boost is enabled by setting the AE mode to
+            'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY', it can dynamically apply a low light
+            boost when the light level threshold is exceeded.
+
+            This state indicates when low light boost is 'ACTIVE' and applied. Similarly, it can
+            indicate when it is not being applied by returning 'INACTIVE'.
+
+            This key will be absent from the CaptureResult if AE mode is not set to
+            'ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY.
+          </details>
+        </entry>
+      </dynamic>
     </section>
     <section name="demosaic">
       <controls>
