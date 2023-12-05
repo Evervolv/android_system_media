@@ -493,6 +493,7 @@ typedef enum camera_metadata_tag {
     ANDROID_INFO_VERSION,                             // byte         | public       | HIDL v3.3
     ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION, // enum         | system       | HIDL v3.4
     ANDROID_INFO_DEVICE_STATE_ORIENTATIONS,           // int64[]      | ndk_public   | HIDL v3.7
+    ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION, // enum         | fwk_java_public
     ANDROID_INFO_END,
 
     ANDROID_BLACK_LEVEL_LOCK =                        // enum         | public       | HIDL v3.2
@@ -1307,6 +1308,14 @@ typedef enum camera_metadata_enum_android_info_supported_buffer_management_versi
     ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_SESSION_CONFIGURABLE
                                                                      , // HIDL v3.9
 } camera_metadata_enum_android_info_supported_buffer_management_version_t;
+
+// ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION
+typedef enum camera_metadata_enum_android_info_session_configuration_query_version {
+    ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION_UPSIDE_DOWN_CAKE
+                                                                      = 34,
+    ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION_VANILLA_ICE_CREAM
+                                                                      = 35,
+} camera_metadata_enum_android_info_session_configuration_query_version_t;
 
 
 // ANDROID_BLACK_LEVEL_LOCK

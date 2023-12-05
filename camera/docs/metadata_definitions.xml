@@ -73,6 +73,9 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
     <typedef name="imageFormat">
       <language name="java">int</language>
     </typedef>
+    <typedef name="versionCode">
+      <language name="java">int</language>
+    </typedef>
     <typedef name="streamConfigurationMap">
       <language name="java">android.hardware.camera2.params.StreamConfigurationMap</language>
     </typedef>
@@ -6419,10 +6422,10 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
 
               Combinations of logical and physical streams, or physical streams from different
               physical cameras are not guaranteed. However, if the camera device supports
-              {@link CameraDevice#isSessionConfigurationSupported|ACameraDevice_isSessionConfigurationSupported},
+              {@link CameraManager#isSessionConfigurationWithParametersSupported|ACameraDevice_isSessionConfigurationSupported},
               application must be able to query whether a stream combination involving physical
               streams is supported by calling
-              {@link CameraDevice#isSessionConfigurationSupported|ACameraDevice_isSessionConfigurationSupported}.
+              {@link CameraManager#isSessionConfigurationWithParametersSupported|ACameraDevice_isSessionConfigurationSupported}.
 
               Camera application shouldn't assume that there are at most 1 rear camera and 1 front
               camera in the system. For an application that switches between front and back cameras,
@@ -8771,7 +8774,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             When the key is present, only a PRIVATE/YUV output of the specified size is guaranteed
             to be supported by the camera HAL in the secure camera mode. Any other format or
             resolutions might not be supported. Use
-            {@link CameraDevice#isSessionConfigurationSupported|ACameraDevice_isSessionConfigurationSupported}
+            {@link CameraManager#isSessionConfigurationWithParametersSupported|ACameraDevice_isSessionConfigurationSupported}
             API to query if a secure session configuration is supported if the device supports this
             API.
 
@@ -12896,6 +12899,90 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           HAL must populate the array with
           (hardware::camera::provider::V2_5::DeviceState, sensorOrientation) pairs for each
           supported device state bitwise combination.
+          </details>
+        </entry>
+        <entry name="sessionConfigurationQueryVersion" type="int32"
+          visibility="fwk_java_public" enum="true" typedef="versionCode"
+          hwlevel="legacy" aconfig_flag="feature_combination_query">
+          <enum>
+            <value id="34">UPSIDE_DOWN_CAKE</value>
+            <value id="35">VANILLA_ICE_CREAM</value>
+          </enum>
+          <description>The version of the session configuration query
+          {@link android.hardware.camera2.CameraManager#isSessionConfigurationWithParametersSupported}
+          API
+          </description>
+          <details>The possible values in this key correspond to the values defined in
+          android.os.Build.VERSION_CODES. Each version defines a set of feature combinations the
+          camera device must reliably report whether they are supported via
+          {@link android.hardware.camera2.CameraManager#isSessionConfigurationWithParametersSupported}
+          API. And the version is always less or equal to android.os.Build.VERSION.SDK_INT.
+
+          If set to UPSIDE_DOWN_CAKE, this camera device doesn't support
+          {@link android.hardware.camera2.CameraManager#isSessionConfigurationWithParametersSupported}.
+          Calling the method for this camera ID throws an UnsupportedOperationException.
+
+          If set to VANILLA_ICE_CREAM, the application can call
+          {@link android.hardware.camera2.CameraManager#isSessionConfigurationWithParametersSupported}
+          to check if the combinations of below features are supported.
+
+          * A subset of LIMITED-level device stream combinations.
+
+          Target 1    |     Size      | Target 2    |     Size    | Sample use case(s)
+          :----------:|:-------------:|:-----------:|:-----------:|:-------------------:
+          PRIV        | MAXIMUM       |             |             | Simple preview, GPU video processing, or no-preview video recording.
+          PRIV        | PREVIEW       |             |             |
+          PRIV        | S1440P        |             |             |
+          PRIV        | S1080P        |             |             |
+          PRIV        | S720P         |             |             |
+          YUV         | MAXIMUM       |             |             | In-application video/image processing.
+          YUV         | PREVIEW       |             |             |
+          YUV         | S1440P        |             |             |
+          YUV         | S1080P        |             |             |
+          YUV         | S720P         |             |             |
+          PRIV        | PREVIEW       | JPEG        | MAXIMUM     | Standard still imaging.
+          PRIV        | S1440P        | JPEG        | MAXIMUM     |
+          PRIV        | S1080P        | JPEG        | MAXIMUM     |
+          PRIV        | S720P         | JPEG        | MAXIMUM     |
+          PRIV        | S1440P        | JPEG        | S1440P      |
+          PRIV        | S1080P        | JPEG        | S1080P      |
+          PRIV        | S720P         | JPEG        | S1080P      |
+          YUV         | PREVIEW       | JPEG        | MAXIMUM     | In-app processing plus still capture.
+          YUV         | S1440P        | JPEG        | MAXIMUM     |
+          YUV         | S1080P        | JPEG        | MAXIMUM     |
+          YUV         | S720P         | JPEG        | MAXIMUM     |
+          YUV         | S1440P        | JPEG        | S1440P      |
+          YUV         | S1080P        | JPEG        | S1080P      |
+          YUV         | S720P         | JPEG        | S1080P      |
+          PRIV        | PREVIEW       | PRIV        | PREVIEW     | Standard recording.
+          PRIV        | S1440P        | PRIV        | S1440P      |
+          PRIV        | S1080P        | PRIV        | S1080P      |
+          PRIV        | S720P         | PRIV        | S720P       |
+          PRIV        | PREVIEW       | YUV         | PREVIEW     | Preview plus in-app processing.
+          PRIV        | S1440P        | YUV         | S1440P      |
+          PRIV        | S1080P        | YUV         | S1080P      |
+          PRIV        | S720P         | YUV         | S720P       |
+
+              - {@code MAXIMUM} size refers to the camera device's maximum output resolution for
+                that format from {@code StreamConfigurationMap#getOutputSizes}. {@code PREVIEW} size
+                refers to the best size match to the device's screen resolution, or to 1080p
+                (@code 1920x1080}, whichever is smaller. Both sizes are guaranteed to be supported.
+
+              - {@code S1440P} refers to {@code 1920x1440 (4:3)} and {@code 2560x1440 (16:9)}.
+                {@code S1080P} refers to {@code 1440x1080 (4:3)} and {@code 1920x1080 (16:9)}.
+                And {@code S720P} refers to {@code 960x720 (4:3)} and {@code 1280x720 (16:9)}.
+
+              - If a combination contains a S1440P, S1080P, or S720P stream,
+                both 4:3 and 16:9 aspect ratio sizes can be queried. For example, for the
+                stream combination of {PRIV, S1440P, JPEG, MAXIMUM}, and if MAXIMUM ==
+                4032 x 3024, the application will be able to query both
+                {PRIV, 1920 x 1440, JPEG, 4032 x 3024} and {PRIV, 2560 x 1440, JPEG, 4032 x 2268}
+                without an exception being thrown.
+
+          * VIDEO_STABILIZATION_MODES: {OFF, PREVIEW}
+          * AE_TARGET_FPS_RANGE: {{*, 30}, {*, 60}}
+          * DYNAMIC_RANGE_PROFILE: {STANDARD, HLG10}
+
           </details>
         </entry>
       </static>

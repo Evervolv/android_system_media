@@ -1231,6 +1231,8 @@
             ><a href="#static_android.info.deviceStateSensorOrientationMap">android.info.deviceStateSensorOrientationMap</a></li>
             <li
             ><a href="#static_android.info.deviceStateOrientations">android.info.deviceStateOrientations</a></li>
+            <li
+            ><a href="#static_android.info.sessionConfigurationQueryVersion">android.info.sessionConfigurationQueryVersion</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -20389,10 +20391,10 @@ callback.<wbr/></li>
 </ul>
 <p>Combinations of logical and physical streams,<wbr/> or physical streams from different
 physical cameras are not guaranteed.<wbr/> However,<wbr/> if the camera device supports
-<a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>,<wbr/>
+<a href="https://developer.android.com/reference/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>,<wbr/>
 application must be able to query whether a stream combination involving physical
 streams is supported by calling
-<a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>.<wbr/></p>
+<a href="https://developer.android.com/reference/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>.<wbr/></p>
 <p>Camera application shouldn't assume that there are at most 1 rear camera and 1 front
 camera in the system.<wbr/> For an application that switches between front and back cameras,<wbr/>
 the recommendation is to switch between the first rear camera and the first front
@@ -24830,7 +24832,7 @@ if the camera device does not list SECURE_<wbr/>IMAGE_<wbr/>DATA capability.<wbr
 <p>When the key is present,<wbr/> only a PRIVATE/<wbr/>YUV output of the specified size is guaranteed
 to be supported by the camera HAL in the secure camera mode.<wbr/> Any other format or
 resolutions might not be supported.<wbr/> Use
-<a href="https://developer.android.com/reference/CameraDevice.html#isSessionConfigurationSupported">CameraDevice#isSessionConfigurationSupported</a>
+<a href="https://developer.android.com/reference/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>
 API to query if a secure session configuration is supported if the device supports this
 API.<wbr/></p>
 <p>If this key returns null on a device with SECURE_<wbr/>IMAGE_<wbr/>DATA capability,<wbr/> the application
@@ -36433,6 +36435,339 @@ Device state orientation maps are optional and maybe present on devices that sup
               <p>HAL must populate the array with
 (hardware::camera::provider::V2_<wbr/>5::DeviceState,<wbr/> sensorOrientation) pairs for each
 supported device state bitwise combination.<wbr/></p>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="static_android.info.sessionConfigurationQueryVersion">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>info.<wbr/>session<wbr/>Configuration<wbr/>Query<wbr/>Version
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">int32</span>
+
+              <span class="entry_type_visibility"> [fwk_java_public as versionCode]</span>
+
+
+              <span class="entry_type_hwlevel">[legacy] </span>
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">UPSIDE_DOWN_CAKE (v3.2)</span>
+                    <span class="entry_type_enum_value">34</span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">VANILLA_ICE_CREAM (v3.2)</span>
+                    <span class="entry_type_enum_value">35</span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The version of the session configuration query
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>
+API</p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>2</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>The possible values in this key correspond to the values defined in
+android.<wbr/>os.<wbr/>Build.<wbr/>VERSION_<wbr/>CODES.<wbr/> Each version defines a set of feature combinations the
+camera device must reliably report whether they are supported via
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>
+API.<wbr/> And the version is always less or equal to android.<wbr/>os.<wbr/>Build.<wbr/>VERSION.<wbr/>SDK_<wbr/>INT.<wbr/></p>
+<p>If set to UPSIDE_<wbr/>DOWN_<wbr/>CAKE,<wbr/> this camera device doesn't support
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>.<wbr/>
+Calling the method for this camera ID throws an UnsupportedOperationException.<wbr/></p>
+<p>If set to VANILLA_<wbr/>ICE_<wbr/>CREAM,<wbr/> the application can call
+<a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#isSessionConfigurationWithParametersSupported">CameraManager#isSessionConfigurationWithParametersSupported</a>
+to check if the combinations of below features are supported.<wbr/></p>
+<ul>
+<li>A subset of LIMITED-level device stream combinations.<wbr/></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Target 1</th>
+<th style="text-align: center;">Size</th>
+<th style="text-align: center;">Target 2</th>
+<th style="text-align: center;">Size</th>
+<th style="text-align: center;">Sample use case(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">Simple preview,<wbr/> GPU video processing,<wbr/> or no-preview video recording.<wbr/></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">In-application video/<wbr/>image processing.<wbr/></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;">Standard still imaging.<wbr/></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;">In-app processing plus still capture.<wbr/></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">MAXIMUM</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;">JPEG</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;">Standard recording.<wbr/></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">PREVIEW</td>
+<td style="text-align: center;">Preview plus in-app processing.<wbr/></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1440P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S1080P</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">PRIV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;">YUV</td>
+<td style="text-align: center;">S720P</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<pre><code>- {@code MAXIMUM} size refers to the camera device's maximum output resolution for
+  that format from {@code StreamConfigurationMap#getOutputSizes}.<wbr/> {@code PREVIEW} size
+  refers to the best size match to the device's screen resolution,<wbr/> or to 1080p
+  (@code 1920x1080},<wbr/> whichever is smaller.<wbr/> Both sizes are guaranteed to be supported.<wbr/>
+
+- {@code S1440P} refers to {@code 1920x1440 (4:3)} and {@code 2560x1440 (16:9)}.<wbr/>
+  {@code S1080P} refers to {@code 1440x1080 (4:3)} and {@code 1920x1080 (16:9)}.<wbr/>
+  And {@code S720P} refers to {@code 960x720 (4:3)} and {@code 1280x720 (16:9)}.<wbr/>
+
+- If a combination contains a S1440P,<wbr/> S1080P,<wbr/> or S720P stream,<wbr/>
+  both 4:3 and 16:9 aspect ratio sizes can be queried.<wbr/> For example,<wbr/> for the
+  stream combination of {PRIV,<wbr/> S1440P,<wbr/> JPEG,<wbr/> MAXIMUM},<wbr/> and if MAXIMUM ==
+  4032 x 3024,<wbr/> the application will be able to query both
+  {PRIV,<wbr/> 1920 x 1440,<wbr/> JPEG,<wbr/> 4032 x 3024} and {PRIV,<wbr/> 2560 x 1440,<wbr/> JPEG,<wbr/> 4032 x 2268}
+  without an exception being thrown.<wbr/>
+</code></pre>
+<ul>
+<li>VIDEO_<wbr/>STABILIZATION_<wbr/>MODES: {OFF,<wbr/> PREVIEW}</li>
+<li>AE_<wbr/>TARGET_<wbr/>FPS_<wbr/>RANGE: {{<em>,<wbr/> 30},<wbr/> {</em>,<wbr/> 60}}</li>
+<li>DYNAMIC_<wbr/>RANGE_<wbr/>PROFILE: {STANDARD,<wbr/> HLG10}</li>
+</ul>
             </td>
           </tr>
 
