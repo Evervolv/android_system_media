@@ -33,7 +33,8 @@ TEST(audio_math_tests, safe_isnan) {
 #endif
 
     EXPECT_TRUE(au_isnan);
-    EXPECT_FALSE(android::audio_utils::safe_isnan(1.f));
+    constexpr bool not_a_nan = android::audio_utils::safe_isnan(1.f);
+    EXPECT_FALSE(not_a_nan);
     EXPECT_FALSE(android::audio_utils::safe_isnan(std::numeric_limits<float>::infinity()));
     EXPECT_FALSE(android::audio_utils::safe_isnan(std::numeric_limits<float>::max()));
     EXPECT_FALSE(android::audio_utils::safe_isnan(std::numeric_limits<float>::min()));
@@ -56,7 +57,8 @@ TEST(audio_math_tests, safe_isinf) {
 
     EXPECT_TRUE(eq_isinf);
     EXPECT_TRUE(au_isinf);
-    EXPECT_FALSE(android::audio_utils::safe_isinf(1.f));
+    constexpr bool not_a_inf = android::audio_utils::safe_isinf(1.f);
+    EXPECT_FALSE(not_a_inf);
     EXPECT_FALSE(android::audio_utils::safe_isinf(std::nanf("")));
     EXPECT_FALSE(android::audio_utils::safe_isinf(std::numeric_limits<float>::max()));
     EXPECT_FALSE(android::audio_utils::safe_isinf(std::numeric_limits<float>::min()));
