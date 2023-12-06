@@ -12849,6 +12849,15 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               HIDL ICameraDevice version 3.5.
               </notes>
             </value>
+            <value hal_version="3.9" aconfig_flag="session_hal_buf_manager">
+              SESSION_CONFIGURABLE
+              <notes>
+              This camera device supports the buffer management APIs provided by AIDL ICameraDevice
+              version 1. It also supports the ICameraDeviceSession.configureStreamsV2 call to
+              inform the camera framework whether HAL buffer manager must be used for the
+              particular session configured.
+              </notes>
+            </value>
           </enum>
           <description>
               The version of buffer management API this camera device supports and opts into.

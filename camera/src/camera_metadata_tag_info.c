@@ -3559,6 +3559,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "HIDL_DEVICE_3_5";
                     ret = 0;
                     break;
+                case ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_SESSION_CONFIGURABLE:
+                    msg = "SESSION_CONFIGURABLE";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
@@ -6906,6 +6910,12 @@ int camera_metadata_enum_value(uint32_t tag,
                 enumName = "HIDL_DEVICE_3_5";
                 if (strncmp(name, enumName, size) == 0) {
                     *value = ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_HIDL_DEVICE_3_5;
+                    ret = 0;
+                    break;
+                }
+                enumName = "SESSION_CONFIGURABLE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_INFO_SUPPORTED_BUFFER_MANAGEMENT_VERSION_SESSION_CONFIGURABLE;
                     ret = 0;
                     break;
                 }
