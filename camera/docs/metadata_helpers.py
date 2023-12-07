@@ -189,6 +189,7 @@ def protobuf_type(entry):
     "deviceStateSensorOrientationMap"  : "DeviceStateSensorOrientationMap",
     "dynamicRangeProfiles"   : "DynamicRangeProfiles",
     "colorSpaceProfiles"     : "ColorSpaceProfiles",
+    "versionCode"            : "int32",
   }
 
   if typeName not in typename_to_protobuftype:

@@ -813,6 +813,9 @@ static tag_info_t android_info[ANDROID_INFO_END -
                                         TYPE_BYTE   },
     [ ANDROID_INFO_DEVICE_STATE_ORIENTATIONS - ANDROID_INFO_START ] =
     { "deviceStateOrientations",       TYPE_INT64  },
+    [ ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION - ANDROID_INFO_START ] =
+    { "sessionConfigurationQueryVersion",
+                                        TYPE_INT32  },
 };
 
 static tag_info_t android_black_level[ANDROID_BLACK_LEVEL_END -
@@ -3569,6 +3572,21 @@ int camera_metadata_enum_snprint(uint32_t tag,
             break;
         }
         case ANDROID_INFO_DEVICE_STATE_ORIENTATIONS: {
+            break;
+        }
+        case ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION: {
+            switch (value) {
+                case ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION_UPSIDE_DOWN_CAKE:
+                    msg = "UPSIDE_DOWN_CAKE";
+                    ret = 0;
+                    break;
+                case ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION_VANILLA_ICE_CREAM:
+                    msg = "VANILLA_ICE_CREAM";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
             break;
         }
 
@@ -6922,6 +6940,21 @@ int camera_metadata_enum_value(uint32_t tag,
             break;
         }
         case ANDROID_INFO_DEVICE_STATE_ORIENTATIONS: {
+            break;
+        }
+        case ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION: {
+                enumName = "UPSIDE_DOWN_CAKE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION_UPSIDE_DOWN_CAKE;
+                    ret = 0;
+                    break;
+                }
+                enumName = "VANILLA_ICE_CREAM";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_INFO_SESSION_CONFIGURATION_QUERY_VERSION_VANILLA_ICE_CREAM;
+                    ret = 0;
+                    break;
+                }
             break;
         }
 
