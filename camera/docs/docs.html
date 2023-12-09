@@ -266,6 +266,8 @@
             ><a href="#static_android.control.availableSettingsOverrides">android.control.availableSettingsOverrides</a></li>
             <li
             ><a href="#static_android.control.autoframingAvailable">android.control.autoframingAvailable</a></li>
+            <li
+            ><a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.control.lowLightBoostInfoLuminanceRange</a></li>
           </ul>
         </li>
         <li>
@@ -337,6 +339,8 @@
             ><a href="#dynamic_android.control.autoframing">android.control.autoframing</a></li>
             <li
             ><a href="#dynamic_android.control.autoframingState">android.control.autoframingState</a></li>
+            <li
+            ><a href="#dynamic_android.control.lowLightBoostState">android.control.lowLightBoostState</a></li>
           </ul>
         </li>
       </ul> <!-- toc_section -->
@@ -2787,6 +2791,39 @@ other available AE modes.<wbr/></p>
 <p>If the camera device supports AE external flash mode,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> must
 be FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
 flash.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY (v3.9)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>Like 'ON' but applies additional brightness boost in low light scenes.<wbr/></p>
+<p>When the scene lighting conditions are within the range defined by
+<a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range</a> this mode will apply additional
+brightness boost.<wbr/></p>
+<p>This mode will automatically adjust the intensity of low light boost applied
+according to the scene lighting conditions.<wbr/> A darker scene will receive more boost
+while a brighter scene will receive less boost.<wbr/></p>
+<p>This mode can ignore the set target frame rate to allow more light to be captured
+which can result in choppier motion.<wbr/> The frame rate can extend to lower than the
+<a href="#static_android.control.aeAvailableTargetFpsRanges">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Target<wbr/>Fps<wbr/>Ranges</a> but will not go below 10 FPS.<wbr/> This mode
+can also increase the sensor sensitivity gain which can result in increased luma
+and chroma noise.<wbr/> The sensor sensitivity gain can extend to higher values beyond
+<a href="#static_android.sensor.info.sensitivityRange">android.<wbr/>sensor.<wbr/>info.<wbr/>sensitivity<wbr/>Range</a>.<wbr/> This mode may also apply additional
+processing to recover details in dark and bright areas of the image,<wbr/>and noise
+reduction at high sensitivity gain settings to manage the trade-off between light
+sensitivity and capture noise.<wbr/></p>
+<p>This mode is restricted to two output surfaces.<wbr/> One output surface type can either
+be SurfaceView or TextureView.<wbr/> Another output surface type can either be MediaCodec
+or MediaRecorder.<wbr/> This mode cannot be used with a target FPS range higher than 30
+FPS.<wbr/></p>
+<p>If the session configuration is not supported,<wbr/> the AE mode reported in the
+CaptureResult will be 'ON' instead of 'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY'.<wbr/></p>
+<p>The application can observe the CapturerResult field
+<a href="#dynamic_android.control.lowLightBoostState">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>State</a> to determine when low light boost is 'ACTIVE' or
+'INACTIVE'.<wbr/></p>
+<p>The low light boost is 'ACTIVE' once the scene lighting condition is less than the
+upper bound lux value defined by <a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range</a>.<wbr/>
+This mode will be 'INACTIVE' once the scene lighting condition is greater than the
+upper bound lux value defined by <a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range</a>.<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -7602,6 +7639,61 @@ CaptureRequest keys for each override.<wbr/></p>
           <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
            <!-- end of entry -->
         
+                
+          <tr class="entry" id="static_android.control.lowLightBoostInfoLuminanceRange">
+            <td class="entry_name
+             " rowspan="1">
+              android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name">float</span>
+                <span class="entry_type_container">x</span>
+
+                <span class="entry_type_array">
+                  2
+                </span>
+              <span class="entry_type_visibility"> [public as rangeFloat]</span>
+
+
+
+
+
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>The operating luminance range of low light boost measured in lux (lx).<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+              <p>The lower bound indicates the lowest scene luminance value the AE mode
+'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY' can operate within.<wbr/> Scenes of lower luminance
+than this may receive less brightening,<wbr/> increased noise,<wbr/> or artifacts.<wbr/></p>
+<p>The upper bound indicates the luminance threshold at the point when the mode is enabled.<wbr/>
+For example,<wbr/> 'Range[0.<wbr/>3,<wbr/> 30.<wbr/>0]' defines 0.<wbr/>3 lux being the lowest scene luminance the
+mode can reliably support.<wbr/> 30.<wbr/>0 lux represents the threshold when this mode is
+activated.<wbr/> Scenes measured at less than or equal to 30 lux will activate low light
+boost.<wbr/></p>
+<p>If this key is defined,<wbr/> then the AE mode 'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY' will
+also be present.<wbr/></p>
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>9</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
         
 
       <!-- end of kind -->
@@ -8071,6 +8163,39 @@ other available AE modes.<wbr/></p>
 <p>If the camera device supports AE external flash mode,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> must
 be FLASH_<wbr/>REQUIRED after the camera device finishes AE scan and it's too dark without
 flash.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY (v3.9)</span>
+                    <span class="entry_type_enum_optional">[optional]</span>
+                    <span class="entry_type_enum_notes"><p>Like 'ON' but applies additional brightness boost in low light scenes.<wbr/></p>
+<p>When the scene lighting conditions are within the range defined by
+<a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range</a> this mode will apply additional
+brightness boost.<wbr/></p>
+<p>This mode will automatically adjust the intensity of low light boost applied
+according to the scene lighting conditions.<wbr/> A darker scene will receive more boost
+while a brighter scene will receive less boost.<wbr/></p>
+<p>This mode can ignore the set target frame rate to allow more light to be captured
+which can result in choppier motion.<wbr/> The frame rate can extend to lower than the
+<a href="#static_android.control.aeAvailableTargetFpsRanges">android.<wbr/>control.<wbr/>ae<wbr/>Available<wbr/>Target<wbr/>Fps<wbr/>Ranges</a> but will not go below 10 FPS.<wbr/> This mode
+can also increase the sensor sensitivity gain which can result in increased luma
+and chroma noise.<wbr/> The sensor sensitivity gain can extend to higher values beyond
+<a href="#static_android.sensor.info.sensitivityRange">android.<wbr/>sensor.<wbr/>info.<wbr/>sensitivity<wbr/>Range</a>.<wbr/> This mode may also apply additional
+processing to recover details in dark and bright areas of the image,<wbr/>and noise
+reduction at high sensitivity gain settings to manage the trade-off between light
+sensitivity and capture noise.<wbr/></p>
+<p>This mode is restricted to two output surfaces.<wbr/> One output surface type can either
+be SurfaceView or TextureView.<wbr/> Another output surface type can either be MediaCodec
+or MediaRecorder.<wbr/> This mode cannot be used with a target FPS range higher than 30
+FPS.<wbr/></p>
+<p>If the session configuration is not supported,<wbr/> the AE mode reported in the
+CaptureResult will be 'ON' instead of 'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY'.<wbr/></p>
+<p>The application can observe the CapturerResult field
+<a href="#dynamic_android.control.lowLightBoostState">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>State</a> to determine when low light boost is 'ACTIVE' or
+'INACTIVE'.<wbr/></p>
+<p>The low light boost is 'ACTIVE' once the scene lighting condition is less than the
+upper bound lux value defined by <a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range</a>.<wbr/>
+This mode will be 'INACTIVE' once the scene lighting condition is greater than the
+upper bound lux value defined by <a href="#static_android.control.lowLightBoostInfoLuminanceRange">android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>Info<wbr/>Luminance<wbr/>Range</a>.<wbr/></p></span>
                   </li>
                 </ul>
 
@@ -12003,6 +12128,71 @@ zooming in,<wbr/> zooming out or pan),<wbr/> the state will be FRAMING.<wbr/></l
 <li>When field of view is not being adjusted anymore and has reached a stable state,<wbr/> the
 state will be CONVERGED.<wbr/></li>
 </ul>
+            </td>
+          </tr>
+
+
+          <tr class="entry_spacer"><td class="entry_spacer" colspan="7"></td></tr>
+           <!-- end of entry -->
+        
+                
+          <tr class="entry" id="dynamic_android.control.lowLightBoostState">
+            <td class="entry_name
+             " rowspan="3">
+              android.<wbr/>control.<wbr/>low<wbr/>Light<wbr/>Boost<wbr/>State
+            </td>
+            <td class="entry_type">
+                <span class="entry_type_name entry_type_name_enum">byte</span>
+
+              <span class="entry_type_visibility"> [public]</span>
+
+
+
+
+
+                <ul class="entry_type_enum">
+                  <li>
+                    <span class="entry_type_enum_name">INACTIVE (v3.9)</span>
+                    <span class="entry_type_enum_notes"><p>The AE mode 'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY' is enabled but not applied.<wbr/></p></span>
+                  </li>
+                  <li>
+                    <span class="entry_type_enum_name">ACTIVE (v3.9)</span>
+                    <span class="entry_type_enum_notes"><p>The AE mode 'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY' is enabled and applied.<wbr/></p></span>
+                  </li>
+                </ul>
+
+            </td> <!-- entry_type -->
+
+            <td class="entry_description">
+              <p>Current state of the low light boost AE mode.<wbr/></p>
+            </td>
+
+            <td class="entry_units">
+            </td>
+
+            <td class="entry_range">
+            </td>
+
+            <td class="entry_hal_version">
+              <p>3.<wbr/>9</p>
+            </td>
+
+            <td class="entry_tags">
+            </td>
+
+          </tr>
+          <tr class="entries_header">
+            <th class="th_details" colspan="6">Details</th>
+          </tr>
+          <tr class="entry_cont">
+            <td class="entry_details" colspan="6">
+              <p>When low light boost is enabled by setting the AE mode to
+'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY',<wbr/> it can dynamically apply a low light
+boost when the light level threshold is exceeded.<wbr/></p>
+<p>This state indicates when low light boost is 'ACTIVE' and applied.<wbr/> Similarly,<wbr/> it can
+indicate when it is not being applied by returning 'INACTIVE'.<wbr/></p>
+<p>This key will be absent from the CaptureResult if AE mode is not set to
+'ON_<wbr/>LOW_<wbr/>LIGHT_<wbr/>BOOST_<wbr/>BRIGHTNESS_<wbr/>PRIORITY.<wbr/></p>
             </td>
           </tr>
 

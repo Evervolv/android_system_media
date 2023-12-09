@@ -279,6 +279,11 @@ static tag_info_t android_control[ANDROID_CONTROL_END -
     { "autoframingAvailable",          TYPE_BYTE   },
     [ ANDROID_CONTROL_AUTOFRAMING_STATE - ANDROID_CONTROL_START ] =
     { "autoframingState",              TYPE_BYTE   },
+    [ ANDROID_CONTROL_LOW_LIGHT_BOOST_INFO_LUMINANCE_RANGE - ANDROID_CONTROL_START ] =
+    { "lowLightBoostInfoLuminanceRange",
+                                        TYPE_FLOAT  },
+    [ ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE - ANDROID_CONTROL_START ] =
+    { "lowLightBoostState",            TYPE_BYTE   },
 };
 
 static tag_info_t android_demosaic[ANDROID_DEMOSAIC_END -
@@ -1159,6 +1164,10 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     msg = "ON_EXTERNAL_FLASH";
                     ret = 0;
                     break;
+                case ANDROID_CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY:
+                    msg = "ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY";
+                    ret = 0;
+                    break;
                 default:
                     msg = "error: enum value out of range";
             }
@@ -1883,6 +1892,24 @@ int camera_metadata_enum_snprint(uint32_t tag,
                     break;
                 case ANDROID_CONTROL_AUTOFRAMING_STATE_CONVERGED:
                     msg = "CONVERGED";
+                    ret = 0;
+                    break;
+                default:
+                    msg = "error: enum value out of range";
+            }
+            break;
+        }
+        case ANDROID_CONTROL_LOW_LIGHT_BOOST_INFO_LUMINANCE_RANGE: {
+            break;
+        }
+        case ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE: {
+            switch (value) {
+                case ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE_INACTIVE:
+                    msg = "INACTIVE";
+                    ret = 0;
+                    break;
+                case ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE_ACTIVE:
+                    msg = "ACTIVE";
                     ret = 0;
                     break;
                 default:
@@ -4184,6 +4211,12 @@ int camera_metadata_enum_value(uint32_t tag,
                     ret = 0;
                     break;
                 }
+                enumName = "ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_AE_MODE_ON_LOW_LIGHT_BOOST_BRIGHTNESS_PRIORITY;
+                    ret = 0;
+                    break;
+                }
             break;
         }
         case ANDROID_CONTROL_AE_REGIONS: {
@@ -5039,6 +5072,24 @@ int camera_metadata_enum_value(uint32_t tag,
                 enumName = "CONVERGED";
                 if (strncmp(name, enumName, size) == 0) {
                     *value = ANDROID_CONTROL_AUTOFRAMING_STATE_CONVERGED;
+                    ret = 0;
+                    break;
+                }
+            break;
+        }
+        case ANDROID_CONTROL_LOW_LIGHT_BOOST_INFO_LUMINANCE_RANGE: {
+            break;
+        }
+        case ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE: {
+                enumName = "INACTIVE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE_INACTIVE;
+                    ret = 0;
+                    break;
+                }
+                enumName = "ACTIVE";
+                if (strncmp(name, enumName, size) == 0) {
+                    *value = ANDROID_CONTROL_LOW_LIGHT_BOOST_STATE_ACTIVE;
                     ret = 0;
                     break;
                 }
@@ -7450,4 +7501,4 @@ int camera_metadata_enum_value(uint32_t tag,
 }
 
 
-#define CAMERA_METADATA_ENUM_STRING_MAX_SIZE 29
+#define CAMERA_METADATA_ENUM_STRING_MAX_SIZE 39
