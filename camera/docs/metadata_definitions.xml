@@ -884,7 +884,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           To start a CaptureSession with a target FPS range different from the
           capture request template's default value, the application
           is strongly recommended to call
-          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}
+          {@link android.hardware.camera2.params.SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}
           with the target fps range before creating the capture session. The aeTargetFpsRange is
           typically a session parameter. Specifying it at session creation time helps avoid
           session reconfiguration delays in cases like 60fps or high speed recording.
@@ -2160,7 +2160,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           Surface types that can be stabilized.
 
           The application is strongly recommended to call
-          {@link SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}
+          {@link android.hardware.camera2.params.SessionConfiguration#setSessionParameters|ACameraDevice_createCaptureSessionWithSessionParameters}
           with the desired video stabilization mode before creating the capture session.
           Video stabilization mode is a session parameter on many devices. Specifying
           it at session creation time helps avoid reconfiguration delay caused by difference
