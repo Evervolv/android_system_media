@@ -9,7 +9,7 @@ option java_outer_classname = "CameraDeviceInfoProto";
 // Content of this file is generated from $(ANDROID_ROOT)/system/media/camera/doc
 // Keep internal protocol buffer definition in sync with this one
 // Camera related device information
-// Next Id: 9
+// Next Id: 10
 message CameraDeviceInfo {
   // Supported profiles from CamcorderProfile.hasProfile
   optional bool profile_480p = 1;
@@ -244,5 +244,7 @@ message CameraDeviceInfo {
 
   // Per camera (front/back) informations
   repeated PerCameraInfo per_camera_info = 8;
+
+  optional bool supports_device_as_webcam = 9;
 } // CameraDeviceInfo
 

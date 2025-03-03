@@ -26,12 +26,7 @@
 #include <system/audio_effects/audio_effects_utils.h>
 
 using namespace android;
-using android::effect::utils::EffectParamReader;
-using android::effect::utils::EffectParamWrapper;
-using android::effect::utils::EffectParamWriter;
-using android::effect::utils::operator==;
-using android::effect::utils::operator!=;
-using android::effect::utils::ToString;
+using namespace android::effect::utils;
 
 TEST(EffectParamWrapperTest, setAndGetMatches) {
     effect_param_t param = {.psize = 2, .vsize = 0x10};
@@ -477,4 +472,93 @@ TEST(AudioEffectsUtilsTest, ToStringBoundaryValues) {
     std::string expected = "ffffffff-ffff-ffff-ffff-ffffffffffff";
 
     EXPECT_EQ(ToString(uuid), expected);
+}
+
+TEST(AudioEffectsUtilsTest, writeToEffectParamInts) {
+    int32_t buf32[sizeof(effect_param_t) / sizeof(int32_t) + 2 * sizeof(int32_t)];
+    int32_t p = 0x10, v = 0xff;
+    effect_param_t *param = (effect_param_t *)buf32;
+    EXPECT_EQ(OK, writeToEffectParam(param, p, v));
+    EXPECT_EQ(param->psize, sizeof(p));
+    EXPECT_EQ(param->vsize, sizeof(v));
+    EXPECT_EQ(*reinterpret_cast<int32_t*>(param->data), p);
+    EXPECT_EQ(*(reinterpret_cast<int32_t *>(param->data) + 1), v);
+
+    int32_t pRead, vRead;
+    EXPECT_EQ(OK, readFromEffectParam(param, &pRead, &vRead));
+    EXPECT_EQ(pRead, p);
+    EXPECT_EQ(vRead, v);
+}
+
+TEST(AudioEffectsUtilsTest, writeToEffectParamWithPadding) {
+    int32_t buf32[sizeof(effect_param_t) / sizeof(int32_t) + 2 * sizeof(int32_t)];
+    int8_t p = 0x10;
+    uint32_t v = 0xff;
+    effect_param_t *param = (effect_param_t *)buf32;
+    EXPECT_EQ(OK, writeToEffectParam(param, p, v));
+    EXPECT_EQ(param->psize, EffectParamWrapper::padding(sizeof(p)));
+    EXPECT_EQ(param->vsize, sizeof(v));
+    EXPECT_EQ(*reinterpret_cast<int32_t*>(param->data), p);
+    EXPECT_EQ(*(reinterpret_cast<int32_t *>(param->data) + 1), v);
+
+    int32_t pRead, vRead;
+    EXPECT_EQ(OK, readFromEffectParam(param, &pRead, &vRead));
+    EXPECT_EQ(pRead, p);
+    EXPECT_EQ(vRead, v);
+}
+
+TEST(AudioEffectsUtilsTest, writeToEffectParamNullptr) {
+    int8_t p = 0x10;
+    uint32_t v = 0xff;
+    EXPECT_EQ(BAD_VALUE, writeToEffectParam(nullptr, p, v));
+}
+
+TEST(AudioEffectsUtilsTest, writeToEffectParamNoEnoughSpace) {
+    int32_t buf32[sizeof(effect_param_t)];
+    int8_t p = 0x10;
+    uint32_t v = 0xff;
+    effect_param_t *param = (effect_param_t *)buf32;
+    EXPECT_EQ(BAD_VALUE, writeToEffectParam(nullptr, p, v, sizeof(effect_param_t)));
+}
+
+TEST(AudioEffectsUtilsTest, readFromEffectParamNullptr) {
+    int32_t buf32[sizeof(effect_param_t)];
+    int8_t p = 0x10;
+    uint32_t v = 0xff;
+    effect_param_t *param = (effect_param_t *)buf32;
+    EXPECT_EQ(BAD_VALUE, readFromEffectParam(nullptr, &p, &v));
+    EXPECT_EQ(BAD_VALUE, readFromEffectParam(param, (int8_t*)0, &v));
+    EXPECT_EQ(BAD_VALUE, readFromEffectParam(param, &p, (uint32_t *)0));
+}
+
+TEST(AudioEffectsUtilsTest, readFromEffectParamPSizeTooSmall) {
+    int32_t buf32[sizeof(effect_param_t) / sizeof(int32_t) + 2 * sizeof(int32_t)];
+    int8_t p = 0x10;
+    uint32_t v = 0xff;
+    effect_param_t *param = (effect_param_t *)buf32;
+    EXPECT_EQ(OK, writeToEffectParam(param, p, v));
+    EXPECT_EQ(param->psize, EffectParamWrapper::padding(sizeof(p)));
+    EXPECT_EQ(param->vsize, sizeof(v));
+    EXPECT_EQ(*reinterpret_cast<int32_t*>(param->data), p);
+    EXPECT_EQ(*(reinterpret_cast<int32_t *>(param->data) + 1), v);
+
+    param->psize--;
+    int32_t pRead, vRead;
+    EXPECT_EQ(BAD_VALUE, readFromEffectParam(param, &pRead, &vRead));
+}
+
+TEST(AudioEffectsUtilsTest, readFromEffectParamVSizeTooSmall) {
+    int32_t buf32[sizeof(effect_param_t) / sizeof(int32_t) + 2 * sizeof(int32_t)];
+    int8_t p = 0x10;
+    uint32_t v = 0xff;
+    effect_param_t *param = (effect_param_t *)buf32;
+    EXPECT_EQ(OK, writeToEffectParam(param, p, v));
+    EXPECT_EQ(param->psize, EffectParamWrapper::padding(sizeof(p)));
+    EXPECT_EQ(param->vsize, sizeof(v));
+    EXPECT_EQ(*reinterpret_cast<int32_t*>(param->data), p);
+    EXPECT_EQ(*(reinterpret_cast<int32_t *>(param->data) + 1), v);
+
+    param->vsize--;
+    int32_t pRead, vRead;
+    EXPECT_EQ(BAD_VALUE, readFromEffectParam(param, &pRead, &vRead));
 }

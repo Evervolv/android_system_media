@@ -18,6 +18,7 @@
 
 #include "intrinsic_utils.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <functional>

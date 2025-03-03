@@ -45,6 +45,24 @@ cc_test {
 }
 
 cc_test {
+    name: "audio_dsp_tests",
+    host_supported: true,
+    srcs: ["audio_dsp_tests.cpp"],
+    shared_libs: [
+        "libbase",
+        "liblog",
+    ],
+    header_libs: [
+        "libaudioutils_headers",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wthread-safety",
+    ],
+}
+
+cc_test {
     name: "audio_float_tests",
     host_supported: true,
     srcs: ["audio_float_tests.cpp"],
