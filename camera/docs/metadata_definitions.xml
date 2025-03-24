@@ -13345,7 +13345,6 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
               PRIV        | S1080P        | JPEG/JPEG_R     | UHD          |
               PRIV        | S1080P        | JPEG/JPEG_R     | S1440P       |
               PRIV        | S1080P        | JPEG/JPEG_R     | S1080P       |
-              PRIV        | S1080P        | PRIV            | UHD          |
               PRIV        | S720P         | JPEG/JPEG_R     | MAXIMUM_16_9 |
               PRIV        | S720P         | JPEG/JPEG_R     | UHD          |
               PRIV        | S720P         | JPEG/JPEG_R     | S1080P       |
@@ -13371,11 +13370,12 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           When set to BAKLAVA, the additional stream combinations below are verified
           by the compliance tests:
 
-          Target 1    |     Size      | Target 2        |     Size     | Target 3   |    Size     |
-          :----------:|:-------------:|:---------------:|:------------:|:----------:|:-----------:|
-          PRIV        | S1080P        | PRIV            | S1080P       |            |             |
-          PRIV        | S1080P        | PRIV            | S1440P       |            |             |
-          PRIV        | S1080P        | YUV             | S1080P       | S1080P     | PRIV        |
+          Target 1     |     Size      | Target 2        |     Size     | Target 3   |    Size     |
+          :-----------:|:-------------:|:---------------:|:------------:|:----------:|:-----------:|
+          PRIV Preview | S1080P        | PRIV Video      | S1080P       |            |             |
+          PRIV Preview | S1080P        | PRIV Video      | S1440P       |            |             |
+          PRIV Preview | S1080P        | PRIV Video      | UHD          |            |             |
+          PRIV Preview | S1080P        | YUV Analysis    | S1080P       | PRIV Video | 1080P       |
 
           * VIDEO_STABILIZATION_MODE: {OFF, ON} for the newly added stream combinations given the
           presence of dedicated video stream

@@ -2532,6 +2532,7 @@ __END_DECLS
 #define AUDIO_OFFLOAD_CODEC_PADDING_SAMPLES  "padding_samples"
 
 #define AUDIO_PARAMETER_CLIP_TRANSITION_SUPPORT "aosp.clipTransitionSupport"
+#define AUDIO_PARAMETER_CREATE_MMAP_BUFFER "aosp.createMmapBuffer"
 
 /**
  * The maximum supported audio sample rate.

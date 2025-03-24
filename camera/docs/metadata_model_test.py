@@ -35,12 +35,12 @@ class TestInnerNamespace(TestCase):
     combined_ins = [i for i in combined_children_namespace.namespaces]
     combined_ent = [i for i in combined_children_namespace.entries]
 
-    self.assertEquals(kind, combined_children_namespace.parent)
-    self.assertEquals(1, len(combined_ins))
-    self.assertEquals(1, len(combined_ent))
+    self.assertEqual(kind, combined_children_namespace.parent)
+    self.assertEqual(1, len(combined_ins))
+    self.assertEqual(1, len(combined_ent))
 
-    self.assertEquals("ins1", combined_ins[0].name)
-    self.assertEquals("entry3", combined_ent[0].name)
+    self.assertEqual("ins1", combined_ins[0].name)
+    self.assertEqual("entry3", combined_ent[0].name)
 
     new_ins = combined_ins[0]
     self.assertIn(entry1, new_ins.entries)
@@ -75,7 +75,7 @@ class TestKind(TestCase):
     #
     combined_kind = section.combine_kinds_into_single_node()
 
-    self.assertEquals(section, combined_kind.parent)
+    self.assertEqual(section, combined_kind.parent)
 
     self.assertIn(ins1, combined_kind.namespaces)
     self.assertIn(ins2, combined_kind.namespaces)
@@ -115,12 +115,12 @@ class TestKind(TestCase):
     combined_ins = [i for i in combined_children_kind.namespaces]
     combined_ent = [i for i in combined_children_kind.entries]
 
-    self.assertEquals(section, combined_children_kind.parent)
-    self.assertEquals(1, len(combined_ins))
-    self.assertEquals(1, len(combined_ent))
+    self.assertEqual(section, combined_children_kind.parent)
+    self.assertEqual(1, len(combined_ins))
+    self.assertEqual(1, len(combined_ent))
 
-    self.assertEquals("ins1", combined_ins[0].name)
-    self.assertEquals("entry3", combined_ent[0].name)
+    self.assertEqual("ins1", combined_ins[0].name)
+    self.assertEqual("entry3", combined_ent[0].name)
 
     new_ins = combined_ins[0]
     self.assertIn(entry1, new_ins.entries)
