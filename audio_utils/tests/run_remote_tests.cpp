@@ -20,16 +20,16 @@
 
 static void WorkerThread(android::audio_utils::RunRemote& runRemote) {
     while (true) {
-        const int c = runRemote.getc();
+        const int c = runRemote.getChar();
         switch (c) {
             case 'a':
-                runRemote.putc('a');  // send ack
+                runRemote.putChar('a');  // send ack
                 break;
             case 'b':
-                runRemote.putc('b');
+                runRemote.putChar('b');
                 break;
             default:
-                runRemote.putc('x');
+                runRemote.putChar('x');
                 break;
         }
     }
@@ -39,15 +39,15 @@ TEST(RunRemote, basic) {
     auto remoteWorker = std::make_shared<android::audio_utils::RunRemote>(WorkerThread);
     remoteWorker->run();
 
-    remoteWorker->putc('a');
-    EXPECT_EQ('a', remoteWorker->getc());
+    remoteWorker->putChar('a');
+    EXPECT_EQ('a', remoteWorker->getChar());
 
-    remoteWorker->putc('b');
-    EXPECT_EQ('b', remoteWorker->getc());
+    remoteWorker->putChar('b');
+    EXPECT_EQ('b', remoteWorker->getChar());
 
-    remoteWorker->putc('c');
-    EXPECT_EQ('x', remoteWorker->getc());
+    remoteWorker->putChar('c');
+    EXPECT_EQ('x', remoteWorker->getChar());
 
     remoteWorker->stop();
-    EXPECT_EQ(-1, remoteWorker->getc());  // remote closed
+    EXPECT_EQ(-1, remoteWorker->getChar());  // remote closed
 }

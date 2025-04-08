@@ -3235,7 +3235,12 @@ conditions.<wbr/></p>
 (triggered by <a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a>) and
 may be fired for captures for which the
 <a href="#controls_android.control.captureIntent">android.<wbr/>control.<wbr/>capture<wbr/>Intent</a> field is set to
-STILL_<wbr/>CAPTURE</p></span>
+STILL_<wbr/>CAPTURE.<wbr/></p>
+<p>It's important to wait for the precapture sequence
+to complete (i.<wbr/>e.,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> reaches
+FLASH_<wbr/>REQUIRED,<wbr/> CONVERGED,<wbr/> or LOCKED) before submitting a
+STILL_<wbr/>CAPTURE request.<wbr/> Otherwise,<wbr/> in low-light conditions,<wbr/>
+the image captures with flash fired won't have correct exposures.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">ON_ALWAYS_FLASH (v3.2)</span>
@@ -3246,7 +3251,12 @@ captures.<wbr/></p>
 (triggered by <a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a>) and
 will always be fired for captures for which the
 <a href="#controls_android.control.captureIntent">android.<wbr/>control.<wbr/>capture<wbr/>Intent</a> field is set to
-STILL_<wbr/>CAPTURE</p></span>
+STILL_<wbr/>CAPTURE.<wbr/></p>
+<p>It's important to wait for the precapture sequence
+to complete (i.<wbr/>e.,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> reaches
+FLASH_<wbr/>REQUIRED,<wbr/> CONVERGED,<wbr/> or LOCKED) Dbefore submitting a
+STILL_<wbr/>CAPTURE request.<wbr/> Otherwise,<wbr/> in low-light conditions,<wbr/>
+the image captures with flash fired won't have correct exposures.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">ON_AUTO_FLASH_REDEYE (v3.2)</span>
@@ -8873,7 +8883,12 @@ conditions.<wbr/></p>
 (triggered by <a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a>) and
 may be fired for captures for which the
 <a href="#controls_android.control.captureIntent">android.<wbr/>control.<wbr/>capture<wbr/>Intent</a> field is set to
-STILL_<wbr/>CAPTURE</p></span>
+STILL_<wbr/>CAPTURE.<wbr/></p>
+<p>It's important to wait for the precapture sequence
+to complete (i.<wbr/>e.,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> reaches
+FLASH_<wbr/>REQUIRED,<wbr/> CONVERGED,<wbr/> or LOCKED) before submitting a
+STILL_<wbr/>CAPTURE request.<wbr/> Otherwise,<wbr/> in low-light conditions,<wbr/>
+the image captures with flash fired won't have correct exposures.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">ON_ALWAYS_FLASH (v3.2)</span>
@@ -8884,7 +8899,12 @@ captures.<wbr/></p>
 (triggered by <a href="#controls_android.control.aePrecaptureTrigger">android.<wbr/>control.<wbr/>ae<wbr/>Precapture<wbr/>Trigger</a>) and
 will always be fired for captures for which the
 <a href="#controls_android.control.captureIntent">android.<wbr/>control.<wbr/>capture<wbr/>Intent</a> field is set to
-STILL_<wbr/>CAPTURE</p></span>
+STILL_<wbr/>CAPTURE.<wbr/></p>
+<p>It's important to wait for the precapture sequence
+to complete (i.<wbr/>e.,<wbr/> <a href="#dynamic_android.control.aeState">android.<wbr/>control.<wbr/>ae<wbr/>State</a> reaches
+FLASH_<wbr/>REQUIRED,<wbr/> CONVERGED,<wbr/> or LOCKED) Dbefore submitting a
+STILL_<wbr/>CAPTURE request.<wbr/> Otherwise,<wbr/> in low-light conditions,<wbr/>
+the image captures with flash fired won't have correct exposures.<wbr/></p></span>
                   </li>
                   <li>
                     <span class="entry_type_enum_name">ON_AUTO_FLASH_REDEYE (v3.2)</span>

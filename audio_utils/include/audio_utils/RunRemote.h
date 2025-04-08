@@ -112,7 +112,7 @@ public:
     }
 
     /** waits for a char from the remote process. */
-    int getc() {
+    int getChar() {
         unsigned char c;
         // EOF returns 0 (this is a blocking read), -1 on error.
         if (read(mInFd, &c, 1) != 1) return -1;
@@ -120,7 +120,7 @@ public:
     }
 
     /** sends a char to the remote process. */
-    int putc(int c) {
+    int putChar(int c) {
         while (true) {
             int ret = write(mOutFd, &c, 1);  // LE.
             if (ret == 1) return 1;

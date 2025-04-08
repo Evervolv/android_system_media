@@ -762,7 +762,13 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 (triggered by android.control.aePrecaptureTrigger) and
                 may be fired for captures for which the
                 android.control.captureIntent field is set to
-                STILL_CAPTURE
+                STILL_CAPTURE.
+
+                It's important to wait for the precapture sequence
+                to complete (i.e., android.control.aeState reaches
+                FLASH_REQUIRED, CONVERGED, or LOCKED) before submitting a
+                STILL_CAPTURE request. Otherwise, in low-light conditions,
+                the image captures with flash fired won't have correct exposures.
               </notes>
             </value>
             <value>ON_ALWAYS_FLASH
@@ -775,7 +781,13 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
                 (triggered by android.control.aePrecaptureTrigger) and
                 will always be fired for captures for which the
                 android.control.captureIntent field is set to
-                STILL_CAPTURE
+                STILL_CAPTURE.
+
+                It's important to wait for the precapture sequence
+                to complete (i.e., android.control.aeState reaches
+                FLASH_REQUIRED, CONVERGED, or LOCKED) Dbefore submitting a
+                STILL_CAPTURE request. Otherwise, in low-light conditions,
+                the image captures with flash fired won't have correct exposures.
               </notes>
             </value>
             <value>ON_AUTO_FLASH_REDEYE
