@@ -91,6 +91,7 @@ constexpr char kEffectImplUuidDynamicsProcessing[] = "e0e6539b-1781-7261-676f-6d
 constexpr char kEffectImplUuidEqualizerSw[] = "0bed4300-847d-11df-bb17-0002a5d5c51b";
 constexpr char kEffectImplUuidEqualizerBundle[] = "ce772f20-847d-11df-bb17-0002a5d5c51b";
 constexpr char kEffectImplUuidEqualizerProxy[] = "c8e70ecd-48ca-456e-8a4f-0002a5d5c51b";
+constexpr char kEffectImplUuidEraser[] = "fa81ad26-588b-11ed-9b6a-0242ac120002";
 constexpr char kEffectImplUuidEraserSw[] = "fa81ab46-588b-11ed-9b6a-0242ac120002";
 constexpr char kEffectImplUuidHapticGeneratorSw[] = "fa819110-588b-11ed-9b6a-0242ac120002";
 constexpr char kEffectImplUuidHapticGenerator[] = "97c4acd1-8b82-4f2f-832e-c2fe5d7a9931";
@@ -153,6 +154,7 @@ constexpr char kEffectImplUuidExtension[] = "fa81dd00-588b-11ed-9b6a-0242ac12000
     V(ImplUuidEqualizerSw)              \
     V(ImplUuidEqualizerBundle)          \
     V(ImplUuidEqualizerProxy)           \
+    V(ImplUuidEraser)                   \
     V(ImplUuidEraserSw)                 \
     V(ImplUuidExtension)                \
     V(ImplUuidHapticGeneratorSw)        \
