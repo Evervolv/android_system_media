@@ -126,33 +126,40 @@ using mutex = mutex_impl<AudioMutexAttributes>;
 //
 // This is implemented by maintaining a queue of threads waiting to acquire the
 // lock. When a thread attempts to acquire the lock, it adds itself to the
-// queue and waits until it is at the front of the queue. When a thread releases
-// the lock, it removes itself from the queue and notifies the next thread in
-// the queue.
+// queue and waits until it is at the front of the queue if waiting is needed.
+// When a thread releases the lock, it notifies the next thread in the queue.
 class CAPABILITY("mutex") fair_mutex {
 public:
     void lock() ACQUIRE() {
         std::unique_lock ul(mutex_);
-        uint64_t my_seq = next_seq_++;
-        queue_.push(my_seq);
-        while (queue_.front() != my_seq) {
-            cv_.wait(ul);
+        if (++clients_ == 1) return;  // we're the only one.
+        auto cvp = std::make_shared<std::pair<bool, std::condition_variable>>();
+        queue_.push(cvp);
+        while (!cvp->first) {
+            cvp->second.wait(ul);
         }
     }
 
     void unlock() RELEASE() {
+        std::shared_ptr<std::pair<bool, std::condition_variable>> cvp;
         {
             std::lock_guard lg(mutex_);
+            if (--clients_ == 0) return;  // noone else.
+            LOG_ALWAYS_FATAL_IF(clients_ < 0,
+                    "%s: unlock called too many times (%lld)",
+                    __func__, (long long)clients_);
+            cvp = queue_.front();
+            cvp->first = true;
             queue_.pop();
         }
-        cv_.notify_all();
+        cvp->second.notify_all();
     }
 
 private:
     std::mutex mutex_;
-    std::condition_variable cv_;
-    std::queue<uint64_t> queue_ GUARDED_BY(mutex_);
-    uint64_t next_seq_ GUARDED_BY(mutex_){};
+    std::queue<std::shared_ptr<std::pair<bool, std::condition_variable>>>
+            queue_ GUARDED_BY(mutex_);
+    int64_t clients_ GUARDED_BY(mutex_) = 0;
 };
 
 // Capabilities in priority order
