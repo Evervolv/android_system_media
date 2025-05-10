@@ -28,6 +28,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <sys/syscall.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -119,6 +120,40 @@ inline constexpr const char* const gMutexNames[] = {
 class AudioMutexAttributes;
 template <typename T> class mutex_impl;
 using mutex = mutex_impl<AudioMutexAttributes>;
+
+// fair_mutex is a mutex that guarantees fairness: threads acquire the lock in the
+// order they attempt to acquire it.
+//
+// This is implemented by maintaining a queue of threads waiting to acquire the
+// lock. When a thread attempts to acquire the lock, it adds itself to the
+// queue and waits until it is at the front of the queue. When a thread releases
+// the lock, it removes itself from the queue and notifies the next thread in
+// the queue.
+class CAPABILITY("mutex") fair_mutex {
+public:
+    void lock() ACQUIRE() {
+        std::unique_lock ul(mutex_);
+        uint64_t my_seq = next_seq_++;
+        queue_.push(my_seq);
+        while (queue_.front() != my_seq) {
+            cv_.wait(ul);
+        }
+    }
+
+    void unlock() RELEASE() {
+        {
+            std::lock_guard lg(mutex_);
+            queue_.pop();
+        }
+        cv_.notify_all();
+    }
+
+private:
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    std::queue<uint64_t> queue_ GUARDED_BY(mutex_);
+    uint64_t next_seq_ GUARDED_BY(mutex_){};
+};
 
 // Capabilities in priority order
 // (declaration only, value is nullptr)

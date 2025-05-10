@@ -438,6 +438,84 @@ TEST(audio_mutex_tests, StdTimedLock) {
         EXPECT_TRUE(success);
     }
 }
+
+TEST(audio_mutex_tests, FairMutexBasic) {
+    audio_utils::fair_mutex fm;
+    int critical_section = 0;
+    constexpr int kNumThreads = 2;
+    constexpr int kWorkerIterations = 100;
+    std::vector<std::thread> threads;
+
+    auto worker = [&] {
+        for (int i = 0; i < kWorkerIterations; ++i) {
+            std::lock_guard lg(fm);
+            ++critical_section;
+            std::this_thread::yield();
+        }
+    };
+
+    for (int i = 0; i < kNumThreads; ++i) {
+        threads.emplace_back(worker);
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    EXPECT_EQ(critical_section, kNumThreads * kWorkerIterations);
+}
+
+TEST(audio_mutex_tests, FairMutexFairness) {
+    audio_utils::fair_mutex fm;
+    std::mutex order_mutex;
+    std::vector<int> acquisition_order;
+    const std::vector<int> expected_order = {1, 2, 3, 4};
+
+    // Main thread acquires lock first to establish a barrier
+    std::unique_lock outer_lg(fm);
+
+    // Synchronization control variables (one atomic flag per thread)
+    std::vector<std::atomic<bool>> thread_ready(expected_order.size() + 1);
+    for (auto& flag : thread_ready) {
+        flag.store(false, std::memory_order_relaxed);
+    }
+
+    // Generic thread task template
+    auto thread_task = [&](int thread_id, std::atomic<bool>& ready_flag) {
+        ready_flag.store(true);  // Notify main thread of startup completion
+        std::lock_guard inner_lg(fm);  // Blocking lock acquisition
+
+        {   // Record lock acquisition order
+            std::lock_guard lgo(order_mutex);
+            acquisition_order.push_back(thread_id);
+        }
+    };
+
+    // Start four threads sequentially
+    std::vector<std::thread> threads;
+    for (size_t i = 0; i < expected_order.size(); ++i) {
+        int thread_id = expected_order[i];
+        threads.emplace_back([&, thread_id] {
+            thread_task(thread_id, thread_ready[thread_id]);
+        });
+        while (!thread_ready[thread_id].load(
+            std::memory_order_acquire)) {} // Wait until thread enters wait queue
+    }
+
+    // Ensure all threads enter kernel-level wait queue
+    std::this_thread::sleep_for(100ms);
+    outer_lg.unlock();  // Release lock to trigger contention
+
+    // Wait for all threads to complete
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    // Validation loop
+    for (size_t i = 0; i < expected_order.size(); ++i) {
+        EXPECT_EQ(acquisition_order[i], expected_order[i]);
+    }
+}
 // The following tests are evaluated for the android::audio_utils::mutex
 // Non-Priority Inheritance and Priority Inheritance cases.
 
