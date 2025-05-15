@@ -1217,6 +1217,8 @@ TEST(camera_metadata, delete_metadata) {
     EXPECT_EQ(num_data, get_camera_metadata_data_count(m));
     EXPECT_EQ(data_capacity, get_camera_metadata_data_capacity(m));
 
+    int64_t exposureTimeExpected = 0;
+    int64_t exposureTimeFound = 0;
     for (size_t i = 0; i < num_entries; i++) {
         camera_metadata_entry e2;
         result = get_camera_metadata_entry(m, i, &e2);
@@ -1224,9 +1226,10 @@ TEST(camera_metadata, delete_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = i < 1 ? 100 : 200 + 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += i < 1 ? 100 : 200 + 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 }
 
 TEST(camera_metadata, update_metadata) {
@@ -1406,6 +1409,8 @@ TEST(camera_metadata, update_metadata) {
     EXPECT_EQ((size_t)1, e.count);
     EXPECT_EQ(newFrameCount, *e.data.i32);
 
+    int64_t exposureTimeExpected = 0;
+    int64_t exposureTimeFound = 0;
     for (size_t i = 1; i < num_entries; i++) {
         camera_metadata_entry e2;
         result = get_camera_metadata_entry(m, i, &e2);
@@ -1413,9 +1418,10 @@ TEST(camera_metadata, update_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 
     // Update to bigger than entry
 
@@ -1456,6 +1462,8 @@ TEST(camera_metadata, update_metadata) {
     EXPECT_EQ(newFrameCounts[2], e.data.i32[2]);
     EXPECT_EQ(newFrameCounts[3], e.data.i32[3]);
 
+    exposureTimeExpected = 0;
+    exposureTimeFound = 0;
     for (size_t i = 1; i < num_entries; i++) {
         camera_metadata_entry e2;
         result = get_camera_metadata_entry(m, i, &e2);
@@ -1463,9 +1471,10 @@ TEST(camera_metadata, update_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 
     // Update to smaller than entry
     result = update_camera_metadata_entry(m,
@@ -1494,6 +1503,8 @@ TEST(camera_metadata, update_metadata) {
     EXPECT_EQ((size_t)1, e.count);
     EXPECT_EQ(newFrameCount, *e.data.i32);
 
+    exposureTimeExpected = 0;
+    exposureTimeFound = 0;
     for (size_t i = 1; i < num_entries; i++) {
         camera_metadata_entry_t e2;
         result = get_camera_metadata_entry(m, i, &e2);
@@ -1501,9 +1512,10 @@ TEST(camera_metadata, update_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 
     // Setup new buffer with no spare data space
 
@@ -1590,6 +1602,8 @@ TEST(camera_metadata, update_metadata) {
     EXPECT_EQ(newExposures[0], e.data.i64[0]);
     EXPECT_EQ(newExposures[1], e.data.i64[1]);
 
+    exposureTimeExpected = 0;
+    exposureTimeFound = 0;
     for (size_t i = 2; i < num_entries; i++) {
         camera_metadata_entry_t e2;
         result = get_camera_metadata_entry(m2, i, &e2);
@@ -1597,9 +1611,10 @@ TEST(camera_metadata, update_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 
     // Update when there's no data room, but data size doesn't change
 
@@ -1629,6 +1644,8 @@ TEST(camera_metadata, update_metadata) {
     EXPECT_EQ((size_t)1, e.count);
     EXPECT_EQ(newFrameCount, *e.data.i32);
 
+    exposureTimeExpected = 0;
+    exposureTimeFound = 0;
     for (size_t i = 2; i < num_entries; i++) {
         camera_metadata_entry_t e2;
         result = get_camera_metadata_entry(m2, i, &e2);
@@ -1636,9 +1653,10 @@ TEST(camera_metadata, update_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 
     // Update when there's no data room, but data size shrinks
 
@@ -1668,6 +1686,8 @@ TEST(camera_metadata, update_metadata) {
     EXPECT_EQ((size_t)1, e.count);
     EXPECT_EQ(newFrameCount, *e.data.i32);
 
+    exposureTimeExpected = 0;
+    exposureTimeFound = 0;
     for (size_t i = 2; i < num_entries; i++) {
         camera_metadata_entry_t e2;
         result = get_camera_metadata_entry(m2, i, &e2);
@@ -1675,9 +1695,10 @@ TEST(camera_metadata, update_metadata) {
         EXPECT_EQ(i, e2.index);
         EXPECT_EQ(ANDROID_SENSOR_EXPOSURE_TIME, e2.tag);
         EXPECT_EQ(TYPE_INT64, e2.type);
-        int64_t exposureTime = 100 * i;
-        EXPECT_EQ(exposureTime, *e2.data.i64);
+        exposureTimeExpected += 100 * i;
+        exposureTimeFound += *e2.data.i64;
     }
+    EXPECT_EQ(exposureTimeExpected, exposureTimeFound);
 
 }
 
