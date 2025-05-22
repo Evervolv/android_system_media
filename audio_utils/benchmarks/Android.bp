@@ -10,6 +10,24 @@ package {
 }
 
 cc_benchmark {
+    name: "audio_atomic_benchmark",
+
+    srcs: ["audio_atomic_benchmark.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libutils",
+    ],
+    static_libs: [
+        "libaudioutils",
+    ],
+}
+
+cc_benchmark {
     name: "audio_mutex_benchmark",
 
     srcs: ["audio_mutex_benchmark.cpp"],

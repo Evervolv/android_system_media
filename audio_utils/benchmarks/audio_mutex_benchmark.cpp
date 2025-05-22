@@ -34,27 +34,6 @@ $ atest audio_mutex_benchmark
 
 Benchmark                                                     Time        CPU        Iteration
 audio_mutex_benchmark:
-  #BM_atomic_add_equals<int32_t>                                6.502025194439543 ns       6.47205015631869 ns     108145417
-  #BM_atomic_add_to_seq_cst<int16_t>                             6.55807517340572 ns      6.526952655561198 ns     107217450
-  #BM_atomic_add_to_seq_cst<int32_t>                            6.610803828172807 ns       6.58148248625125 ns     106355671
-  #BM_atomic_add_to_seq_cst<int64_t>                           6.5568264443311595 ns      6.526632489003918 ns     107237292
-  #BM_atomic_add_to_seq_cst<float>                              7.884542958080632 ns     7.8526649209116375 ns      89368018
-  #BM_atomic_add_to_seq_cst<double>                             7.931010792308195 ns      7.893661616016361 ns      88487681
-  #BM_atomic_add_to_relaxed<int16_t>                            5.167222836799001 ns      5.144664678496968 ns     136918225
-  #BM_atomic_add_to_relaxed<int32_t>                            5.181042322951031 ns       5.15622768069756 ns     135684124
-  #BM_atomic_add_to_relaxed<int64_t>                             5.16751983474899 ns      5.144558629227656 ns     138681351
-  #BM_atomic_add_to_relaxed<float>                             7.7921119585599525 ns      7.741060701068997 ns      90441768
-  #BM_atomic_add_to_relaxed<double>                             7.774451559752642 ns      7.737580743492468 ns      90244734
-  #BM_atomic_add_to_unordered<int16_t>                         0.3535942390008131 ns            0.351996905 ns    1000000000
-  #BM_atomic_add_to_unordered<int32_t>                        0.35363073799817357 ns     0.3519564250000009 ns    1000000000
-  #BM_atomic_add_to_unordered<int64_t>                        0.35689860000275075 ns    0.35208711699999995 ns    1000000000
-  #BM_atomic_add_to_unordered<float>                           0.7052556854655034 ns     0.7020281104213322 ns     997014156
-  #BM_atomic_add_to_unordered<double>                          0.7050851735423606 ns     0.7020307730369924 ns     997136097
-  #BM_atomic_add_to_unordered<volatile_int16_t>                1.7630191837466263 ns      1.755060622823009 ns     398830899
-  #BM_atomic_add_to_unordered<volatile_int32_t>                1.7636458882248507 ns     1.7551169249266374 ns     398840618
-  #BM_atomic_add_to_unordered<volatile_int64_t>                 1.762758401503814 ns      1.755028484468997 ns     398845420
-  #BM_atomic_add_to_unordered<volatile_float>                  2.6616841096538084 ns     2.6491095463299206 ns     264227784
-  #BM_atomic_add_to_unordered<volatile_double>                  2.659741383344485 ns     2.6476598391107227 ns     264613772
   #BM_gettid                                                   2.1159776035370936 ns       2.10614115284375 ns     332373750
   #BM_systemTime                                                45.25256074688064 ns     45.040996499041846 ns      15560597
   #BM_thread_8_variables                                       2.8218847925890063 ns      2.808269438152783 ns     249265931
@@ -123,96 +102,6 @@ audio_mutex_benchmark:
 */
 
 // ---
-
-template<typename Integer>
-static void BM_atomic_add_equals(benchmark::State &state) {
-    Integer i = 10;
-    std::atomic<Integer> dst;
-    while (state.KeepRunning()) {
-        dst += i;
-    }
-    LOG(DEBUG) << __func__ << "  " << dst.load();
-}
-
-BENCHMARK(BM_atomic_add_equals<int32_t>);
-
-template <typename T>
-static void BM_atomic_add_to(benchmark::State &state, std::memory_order order) {
-    int64_t i64 = 10;
-    std::atomic<T> dst;
-    while (state.KeepRunning()) {
-        android::audio_utils::atomic_add_to(dst, i64, order);
-    }
-    LOG(DEBUG) << __func__ << "  " << dst.load();
-}
-
-// Avoid macro issues with the comma.
-template <typename T>
-static void BM_atomic_add_to_seq_cst(benchmark::State &state) {
-    BM_atomic_add_to<T>(state, std::memory_order_seq_cst);
-}
-
-BENCHMARK(BM_atomic_add_to_seq_cst<int16_t>);
-
-BENCHMARK(BM_atomic_add_to_seq_cst<int32_t>);
-
-BENCHMARK(BM_atomic_add_to_seq_cst<int64_t>);
-
-BENCHMARK(BM_atomic_add_to_seq_cst<float>);
-
-BENCHMARK(BM_atomic_add_to_seq_cst<double>);
-
-template <typename T>
-static void BM_atomic_add_to_relaxed(benchmark::State &state) {
-    BM_atomic_add_to<T>(state, std::memory_order_relaxed);
-}
-
-BENCHMARK(BM_atomic_add_to_relaxed<int16_t>);
-
-BENCHMARK(BM_atomic_add_to_relaxed<int32_t>);
-
-BENCHMARK(BM_atomic_add_to_relaxed<int64_t>);
-
-BENCHMARK(BM_atomic_add_to_relaxed<float>);
-
-BENCHMARK(BM_atomic_add_to_relaxed<double>);
-
-template <typename T>
-static void BM_atomic_add_to_unordered(benchmark::State &state) {
-    int64_t i64 = 10;
-    android::audio_utils::unordered_atomic<T> dst;
-    while (state.KeepRunning()) {
-        android::audio_utils::atomic_add_to(dst, i64, std::memory_order_relaxed);
-    }
-    LOG(DEBUG) << __func__ << "  " << dst.load();
-}
-
-BENCHMARK(BM_atomic_add_to_unordered<int16_t>);
-
-BENCHMARK(BM_atomic_add_to_unordered<int32_t>);
-
-BENCHMARK(BM_atomic_add_to_unordered<int64_t>);
-
-BENCHMARK(BM_atomic_add_to_unordered<float>);
-
-BENCHMARK(BM_atomic_add_to_unordered<double>);
-
-// type aliases to allow for macro parsing.
-using volatile_int16_t = volatile int16_t;
-using volatile_int32_t = volatile int32_t;
-using volatile_int64_t = volatile int64_t;
-using volatile_float = volatile float;
-using volatile_double = volatile double;
-
-BENCHMARK(BM_atomic_add_to_unordered<volatile_int16_t>);
-
-BENCHMARK(BM_atomic_add_to_unordered<volatile_int32_t>);
-
-BENCHMARK(BM_atomic_add_to_unordered<volatile_int64_t>);
-
-BENCHMARK(BM_atomic_add_to_unordered<volatile_float>);
-
-BENCHMARK(BM_atomic_add_to_unordered<volatile_double>);
 
 // Benchmark gettid().  The mutex class uses this to get the linux thread id.
 static void BM_gettid(benchmark::State &state) {

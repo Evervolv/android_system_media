@@ -21,43 +21,29 @@
 #undef LOG_TAG
 #define LOG_TAG "audio_utils::atomic"
 
+#include <atomic>
+
 namespace android::audio_utils {
 
-// relaxed_atomic implements the same features as std::atomic<T> but using
-// std::memory_order_relaxed as default.
+// Rationale:
+
+// std::atomic defaults to memory_order_seq_cst access, with no template options to change the
+// default behavior (one must specify a different memory order on each method call).
+// This confuses the atomic-by-method-access strategy used in Linux (and older Android methods)
+// with an incomplete atomic-by-declaration strategy for C++.
 //
-// This is the minimum consistency for the multiple writer multiple reader case.
+// Although the std::atomic default memory_order_seq_cst is the safest and strictest,
+// we can often relax the conditions of access based on the variable usage.
+//
+// The audio_utils atomic fixes this declaration deficiency of std::atomic.
+// It allows template specification of relaxed and unordered access by default.
+// Consistent atomic behavior is then based on the variable declaration, and switching
+// and benchmarking different atomic safety guarantees is easy.
 
-template <typename T>
-class relaxed_atomic : private std::atomic<T> {
-public:
-    constexpr relaxed_atomic(T desired = {}) : std::atomic<T>(desired) {}
-    operator T() const { return std::atomic<T>::load(std::memory_order_relaxed); }
-    T operator=(T desired) {
-        std::atomic<T>::store(desired, std::memory_order_relaxed); return desired;
-    }
-
-    T operator--() { return std::atomic<T>::fetch_sub(1, std::memory_order_relaxed) - 1; }
-    T operator++() { return std::atomic<T>::fetch_add(1, std::memory_order_relaxed) + 1;  }
-    T operator+=(const T value) {
-        return std::atomic<T>::fetch_add(value, std::memory_order_relaxed) + value;
-    }
-
-    T load(std::memory_order order = std::memory_order_relaxed) const {
-        return std::atomic<T>::load(order);
-    }
-    T fetch_add(T arg, std::memory_order order =std::memory_order_relaxed) {
-        return std::atomic<T>::fetch_add(arg, order);
-    }
-    bool compare_exchange_weak(
-            T& expected, T desired, std::memory_order order = std::memory_order_relaxed) {
-        return std::atomic<T>::compare_exchange_weak(expected, desired, order);
-    }
-};
-
-// unordered_atomic implements data storage such that memory reads have a value
-// consistent with a memory write in some order, i.e. not having values
-// "out of thin air".
+// About unordered access.
+//
+// memory_order_unordered implements data storage such that memory reads have a value
+// consistent with a memory write in some order.
 //
 // Unordered memory reads and writes may not actually take place but be implicitly cached.
 // Nevertheless, a memory read should return at least as contemporaneous a value
@@ -76,30 +62,290 @@ public:
 // optimizations can take place which would otherwise be discouraged for atomics.
 // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0062r1.html
 
-// VT may be volatile qualified, if desired, or a normal arithmetic type.
-template <typename VT>
-class unordered_atomic {
+// std::atomic and the C11 atomics are not sufficient to implement these libraries
+// with unordered access.  We use the C++ compiler built-ins.
+//
+// https://en.cppreference.com/w/c/language/atomic
+
+enum memory_order {
+    memory_order_unordered = -1,
+    memory_order_relaxed = (int)std::memory_order_relaxed,
+    // memory_order_consume = (int)std::memory_order_consume, // deprecated and omitted.
+    memory_order_acquire = (int)std::memory_order_acquire,
+    memory_order_release = (int)std::memory_order_release,
+    memory_order_acq_rel = (int)std::memory_order_acq_rel,
+    memory_order_seq_cst = (int)std::memory_order_seq_cst,
+};
+
+inline constexpr int to_gnu_memory_order(memory_order mo) {
+    return mo == memory_order_relaxed ? __ATOMIC_RELAXED
+    // : mo == memory_order_consume ? __ATOMIC_CONSUME  // deprecated and omitted.
+    : mo == memory_order_acquire ? __ATOMIC_ACQUIRE
+    : mo == memory_order_release ? __ATOMIC_RELEASE
+    : mo == memory_order_acq_rel ? __ATOMIC_ACQ_REL
+    : mo == memory_order_seq_cst ? __ATOMIC_SEQ_CST : -1;
+}
+
+inline constexpr int to_gnu_load_memory_order(memory_order mo) {
+    return mo == memory_order_relaxed ? __ATOMIC_RELAXED
+    // : mo == memory_order_consume ? __ATOMIC_CONSUME  // deprecated and omitted.
+    : mo == memory_order_acquire ? __ATOMIC_ACQUIRE
+    : mo == memory_order_release ? __ATOMIC_RELAXED  // see compare-exchange
+    : mo == memory_order_acq_rel ? __ATOMIC_ACQUIRE
+    : mo == memory_order_seq_cst ? __ATOMIC_SEQ_CST : -1;
+}
+
+inline constexpr int to_gnu_store_memory_order(memory_order mo) {
+    return mo == memory_order_relaxed ? __ATOMIC_RELAXED
+    // : mo == memory_order_consume ? __ATOMIC_CONSUME  // deprecated and omitted.
+    : mo == memory_order_acquire ? __ATOMIC_RELAXED  // for symmetry with load.
+    : mo == memory_order_release ? __ATOMIC_RELEASE
+    : mo == memory_order_acq_rel ? __ATOMIC_RELEASE
+    : mo == memory_order_seq_cst ? __ATOMIC_SEQ_CST : -1;
+}
+
+template <typename VT, memory_order MO>
+class atomic {
     using T = std::decay_t<VT>;
     static_assert(std::atomic<T>::is_always_lock_free);
 public:
-    constexpr unordered_atomic(T desired = {}) : t_(desired) {}
-    operator T() const { return t_; }
-    T operator=(T desired) { t_ = desired; return desired; }
+    constexpr atomic(T desired = {}) : t_(desired) {}
 
-    // a volatile ++t_ or t_ += 1 is deprecated in C++20.
-    T operator--() { return operator+=(-1); }
-    T operator++() { return operator+=(1); }
-    T operator+=(const T value) {
-        T output;
-        // atomic overflow is defined as 2's complement.
-        (void)__builtin_add_overflow(t_, value, &output);
-        return operator=(output);
+    constexpr operator T() const { return load(); }
+
+    constexpr T operator=(T desired) {
+        store(desired);
+        return desired;
     }
 
-    T load(std::memory_order order = std::memory_order_relaxed) const { (void)order; return t_; }
+    constexpr T operator--(int) { return fetch_sub(1); }
+    constexpr T operator++(int) { return fetch_add(1); }
+    constexpr T operator--() { return operator-=(1); }
+    constexpr T operator++() { return operator+=(1); }
+
+    // these operations return the result.
+    constexpr T operator+=(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            if constexpr (std::is_integral_v<T>) {
+                T output;
+                // use 2's complement overflow to match atomic spec.
+                (void)__builtin_add_overflow(t_, value, &output);
+                return operator=(output);
+            } else /* constexpr */ {
+                return t_ += value;
+            }
+        } else /* constexpr */ {
+            return __atomic_add_fetch(&t_, value, to_gnu_memory_order(MO));
+        }
+    }
+    constexpr T operator-=(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            if constexpr (std::is_integral_v<T>) {
+                T output;
+                // use 2's complement overflow to match atomic spec.
+                (void)__builtin_sub_overflow(t_, value, &output);
+                return operator=(output);
+            } else /* constexpr */ {
+                return t_ -= value;
+            }
+        } else /* constexpr */ {
+            return __atomic_sub_fetch(&t_, value, to_gnu_memory_order(MO));
+        }
+    }
+    constexpr T operator&=(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            return t_ &= value;
+        } else /* constexpr */ {
+            return __atomic_and_fetch(&t_, value, to_gnu_memory_order(MO));
+        }
+    }
+    constexpr T operator|=(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            return t_ |= value;
+        } else /* constexpr */ {
+            return __atomic_or_fetch(&t_, value, to_gnu_memory_order(MO));
+        }
+    }
+    constexpr T operator^=(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            return t_ ^= value;
+        } else /* constexpr */ {
+            return __atomic_xor_fetch(&t_, value, to_gnu_memory_order(MO));
+        }
+    }
+
+    // classic atomic load and store
+    constexpr T load() const {
+        if constexpr (MO == memory_order_unordered) {
+            return t_;
+        } else /* constexpr */ {
+            return load(MO);
+        }
+    }
+    constexpr T load(memory_order mo) const {
+        if (mo == memory_order_unordered) {
+            return t_;
+        } else {
+            T ret;
+            __atomic_load(&t_, &ret, to_gnu_load_memory_order(mo));
+            return ret;
+        }
+    }
+    constexpr void store(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            t_ = value;
+        } else /* constexpr */ {
+            store(value, MO);
+        }
+    }
+    constexpr void store(T value, memory_order mo) {
+        if (mo == memory_order_unordered) {
+            t_ = value;
+        } else {
+            __atomic_store(&t_, &value, to_gnu_store_memory_order(mo));
+        }
+    }
+
+    // these operations return the value prior to the result.
+    constexpr T fetch_add(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            auto old = t_;
+            T output;
+            (void)__builtin_add_overflow(t_, value, &output);
+            store(output);
+            return old;
+        } else /* constexpr */ {
+            return fetch_add(value, MO);
+        }
+    }
+    constexpr T fetch_add(T value, memory_order mo) {
+        if (mo == memory_order_unordered) {
+            auto old = t_;
+            T output;
+            (void)__builtin_add_overflow(t_, value, &output);
+            store(output, mo);
+            return old;
+        } else {
+            return __atomic_fetch_add(&t_, value, to_gnu_memory_order(mo));
+        }
+    }
+    constexpr T fetch_sub(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            auto old = t_;
+            T output;
+            (void)__builtin_sub_overflow(t_, value, &output);
+            store(output);
+            return old;
+        } else /* constexpr */ {
+            return fetch_sub(value, MO);
+        }
+    }
+    constexpr T fetch_sub(T value, memory_order mo) {
+        if (mo == memory_order_unordered) {
+            auto old = t_;
+            T output;
+            (void)__builtin_sub_overflow(t_, value, &output);
+            store(output, mo);
+            return old;
+        } else {
+            return __atomic_fetch_sub(&t_, value, to_gnu_memory_order(mo));
+        }
+    }
+    constexpr T fetch_and(T value, memory_order mo = MO) {
+        if (mo == memory_order_unordered) {
+            auto old = t_;
+            t_ &= value;
+            return old;
+        } else {
+            return __atomic_fetch_and(&t_, value, to_gnu_memory_order(mo));
+        }
+    }
+    constexpr T fetch_or(T value, memory_order mo = MO) {
+        if (mo == memory_order_unordered) {
+            auto old = t_;
+            t_ |= value;
+            return old;
+        } else {
+            return __atomic_fetch_or(&t_, value, to_gnu_memory_order(mo));
+        }
+    }
+    constexpr T fetch_xor(T value, memory_order mo = MO) {
+        if (mo == memory_order_unordered) {
+            auto old = t_;
+            t_ ^= value;
+            return old;
+        } else {
+            return __atomic_fetch_xor(&t_, value, to_gnu_memory_order(mo));
+        }
+    }
+
+    bool compare_exchange_weak(VT& expected, T desired, memory_order mo = MO) {
+        if (mo == memory_order_unordered) {
+            if (t_ == expected) {
+                t_= desired;
+                return true;
+            } else {
+                expected = t_;
+                return false;
+            }
+        } else {
+            return __atomic_compare_exchange(&t_,
+                    const_cast<T*>(&expected),  // builtin does not take volatile ptr.
+                    &desired,
+                    true /* weak */,
+                    to_gnu_memory_order(mo),
+                    to_gnu_load_memory_order(mo));
+        }
+    }
 
 private:
-    VT t_;
+    // align 8 byte long long/double on 8 bytes on x86.
+    VT t_ __attribute__((aligned(std::max(sizeof(VT), alignof(VT)))));
 };
+
+/**
+ * Helper method to accumulate floating point values to an atomic
+ * prior to C++23 support of atomic<float> atomic<double> accumulation.
+ *
+ * Note floating point has signed zero, nan, comparison issues.
+ */
+template <typename AccumulateType, typename ValueType>
+requires std::is_floating_point<AccumulateType>::value
+void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src,
+        std::memory_order order = std::memory_order_seq_cst) {
+    static_assert(std::atomic<AccumulateType>::is_always_lock_free);
+    AccumulateType expected;
+    do {
+        expected = dst;
+    } while (!dst.compare_exchange_weak(expected, expected + src, order));
+}
+
+template <typename AccumulateType, typename ValueType>
+requires std::is_integral<AccumulateType>::value
+void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src,
+        std::memory_order order = std::memory_order_seq_cst) {
+    dst.fetch_add(src, order);
+}
+
+template <typename AccumulateType, memory_order MemoryOrder, typename ValueType>
+requires std::is_floating_point<AccumulateType>::value
+void atomic_add_to(atomic<AccumulateType, MemoryOrder>& dst, ValueType src,
+        memory_order order = MemoryOrder) {
+    if (order == memory_order_unordered) {
+        dst += src;
+    } else {
+        AccumulateType expected;
+        do {
+            expected = dst;
+        } while (!dst.compare_exchange_weak(expected, expected + src, order));
+    }
+}
+
+template <typename AccumulateType, memory_order MemoryOrder, typename ValueType>
+requires std::is_integral<AccumulateType>::value
+void atomic_add_to(atomic<AccumulateType, MemoryOrder>& dst, ValueType src,
+        memory_order order = MemoryOrder) {
+    dst.fetch_add(src, order);
+}
 
 } // namespace android::audio_utils

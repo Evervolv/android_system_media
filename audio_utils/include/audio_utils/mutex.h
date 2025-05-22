@@ -456,7 +456,7 @@ inline constexpr pid_t kInvalidTid = -1;
 //
 // We used relaxed_atomic instead of std::atomic/memory_order_seq_cst here.
 template <typename T>
-using stats_atomic = relaxed_atomic<T>;
+using stats_atomic = atomic<T, memory_order_relaxed>;
 
 // thread_atomic is a single writer multiple reader object.
 //
@@ -466,7 +466,7 @@ using stats_atomic = relaxed_atomic<T>;
 //
 // We use unordered_atomic instead of std::atomic/memory_order_seq_cst here.
 template <typename T>
-using thread_atomic = unordered_atomic<T>;
+using thread_atomic = atomic<T, memory_order_unordered>;
 
 inline void compiler_memory_barrier() {
     // Reads or writes are not migrated or cached by the compiler across this barrier.
@@ -493,56 +493,10 @@ inline void compiler_memory_barrier() {
 inline void metadata_memory_barrier_if_needed() {
     // check the level of atomicity used for thread metadata to alter the
     // use of a barrier here.
-    if constexpr (std::is_same_v<thread_atomic<int32_t>, unordered_atomic<int32_t>>
-            || std::is_same_v<thread_atomic<int32_t>, relaxed_atomic<int32_t>>) {
+    if constexpr (std::is_same_v<thread_atomic<int32_t>, atomic<int32_t, memory_order_unordered>>
+            || std::is_same_v<thread_atomic<int32_t>, atomic<int32_t, memory_order_relaxed>>) {
         compiler_memory_barrier();
     }
-}
-
-/**
- * Helper method to accumulate floating point values to an atomic
- * prior to C++23 support of atomic<float> atomic<double> accumulation.
- */
-template <typename AccumulateType, typename ValueType>
-requires std::is_floating_point<AccumulateType>::value
-void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_seq_cst) {
-    static_assert(std::atomic<AccumulateType>::is_always_lock_free);
-    AccumulateType expected;
-    do {
-        expected = dst;
-    } while (!dst.compare_exchange_weak(expected, expected + src, order));
-}
-
-template <typename AccumulateType, typename ValueType>
-requires std::is_integral<AccumulateType>::value
-void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_seq_cst) {
-    dst.fetch_add(src, order);
-}
-
-template <typename AccumulateType, typename ValueType>
-requires std::is_floating_point<AccumulateType>::value
-void atomic_add_to(relaxed_atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_relaxed) {
-    AccumulateType expected;
-    do {
-        expected = dst;
-    } while (!dst.compare_exchange_weak(expected, expected + src, order));
-}
-
-template <typename AccumulateType, typename ValueType>
-requires std::is_integral<AccumulateType>::value
-void atomic_add_to(relaxed_atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_relaxed) {
-    dst.fetch_add(src, order);
-}
-
-template <typename AccumulateType, typename ValueType>
-void atomic_add_to(unordered_atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_relaxed) {
-    (void)order; // unused
-    dst = dst + src;
 }
 
 /**
