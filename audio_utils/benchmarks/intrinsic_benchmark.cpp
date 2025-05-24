@@ -17,6 +17,7 @@
 #include <array>
 #include <climits>
 #include <cstdlib>
+#include <functional>
 #include <random>
 #include <vector>
 

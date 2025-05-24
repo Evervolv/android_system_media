@@ -18,6 +18,7 @@
 #define ANDROID_AUDIO_UTILS_INTRINSIC_UTILS_H
 
 #include <array>  // std::size
+#include <cstdlib>  // std::abs
 #include <type_traits>
 #include "template_utils.h"
 

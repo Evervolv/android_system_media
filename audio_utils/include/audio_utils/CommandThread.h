@@ -17,6 +17,7 @@
 #pragma once
 
 #include <deque>
+#include <functional>
 #include <mutex>
 #include <thread>
 #include <audio_utils/mutex.h>

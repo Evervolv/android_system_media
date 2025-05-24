@@ -17,10 +17,13 @@
 #pragma once
 #include <utils/Log.h>
 
+#include <atomic>
+
 #pragma push_macro("LOG_TAG")
 #undef LOG_TAG
 #define LOG_TAG "audio_utils::atomic"
 
+#include <algorithm>
 #include <atomic>
 
 namespace android::audio_utils {
@@ -349,3 +352,5 @@ void atomic_add_to(atomic<AccumulateType, MemoryOrder>& dst, ValueType src,
 }
 
 } // namespace android::audio_utils
+
+#pragma pop_macro("LOG_TAG")

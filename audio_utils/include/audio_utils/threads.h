@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <bitset>
+#include <sched.h>         // CPU_SETSIZE
 #include <sys/syscall.h>   // SYS_gettid
 #include <unistd.h>        // bionic gettid
 #include <utils/Errors.h>  // status_t
