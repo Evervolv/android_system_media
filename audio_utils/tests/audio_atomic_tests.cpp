@@ -36,6 +36,12 @@ static_assert(atomic<int, memory_order_unordered>(1).operator&=(1) == 1);
 static_assert(atomic<int, memory_order_unordered>(1).operator|=(1) == 1);
 static_assert(atomic<int, memory_order_unordered>(1).operator^=(1) == 0);
 
+// min/max ops
+static_assert(atomic<int, memory_order_unordered>(1).min(2, memory_order_unordered) == 1);
+static_assert(atomic<int, memory_order_unordered>(3).min(2, memory_order_unordered) == 2);
+static_assert(atomic<int, memory_order_unordered>(1).max(2, memory_order_unordered) == 2);
+static_assert(atomic<int, memory_order_unordered>(3).max(2, memory_order_unordered) == 3);
+
 // overflow
 static_assert(atomic<int, memory_order_unordered>(INT_MAX).operator+=(INT_MAX)
          == (INT_MAX << 1));
@@ -79,6 +85,72 @@ TEST(audio_atomic_tests, add_seq_cst) {
     testAdd<memory_order_seq_cst>();
 }
 
+template <android::audio_utils::memory_order MO>
+void testMin() {
+    constexpr size_t kNumThreads = 10;
+    std::vector<std::thread> threads;
+    atomic<size_t, MO> value = INT32_MAX;
+
+    for (size_t i = 0; i < kNumThreads; ++i) {
+        threads.emplace_back([&value, i] {
+            value.min(i);
+        });
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
+    EXPECT_EQ(value, 0UL);
+}
+
+TEST(audio_atomic_tests, min_relaxed) {
+testMin<memory_order_relaxed>();
+}
+TEST(audio_atomic_tests, min_acquire) {
+testMin<memory_order_acquire>();
+}
+TEST(audio_atomic_tests, min_release) {
+testMin<memory_order_release>();
+}
+TEST(audio_atomic_tests, min_acq_rel) {
+testMin<memory_order_acq_rel>();
+}
+TEST(audio_atomic_tests, min_seq_cst) {
+testMin<memory_order_seq_cst>();
+}
+
+template <android::audio_utils::memory_order MO>
+void testMax() {
+    constexpr size_t kNumThreads = 10;
+    std::vector<std::thread> threads;
+    atomic<size_t, MO> value = 0;
+
+    for (size_t i = 0; i < kNumThreads; ++i) {
+        threads.emplace_back([&value, i] {
+            value.max(i);
+        });
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
+    EXPECT_EQ(value, kNumThreads - 1);
+}
+
+TEST(audio_atomic_tests, max_relaxed) {
+testMax<memory_order_relaxed>();
+}
+TEST(audio_atomic_tests, max_acquire) {
+testMax<memory_order_acquire>();
+}
+TEST(audio_atomic_tests, max_release) {
+testMax<memory_order_release>();
+}
+TEST(audio_atomic_tests, max_acq_rel) {
+testMax<memory_order_acq_rel>();
+}
+TEST(audio_atomic_tests, max_seq_cst) {
+testMax<memory_order_seq_cst>();
+}
+
 template <typename T, android::audio_utils::memory_order MO>
 void testOp() {
     size_t kTrials = 1000;
@@ -114,6 +186,16 @@ void testOp() {
         r = dis(gen);
         value ^= r;
         avalue ^= r;
+        EXPECT_EQ(value, avalue);
+
+        r = dis(gen);
+        value  = std::min(value, r);
+        avalue.min(r);
+        EXPECT_EQ(value, avalue);
+
+        r = dis(gen);
+        value  = std::max(value, r);
+        avalue.max(r);
         EXPECT_EQ(value, avalue);
     }
 }

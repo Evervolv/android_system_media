@@ -525,8 +525,8 @@ struct mutex_stat {
     template <typename WaitTimeType>
     void add_wait_time(WaitTimeType wait_ns) {
         AccumulatorType value_ns = wait_ns;
-        atomic_add_to(wait_sum_ns, value_ns);
-        atomic_add_to(wait_sumsq_ns, value_ns * value_ns);
+        (void) wait_sum_ns.fetch_add(value_ns);
+        (void) wait_sumsq_ns.fetch_add(value_ns * value_ns);
     }
 
     std::string to_string() const {

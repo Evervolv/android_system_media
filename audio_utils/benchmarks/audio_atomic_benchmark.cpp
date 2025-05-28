@@ -30,42 +30,52 @@ $ atest audio_atomic_benchmark
 
 Benchmark                                             Time             CPU   Iterations
 ---------------------------------------------------------------------------------------
-BM_std_atomic_add_equals<int32_t>                  6.08 ns         6.05 ns    110640147
-BM_std_atomic_add_to_relaxed<int16_t>              4.74 ns         4.72 ns    148511326
-BM_std_atomic_add_to_relaxed<int32_t>              4.74 ns         4.72 ns    148343747
-BM_std_atomic_add_to_relaxed<int64_t>              4.73 ns         4.71 ns    148560293
-BM_std_atomic_add_to_relaxed<float>                10.1 ns         10.1 ns     69656453
-BM_std_atomic_add_to_relaxed<double>               10.1 ns         10.1 ns     69111694
-BM_std_atomic_add_to_seq_cst<int16_t>              6.15 ns         6.12 ns    113981457
-BM_std_atomic_add_to_seq_cst<int32_t>              6.14 ns         6.11 ns    114541314
-BM_std_atomic_add_to_seq_cst<int64_t>              6.15 ns         6.12 ns    114542833
-BM_std_atomic_add_to_seq_cst<float>                10.2 ns         10.2 ns     68650295
-BM_std_atomic_add_to_seq_cst<double>               10.2 ns         10.2 ns     68695088
-BM_atomic_add_to_unordered<int16_t>               0.324 ns        0.322 ns   2170285304
-BM_atomic_add_to_unordered<int32_t>               0.325 ns        0.324 ns   2165224174
-BM_atomic_add_to_unordered<int64_t>               0.325 ns        0.323 ns   2166623969
-BM_atomic_add_to_unordered<float>                 0.650 ns        0.646 ns   1080684524
-BM_atomic_add_to_unordered<double>                0.648 ns        0.646 ns   1083652559
-BM_atomic_add_to_unordered<volatile_int16_t>       1.97 ns         1.97 ns    355375324
-BM_atomic_add_to_unordered<volatile_int32_t>       1.97 ns         1.96 ns    357236012
-BM_atomic_add_to_unordered<volatile_int64_t>       1.97 ns         1.96 ns    357296847
-BM_atomic_add_to_unordered<volatile_float>         2.73 ns         2.72 ns    257564754
-BM_atomic_add_to_unordered<volatile_double>        2.73 ns         2.72 ns    257254223
-BM_atomic_add_to_relaxed<int16_t>                  4.66 ns         4.64 ns    150588767
-BM_atomic_add_to_relaxed<int32_t>                  4.63 ns         4.59 ns    152128364
-BM_atomic_add_to_relaxed<int64_t>                  4.66 ns         4.64 ns    150650980
-BM_atomic_add_to_relaxed<float>                    8.34 ns         8.30 ns     84584618
-BM_atomic_add_to_relaxed<double>                   8.19 ns         8.16 ns     90196988
-BM_atomic_add_to_acq_rel<int16_t>                  6.08 ns         6.06 ns    115712285
-BM_atomic_add_to_acq_rel<int32_t>                  6.09 ns         6.07 ns    115737507
-BM_atomic_add_to_acq_rel<int64_t>                  6.08 ns         6.05 ns    115364041
-BM_atomic_add_to_acq_rel<float>                    8.42 ns         8.40 ns     83578269
-BM_atomic_add_to_acq_rel<double>                   7.94 ns         7.90 ns     83344879
-BM_atomic_add_to_seq_cst<int16_t>                  6.08 ns         6.05 ns    115703258
-BM_atomic_add_to_seq_cst<int32_t>                  6.09 ns         6.06 ns    115860124
-BM_atomic_add_to_seq_cst<int64_t>                  6.08 ns         6.06 ns    115305035
-BM_atomic_add_to_seq_cst<float>                    8.44 ns         8.40 ns     83275488
-BM_atomic_add_to_seq_cst<double>                   8.42 ns         8.39 ns     83474250
+BM_std_atomic_add_equals<int32_t>                  6.09 ns         6.06 ns    111837415
+BM_std_atomic_add_to_relaxed<int16_t>              4.73 ns         4.71 ns    148254244
+BM_std_atomic_add_to_relaxed<int32_t>              4.74 ns         4.72 ns    148431804
+BM_std_atomic_add_to_relaxed<int64_t>              4.73 ns         4.72 ns    148325212
+BM_std_atomic_add_to_relaxed<float>                8.43 ns         8.40 ns     83275005
+BM_std_atomic_add_to_relaxed<double>               8.44 ns         8.41 ns     83175275
+BM_std_atomic_add_to_seq_cst<int16_t>              6.15 ns         6.12 ns    114333415
+BM_std_atomic_add_to_seq_cst<int32_t>              6.14 ns         6.12 ns    114419640
+BM_std_atomic_add_to_seq_cst<int64_t>              6.14 ns         6.12 ns    114268405
+BM_std_atomic_add_to_seq_cst<float>                8.24 ns         8.22 ns     84437565
+BM_std_atomic_add_to_seq_cst<double>               8.25 ns         8.22 ns     85743036
+BM_atomic_add_to_unordered<int16_t>               0.324 ns        0.323 ns   2164817147
+BM_atomic_add_to_unordered<int32_t>               0.324 ns        0.323 ns   2165111368
+BM_atomic_add_to_unordered<int64_t>               0.324 ns        0.323 ns   2166007205
+BM_atomic_add_to_unordered<float>                 0.650 ns        0.647 ns   1082261791
+BM_atomic_add_to_unordered<double>                0.649 ns        0.647 ns   1084858584
+BM_atomic_add_to_unordered<volatile_int16_t>       1.97 ns         1.97 ns    356078819
+BM_atomic_add_to_unordered<volatile_int32_t>       1.97 ns         1.97 ns    356752252
+BM_atomic_add_to_unordered<volatile_int64_t>       1.97 ns         1.97 ns    355550844
+BM_atomic_add_to_unordered<volatile_float>         2.73 ns         2.72 ns    257345858
+BM_atomic_add_to_unordered<volatile_double>        2.73 ns         2.72 ns    257569407
+BM_atomic_add_to_relaxed<int16_t>                  4.66 ns         4.64 ns    150820948
+BM_atomic_add_to_relaxed<int32_t>                  4.66 ns         4.65 ns    150876792
+BM_atomic_add_to_relaxed<int64_t>                  4.66 ns         4.65 ns    150875922
+BM_atomic_add_to_relaxed<float>                    8.59 ns         8.57 ns     81660591
+BM_atomic_add_to_relaxed<double>                   8.59 ns         8.57 ns     81708337
+BM_atomic_add_to_acq_rel<int16_t>                  6.09 ns         6.07 ns    115522143
+BM_atomic_add_to_acq_rel<int32_t>                  6.09 ns         6.07 ns    115954305
+BM_atomic_add_to_acq_rel<int64_t>                  6.09 ns         6.07 ns    115475851
+BM_atomic_add_to_acq_rel<float>                    8.31 ns         8.28 ns     84750753
+BM_atomic_add_to_acq_rel<double>                   8.33 ns         8.31 ns     84298009
+BM_atomic_add_to_seq_cst<int16_t>                  6.08 ns         6.06 ns    115819800
+BM_atomic_add_to_seq_cst<int32_t>                  6.09 ns         6.07 ns    115277139
+BM_atomic_add_to_seq_cst<int64_t>                  6.09 ns         6.06 ns    115215686
+BM_atomic_add_to_seq_cst<float>                    8.37 ns         8.35 ns     84116069
+BM_atomic_add_to_seq_cst<double>                   8.35 ns         8.32 ns     83978265
+BM_atomic_min_unordered<int16_t>                  0.324 ns        0.323 ns   2162398052
+BM_atomic_min_unordered<int32_t>                  0.325 ns        0.324 ns   2167766537
+BM_atomic_min_unordered<int64_t>                  0.324 ns        0.323 ns   2166667968
+BM_atomic_min_unordered<float>                    0.325 ns        0.324 ns   2167960175
+BM_atomic_min_unordered<double>                   0.325 ns        0.324 ns   2167053545
+BM_atomic_min_seq_cst<int16_t>                     11.5 ns         11.5 ns     61168869
+BM_atomic_min_seq_cst<int32_t>                     10.3 ns         10.2 ns     68411173
+BM_atomic_min_seq_cst<int64_t>                     10.2 ns         10.2 ns     68716761
+BM_atomic_min_seq_cst<float>                       10.6 ns         10.6 ns     66304219
+BM_atomic_min_seq_cst<double>                      10.5 ns         10.5 ns     66700397
 
 */
 
@@ -78,7 +88,6 @@ static void BM_std_atomic_add_equals(benchmark::State &state) {
     while (state.KeepRunning()) {
         dst += i;
     }
-    LOG(DEBUG) << __func__ << "  " << dst.load();
 }
 
 BENCHMARK(BM_std_atomic_add_equals<int32_t>);
@@ -88,9 +97,8 @@ static void BM_atomic_add_to(benchmark::State &state) {
     int64_t i64 = 10;
     android::audio_utils::atomic<T, MO> dst;
     while (state.KeepRunning()) {
-        android::audio_utils::atomic_add_to(dst, i64, MO);
+        dst.fetch_add(i64, MO);
     }
-    LOG(DEBUG) << __func__ << "  " << dst.load();
 }
 
 template <typename T>
@@ -98,9 +106,8 @@ static void BM_std_atomic_add_to(benchmark::State &state, std::memory_order orde
     int64_t i64 = 10;
     std::atomic<T> dst;
     while (state.KeepRunning()) {
-        android::audio_utils::atomic_add_to(dst, i64, order);
+        dst.fetch_add(i64, order);
     }
-    LOG(DEBUG) << __func__ << "  " << dst.load();
 }
 
 template <typename T>
@@ -181,5 +188,36 @@ BENCHMARK(BM_atomic_add_to_seq_cst<int32_t>);
 BENCHMARK(BM_atomic_add_to_seq_cst<int64_t>);
 BENCHMARK(BM_atomic_add_to_seq_cst<float>);
 BENCHMARK(BM_atomic_add_to_seq_cst<double>);
+
+template <typename T, android::audio_utils::memory_order MO>
+static void BM_atomic_min(benchmark::State &state) {
+    int64_t i64 = 10;
+    android::audio_utils::atomic<T, MO> dst;
+    while (state.KeepRunning()) {
+        dst.min(i64, MO);  // MO is optional, as same as atomic decl.
+    }
+}
+
+template <typename T>
+static void BM_atomic_min_unordered(benchmark::State &state) {
+    BM_atomic_min<T, android::audio_utils::memory_order_unordered>(state);
+}
+
+BENCHMARK(BM_atomic_min_unordered<int16_t>);
+BENCHMARK(BM_atomic_min_unordered<int32_t>);
+BENCHMARK(BM_atomic_min_unordered<int64_t>);
+BENCHMARK(BM_atomic_min_unordered<float>);
+BENCHMARK(BM_atomic_min_unordered<double>);
+
+template <typename T>
+static void BM_atomic_min_seq_cst(benchmark::State &state) {
+    BM_atomic_min<T, android::audio_utils::memory_order_seq_cst>(state);
+}
+
+BENCHMARK(BM_atomic_min_seq_cst<int16_t>);
+BENCHMARK(BM_atomic_min_seq_cst<int32_t>);
+BENCHMARK(BM_atomic_min_seq_cst<int64_t>);
+BENCHMARK(BM_atomic_min_seq_cst<float>);
+BENCHMARK(BM_atomic_min_seq_cst<double>);
 
 BENCHMARK_MAIN();

@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <functional>
 
 namespace android::audio_utils {
 
@@ -209,12 +210,61 @@ public:
         }
     }
 
+    constexpr T apply(const std::function<T(T)>& f, memory_order mo = MO) {
+        if (mo == memory_order_unordered) {
+            return t_ = f(t_);
+        } else {
+            T expected, result;
+            do {
+                expected = t_;
+                result = f(expected);
+            } while (!compare_exchange_weak(expected, result, mo));
+            return result;
+        }
+    }
+
+    constexpr T max(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            return t_ = std::max(t_, value);
+        } else /* constexpr */ {
+            return max(value, MO);
+        }
+    }
+
+    constexpr T max(T value, memory_order mo) {
+        if (mo == memory_order_unordered) {
+            return t_ = std::max(t_, value);
+        } else {
+            return apply([value](T a) -> T { return std::max(value, a); }, mo);
+        }
+    }
+
+    constexpr T min(T value) {
+        if constexpr (MO == memory_order_unordered) {
+            return t_ = std::min(t_, value);
+        } else /* constexpr */ {
+            return min(value, MO);
+        }
+    }
+
+    constexpr T min(T value, memory_order mo) {
+        if (mo == memory_order_unordered) {
+            return t_ = std::min(t_, value);
+        } else {
+            return apply([value](T a) -> T { return std::min(value, a); }, mo);
+        }
+    }
+
     // these operations return the value prior to the result.
     constexpr T fetch_add(T value) {
         if constexpr (MO == memory_order_unordered) {
             auto old = t_;
             T output;
-            (void)__builtin_add_overflow(t_, value, &output);
+            if constexpr (std::is_floating_point_v<T>) {
+                output = t_ + value;
+            } else /* constexpr */ {
+                (void)__builtin_add_overflow(t_, value, &output);
+            }
             store(output);
             return old;
         } else /* constexpr */ {
@@ -225,7 +275,11 @@ public:
         if (mo == memory_order_unordered) {
             auto old = t_;
             T output;
-            (void)__builtin_add_overflow(t_, value, &output);
+            if constexpr (std::is_floating_point_v<T>) {
+                output = t_ + value;
+            } else /* constexpr */ {
+                (void)__builtin_add_overflow(t_, value, &output);
+            }
             store(output, mo);
             return old;
         } else {
@@ -236,7 +290,11 @@ public:
         if constexpr (MO == memory_order_unordered) {
             auto old = t_;
             T output;
-            (void)__builtin_sub_overflow(t_, value, &output);
+            if constexpr (std::is_floating_point_v<T>) {
+                output = t_ - value;
+            } else /* constexpr */ {
+                (void)__builtin_sub_overflow(t_, value, &output);
+            }
             store(output);
             return old;
         } else /* constexpr */ {
@@ -247,7 +305,11 @@ public:
         if (mo == memory_order_unordered) {
             auto old = t_;
             T output;
-            (void)__builtin_sub_overflow(t_, value, &output);
+            if constexpr (std::is_floating_point_v<T>) {
+                output = t_ - value;
+            } else /* constexpr */ {
+                (void)__builtin_sub_overflow(t_, value, &output);
+            }
             store(output, mo);
             return old;
         } else {
@@ -305,51 +367,6 @@ private:
     // align 8 byte long long/double on 8 bytes on x86.
     VT t_ __attribute__((aligned(std::max(sizeof(VT), alignof(VT)))));
 };
-
-/**
- * Helper method to accumulate floating point values to an atomic
- * prior to C++23 support of atomic<float> atomic<double> accumulation.
- *
- * Note floating point has signed zero, nan, comparison issues.
- */
-template <typename AccumulateType, typename ValueType>
-requires std::is_floating_point<AccumulateType>::value
-void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_seq_cst) {
-    static_assert(std::atomic<AccumulateType>::is_always_lock_free);
-    AccumulateType expected;
-    do {
-        expected = dst;
-    } while (!dst.compare_exchange_weak(expected, expected + src, order));
-}
-
-template <typename AccumulateType, typename ValueType>
-requires std::is_integral<AccumulateType>::value
-void atomic_add_to(std::atomic<AccumulateType> &dst, ValueType src,
-        std::memory_order order = std::memory_order_seq_cst) {
-    dst.fetch_add(src, order);
-}
-
-template <typename AccumulateType, memory_order MemoryOrder, typename ValueType>
-requires std::is_floating_point<AccumulateType>::value
-void atomic_add_to(atomic<AccumulateType, MemoryOrder>& dst, ValueType src,
-        memory_order order = MemoryOrder) {
-    if (order == memory_order_unordered) {
-        dst += src;
-    } else {
-        AccumulateType expected;
-        do {
-            expected = dst;
-        } while (!dst.compare_exchange_weak(expected, expected + src, order));
-    }
-}
-
-template <typename AccumulateType, memory_order MemoryOrder, typename ValueType>
-requires std::is_integral<AccumulateType>::value
-void atomic_add_to(atomic<AccumulateType, MemoryOrder>& dst, ValueType src,
-        memory_order order = MemoryOrder) {
-    dst.fetch_add(src, order);
-}
 
 } // namespace android::audio_utils
 
