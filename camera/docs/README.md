@@ -8,11 +8,11 @@ C code, Java code, and even XML itself (as a round-trip validity check).
 
 ## Dependencies
 * Python 2.7.x+
-* Beautiful Soup 4+ - HTML/XML parser, used to parse `metadata_definitions.xml`
-* Mako 0.7+         - Template engine, needed to do file generation.
-* Markdown 2.1+     - Plain text to HTML converter, for docs formatting.
-* Tidy              - Cleans up the XML/HTML files.
-* XML Lint          - Validates XML against XSD schema.
+* Beautiful Soup 4.13.x+ - HTML/XML parser, used to parse `metadata_definitions.xml`
+* Mako 0.7+              - Template engine, needed to do file generation.
+* Markdown 2.1+          - Plain text to HTML converter, for docs formatting.
+* Tidy                   - Cleans up the XML/HTML files.
+* XML Lint               - Validates XML against XSD schema.
 
 ## Quick Setup (Debian Rodete):
 NOTE: Debian (and most Linux distros) no longer package Python 2.

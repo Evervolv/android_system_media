@@ -24,8 +24,6 @@ import markdown
 import textwrap
 import sys
 import bs4
-# Monkey-patch BS4. WBR element must not have an end tag.
-bs4.builder.HTMLTreeBuilder.empty_element_tags.add("wbr")
 
 from collections import OrderedDict, defaultdict
 from operator import itemgetter

@@ -4198,10 +4198,6 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
             and android.sensor.frameDuration. The overridden fields for a
             given capture will be available in its CaptureResult.
           </details>
-          <hal_details>
-          The total sensitivity applied for SENSOR_SENSITIVITY_PRIORITY should not be
-          adjusted by any HAL applied android.control.postRawSensitivityBoost.
-          </hal_details>
         </entry>
       </controls>
       <dynamic>
