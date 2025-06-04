@@ -4124,7 +4124,7 @@ xsi:schemaLocation="http://schemas.android.com/service/camera/metadata/ metadata
           <details>
             If set to AUTO, the camera device detects which capture request key the application uses
             to do zoom, android.scaler.cropRegion or android.control.zoomRatio. If
-            the application doesn't set android.scaler.zoomRatio or sets it to 1.0 in the capture
+            the application doesn't set android.control.zoomRatio or sets it to 1.0 in the capture
             request, the effective zoom level is reflected in android.scaler.cropRegion in capture
             results. If android.control.zoomRatio is set to values other than 1.0, the effective
             zoom level is reflected in android.control.zoomRatio. AUTO is the default value
